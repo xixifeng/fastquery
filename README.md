@@ -94,7 +94,7 @@ jdk1.8+
     }
 ]
 ```
-## 一个完整的入门例子
+##一个完整的入门例子
 - 准备一个实体
 <pre>
 public class Student
@@ -124,4 +124,11 @@ public interface StudentDBService extends QueryRepository {
  JSONArray jsonArray = studentDBService.findAll();
  Student[] students = studentDBService.find(); 
 </pre>
-## 文档陆续更新,敬请关注
+
+##查
+```
+
+```
+
+##联系作者
+fastquery#126.com
