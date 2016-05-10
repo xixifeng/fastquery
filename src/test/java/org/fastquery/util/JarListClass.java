@@ -69,9 +69,9 @@ public class JarListClass {
 				e.printStackTrace();
 			} finally {
 				try {
-					if(jar!=null){
+					//if(jar!=null){
 						jar.close();	
-					}
+					//}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
