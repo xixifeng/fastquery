@@ -132,7 +132,7 @@ public class QueryProcess {
 		// yyyyyyyyyyyyyyyyyyyyyyy
 		if(autoIncKey == -1) {
 			// 没有获得主键值
-			LOG.info("通过stat.getGeneratedKeys没有获得主键,将在方法参数里找");
+			LOG.debug("通过stat.getGeneratedKeys没有获得主键,将在方法参数里找");
 			int index = TypeUtil.findId(method.getParameters());
 			if( index != -1 ) {
 				if(method.getParameters()[index].getType() != String.class) {
