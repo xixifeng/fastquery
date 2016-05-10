@@ -115,7 +115,7 @@ public interface StudentDBService extends QueryRepository {
 	@Query("select * from student s where s.sex=?1 and s.age > ?2")
 	JSONArray findBySex(String sex,Integer age);
 	
-	// 查询返回List Map 暂不支持,敬请期待.
+	// 查询返回List Map 暂不支持,敬请期待.或使用 JSONArray
 	//@Query("select * from student s where s.sex=?1 and s.age > ?2")
 	//List<Map<String, Object>> findBySex2(String sex,Integer age);
 	
