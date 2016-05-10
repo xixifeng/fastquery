@@ -189,10 +189,10 @@ public class StudentDBServiceTest {
 
 	@Test
 	public void findBySex3(){
-		List<Map<String, Object>> maps = studentDBService.findBySex2("男", 18);
+/*		List<Map<String, Object>> maps = studentDBService.findBySex2("男", 18);
 		maps.forEach(m -> m.forEach((k,v)-> {
 			LOG.debug(k+" : " + v);
-		}) );
+		}) );*/
 	}
 
 	@Ignore

@@ -115,9 +115,9 @@ public interface StudentDBService extends QueryRepository {
 	@Query("select * from student s where s.sex=?1 and s.age > ?2")
 	JSONArray findBySex(String sex,Integer age);
 	
-	// 查询返回List Map
-	@Query("select * from student s where s.sex=?1 and s.age > ?2")
-	List<Map<String, Object>> findBySex2(String sex,Integer age);
+	// 查询返回List Map 暂不支持,敬请期待.
+	//@Query("select * from student s where s.sex=?1 and s.age > ?2")
+	//List<Map<String, Object>> findBySex2(String sex,Integer age);
 	
 	
 	void updatesx(Integer[] i1,Integer[] i2,Integer[] i3);
@@ -145,7 +145,7 @@ public interface StudentDBService extends QueryRepository {
 	JSONObject saveUserInfo2(String name,Integer age);
 	
 
-	@Modifying
+	@Modifying(table="userinfo")
 	@Query("insert into #{#table} (name,age) values (?1, ?2)")
 	int saveUserInfo3(String name,Integer age);
 	
