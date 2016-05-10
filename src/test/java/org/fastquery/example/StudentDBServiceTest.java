@@ -24,6 +24,7 @@ package org.fastquery.example;
 
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -71,7 +72,7 @@ public class StudentDBServiceTest {
 	//int update(String no,String name,int age)
 	@Test
 	public void update() {
-		int seffot = studentDBService.update("9512101", "大用", 17);
+		int seffot = studentDBService.update("9512101", "小不点", 17);
 		assertThat(seffot, is(1));
 	}
 
@@ -152,7 +153,7 @@ public class StudentDBServiceTest {
 	public void testAdd(){
 		String no = String.valueOf(System.currentTimeMillis()).substring(6);
 		// '9513101', '王陵', '男', '23', '计算机系'
-		int  effect = studentDBService.add(no,"小张", "男", 23, "计算机系");
+		int  effect = studentDBService.add(no,"小蚂蚁", "男", 6, "爬行动物");
 		assertThat(effect, is(1));
 		
 		// 测试删除
@@ -162,7 +163,7 @@ public class StudentDBServiceTest {
 	
 	
 	@Test
-	public void testFindBySex(){
+	public void testFindBySex1(){
 		Student[] students = studentDBService.findBySex(10,"男");
 		int len = students.length;
 		if(len>=3) {
@@ -177,7 +178,7 @@ public class StudentDBServiceTest {
 	
 	@Test
 	public void testFindBySex2(){
-		JSONArray students = studentDBService.findBySex("男", 22);
+		JSONArray students = studentDBService.findBySex("男", 18);
 		if(students.size()>=3) {
 			LOG.debug( JSON.toJSONString(students.subList(0, 3), true) );
 		} else {
@@ -185,7 +186,14 @@ public class StudentDBServiceTest {
 		}
 		LOG.debug(studentDBService);
 	}
-	
+
+	@Test
+	public void findBySex3(){
+		List<Map<String, Object>> maps = studentDBService.findBySex2("男", 18);
+		maps.forEach(m -> m.forEach((k,v)-> {
+			LOG.debug(k+" : " + v);
+		}) );
+	}
 
 	@Ignore
 	@Test

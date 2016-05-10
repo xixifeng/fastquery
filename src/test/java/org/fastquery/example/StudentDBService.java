@@ -22,6 +22,7 @@
 
 package org.fastquery.example;
 
+import java.util.List;
 import java.util.Map;
 
 import org.fastquery.core.Id;
@@ -56,11 +57,11 @@ public interface StudentDBService extends QueryRepository {
 	// 形参: int a,double b,long c,short d,byte e,boolean f,char g,float h
 	// 实参: int a=1; double b=2;long c=3;short d=4;byte e=5;boolean f=true;char g=7;float h=8;
 	@Query("update student s set s.age=?3,s.name=?2 where  s.no=?1")
-	@Modifying(id="no",table="student")
+	@Modifying
 	int update(String no,String name,int age);
 	
 	@Query("update student s set s.age=?2 where  s.no=?1")
-	@Modifying(id="no",table="student")
+	@Modifying
 	int update(String no,int age);
 	
 	@Before(MyBeforeFilter1.class)
@@ -95,23 +96,29 @@ public interface StudentDBService extends QueryRepository {
 	
 	// 增
 	@Query("insert into student (no, name, sex, age, dept) values (?1, ?2, ?3, ?4, ?5)")
-	@Modifying(id="no",table="student")
+	@Modifying
 	int add(String no,String name,String sex,int age,String dept);
 	
 	// 注意:SQL别名删除
-	// 参考,http://blog.csdn.net/chs_jdmdr/article/details/46708917
 	// 删
 	@Query("delete s from student as s where s.no =  ?1") // 根据编号删除
-	@Modifying(id="no",table="student")
+	@Modifying
 	int deleteByNo(String no);
 	
 	// select * from student s where s.sex='男'  and s.age > 22
 	
+	// 查询返回数组格式
 	@Query("select no as no,name,sex,age,dept from student s where s.sex=?2 and s.age > ?1")
 	Student[] findBySex(Integer age,String sex);
 	
+	// 查询返回JSON格式
 	@Query("select * from student s where s.sex=?1 and s.age > ?2")
 	JSONArray findBySex(String sex,Integer age);
+	
+	// 查询返回List Map
+	@Query("select * from student s where s.sex=?1 and s.age > ?2")
+	List<Map<String, Object>> findBySex2(String sex,Integer age);
+	
 	
 	void updatesx(Integer[] i1,Integer[] i2,Integer[] i3);
 	
@@ -138,7 +145,7 @@ public interface StudentDBService extends QueryRepository {
 	JSONObject saveUserInfo2(String name,Integer age);
 	
 
-	@Modifying(id="id",table="userinfo")
+	@Modifying
 	@Query("insert into #{#table} (name,age) values (?1, ?2)")
 	int saveUserInfo3(String name,Integer age);
 	
