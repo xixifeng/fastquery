@@ -170,6 +170,13 @@ List<Map<String, Object>> findBySex2(String sex,Integer age);
 Student[] findAllStudent(... ...);
 ```
 
+## count
+
+```java
+@Query("select count(no) from student")
+long count();
+```
+
 ##改操作
 ```java
 @Query("update student s set s.age=?3,s.name=?2 where  s.no=?1")
