@@ -110,25 +110,22 @@ public class Student
 ```
 
 - DAO接口
-<pre>
+
+```java
 public interface StudentDBService extends QueryRepository {
     @Query("select * from student")
     JSONArray findAll();
     @Query("select * from student")
     Student[] find();      
 }
-</pre>
+```
 
 - 使用DAO接口.
-<pre>
+
+```java
  StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
  JSONArray jsonArray = studentDBService.findAll();
  Student[] students = studentDBService.find(); 
-</pre>
-
-##查
-```
-
 ```
 
 ##联系作者
