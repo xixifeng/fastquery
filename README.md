@@ -100,6 +100,7 @@ jdk1.8+
 ```
 public class Student
 {
+
       private String no;
       private String name;
       private String sex;
