@@ -125,7 +125,6 @@ jdk1.8+
 ```java
  // get porxy impl
  StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
- 
  // call findAll
  JSONArray jsonArray = studentDBService.findAll();
  // call find
