@@ -156,6 +156,33 @@ JSONArray findBySex(String sex,Integer age);
 List<Map<String, Object>> findBySex2(String sex,Integer age);
 ```
 
+##改操作
+```java
+@Query("update student s set s.age=?3,s.name=?2 where  s.no=?1")
+@Modifying
+int update(String no,String name,int age); // 返回修改之后所影响的行数
+	
+@Query("update student s set s.age=?2 where  s.no=?1")
+@Modifying
+int update(String no,int age);
+
+// 返回当前保存的数据 以Map格式返回
+@Modifying(id="id",table="userinfo")
+@Query("insert into #{#table} (name,age) values (?1, ?2)")
+Map<String, Object> addUserInfo(String name,Integer age);
+
+// 返回当前保存的数据 以JSON格式返回
+@Modifying(id="id",table="userinfo")
+@Query("insert into #{#table} (name,age) values (?1, ?2)")
+JSONObject saveUserInfo2(String name,Integer age);
+
+// 返回当前保存的数据的主键信息.
+@Modifying(id="id",table="userinfo")
+@Query("insert into #{#table} (name,age) values (?1, ?2)")
+Primarykey saveUserInfo(String name,Integer age);
+
+```
+
 ##动态条件查询
 ```java
 @Query("select * from Student #{#where} order by age desc")
