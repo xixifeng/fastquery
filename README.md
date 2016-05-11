@@ -5,7 +5,7 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.做为一�
 2. 采用ASM动态生成字节码,因此支持编译前预处理,可最大限度减少运行期的错误.显著提升程序的强壮性.
 3. 支持安全查询,防止SQL注入.
 4. 支持与主流连接池框架集成,如集成c3p0,dbcp等等
-5. 支持 **@Query** 查询,使用 **@Condition**,可实现动态 where 条件查询.
+5. 支持 **@Query** 查询,使用 **@Condition**,可实现动态 `where` 条件查询.
 6. 查询结果集支持JSON类型
 7. 支持AOP,注入拦截只需简单几个注解,如: **@Before** , **@After**
 
@@ -15,7 +15,8 @@ jdk1.8+
 ##配置文件
 ###jdbc-config.xml
 用来配置支持jdbc. 注意:如果采用连接池,该配置文件可以不要.
-```
+
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <jdbc-config>  
         <!-- 配置第一个数据源 -->
@@ -35,9 +36,11 @@ jdk1.8+
     </named-config>
 </jdbc-config>
 ```
+
 ###c3p0-config.xml
 支持c3p0配置,详情配置请参照c3p0官网的说明: http://www.mchange.com/projects/c3p0/.
-```
+
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <c3p0-config>  
     <!--
@@ -67,6 +70,7 @@ jdk1.8+
         </named-config> 
 </c3p0-config>
 ```
+
 ### fastquery.json
 配置数据源的作用范围
 
