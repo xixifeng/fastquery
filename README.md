@@ -170,5 +170,39 @@ List<Map<String, Object>> findBySex2(String sex,Integer age);
 Student[] findAllStudent(... ...);
 ```
 
+### BeforeFilter
+- 准备一个BeforeFilter
+
+```java
+ /**
+  * @author xixifeng (fastquery@126.com)
+  */
+ public class MyBeforeFilter1 extends BeforeFilter<Repository> {
+
+ 	@Override
+ 	public void doFilter(Repository repository, Method method, Object[] args) {
+ 	
+ 		// repository: 当前拦截到的实例
+ 		// method: 当前拦截到的方法
+ 		// args: 当前传递进来的参数
+ 		
+ 		// this.abortWith(returnVal); // 中断拦截器
+		
+ 	}
+ }
+```
+
+- 注入Filter
+
+```java
+// 可以同时绑定多个filter
+@Before(MyBeforeFilter1.class)
+@Before(MyBeforeFilter2.class)
+@Before(MyBeforeFilter3.class)
+public interface StudentDBService extends QueryRepository {
+ // some code ... ...
+}
+```
+
 ##联系作者
 fastquery#126.com

@@ -35,9 +35,12 @@ public class MyBeforeFilter1 extends BeforeFilter<Repository> {
 
 	@Override
 	public void doFilter(Repository repository, Method method, Object[] args) {
-		// TODO Auto-generated method stub
+		// repository: 当前拦截到的实例
+		// method: 当前拦截到的方法
+		// args: 当前传递进来的参数
+		
+		// this.abortWith(returnVal); // 中断拦截器
 		
 	}
-	
 
 }
