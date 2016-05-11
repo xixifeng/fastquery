@@ -98,33 +98,37 @@ jdk1.8+
 - 准备一个实体
 
 ```java
-public class Student
-{
+ public class Student
+ {
       private String no;
       private String name;
       private String sex;
       private Integer age;
       private String dept;
       // getter /setter 省略...
-} 
+ } 
 ```
 
 - DAO接口
 
 ```java
-public interface StudentDBService extends QueryRepository {
+ public interface StudentDBService extends QueryRepository {
     @Query("select * from student")
     JSONArray findAll();
     @Query("select * from student")
     Student[] find();      
-}
+ }
 ```
 
 - 使用DAO接口.
 
 ```java
+ // get porxy impl
  StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
+ 
+ // call findAll
  JSONArray jsonArray = studentDBService.findAll();
+ // call find
  Student[] students = studentDBService.find(); 
 ```
 
