@@ -1,5 +1,5 @@
 #FastQuery 快速操作数据层框架
-FastQuery 基于Java语言.他的使命是:简化Java操作数据层.做为一个开发者, **仅仅只需要设计编写DAO接口即可**,其内部采用ASM动态生成实现,执行快. 因此,代码简洁而优雅.从而,大幅度提升开发效率.
+FastQuery 基于Java语言.他的使命是:简化Java操作数据层.做为一个开发者, **仅仅只需要设计DAO接口即可**,其内部采用ASM动态生成实现,执行快. 因此,代码简洁而优雅.从而,大幅度提升开发效率.
 ##FastQuery 主要特性如下:
 1. 设计优雅,配置简单,极易上手.
 2. 采用ASM动态生成字节码,因此支持编译前预处理,可最大限度减少运行期的错误.显著提升程序的强壮性.
@@ -148,15 +148,15 @@ jdk1.8+
 	
 // 查询返回数组格式
 @Query("select no as no,name,sex,age,dept from student s where s.sex=?2 and s.age > ?1")
-Student[] findBySex(Integer age,String sex);
+Student[] find(Integer age,String sex);
  	
 // 查询返回JSON格式
 @Query("select * from student s where s.sex=?1 and s.age > ?2")
-JSONArray findBySex(String sex,Integer age);
+JSONArray find(String sex,Integer age);
 	
 // 查询返回List Map
 @Query("select * from student s where s.sex=?1 and s.age > ?2")
-List<Map<String, Object>> findBySex2(String sex,Integer age);
+List<Map<String, Object>> findBy(String sex,Integer age);
 ```
 
 ##动态条件查询
@@ -190,7 +190,7 @@ int update(String no,String name,int age); // 返回修改之后所影响的行�
 @Modifying
 int update(String no,int age);
 
-// 以实体bean格式返回,当前保存的数据
+// 以实体bean格式,返回当前保存的数据
 @Query("insert into student (no, name, sex, age, dept) values (?1, ?2, ?3, ?4, ?5)")
 @Modifying(table="student",id="no")
 // 注意: student的主键是字符串不会自增长,在此处需要用@Id标识
