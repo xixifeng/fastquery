@@ -167,7 +167,7 @@ List<Map<String, Object>> findBySex2(String sex,Integer age);
 @Condition(c=COperator.OR,l="dept",o=Operator.IN,r="(?4,?5,?6)")// age in(?4,?5?6)
 @Condition(c=COperator.AND,l="name",o={Operator.NOT,Operator.LIKE},r="?7") // 等效于 name not like ?7
 @Condition(c=COperator.OR,l="age",o=Operator.BETWEEN,r="?8 and ?9") // 等效于 info between ?8 and ?9
-Student[] findAllStudent(String no,String name,Integer age,String dept1,String dept2,String dept3,String name2,Integer age2,Integer age3);
+Student[] findAllStudent(... ...);
 ```
 
 ##联系作者
