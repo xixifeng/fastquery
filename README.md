@@ -102,7 +102,6 @@ jdk1.8+
 
 ##一个完整的入门例子
 - 准备一个实体
-
 ```java
  public class Student
  {
@@ -116,7 +115,6 @@ jdk1.8+
 ```
 
 - DAO接口
-
 ```java
  public interface StudentDBService extends QueryRepository {
     @Query("select * from student")
@@ -127,7 +125,6 @@ jdk1.8+
 ```
 
 - 使用DAO接口.
-
 ```java
  // get porxy impl
  StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
