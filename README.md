@@ -14,7 +14,7 @@ jdk1.8+
 
 ##配置文件
 ###jdbc-config.xml
-用来配置支持jdbc. 注意:如果采用连接池,该配置文件可以不要.
+用来配置支持jdbc. **注意**:如果采用连接池,该配置文件可以不要.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
