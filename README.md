@@ -7,7 +7,7 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.做为一�
 4. 支持与主流连接池框架集成,如集成c3p0,dbcp等等
 5. 支持 `@Query` 查询,使用 `@Condition`,可实现动态 `where` 条件查询.
 6. 查询结果集支持JSON类型
-7. 支持AOP,注入拦截只需简单几个注解,如: `@Before` , `@After`
+7. 支持`AOP`,注入拦截只需简单几个注解,如: `@Before` , `@After`
 
 ##运行环境要求
 jdk1.8+
