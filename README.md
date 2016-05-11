@@ -156,6 +156,20 @@ JSONArray findBySex(String sex,Integer age);
 List<Map<String, Object>> findBySex2(String sex,Integer age);
 ```
 
+##动态条件查询
+```java
+@Query("select * from Student #{#where} order by age desc")
+// 增加一些条件
+@Condition(l="no",o=Operator.LIKE,r="?1") // ?1的值,如果是null, 该行条件将不参与运算
+@Condition(c=COperator.AND,l="name",o=Operator.LIKE,r="?2") // 参数 ?2,如果接受到的值为null,该条件不参与运算
+//通过 ignoreNull=false 开启条件值即使是null也参与运算
+@Condition(c=COperator.AND,l="age",o=Operator.GT,r="?3",ignoreNull=false) // ?3的值是null,该条件也参与运算.
+@Condition(c=COperator.OR,l="dept",o=Operator.IN,r="(?4,?5,?6)")// age in(?4,?5?6)
+@Condition(c=COperator.AND,l="name",o={Operator.NOT,Operator.LIKE},r="?7") // 等效于 name not like ?7
+@Condition(c=COperator.OR,l="age",o=Operator.BETWEEN,r="?8 and ?9") // 等效于 info between ?8 and ?9
+Student[] findAllStudent(... ...);
+```
+
 ##改操作
 ```java
 @Query("update student s set s.age=?3,s.name=?2 where  s.no=?1")
@@ -181,20 +195,6 @@ JSONObject saveUserInfo2(String name,Integer age);
 @Query("insert into #{#table} (name,age) values (?1, ?2)")
 Primarykey saveUserInfo(String name,Integer age);
 
-```
-
-##动态条件查询
-```java
-@Query("select * from Student #{#where} order by age desc")
-// 增加一些条件
-@Condition(l="no",o=Operator.LIKE,r="?1") // ?1的值,如果是null, 该行条件将不参与运算
-@Condition(c=COperator.AND,l="name",o=Operator.LIKE,r="?2") // 参数 ?2,如果接受到的值为null,该条件不参与运算
-//通过 ignoreNull=false 开启条件值即使是null也参与运算
-@Condition(c=COperator.AND,l="age",o=Operator.GT,r="?3",ignoreNull=false) // ?3的值是null,该条件也参与运算.
-@Condition(c=COperator.OR,l="dept",o=Operator.IN,r="(?4,?5,?6)")// age in(?4,?5?6)
-@Condition(c=COperator.AND,l="name",o={Operator.NOT,Operator.LIKE},r="?7") // 等效于 name not like ?7
-@Condition(c=COperator.OR,l="age",o=Operator.BETWEEN,r="?8 and ?9") // 等效于 info between ?8 and ?9
-Student[] findAllStudent(... ...);
 ```
 
 ## BeforeFilter
