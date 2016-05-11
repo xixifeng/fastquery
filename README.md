@@ -173,11 +173,20 @@ List<Map<String, Object>> findBy(String sex,Integer age);
 Student[] findAllStudent(... args ...);
 ```
 
-## count
+##count
 
+统计查询行数
 ```java
 @Query("select count(no) from student")
 long count();
+```
+
+##exists
+
+判断是否存在
+```java
+@Query("select * from student s where s.no=?1")
+boolean exists(String no);
 ```
 
 ##改操作
@@ -185,6 +194,10 @@ long count();
 @Query("update student s set s.age=?3,s.name=?2 where  s.no=?1")
 @Modifying
 int update(String no,String name,int age); // 返回修改之后所影响的行数
+
+@Modifying
+@Query("DELETE FROM `userinfo` WHERE id=?1")
+boolean deleteUserinfoById(int id);
 	
 @Query("update student s set s.age=?2 where  s.no=?1")
 @Modifying
