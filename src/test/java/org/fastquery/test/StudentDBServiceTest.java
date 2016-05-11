@@ -161,6 +161,17 @@ public class StudentDBServiceTest {
 		//assertThat(effect, is(1));
 	}
 	
+	@Test
+	public void addStudent(){
+		String no = String.valueOf(System.currentTimeMillis()).substring(6);
+		Student  student = studentDBService.addStudent(no,"蜘蛛", "男", 3, "爬行动物");
+		assertThat(student.getNo(), equalTo(no));
+		assertThat(student.getName(), equalTo("蜘蛛"));
+		assertThat(student.getSex(), equalTo("男"));
+		assertThat(student.getAge(), equalTo(3));
+		assertThat(student.getDept(), equalTo("爬行动物"));
+	}
+	
 	
 	@Test
 	public void testFindBySex1(){

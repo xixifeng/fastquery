@@ -99,6 +99,12 @@ public interface StudentDBService extends QueryRepository {
 	@Modifying
 	int add(String no,String name,String sex,int age,String dept);
 	
+	// 以实体bean格式返回当前保存的数据
+	@Query("insert into student (no, name, sex, age, dept) values (?1, ?2, ?3, ?4, ?5)")
+	@Modifying(table="student",id="no")
+	// 注意: student的主键是字符串不会自增长,在此处需要用@Id标识
+	Student addStudent(@Id String no,String name,String sex,int age,String dept);
+	
 	// 注意:SQL别名删除
 	// 删
 	@Query("delete s from student as s where s.no =  ?1") // 根据编号删除
