@@ -156,5 +156,19 @@ JSONArray findBySex(String sex,Integer age);
 List<Map<String, Object>> findBySex2(String sex,Integer age);
 ```
 
+##动态条件查询
+```java
+@Query("select * from Student #{#where} order by age desc")
+// 增加一些条件
+@Condition(l="no",o=Operator.LIKE,r="?1") // ?1的值,如果是null, 该行条件将不参与运算
+@Condition(c=COperator.AND,l="name",o=Operator.LIKE,r="?2") // 参数 ?2,如果接受到的值为null,该条件不参与运算
+//通过 ignoreNull=false 开启条件值即使是null也参与运算
+@Condition(c=COperator.AND,l="age",o=Operator.GT,r="?3",ignoreNull=false) // ?3的值是null,该条件也参与运算.
+@Condition(c=COperator.OR,l="dept",o=Operator.IN,r="(?4,?5,?6)")// age in(?4,?5?6)
+@Condition(c=COperator.AND,l="name",o={Operator.NOT,Operator.LIKE},r="?7") // 等效于 name not like ?7
+@Condition(c=COperator.OR,l="age",o=Operator.BETWEEN,r="?8 and ?9") // 等效于 info between ?8 and ?9
+Student[] findAllStudent(String no,String name,Integer age,String dept1,String dept2,String dept3,String name2,Integer age2,Integer age3);
+```
+
 ##联系作者
 fastquery#126.com
