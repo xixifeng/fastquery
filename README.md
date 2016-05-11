@@ -139,21 +139,21 @@ jdk1.8+
 ##带条件查询
 
 ```java
- // sql中的?1 表示当前方法的第一个参数
- // sql中的?2 表示当前方法的第二个参数
- //       ?N 表示当前方法的第N个参数
+// sql中的?1 表示当前方法的第一个参数
+// sql中的?2 表示当前方法的第二个参数
+//       ?N 表示当前方法的第N个参数
 	
- // 查询返回数组格式
- @Query("select no as no,name,sex,age,dept from student s where s.sex=?2 and s.age > ?1")
- Student[] findBySex(Integer age,String sex);
+// 查询返回数组格式
+@Query("select no as no,name,sex,age,dept from student s where s.sex=?2 and s.age > ?1")
+Student[] findBySex(Integer age,String sex);
  	
- // 查询返回JSON格式
- @Query("select * from student s where s.sex=?1 and s.age > ?2")
- JSONArray findBySex(String sex,Integer age);
+// 查询返回JSON格式
+@Query("select * from student s where s.sex=?1 and s.age > ?2")
+JSONArray findBySex(String sex,Integer age);
 	
- // 查询返回List Map
- @Query("select * from student s where s.sex=?1 and s.age > ?2")
- List<Map<String, Object>> findBySex2(String sex,Integer age);
+// 查询返回List Map
+@Query("select * from student s where s.sex=?1 and s.age > ?2")
+List<Map<String, Object>> findBySex2(String sex,Integer age);
 ```
 
 ##联系作者
