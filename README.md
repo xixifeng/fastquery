@@ -69,7 +69,8 @@ jdk1.8+
 ```
 ### fastquery.json
 配置数据源的作用范围
-```
+
+```js
 // @author xixifeng (fastquery@126.com)
 // 配置必须遵循标准的json语法.
 [
@@ -94,6 +95,7 @@ jdk1.8+
     }
 ]
 ```
+
 ##一个完整的入门例子
 - 准备一个实体
 
