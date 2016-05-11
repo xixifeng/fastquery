@@ -190,12 +190,18 @@ int update(String no,String name,int age); // 返回修改之后所影响的行�
 @Modifying
 int update(String no,int age);
 
-// 返回当前保存的数据 以Map格式返回
+// 以实体bean格式返回,当前保存的数据
+@Query("insert into student (no, name, sex, age, dept) values (?1, ?2, ?3, ?4, ?5)")
+@Modifying(table="student",id="no")
+// 注意: student的主键是字符串不会自增长,在此处需要用@Id标识
+Student addStudent(@Id String no,String name,String sex,int age,String dept);
+	
+// 以Map格式,返回当前保存的数据
 @Modifying(id="id",table="userinfo")
 @Query("insert into #{#table} (name,age) values (?1, ?2)")
 Map<String, Object> addUserInfo(String name,Integer age);
 
-// 返回当前保存的数据 以JSON格式返回
+// 以JSON格式,返回当前保存的数据
 @Modifying(id="id",table="userinfo")
 @Query("insert into #{#table} (name,age) values (?1, ?2)")
 JSONObject saveUserInfo2(String name,Integer age);
