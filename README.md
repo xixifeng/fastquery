@@ -97,10 +97,9 @@ jdk1.8+
 ##一个完整的入门例子
 - 准备一个实体
 
-```
+```java
 public class Student
 {
-
       private String no;
       private String name;
       private String sex;
