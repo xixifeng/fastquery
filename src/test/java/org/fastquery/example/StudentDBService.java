@@ -48,7 +48,7 @@ import com.alibaba.fastjson.JSONObject;
 @Before(MyBeforeFilter1.class)
 @Before(MyBeforeFilter2.class)
 //@Before(MyBeforeFilter3.class)
-@After(MyAfterFilter1.class)
+@After(MyAfterFilter.class)
 //@After(MyAfterFilter2.class)
 public interface StudentDBService extends QueryRepository {
 	

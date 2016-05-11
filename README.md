@@ -170,7 +170,7 @@ List<Map<String, Object>> findBySex2(String sex,Integer age);
 Student[] findAllStudent(... ...);
 ```
 
-### BeforeFilter
+## BeforeFilter
 - 准备一个BeforeFilter
 
 ```java
@@ -195,7 +195,7 @@ Student[] findAllStudent(... ...);
 - 注入Filter
 
 ```java
-// 可以同时绑定多个filter
+// 可以同时标识多个@Before
 @Before(MyBeforeFilter1.class)
 @Before(MyBeforeFilter2.class)
 @Before(MyBeforeFilter3.class)
@@ -203,6 +203,39 @@ public interface StudentDBService extends QueryRepository {
  // some code ... ...
 }
 ```
+
+## AfterFilter
+```java
+/**
+ * @author xixifeng (fastquery@126.com)
+ */
+public class MyAfterFilter extends AfterFilter<Repository> {
+
+	@Override
+	public Object doFilter(Repository repository, Method method, Object[] args, Object returnVal) {
+		
+		// repository: 当前拦截到的实例
+		// method: 当前拦截到的method
+		// args: 当前传递进来的参数
+		// returnVal 即将返回的值
+		
+		// 在这里可以中途修改 returnVal
+		
+		return returnVal;
+	}
+}
+```
+
+<br> 
+```java
+// 可以同时标识多个@After
+@After(MyAfterFilter.class)
+@After(MyAfterFilter2.class)
+public interface StudentDBService extends QueryRepository {
+	// some code ... ...
+}
+```
+
 
 ##联系作者
 fastquery#126.com
