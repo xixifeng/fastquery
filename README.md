@@ -1,5 +1,5 @@
 #FastQuery 快速操作数据层框架
-FastQuery 基于Java语言.他的使命是:简化Java操作数据层.做为一个开发者,仅仅只需要设计编写DAO接口即可,其内部采用ASM动态生成实现,执行快. 因此,代码简洁而优雅.从而,大幅度提升开发效率.
+FastQuery 基于Java语言.他的使命是:简化Java操作数据层.做为一个开发者,**仅仅只需要设计编写DAO接口即可**,其内部采用ASM动态生成实现,执行快. 因此,代码简洁而优雅.从而,大幅度提升开发效率.
 ##FastQuery 主要特性如下:
 1. 设计优雅,配置简单,简易上手.
 2. 采用ASM动态生成字节码,因此支持编译前预处理,可最大限度减少运行期的错误.显著提升程序的强壮性.
@@ -102,6 +102,7 @@ jdk1.8+
 
 ##一个完整的入门例子
 - 准备一个实体
+
 ```java
  public class Student
  {
@@ -115,6 +116,7 @@ jdk1.8+
 ```
 
 - DAO接口
+
 ```java
  public interface StudentDBService extends QueryRepository {
     @Query("select * from student")
@@ -125,6 +127,7 @@ jdk1.8+
 ```
 
 - 使用DAO接口.
+
 ```java
  // get porxy impl
  StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
