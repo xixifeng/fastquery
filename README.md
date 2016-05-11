@@ -96,7 +96,8 @@ jdk1.8+
 ```
 ##一个完整的入门例子
 - 准备一个实体
-<pre>
+
+```
 public class Student
 {
       private String no;
@@ -106,7 +107,7 @@ public class Student
       private String dept;
       // getter /setter 省略...
 } 
-</pre>
+```
 
 - DAO接口
 <pre>
