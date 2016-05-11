@@ -84,6 +84,7 @@ jdk1.8+
         "dataSourceName": "xk-c3p0", // 数据源的名称
         "basePackages": [            // 该数据源的作用范围
             "org.fastquery.example.StudentDBService"
+            // 在这可以配置多个DB接口,以","号隔开
         ]
     },
     
@@ -95,6 +96,7 @@ jdk1.8+
         "dataSourceName": "shtest_db",
         "basePackages": [ // 该数据源的作用范围
             "org.fastquery.example.DataAcquireDbService"
+                // 在这可以配置多个DB接口,以","号隔开
         ]
     }
 ]
