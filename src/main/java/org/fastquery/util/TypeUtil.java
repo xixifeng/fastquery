@@ -327,6 +327,46 @@ public class TypeUtil implements Opcodes{
 		return str;
 	}
 	
+	/**
+	 * 判断类型是否是Map<String,Object>
+	 * @param type
+	 * @return
+	 */
+	public static boolean isMapSO(java.lang.reflect.Type type){
+		if(type==null){
+			return false;
+		}
+		
+		if(type.toString().equals("java.util.Map<java.lang.String, java.lang.Object>")){
+			return true;
+		} else {
+			return false;
+		}
+		/*if(ParameterizedType.class.isAssignableFrom(type.getClass())){
+			ParameterizedType parameterizedType = (ParameterizedType) type;
+			java.lang.reflect.Type[] types = parameterizedType.getActualTypeArguments(); // 获取<>中的参数类型
+			if ((parameterizedType.getRawType() == Map.class) && (types[0] == String.class)
+					&& (types[1] == Object.class)){
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}*/
+	}
+	
+	public static boolean isListMapSO(java.lang.reflect.Type type) {
+		if(type==null){
+			return false;
+		}
+		if(type.toString().equals("java.util.List<java.util.Map<java.lang.String, java.lang.Object>>")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 }
 
 

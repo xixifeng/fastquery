@@ -23,10 +23,7 @@
 package org.fastquery.filter.generate.query;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
 
 import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.util.TypeUtil;
@@ -64,7 +61,10 @@ public class QueryReturnTypeFilter implements MethodFilter {
 			return method;
 		} else if(returnType == boolean.class) {
 			return method;
-		} else if(ParameterizedType.class.isAssignableFrom(genericReturnType.getClass())) { // Map<String,Object>   List<Map<String,Object>>
+		} else if(TypeUtil.isMapSO(genericReturnType) || TypeUtil.isListMapSO(genericReturnType)){
+			return method;
+		}
+			/*if(ParameterizedType.class.isAssignableFrom(genericReturnType.getClass())) { // Map<String,Object>   List<Map<String,Object>>
 			if(returnType == Map.class || returnType == List.class) {
 				// 如果type是ParameterizedType的子类,并且返回值的类型是Map,并且该Map中的<>里分别是类型String.class和Object.class
 				ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
@@ -76,7 +76,7 @@ public class QueryReturnTypeFilter implements MethodFilter {
 					this.abortWith(method, errmsg);
 				}	
 			}
-		} else if(returnType == JSONObject.class) {
+		}*/ else if(returnType == JSONObject.class) {
 			return method;
 		} else if(returnType == JSONArray.class) {
 			return method;

@@ -27,6 +27,7 @@ import static org.junit.Assert.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.fastquery.core.Placeholder;
@@ -290,4 +291,49 @@ public class TypeUtilTest implements Opcodes {
 		assertThat(TypeUtil.filterComments("/* \n abc */123\n /* 123 */"), equalTo("123\n "));
 		assertThat(TypeUtil.filterComments("/*** * 111*/abc/*111*/222/*** *333*/"),equalTo("abc222"));
 	}
+	
+	public Map<String, String > todo1(){
+		return null;
+	}
+	public Map<String, Integer > todo2(){
+		return null;
+	}
+	public Map<String, Object > todo3(){
+		return null;
+	}
+	public List<Map<String, Object >> todo4(){
+		return null;
+	}
+	
+	@Test
+	public void isMapSO() throws NoSuchMethodException, SecurityException{
+		java.lang.reflect.Type type1 = TypeUtilTest.class.getMethod("todo1").getGenericReturnType();
+		assertThat(TypeUtil.isMapSO(type1), is(false));
+		
+		java.lang.reflect.Type type2 = TypeUtilTest.class.getMethod("todo2").getGenericReturnType();
+		assertThat(TypeUtil.isMapSO(type2), is(false));
+		
+		java.lang.reflect.Type type3 = TypeUtilTest.class.getMethod("todo3").getGenericReturnType();
+		assertThat(TypeUtil.isMapSO(type3), is(true));
+	}
+	
+	@Test
+	public void isListMapSO() throws NoSuchMethodException, SecurityException{		
+		java.lang.reflect.Type type1 = TypeUtilTest.class.getMethod("todo1").getGenericReturnType();
+		assertThat(TypeUtil.isListMapSO(type1), is(false));
+		
+		java.lang.reflect.Type type2 = TypeUtilTest.class.getMethod("todo2").getGenericReturnType();
+		assertThat(TypeUtil.isListMapSO(type2), is(false));
+		
+		java.lang.reflect.Type type3 = TypeUtilTest.class.getMethod("todo3").getGenericReturnType();
+		assertThat(TypeUtil.isListMapSO(type3), is(false));
+		
+		java.lang.reflect.Type type4 = TypeUtilTest.class.getMethod("todo4").getGenericReturnType();
+		assertThat(TypeUtil.isListMapSO(type4), is(true));
+	}
 }
+
+
+
+
+
