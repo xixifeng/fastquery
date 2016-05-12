@@ -228,7 +228,7 @@ Primarykey saveUserInfo(String name,Integer age);
 
 ```
 
-##@Before 拦截器
+##@Before拦截器
 - 准备一个BeforeFilter
 
 ```java
@@ -262,7 +262,7 @@ public interface StudentDBService extends QueryRepository {
 }
 ```
 
-##@After 拦截器
+##@After拦截器
 ```java
 /**
  * @author xixifeng (fastquery@126.com)
