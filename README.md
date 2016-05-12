@@ -294,6 +294,8 @@ public interface StudentDBService extends QueryRepository {
 }
 ```
 
+##源码地址
+http://git.oschina.net/xixifeng.com/fastquery
 
 ##联系作者
 fastquery#126.com
