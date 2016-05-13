@@ -301,7 +301,9 @@ public interface StudentDBService extends QueryRepository {
 一个方法的拦截器总和=它的所属类的拦截器+自己的拦截器 <br/>
 
 ##源码地址
-http://git.oschina.net/xixifeng.com/fastquery
+
+- http://git.oschina.net/xixifeng.com/fastquery
+- https://github.com/xixifeng/fastquery
 
 ##联系作者
 fastquery#126.com
