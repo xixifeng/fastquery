@@ -24,6 +24,7 @@ package org.fastquery.util;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -35,6 +36,7 @@ import java.util.regex.Pattern;
 import org.fastquery.core.Id;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
+import org.fastquery.core.Repository;
 import org.fastquery.where.Condition;
 import org.fastquery.where.Operator;
 import org.objectweb.asm.Opcodes;
@@ -355,7 +357,11 @@ public class TypeUtil implements Opcodes{
 			return false;
 		}*/
 	}
-	
+	/**
+	 * 判断是否是List<Map<String,Object>>
+	 * @param type
+	 * @return
+	 */
 	public static boolean isListMapSO(java.lang.reflect.Type type) {
 		if(type==null){
 			return false;
@@ -367,6 +373,49 @@ public class TypeUtil implements Opcodes{
 		}
 	}
 	
+	// 假设: 有两个类,其class分别为c1和c2. c1的直接父类的范型为X
+	//  设: X=<T>
+	//  若: (c2就是T 或者 c2是T的子类) 并且T是Repository的子类或者就是Repository. 并且X限制只有一个成员.("<>"中是有可能有多个参数的)
+	//  则: 返回true,反之返回false.
+	public static boolean compareType(Class<?> c1,Class<?> c2){
+		java.lang.reflect.Type type = c1.getGenericSuperclass(); // 获取c1的直接父类的范型
+		// 如果这个type的实例就是ParameterizedType的子类或就是ParameterizedType
+		if(ParameterizedType.class.isAssignableFrom(type.getClass())) { // 判断是否是范型
+			ParameterizedType parameterizedType = (ParameterizedType) type; // 如果是范型就转换
+			java.lang.reflect.Type[] tys = parameterizedType.getActualTypeArguments(); // 范型中有多个类型. 换言只尖括号"<>"中有多个类型
+
+			if(tys.length>1) {
+				//当前: X的范型参数个数已大于1
+				return false;
+			}
+			
+			java.lang.reflect.Type ty = tys[0];
+			
+			if(Class.class.isAssignableFrom(ty.getClass())) { // 如果当前类型是Class的子类或者就是Class
+				Class<?> t = (Class<?>) ty; 
+				if(Repository.class.isAssignableFrom(t)) { // 如果t是Repository的子类或者t就是Repository
+					if(!t.isAssignableFrom(c2)) { 
+						//当前: c2不是t的子类且不就是t.
+						return false;
+					}
+				} else {
+					// 当前: T 不是Repository,且不是Repository的子类
+					return false;
+				}
+			} else {
+				// 当前: T 不是Class,且不是Class的子类
+				return false;
+			}
+			
+		} else {
+			//当前: c1的直接父类不是范型
+			return false;
+		}
+		
+		
+		// 如果以上都不满足
+		return true;
+	}
 }
 
 

@@ -32,6 +32,9 @@ import java.util.regex.Pattern;
 
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
+import org.fastquery.core.QueryRepository;
+import org.fastquery.core.Repository;
+import org.fastquery.filter.BeforeFilter;
 import org.fastquery.util.TypeUtil;
 import org.fastquery.where.COperator;
 import org.fastquery.where.Condition;
@@ -330,6 +333,89 @@ public class TypeUtilTest implements Opcodes {
 		
 		java.lang.reflect.Type type4 = TypeUtilTest.class.getMethod("todo4").getGenericReturnType();
 		assertThat(TypeUtil.isListMapSO(type4), is(true));
+	}
+	
+	// 这些内部类,用做测试
+	class BeforeFilter0 extends BeforeFilter<Repository> {
+		@Override
+		protected void doFilter(Repository repository, Method method, Object[] args) {
+		}
+	}
+	class BeforeFilter1 extends BeforeFilter<DB1> {
+		@Override
+		protected void doFilter(DB1 db1, Method method, Object[] args) {
+		}
+	}
+	class BeforeFilter2 extends BeforeFilter<DB2> {
+		@Override
+		protected void doFilter(DB2 db2, Method method, Object[] args) {
+		}
+	}
+	class BeforeFilter3 extends BeforeFilter<DB3> {
+		@Override
+		protected void doFilter(DB3 db3, Method method, Object[] args) {
+		}
+	}
+	class BeforeFilter4 extends BeforeFilter<DB4> {
+		@Override
+		protected void doFilter(DB4 db4, Method method, Object[] args) {
+		}
+	}
+	class BeforeFilter5 extends BeforeFilter<DB5> {
+		@Override
+		protected void doFilter(DB5 db5, Method method, Object[] args) {
+		}
+	}
+	class BeforeFilter6 extends BeforeFilter<DB6> {
+		@Override
+		protected void doFilter(DB6 db6, Method method, Object[] args) {
+		}
+	}
+	// 这些内部类,用做测试
+	class DB1 implements Repository {
+	}
+	class DB2 implements QueryRepository {
+	}
+	class DB3 implements Repository {
+	}
+	class DB4 implements QueryRepository {
+	}
+	class DB5 implements Repository {
+	}
+	class DB6 implements QueryRepository {
+	}
+	
+	@Test
+	public void compareType(){
+		assertThat(TypeUtil.compareType(BeforeFilter1.class, DB1.class), is(true));
+		assertThat(TypeUtil.compareType(BeforeFilter2.class, DB2.class), is(true));
+		assertThat(TypeUtil.compareType(BeforeFilter3.class, DB3.class), is(true));
+		assertThat(TypeUtil.compareType(BeforeFilter4.class, DB4.class), is(true));
+		assertThat(TypeUtil.compareType(BeforeFilter5.class, DB5.class), is(true));
+		assertThat(TypeUtil.compareType(BeforeFilter6.class, DB6.class), is(true));
+
+		assertThat(TypeUtil.compareType(BeforeFilter1.class, DB6.class), is(false));
+		assertThat(TypeUtil.compareType(BeforeFilter2.class, DB5.class), is(false));
+		assertThat(TypeUtil.compareType(BeforeFilter3.class, DB4.class), is(false));
+		assertThat(TypeUtil.compareType(BeforeFilter4.class, DB3.class), is(false));
+		assertThat(TypeUtil.compareType(BeforeFilter5.class, DB2.class), is(false));
+		assertThat(TypeUtil.compareType(BeforeFilter6.class, DB1.class), is(false));
+		
+		assertThat(TypeUtil.compareType(BeforeFilter1.class, DB2.class), is(false));
+		assertThat(TypeUtil.compareType(BeforeFilter2.class, DB1.class), is(false));
+		assertThat(TypeUtil.compareType(BeforeFilter3.class, DB4.class), is(false));
+		assertThat(TypeUtil.compareType(BeforeFilter4.class, DB3.class), is(false));
+		assertThat(TypeUtil.compareType(BeforeFilter5.class, DB6.class), is(false));
+		assertThat(TypeUtil.compareType(BeforeFilter6.class, DB5.class), is(false));
+		
+		assertThat(TypeUtil.compareType(BeforeFilter0.class, DB1.class), is(true));
+		assertThat(TypeUtil.compareType(BeforeFilter0.class, DB2.class), is(true));
+		assertThat(TypeUtil.compareType(BeforeFilter0.class, DB3.class), is(true));
+		assertThat(TypeUtil.compareType(BeforeFilter0.class, DB4.class), is(true));
+		assertThat(TypeUtil.compareType(BeforeFilter0.class, DB5.class), is(true));
+		assertThat(TypeUtil.compareType(BeforeFilter0.class, DB6.class), is(true));
+		
+		
 	}
 }
 

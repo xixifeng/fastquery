@@ -22,6 +22,7 @@
 
 package org.fastquery.filter.generate.global;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -29,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Repository;
 import org.fastquery.filter.After;
 import org.fastquery.filter.AfterFilter;
@@ -52,43 +52,12 @@ public class InterceptorFilter implements MethodFilter {
 		// 当前类中所有的@Before
 		List<Before> befores = new ArrayList<>(Arrays.asList(iclazz.getAnnotationsByType(Before.class))); // 获取类级别的before's
 		befores.addAll(Arrays.asList(method.getAnnotationsByType(Before.class))); // 获取方法上的before's
-		
-		
-		//1). 校验注入的Before是否合法
-		// 为了描述方便,把当前获取到的拦截器设为 A<T>, 当前接口为: D<R>
-		// 那么,R 必须是T或者是T的子类.
-		// 这里非常抽象,请慢慢推敲,自然会明白.
 		for (Before before : befores) {
 			Class<? extends BeforeFilter<? extends Repository>>[] classz = before.value();
 			for (Class<? extends BeforeFilter<? extends Repository>> class1 : classz) {
-				// ParameterizedType.class.isAssignableFrom(genericReturnType.getClass())
-				// 获得父类的范型.. ................ 如果父类是个接口通过这种方式不行(已经证实)!, 在写这个代码的时候, 明确知道class1的父类是抽象类
-				Type type = class1.getGenericSuperclass();
-				if(ParameterizedType.class.isAssignableFrom(type.getClass())) { // 如果这个type的实例就是ParameterizedType的子类或就是ParameterizedType
-					ParameterizedType parameterizedType = (ParameterizedType) type;
-					Type[] tys = parameterizedType.getActualTypeArguments();
-					for (Type ty : tys) {
-						if(Class.class.isAssignableFrom(ty.getClass())) {
-							Class<?> t = (Class<?>) ty; // 范型<>中的类型
-							if(Repository.class.isAssignableFrom(t)) {
-								if(!t.isAssignableFrom(iclazz)) { // 如果当前iclazz不是T的子类且不就是T.
-									this.abortWith(method, "\n"+before+"\n"+parameterizedType.getRawType().getTypeName()+"<"+t.getName()+"> 这个拦截器作用范围不在" + iclazz +"上!.\n"
-											+ "解决参考方案: " + parameterizedType.getRawType().getTypeName()+"<" +QueryRepository.class.getSimpleName()+ "> 它的作用范围为: 可以放在QueryRepository的子类上\n"
-													+ parameterizedType.getRawType().getTypeName()+"<" +iclazz.getSimpleName()+ "> 它的作用范围为: 只能放在"+iclazz.getName()+"类上\n"
-															+ "亲爱的伙伴,您明白了吗?");
-								}
-							}
-						} else {
-							this.abortWith(method, before.toString()+"错误!");
-						}
-					}
-				} else {
-					this.abortWith(method, before.toString()+"错误!");
-				}
+				compareType(method, iclazz, before, class1);
 			}
 		}
-		
-		
 		
 		// 当前类中所有的@After
 		List<After> afters = new ArrayList<>(Arrays.asList(iclazz.getAnnotationsByType(After.class))); // 获取类级别的after's
@@ -96,39 +65,77 @@ public class InterceptorFilter implements MethodFilter {
 		for (After after : afters) {
 			Class<? extends AfterFilter<? extends Repository>>[] classz = after.value();
 			for (Class<? extends AfterFilter<? extends Repository>> class1 : classz) {
-				// ParameterizedType.class.isAssignableFrom(genericReturnType.getClass())
-				// 获得父类的范型.. ................ 如果父类是个接口通过这种方式不行(已经证实)!, 在写这个代码的时候, 明确知道class1的父类是抽象类
-				Type type = class1.getGenericSuperclass();
-				if(ParameterizedType.class.isAssignableFrom(type.getClass())) { // 如果这个type的实例就是ParameterizedType的子类或就是ParameterizedType
-					ParameterizedType parameterizedType = (ParameterizedType) type;
-					Type[] tys = parameterizedType.getActualTypeArguments();
-					for (Type ty : tys) {
-						if(Class.class.isAssignableFrom(ty.getClass())) {
-							Class<?> t = (Class<?>) ty; // 范型<>中的类型
-							if(Repository.class.isAssignableFrom(t)) {
-								if(!t.isAssignableFrom(iclazz)) { // 如果当前iclazz不是T的子类且不就是T.
-									this.abortWith(method, "\n"+after+"\n"+parameterizedType.getRawType().getTypeName()+"<"+t.getName()+"> 这个拦截器作用范围不在" + iclazz +"上!.\n"
-											+ "解决参考方案: " + parameterizedType.getRawType().getTypeName()+"<" +QueryRepository.class.getSimpleName()+ "> 它的作用范围为: 可以放在QueryRepository的子类上\n"
-													+ parameterizedType.getRawType().getTypeName()+"<" +iclazz.getSimpleName()+ "> 它的作用范围为: 只能放在"+iclazz.getName()+"类上\n"
-															+ "亲爱的伙伴,您明白了吗?");
-								}
-							}
-						} else {
-							this.abortWith(method, after.toString()+"错误!");
-						}
-					}
-				} else {
-					this.abortWith(method, after.toString()+"错误!");
-				}
+				compareType(method, iclazz, after, class1);
 			}
 		}
-		
-		
-		
-		
+
 		return method;
 	}
 	
+	// 假设: 有两个类,其class分别为c1和c2. c1的直接父类的范型为X
+	//  设: X=<T>
+	//  若: (c2就是T 或者 c2是T的子类) 并且T是Repository的子类或者就是Repository. 并且X限制只有一个成员.("<>"中是有可能有多个参数的)
+	//  则: 返回true,反之返回false.
+	public void compareType(Method method, Class<?> c2, Annotation annotation,Class<?> c1) {
+		Type type = c1.getGenericSuperclass(); // 获取c1的直接父类的范型
+		// 如果这个type的实例就是ParameterizedType的子类或就是ParameterizedType
+		if(ParameterizedType.class.isAssignableFrom(type.getClass())) { // 判断是否是范型
+			ParameterizedType parameterizedType = (ParameterizedType) type; // 如果是范型就转换
+			Type[] tys = parameterizedType.getActualTypeArguments(); // 范型中有多个类型. 换言只尖括号"<>"中有多个类型
+
+			if(tys.length>1) {
+				//当前: X的范型参数个数已大于1
+				this.abortWith(method, annotation.toString()+"错误!");
+			}
+			
+			Type ty = tys[0];
+			
+			if(Class.class.isAssignableFrom(ty.getClass())) { // 如果当前类型是Class的子类或者就是Class
+				Class<?> t = (Class<?>) ty; 
+				if(Repository.class.isAssignableFrom(t)) { // 如果t是Repository的子类或者t就是Repository
+					if(!t.isAssignableFrom(c2)) { 
+						//当前: c2不是t的子类且不就是t.
+						filterScopeError(method, annotation, parameterizedType, c2, t);
+					}
+				} else {
+					// 当前: T 不是Repository,且不是Repository的子类
+					this.abortWith(method, annotation.toString()+"错误!");
+				}
+			} else {
+				// 当前: T 不是Class,且不是Class的子类
+				this.abortWith(method, annotation.toString()+"错误!");
+			}
+			
+		} else {
+			//当前: c1的直接父类不是范型
+			this.abortWith(method, annotation.toString()+"错误!");
+		}
+	}
+	
+	/**
+	 * 过滤器作用范围错误提示信息
+	 */
+	private void filterScopeError(Method method,Annotation annotation,ParameterizedType parameterizedType,Class<?> iclazz,Class<?> t){
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n");
+		sb.append(annotation);
+		sb.append("\n");
+		
+		sb.append(parameterizedType.getRawType().getTypeName());
+		sb.append("<");
+		sb.append(t.getSimpleName());
+		sb.append("> 这个拦截器的作用范围不在");
+		sb.append(iclazz);
+		sb.append("上(也就说放在这个类上是非法的)!\n");
+		
+		sb.append("它可以放在");
+		sb.append(t.getSimpleName());
+		sb.append("类上\n");
+		
+		sb.append("举例说明:若有一个拦截器叫A<T>,那么这个拦截器可以用放在T类或T的子类里.反之是违规操作\n");
+
+		this.abortWith(method,sb.toString());
+	}
 
 }
 
