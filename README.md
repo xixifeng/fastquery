@@ -307,7 +307,7 @@ public class MyBeforeFilter3 extends BeforeFilter<DataAcquireDbService> {
 }
 ```
 
-**注意:**
+###注意:
 - `@Before`和`@After`不仅可以标注在接口类上,也可以标注在方法上
 - 标识在类的上方:表示其拦截的作用范围是整个类的方法
 - 标识在方法上:表示其拦截的作用范围是当前方法
