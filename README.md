@@ -295,11 +295,23 @@ public interface StudentDBService extends QueryRepository {
 }
 ```
 
+##控制拦截器的作用域
+若: 有一个拦截器叫A<T>,那么:这个拦截器的作用范围只能在T类或T的子类里.
+举例:
+
+```java
+// 这个拦截器的作用范围在 DataAcquireDbService里或在DataAcquireDbService子类里.
+// 换言之: MyBeforeFilter3这个拦截器只能标注在DataAcquireDbService里或标注在DataAcquireDbService的子类里.
+public class MyBeforeFilter3 extends BeforeFilter<DataAcquireDbService> { 
+     // some code ... ...
+}
+```
+
 **注意:**
-`@Before`和`@After`不仅可以加在接口类上,也可以加在方法上. <br />
-标识在类的上方:表示其拦截的作用范围是整个类的方法. <br />
-标识在方法上:表示其拦截的作用范围是当前方法. <br/>
-一个方法的拦截器总和=它的所属类的拦截器+自己的拦截器 <br/>
+- `@Before`和`@After`不仅可以标注在接口类上,也可以标注在方法上
+- 标识在类的上方:表示其拦截的作用范围是整个类的方法
+- 标识在方法上:表示其拦截的作用范围是当前方法
+- 一个方法的拦截器总和=它的所属类的拦截器+自己的拦截器
 
 ##源码地址
 
