@@ -296,7 +296,7 @@ public interface StudentDBService extends QueryRepository {
 ```
 
 ##控制拦截器的作用域
-若: 有一个拦截器叫A<T>,那么:这个拦截器的作用范围只能在T类或T的子类里.<br />
+若: 有一个拦截器叫`A<T>`,那么:这个拦截器的作用范围只能在T类或T的子类里.<br />
 举例:
 ```java
 // 这个拦截器的作用范围在 DataAcquireDbService里或在DataAcquireDbService子类里.
