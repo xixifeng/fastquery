@@ -319,3 +319,4 @@ public class MyBeforeFilter3 extends BeforeFilter<DataAcquireDbService> {
 
 ##联系作者
 fastquery#126.com
+欢迎批评指正.
