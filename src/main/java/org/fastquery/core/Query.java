@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
+ * 查询语句
  * @author xixifeng (fastquery@126.com)
  */
 @Repeatable(Querys.class)
