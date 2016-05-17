@@ -232,14 +232,14 @@ Primarykey saveUserInfo(String name,Integer age);
 ## @Transactional
 
 ```java
-    // 将三条改操作纳入至一个事务中.
-	@Transactional
-	@Modifying
-	@Query("update `userinfo` set `name`=?1 where id=?3")
-	@Query("update `userinfo` set `age`=?2 where id=?3")
-	// 把主键id修改为1,目前主键id=1是存在的.这行会报错.那么前两行所做的操作全部失效.
-	@Query("update `userinfo` set `id`=1 where `id`=?3")
-	int updateBatch(String name,Integer age,Integer id);
+// 将三条改操作纳入至一个事务中.
+@Transactional
+@Modifying
+@Query("update `userinfo` set `name`=?1 where id=?3")
+@Query("update `userinfo` set `age`=?2 where id=?3")
+// 把主键id修改为1,目前主键id=1是存在的.这行会报错.那么前两行所做的操作全部失效.
+@Query("update `userinfo` set `id`=1 where `id`=?3")
+int updateBatch(String name,Integer age,Integer id);
 ```
 
 
