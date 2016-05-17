@@ -23,6 +23,8 @@
 package org.fastquery.filter.generate.query;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
@@ -42,34 +44,42 @@ class QueryFilterHelper {
 	 * @param query
 	 * @return
 	 */
-	static String getQuerySQL(Method method,Query query){
-		String sql = query.value();
-		StringBuilder sb = new StringBuilder();
-		// 追加条件
-		Condition[] conditions = method.getAnnotationsByType(Condition.class);
-		for (int i = 0; i < conditions.length; i++) {
-			sb.append(' ');
-			sb.append(conditions[i].c().getVal());
-			sb.append(' ');	
-			sb.append(conditions[i].l());
-			sb.append(' ');
-			Operator[] operators = conditions[i].o();
-			for (Operator operator : operators) {
-				sb.append(operator.getVal());
-				sb.append(' ');
-			}
-			sb.append(conditions[i].r());
-		}
-		// 追加条件 End
+	static List<String> getQuerySQL(Method method,Query[] queries){
 		
-		String where = sb.toString();
-		if(!where.equals("") && TypeUtil.matches(query.value(),Placeholder.WHERE_REG).size()!=1) {
-			throw new RuntimeException(method + " 如果有条件注解,那么@Query中的value值,必须存在#{#where},有且只能出现一次");
+		List<String> sqls = new ArrayList<>(queries.length);
+		
+		for (Query query : queries) {
+
+			String sql = query.value();
+			StringBuilder sb = new StringBuilder();
+			// 追加条件
+			Condition[] conditions = method.getAnnotationsByType(Condition.class);
+			for (int i = 0; i < conditions.length; i++) {
+				sb.append(' ');
+				sb.append(conditions[i].c().getVal());
+				sb.append(' ');	
+				sb.append(conditions[i].l());
+				sb.append(' ');
+				Operator[] operators = conditions[i].o();
+				for (Operator operator : operators) {
+					sb.append(operator.getVal());
+					sb.append(' ');
+				}
+				sb.append(conditions[i].r());
+			}
+			// 追加条件 End
+			
+			String where = sb.toString();
+			if(!where.equals("") && TypeUtil.matches(query.value(),Placeholder.WHERE_REG).size()!=1) {
+				throw new RuntimeException(method + " 如果有条件注解,那么@Query中的value值,必须存在#{#where},有且只能出现一次");
+			}
+			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, sb.toString()));
 		}
-		return sql.replaceFirst(Placeholder.WHERE_REG, sb.toString());
+		
+		return sqls;
 	}
 	
-	static String getQuerySQL(Method method){
-		return getQuerySQL(method, method.getAnnotation(Query.class));
+	static List<String> getQuerySQL(Method method){
+		return getQuerySQL(method, method.getAnnotationsByType(Query.class));
 	}
 }

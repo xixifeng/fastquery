@@ -37,6 +37,7 @@ import org.fastquery.filter.generate.modifying.AnnotationSynxFilter;
 import org.fastquery.filter.generate.modifying.ArgsFilter;
 import org.fastquery.filter.generate.modifying.ModifyingReturnTypeFilter;
 import org.fastquery.filter.generate.quartza.IllegalAnnotation;
+import org.fastquery.filter.generate.query.NotAllowedRepeat;
 import org.fastquery.filter.generate.query.ParameterFilter;
 import org.fastquery.filter.generate.query.QueryReturnTypeFilter;
 import org.fastquery.filter.generate.query.SQLFilter;
@@ -70,14 +71,14 @@ class GenerateExtends {
 		MethodFilterChain quartzFilterChain = null;
 		
 		Modifying modifying = null;
-		Query query = null;
+		Query[] querys = null;
 		Quartz quartz = null;
 		
 		Method[] methods = repositoryClazz.getMethods();
 		for (Method method : methods) {
 			
 			modifying = method.getAnnotation(Modifying.class);
-			query = method.getAnnotation(Query.class);
+			querys = method.getAnnotationsByType(Query.class);
 			quartz = method.getAnnotation(Quartz.class);
 			
 			// 对过滤器做8个分类
@@ -110,21 +111,22 @@ class GenerateExtends {
 				
 				
 				// filter/modifying
-				if(modifying!=null && query!=null) {
+				if(modifying!=null && querys.length>0) {
 					queryFilterChain.addFilter(new AnnotationSynxFilter());
 					queryFilterChain.addFilter(new ArgsFilter());
 					queryFilterChain.addFilter(new ModifyingReturnTypeFilter());
 				}
 				
 				// filter/query
-				if(query!=null && modifying==null) {
+				if(querys.length>0 && modifying==null) {
 					queryFilterChain.addFilter(new QueryReturnTypeFilter());
 					queryFilterChain.addFilter(new SQLFilter());
 					queryFilterChain.addFilter(new ParameterFilter());
+					queryFilterChain.addFilter(new NotAllowedRepeat());
 				}
 				
 				// filter/mquery
-				if(query == null && modifying == null) {
+				if(querys.length == 0 && modifying == null) {
 					// 有待扩展...
 				}
 

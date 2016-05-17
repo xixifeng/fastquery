@@ -28,12 +28,13 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
+ * 运行所有的测试用例
  * 
  * @author xixifeng (fastquery@126.com)
  */
 //指定运行器
 @RunWith(Suite.class)
-@SuiteClasses({DataAcquireDbServiceTest.class,StudentDBServiceTest.class,TypeUtilTest.class})
+@SuiteClasses({StudentDBServiceTest.class,DataAcquireDbServiceTest.class,UserInfoDBServiceTest.class,TypeUtilTest.class})
 public class AllTest {
 
 }

@@ -23,6 +23,7 @@
 package org.fastquery.filter.generate.query;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.util.TypeUtil;
@@ -37,10 +38,12 @@ public class ParameterFilter implements MethodFilter {
 
 	@Override
 	public Method doFilter(Method method) {
-		//Query query = method.getAnnotation(Query.class);
-		//String sql = query.value();
-		String sql = QueryFilterHelper.getQuerySQL(method);
-
+		StringBuilder sb = new StringBuilder();
+		List<String> list = QueryFilterHelper.getQuerySQL(method);
+		list.forEach( str -> {
+			sb.append(str);
+		});
+		String sql = sb.toString();
 			
 			// 1). 检测SQL参数的书写规则
 			// 计算出sql 中出现 "\\?\\d+" 几次, "?"后面进跟数字表明是一个参数

@@ -58,12 +58,12 @@ public class ConditionParameterFilter implements MethodFilter {
 		// 4). 条件运算符如果是Operator.IN,那么r()的值必须符合正则: "(?4,?5,?6)"
 		// 5). 条件运算符如果是Operator.BETWEEN,那么r()的值必须符合正则: "?8 and ?9"
 		// 6). 条件运算符如果不是Operator.BETWEEN又不是Operator.BETWEEN,那么r()的值必须符合正则: "?8"
-		Query query = method.getAnnotation(Query.class);
-		if(query==null){
+		Query[] queries = method.getAnnotationsByType(Query.class);
+		if(queries.length==0){
 			return method;
 		}
 		
-		int countWhere = TypeUtil.matches(query.value(),Placeholder.WHERE_REG).size(); // 
+		int countWhere = TypeUtil.matches(queries[0].value(),Placeholder.WHERE_REG).size(); // 
 		// >1).
 		if( countWhere >1 ) {
 			this.abortWith(method,"@Query中的value值,有且只能出现一次#{#where}");

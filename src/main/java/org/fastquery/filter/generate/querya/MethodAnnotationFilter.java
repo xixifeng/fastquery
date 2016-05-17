@@ -43,24 +43,21 @@ public class MethodAnnotationFilter implements MethodFilter {
 		String[] updateFlags = {"update","insert","delete","create","alter"};
 		
 		// 1). 检测是否是update,如果是,需要加注解Modifying
-		Query query = method.getAnnotation(Query.class);
-		// 如果存在@query
-		if(query != null) {
-						
-			// 获取sql语句
-			String sql = query.value();
-			
-			if( method.getAnnotation(Modifying.class)==null ) {
-				for (String updateFlag : updateFlags) {
-					if(TypeUtil.containsIgnoreCase(sql, updateFlag)) {
-						this.abortWith(method, query.value()+"中包含有SQL关键字"+updateFlag+",它属于修改操作,必须要配合@Modifying一起使用.");
+		// 返回与该元素关联的注释。如果没有与该元素关联的注释，返回值是一个长度为0的数组。 
+		Query[] querys = method.getAnnotationsByType(Query.class);
+		for (Query query : querys) {
+				// 获取sql语句
+				String sql = query.value();
+				
+				if( method.getAnnotation(Modifying.class)==null ) {
+					for (String updateFlag : updateFlags) {
+						if(TypeUtil.containsIgnoreCase(sql, updateFlag)) {
+							this.abortWith(method, query.value()+"中包含有SQL关键字"+updateFlag+",它属于修改操作,必须要配合@Modifying一起使用.");
+						}
 					}
 				}
-			}
-			
-			
 		}
-
+		
 		// 2). 检测... 
 		
 		return method;

@@ -52,68 +52,68 @@ public class ModifyingReturnTypeFilter implements MethodFilter {
 		String errmsg2 = " 该SQL的操作结果不能映射成Map格式";
 		Type genericReturnType = method.getGenericReturnType();
 		Class<?> returnType = method.getReturnType();
+		
+		Query[] queries = method.getAnnotationsByType(Query.class);
+		for (Query query : queries) {
 
-		// 1). 校验 SQL中存在"insert into" 才能允许其返回值为 Map<String,Object>
-		// 不用判断 method.getAnnotation(Query.class) 是否为null
-		// 如果当前方法没有标记 @Modifying 和 @ Query 是进入不了这个过滤器的. 过滤器已经分成了8类
-		String sql = method.getAnnotation(Query.class).value();
-		// 如果返回值是Map 并且 没有包含 "insert into" 或 "update"
-		
-		// sql中既不含insert又不含update,才会返回true
-		boolean nothas = !TypeUtil.containsIgnoreCase(sql, "insert into") && !TypeUtil.containsIgnoreCase(sql, "update");
-		
-		if((returnType == Map.class) && nothas) {
-			this.abortWith(method, sql + errmsg2);
-		}
-		
-		// 2). 校验:如果返回值是JSONObject,那么SQL必须是insert语句 或 "update"
-		if((returnType == JSONObject.class) && nothas) {
-			this.abortWith(method, sql + errmsg2);
-		}
-		
-		// 3). 校验:如果返回值是实体,那么SQL必须是insert 或 "update"
-		// 如果 returnType 是 bean 并且 没有包含 insert
-		if((TypeUtil.hasDefaultConstructor(returnType)) && nothas) {
-			this.abortWith(method, sql + errmsg2);
-		}
-		
-		// 4). 校验:如果是删除操作,那么返回值只能是void 或者 int
-		// 返回值既不是void类型又不是int并且也不是boolean类型,才会返回true.
-		boolean hsx = (returnType!=void.class) && (returnType!=int.class) && (returnType!=boolean.class);
-		if(TypeUtil.containsIgnoreCase(sql, "delete") && hsx) {
-			this.abortWith(method, sql + "该SQL是删除操作,返回值只能是void或int类型.");
-		}
+			// 1). 校验 SQL中存在"insert into" 才能允许其返回值为 Map<String,Object>
+			// 如果当前方法没有标记 @Modifying 和 @ Query 是进入不了这个过滤器的. 过滤器已经分成了8类
+			String sql = query.value();
+			// 如果返回值是Map 并且 没有包含 "insert into" 或 "update"
+			
+			// sql中既不含insert又不含update,才会返回true
+			boolean nothas = !TypeUtil.containsIgnoreCase(sql, "insert into") && !TypeUtil.containsIgnoreCase(sql, "update");
+			
+			if((returnType == Map.class) && nothas) {
+				this.abortWith(method, sql + errmsg2);
+			}
+			
+			// 2). 校验:如果返回值是JSONObject,那么SQL必须是insert语句 或 "update"
+			if((returnType == JSONObject.class) && nothas) {
+				this.abortWith(method, sql + errmsg2);
+			}
+			
+			// 3). 校验:如果返回值是实体,那么SQL必须是insert 或 "update"
+			// 如果 returnType 是 bean 并且 没有包含 insert
+			if((TypeUtil.hasDefaultConstructor(returnType)) && nothas) {
+				this.abortWith(method, sql + errmsg2);
+			}
+			
+			// 4). 校验:如果是删除操作,那么返回值只能是void 或者 int
+			// 返回值既不是void类型又不是int并且也不是boolean类型,才会返回true.
+			boolean hsx = (returnType!=void.class) && (returnType!=int.class) && (returnType!=boolean.class);
+			if(TypeUtil.containsIgnoreCase(sql, "delete") && hsx) {
+				this.abortWith(method, sql + "该SQL是删除操作,返回值只能是void或int类型.");
+			}
 
-		
-		// 5). 校验返回值所允许的类型
-		if (returnType == void.class) {
-			return method;
-		} else if (returnType == int.class) {
-			return method;
-		} else if (ParameterizedType.class.isAssignableFrom(genericReturnType.getClass())) {
-			// 如果type是ParameterizedType的子类,并且返回值的类型是Map,并且该Map中的<>里分别是类型String.class和Object.class
-			ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
-			Type[] types = parameterizedType.getActualTypeArguments(); // 获取<>中的参数类型
-			if ((parameterizedType.getRawType() == Map.class) && (types[0] == String.class)
-					&& (types[1] == Object.class)) {
+			
+			// 5). 校验返回值所允许的类型
+			if (returnType == void.class) {
+				return method;
+			} else if (returnType == int.class) {
+				return method;
+			} else if (ParameterizedType.class.isAssignableFrom(genericReturnType.getClass())) {
+				// 如果type是ParameterizedType的子类,并且返回值的类型是Map,并且该Map中的<>里分别是类型String.class和Object.class
+				ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
+				Type[] types = parameterizedType.getActualTypeArguments(); // 获取<>中的参数类型
+				if ((parameterizedType.getRawType() == Map.class) && (types[0] == String.class)
+						&& (types[1] == Object.class)) {
+					return method;
+				} else {
+					this.abortWith(method, errmsg);
+				}
+			} else if (returnType == JSONObject.class) {
+				return method;
+			} else if (returnType == Primarykey.class) {
+				return method;
+			} else if ( TypeUtil.hasDefaultConstructor(returnType) ) { // 判断是否是 Bean
+				return method;
+			} else if(returnType == boolean.class){
 				return method;
 			} else {
 				this.abortWith(method, errmsg);
 			}
-		} else if (returnType == JSONObject.class) {
-			return method;
-		} else if (returnType == Primarykey.class) {
-			return method;
-		} else if ( TypeUtil.hasDefaultConstructor(returnType) ) { // 判断是否是 Bean
-			return method;
-		} else if(returnType == boolean.class){
-			return method;
-		} else {
-			this.abortWith(method, errmsg);
 		}
-
-		
-
 		return method;
 	}
 }

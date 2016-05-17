@@ -83,18 +83,18 @@ public class Prepared {
 			// 2. 只包含@Query
 			// 3. 只包含@Modify 这是不允许的, 该检测已放在生成类之前做了.
 			// 4. 没有Query,也没有@Modify
-			Query query = method.getAnnotation(Query.class);
+			Query[] querys = method.getAnnotationsByType(Query.class);
 			Modifying modifying = method.getAnnotation(Modifying.class);
-			if( query!=null && modifying !=null) {
-				return QueryProcess.getInstance().modifying(method,returnType, query, packageName,args);
-			} else if( query != null) {
-				return QueryProcess.getInstance().query(method,returnType, query,packageName, args);
+			if( querys.length>0 && modifying !=null) {
+				return QueryProcess.getInstance().modifying(method,returnType, querys, packageName,args);
+			} else if(querys.length>0) {
+				return QueryProcess.getInstance().query(method,returnType, querys,packageName, args);
 			} //else if(iclazz.getAnnotation(Modifying.class)!=null) {
 			  //Modifying 不能独存,要么不要加, 在生成Repository实现之前已经做了检测
 			  //throw new RuntimeException(method+"@Modifying不能独存,依赖@Query!");
 			  //}
 			 else {
-				 return QueryProcess.getInstance().methodQuery(method,methodName,returnType, query,packageName, args);
+				 return QueryProcess.getInstance().methodQuery(method,methodName,returnType, querys,packageName, args);
 			}
 			
 		} else {

@@ -36,7 +36,7 @@ public class IllegalAnnotation implements MethodFilter {
 
 	@Override
 	public Method doFilter(Method method) {
-		if(method.getAnnotation(Query.class) != null) {
+		if(method.getAnnotationsByType(Query.class).length > 0) {
 			this.abortWith(method, "QuartzRepository中禁止出现@Query!");
 		}
 		

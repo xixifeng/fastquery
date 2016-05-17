@@ -197,24 +197,6 @@ public class TypeUtilTest implements Opcodes {
 	public void method01() {
 	}
 
-	/*
-	 * 
-	 * public void conditionParameterFilter() throws NoSuchMethodException,
-	 * SecurityException{ ConditionParameterFilter conditionParameterFilter =
-	 * new ConditionParameterFilter(); Method method =
-	 * TypeUtilTest.class.getMethod("method01");
-	 * conditionParameterFilter.doFilter(method); }
-	 * 
-	 * @Test public void testGetQuerySQL1() throws NoSuchMethodException,
-	 * SecurityException { Method method =
-	 * TypeUtilTest.class.getMethod("method01"); String sql =
-	 * TypeUtil.getQuerySQL(method, method.getAnnotation(Query.class));
-	 * assertThat(sql, equalToIgnoringCase(
-	 * "select * from Student   field1 = ?1 and field2 = ?2 and field3 = ?3 or age in (?3,?7,?8) and name not like ?7 or info BETWEEN ?8 and ?9 ORDER BY DESC"
-	 * )); assertThat(sql, equalTo(
-	 * "select * from Student   field1 = ?1 AND field2 = ?2 AND field3 = ?3 OR age IN (?3,?7,?8) AND name NOT LIKE ?7 OR info BETWEEN ?8 and ?9 order by desc"
-	 * )); }
-	 */
 	@Test
 	public void placeholder() {
 		// 匹配 (?4,?5,?6)的正则(允许有首尾空格)

@@ -275,44 +275,48 @@ public class TypeUtil implements Opcodes{
 	 * @param args
 	 * @return
 	 */
-	public static String getQuerySQL(Method method,Query query,Object[] args){
-		String sql = query.value();
-		StringBuilder sb = new StringBuilder();
-		// 追加条件
-		Condition[] conditions = method.getAnnotationsByType(Condition.class);
-		o:for (int i = 0; i < conditions.length; i++) {
-			
-			if(conditions[i].ignoreNull()){ // 忽略null,那么就要看参数是否传递null啦
-				// r 属性中包含的参数,必须去重
-				Set<String> pars = TypeUtil.matchesNotrepeat(conditions[i].r(), "\\?\\d+");
-				if(pars.size()!=0){ // 表明这个条件有"?"占位符号
-					for (String par : pars) {
-						int index = Integer.valueOf(par.replace("?", "")); // 计数是1开始的
-						if(args[index-1] == null){ //如果传递了参数null, 那么这个条件就不加入
-							continue o; // 跳出最外层的当次循环
+	public static List<String> getQuerySQL(Method method,Query[] queries,Object[] args){
+		List<String> sqls = new ArrayList<>();
+		for (Query query : queries) {
+			String sql = query.value();
+			StringBuilder sb = new StringBuilder();
+			// 追加条件
+			Condition[] conditions = method.getAnnotationsByType(Condition.class);
+			o:for (int i = 0; i < conditions.length; i++) {
+				
+				if(conditions[i].ignoreNull()){ // 忽略null,那么就要看参数是否传递null啦
+					// r 属性中包含的参数,必须去重
+					Set<String> pars = TypeUtil.matchesNotrepeat(conditions[i].r(), "\\?\\d+");
+					if(pars.size()!=0){ // 表明这个条件有"?"占位符号
+						for (String par : pars) {
+							int index = Integer.valueOf(par.replace("?", "")); // 计数是1开始的
+							if(args[index-1] == null){ //如果传递了参数null, 那么这个条件就不加入
+								continue o; // 跳出最外层的当次循环
+							}
 						}
 					}
 				}
-			}
-			sb.append(' ');
-			if(sb.length() > 1){ // 第一个条件不能加上条件连接符,请特别注意:此处的条件不能用if(i!=0),因为上面会中途跳出循环.
-				sb.append(conditions[i].c().getVal());	
-			}
-			sb.append(' ');	
-			sb.append(conditions[i].l());
-			sb.append(' ');
-			Operator[] operators = conditions[i].o();
-			for (Operator operator : operators) {
-				sb.append(operator.getVal());
 				sb.append(' ');
+				if(sb.length() > 1){ // 第一个条件不能加上条件连接符,请特别注意:此处的条件不能用if(i!=0),因为上面会中途跳出循环.
+					sb.append(conditions[i].c().getVal());	
+				}
+				sb.append(' ');	
+				sb.append(conditions[i].l());
+				sb.append(' ');
+				Operator[] operators = conditions[i].o();
+				for (Operator operator : operators) {
+					sb.append(operator.getVal());
+					sb.append(' ');
+				}
+				sb.append(conditions[i].r());
 			}
-			sb.append(conditions[i].r());
+			// 追加条件 End
+			if(!sb.toString().equals("")){ // 特别注意: 此处不能写成 !sb.equals("")
+				sb.replace(0, 1, "where");
+			}
+			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, sb.toString()));
 		}
-		// 追加条件 End
-		if(!sb.toString().equals("")){ // 特别注意: 此处不能写成 !sb.equals("")
-			sb.replace(0, 1, "where");
-		}
-		return sql.replaceFirst(Placeholder.WHERE_REG, sb.toString());
+		return sqls;
 	}
 	
 	

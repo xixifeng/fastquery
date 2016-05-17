@@ -71,107 +71,142 @@ public class QueryProcess {
 	}
 	
 	// 改操作
-	Object modifying(Method method,Class<?> returnType,Query query,String packageName,Object...args) {
-		int effect = -1;       // 影响行数
-		long autoIncKey = -1;  // 主键
-		String pkey = null;    // 字符串类型的主键
-		// 获取sql
-		String sql = query.value();
-		int[] ints = TypeUtil.getSQLParameter(sql);
-		sql = sql.replaceAll(Placeholder.SP1_REG, "?");
-		Modifying modifying = method.getAnnotation(Modifying.class);
-		String id = modifying.id(); // 不可能为null
-		String table = modifying.table();
-		// 替换SQL中的占位变量符
-		sql = sql.replaceAll(Placeholder.TABLE_REG, table);
-		sql = sql.replaceAll(Placeholder.ID_REG, id);
-		showArgs(ints,args);
-		LOG.info(sql);
-		
+	Object modifying(Method method,Class<?> returnType,Query[] queries,String packageName,Object...args) {
 		// 获取数据源
 		DataSource dataSource = DataSourceManage.getDataSource(packageName);
 		Connection conn = null;
 		PreparedStatement stat = null;
 		ResultSet rs = null;
+		
+		int sqlCount = queries.length;
+		int[] effects = new int[sqlCount]; // 影响行数集合
+		Primarykey[] primarykeys = new Primarykey[sqlCount];// 主键集合
+		
+		Modifying modifying = method.getAnnotation(Modifying.class);
+		String id = modifying.id(); // 不可能为null
+		String table = modifying.table();
+		
+		
+		int effect = -1;
+		long autoIncKey = -1;
+		String pkey = null;
+		
 		try {
 			conn = dataSource.getConnection();
-			// Statement.RETURN_GENERATED_KEYS
-			stat = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
-			// 注意: preparedStatement的参数索引是从1开始的!
-			for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
-				// ints[i-1] 表示当前SQL参数对应方法的第几个参数. 从1开始计数
-				// 从args中取出值,数组的值是从0开始的,因此必须减去1
-				stat.setObject(i, args[ints[i-1]-1]);
+			conn.setAutoCommit(false);
+			// 逐个执行修改操作
+			for (int jk = 0; jk < sqlCount; jk++) { 
+				// 获取sql
+				String sql = queries[jk].value();
+				int[] ints = TypeUtil.getSQLParameter(sql);
+				sql = sql.replaceAll(Placeholder.SP1_REG, "?");
+				// 替换SQL中的占位变量符
+				sql = sql.replaceAll(Placeholder.TABLE_REG, table);
+				sql = sql.replaceAll(Placeholder.ID_REG, id);
+				showArgs(ints,args);
+				LOG.info(sql);
+				
+				try {
+					// Statement.RETURN_GENERATED_KEYS
+					stat = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+					// 注意: preparedStatement的参数索引是从1开始的!
+					for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
+						// ints[i-1] 表示当前SQL参数对应方法的第几个参数. 从1开始计数
+						// 从args中取出值,数组的值是从0开始的,因此必须减去1
+						stat.setObject(i, args[ints[i-1]-1]);
+					}
+					effect = stat.executeUpdate();
+					
+					// XXXXXXXXXXXX
+					//如果主键不是自动增长,在此处获取不到
+					//手动添加主键,需要在参数种标识 @Id(value=table="student") 表示该字段是student表的主键 否则报错
+					//如果按照以上形式标识主键了,那么就可以在生成代码之前做检测了
+					rs = stat.getGeneratedKeys();
+					if (rs.next()) { 
+						autoIncKey = rs.getLong(1);
+						LOG.debug("通过getGeneratedKeys获得主键" + autoIncKey);
+					}
+					// XXXXXXXXXXXX End
+					
+				} finally {
+					// rs 在这个for循环中可能会创建多个.
+					close(rs, stat, null);  // 这个不能省略
+				}	
+				
+				// yyyyyyyyyyyyyyyyyyyyyyy
+				if(autoIncKey == -1) {
+					// 没有获得主键值
+					LOG.debug("通过stat.getGeneratedKeys没有获得主键,将在方法参数里找");
+					int index = TypeUtil.findId(method.getParameters());
+					if( index != -1 ) {
+						if(method.getParameters()[index].getType() != String.class) {
+							autoIncKey = Long.valueOf(args[index].toString()); // 在此不会出现类型转换问题, 因为在check.filter里做校验了		
+						} else {
+							pkey = (String) args[index];
+						}
+					}
+				} 
+				// yyyyyyyyyyyyyyyyyyyyyyy End
+				
+				effects[jk] = effect;
+				primarykeys[jk] = new Primarykey(autoIncKey, pkey);
 			}
-			effect = stat.executeUpdate();
-			
-			
-			
-			// XXXXXXXXXXXX
-			
-			//如果主键不是自动增长,在此处获取不到
-			//手动添加主键,需要在参数种标识 @Id(value=table="student") 表示该字段是student表的主键 否则报错
-			//如果按照以上形式标识主键了,那么就可以在生成代码之前做检测了
-			rs = stat.getGeneratedKeys();
-			if (rs.next()) { 
-				autoIncKey = rs.getLong(1);
-				LOG.debug("通过getGeneratedKeys获得主键" + autoIncKey);
-			}
-			//return new Primarykey(generatedKeys);
-			//待续..args.
-			//.args.getClass().getName().
-			
-			// XXXXXXXXXXXX End
-			
-		} catch (SQLException e) {
+			// 逐个执行修改操作 End
+			conn.commit();
+		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			close(rs, stat, conn);
-		}	
-		
-		// yyyyyyyyyyyyyyyyyyyyyyy
-		if(autoIncKey == -1) {
-			// 没有获得主键值
-			LOG.debug("通过stat.getGeneratedKeys没有获得主键,将在方法参数里找");
-			int index = TypeUtil.findId(method.getParameters());
-			if( index != -1 ) {
-				if(method.getParameters()[index].getType() != String.class) {
-					autoIncKey = Long.valueOf(args[index].toString()); // 在此不会出现类型转换问题, 因为在check.filter里做校验了		
-				} else {
-					pkey = (String) args[index];
-				}
+			effects = new int[sqlCount]; // 影响行数集合
+			primarykeys = new Primarykey[sqlCount];// 主键集合
+			try {
+				conn.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
 			}
-		} 
-		// yyyyyyyyyyyyyyyyyyyyyyy End
-
+		} finally {
+			// 释放资源
+			close(rs, stat, conn);
+		}
 		
 		// 返回类型分析=====================================
+		Primarykey pk = primarykeys[0];
 		ModifyingHandler mh = ModifyingHandler.getInstance();
 		if(returnType==void.class) {
 			return mh.voidType();
 		} else if(returnType == int.class) {
-			return effect;
+			return sumIntArray(effects);
 		} else if(returnType == Map.class) { // 如果然会值是Map,那么一定是insert或update,在生成实现的时候已经做安全检测
-			return mh.mapType(packageName,table,id,autoIncKey,pkey);
+			return mh.mapType(packageName,table,id,pk.getPrimarykey(),pk.getSpecifyPrimarykey());
 		} else if(returnType == JSONObject.class) {
-			return mh.jsonObjectType(packageName,table,id,autoIncKey,pkey);
+			return mh.jsonObjectType(packageName,table,id,pk.getPrimarykey(),pk.getSpecifyPrimarykey());
 		} else if(returnType == Primarykey.class) {
-			return mh.primarykeyType(autoIncKey,pkey);
+			return mh.primarykeyType(pk.getPrimarykey(),pk.getSpecifyPrimarykey());
 		} else if(returnType == boolean.class) {
-			return mh.booleanType(effect);
+			return mh.booleanType(sumIntArray(effects));
 		} else { // 把值强制转换成 returnType
-			return mh.beanType(packageName,table,id,autoIncKey,pkey,returnType);
+			return mh.beanType(packageName,table,id,pk.getPrimarykey(),pk.getSpecifyPrimarykey(),returnType);
 		}
 		// 返回类型分析===================================== End
 		
 	}
 	
+	/**
+	 * 统计一个int数组,所有元素相加的和
+	 * @param ints
+	 * @return
+	 */
+	private int sumIntArray(int[] ints){
+		int sum = 0;
+		for (int i : ints) {
+			sum += i;
+		}
+		return sum;
+	}
 	
 	// 查操作
-	Object query(Method method,Class<?> returnType, Query query, String packageName,Object...args) {
+	Object query(Method method,Class<?> returnType, Query[] query, String packageName,Object...args) {
 		// 获取sql
 		//String sql = query.value();
-		String sql = TypeUtil.getQuerySQL(method, query, args);
+		String sql = TypeUtil.getQuerySQL(method, query, args).get(0);
 		int[] ints = TypeUtil.getSQLParameter(sql);
 		showArgs(ints,args);
 		LOG.info(sql);
@@ -235,7 +270,7 @@ public class QueryProcess {
 	}
 	
 
-	Object methodQuery(Method method,String methodName, Class<?> returnType, Query query, String packageName,Object[] args) {
+	Object methodQuery(Method method,String methodName, Class<?> returnType, Query[] query, String packageName,Object[] args) {
 		// TODO Auto-generated method stub
 		return null;
 	}

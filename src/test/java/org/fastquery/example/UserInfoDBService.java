@@ -20,35 +20,41 @@
  * 
  */
 
-package org.fastquery.filter.generate.query;
+package org.fastquery.example;
 
-import java.lang.reflect.Method;
-
+import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
-import org.fastquery.filter.generate.common.MethodFilter;
+import org.fastquery.core.QueryRepository;
+import org.fastquery.core.Transactional;
+
+import com.alibaba.fastjson.JSONArray;
 
 /**
- * SQL 安全检测
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-public class SQLFilter implements MethodFilter {
+public interface UserInfoDBService extends QueryRepository {
 
-	@Override
-	public Method doFilter(Method method) {
-		Query[] queries = method.getAnnotationsByType(Query.class);
-		for (Query query : queries) {
-			String sql = query.value();
-			
-			if(sql.equals("")) {
-				this.abortWith(method, sql+"该方法,没有标注任何SQL语句");
-			}
-			
-			if(sql.length()<6) {
-				this.abortWith(method, sql+"SQL语法错误");
-			}
-		}
-		
-		return method;
-	}
-
+	@Query("select * from `userinfo` as u where u.age>?1")
+	JSONArray findUserInfoByAge(Integer age);
+	
+	
+	@Transactional
+	@Modifying
+	@Query("update `userinfo` set `name`=?1 where id=?3")
+	@Query("update `userinfo` set `age`=?2 where id=?3")
+	@Query("update `userinfo` set `name`=?1,`age`=?2 where id=?3")
+	int updateBatch(String name,Integer age,Integer id);
+	
+	
+	@Transactional
+	@Modifying
+	@Query("update `userinfo` set `name`=?1 where id=?3")
+	@Query("update `userinfo` set `age`=?2 where id=?3")
+	@Query("update `userinfo` set `id`=1 where `id`=?3") // 把主键id修改为1,可是目前id=1是存在的.这行会报错.那么前两行所做的操作失效.
+	int updateBatch2(String name,Integer age,Integer id);
+	
+	
 }
+
+

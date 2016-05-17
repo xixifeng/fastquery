@@ -36,7 +36,7 @@ public class ModifyingDependencyFilter implements MethodFilter{
 
 	@Override
 	public Method doFilter(Method method) {
-		if(method.getAnnotation(Modifying.class)!=null && method.getAnnotation(Query.class) == null) {
+		if(method.getAnnotation(Modifying.class)!=null && method.getAnnotationsByType(Query.class).length==0) {
 			this.abortWith(method, "有@Modifying,而它依赖@Query!");
 		}
 		return method;
