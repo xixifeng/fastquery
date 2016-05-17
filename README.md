@@ -232,7 +232,7 @@ Primarykey saveUserInfo(String name,Integer age);
 ## @Transactional
 
 ```java
-// 将三条改操作纳入至一个事务中.
+// 将三条改操作纳入到一个事务中.
 @Transactional
 @Modifying
 @Query("update `userinfo` set `name`=?1 where id=?3")
