@@ -1,6 +1,6 @@
-#FastQuery 快速操作数据层框架
+# FastQuery 快速操作数据层框架
 FastQuery 基于Java语言.他的使命是:简化Java操作数据层.做为一个开发者, **仅仅只需要设计DAO接口即可**,其内部采用ASM动态生成实现,执行快. 因此,代码简洁而优雅.从而,大幅度提升开发效率.
-##FastQuery 主要特性如下:
+## FastQuery 主要特性如下:
 1. 设计优雅,配置简单,极易上手.
 2. 采用ASM动态生成字节码,因此支持编译前预处理,可最大限度减少运行期的错误.显著提升程序的强壮性.
 3. 支持安全查询,防止SQL注入.
@@ -9,11 +9,11 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.做为一�
 6. 支持查询结果集以JSON类型返回
 7. 支持`AOP`,注入拦截器只需标识几个简单的注解,如: `@Before` , `@After`
 
-##运行环境要求
+## 运行环境要求
 jdk1.8+
 
-##配置文件
-###jdbc-config.xml
+## 配置文件
+### jdbc-config.xml
 用来配置支持jdbc. **注意**:如果采用连接池,该配置文件可以不要.
 
 ```xml
@@ -37,7 +37,7 @@ jdk1.8+
 </jdbc-config>
 ```
 
-###c3p0-config.xml
+### c3p0-config.xml
 支持c3p0配置,详情配置请参照c3p0官网的说明: http://www.mchange.com/projects/c3p0/.
 
 ```xml
@@ -102,7 +102,7 @@ jdk1.8+
 ]
 ```
 
-##一个完整的入门例子
+## 一个完整的入门例子
 - 准备一个实体
 
 ```java
@@ -141,7 +141,7 @@ jdk1.8+
  Student[] students = studentDBService.find(); 
 ```
 
-##带条件查询
+## 带条件查询
 
 ```java
 // sql中的?1 表示当前方法的第一个参数
@@ -161,7 +161,7 @@ JSONArray find(String sex,Integer age);
 List<Map<String, Object>> findBy(String sex,Integer age);
 ```
 
-##动态条件查询
+## 动态条件查询
 ```java
 @Query("select * from Student #{#where} order by age desc")
 // 增加一些条件
@@ -176,7 +176,7 @@ List<Map<String, Object>> findBy(String sex,Integer age);
 Student[] findAllStudent(... args ...);
 ```
 
-##count
+## count
 
 统计查询行数
 ```java
@@ -184,7 +184,7 @@ Student[] findAllStudent(... args ...);
 long count();
 ```
 
-##exists
+## exists
 
 判断是否存在
 ```java
@@ -192,7 +192,7 @@ long count();
 boolean exists(String no);
 ```
 
-##改操作
+## 改操作
 ```java
 @Query("update student s set s.age=?3,s.name=?2 where  s.no=?1")
 @Modifying
@@ -229,7 +229,7 @@ Primarykey saveUserInfo(String name,Integer age);
 
 ```
 
-##@Before拦截器
+## @Before拦截器
 - 准备一个BeforeFilter
 
 ```java
@@ -263,7 +263,7 @@ public interface StudentDBService extends QueryRepository {
 }
 ```
 
-##@After拦截器
+## @After拦截器
 ```java
 /**
  * @author xixifeng (fastquery@126.com)
@@ -295,7 +295,7 @@ public interface StudentDBService extends QueryRepository {
 }
 ```
 
-##控制拦截器的作用域
+## 控制拦截器的作用域
 若: 有一个拦截器叫`A<T>`,那么:这个拦截器的作用范围只能在T类或T的子类里.<br />
 举例:
 ```java
@@ -306,16 +306,16 @@ public class MyBeforeFilter3 extends BeforeFilter<DataAcquireDbService> {
 }
 ```
 
-###注意:
+### 注意:
 - `@Before`和`@After`不仅可以标注在接口类上,也可以标注在方法上
 - 标识在类的上方:表示其拦截的作用范围是整个类的方法
 - 标识在方法上:表示其拦截的作用范围是当前方法
 - 一个方法的拦截器总和=它的所属类的拦截器+自己的拦截器
 
-## git
+## 源码
 
-- https://github.com/xixifeng/fastquery
 - http://git.oschina.net/xixifeng.com/fastquery
+- https://github.com/xixifeng/fastquery
 - https://code.aliyun.com/xixifeng/fastquery
 
 ## 联系作者
