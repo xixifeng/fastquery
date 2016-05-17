@@ -312,11 +312,12 @@ public class MyBeforeFilter3 extends BeforeFilter<DataAcquireDbService> {
 - 标识在方法上:表示其拦截的作用范围是当前方法
 - 一个方法的拦截器总和=它的所属类的拦截器+自己的拦截器
 
-##源码地址
+## git
 
 - https://github.com/xixifeng/fastquery
 - http://git.oschina.net/xixifeng.com/fastquery
+- https://code.aliyun.com/xixifeng/fastquery
 
-##联系作者
+## 联系作者
 fastquery#126.com
 欢迎批评指正.
