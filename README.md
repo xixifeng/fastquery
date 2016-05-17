@@ -83,7 +83,8 @@ jdk1.8+
         "config": "c3p0",            // 表示由c3p0负责提供数据源
         "dataSourceName": "xk-c3p0", // 数据源的名称
         "basePackages": [            // 该数据源的作用范围
-            "org.fastquery.example.StudentDBService"
+            "org.fastquery.example.StudentDBService",
+            "org.fastquery.example.UserInfoDBService"
             // 在这可以配置多个DB接口,以","号隔开
         ]
     },
