@@ -20,12 +20,11 @@
     <named-config name="xk-c3p0">  
         <property name="driverClass">com.mysql.jdbc.Driver</property>  
         <!-- 在这里需要把 & 替换成 &amp; 不然会报错: XML configuration disabled! Verify that standard XML libs are available-->
-        <!-- 看到有人把UTF-8写作 utf8 不知道哪个对 -->
         <!-- 如果前后台数据库编码一致,不必加?useUnicode=true&amp;characterEncoding=UTF-8 -->
         <property name="jdbcUrl">jdbc:mysql://192.168.8.10:3306/xk</property>  
         <property name="user">xk</property>  
         <property name="password">abc123</property>  
-        <property name="idleConnectionTestPeriod">3</property> <!-- 断开重链 -->
+        <property name="idleConnectionTestPeriod">3</property>
         
         <property name="acquireIncrement">50</property>  
         <property name="initialPoolSize">100</property>  

@@ -31,6 +31,7 @@
         "basePackages": [            // 该数据源的作用范围
             "org.fastquery.example.StudentDBService",
             "org.fastquery.example.UserInfoDBService"
+            // 在这可以配置多个DB接口,以","号隔开
         ]
     },
     
@@ -42,6 +43,7 @@
         "dataSourceName": "shtest_db",
         "basePackages": [ // 该数据源的作用范围
             "org.fastquery.example.DataAcquireDbService"
+            // 在这可以配置多个DB接口,以","号隔开
         ]
     }
 ]
