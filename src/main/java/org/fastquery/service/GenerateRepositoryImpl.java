@@ -35,7 +35,7 @@ import org.fastquery.util.LoadPrperties;
  * 这个类在osgi环境中不能调用
  * @author xixifeng (fastquery@126.com)
  */
-class GenerateRepositoryImpl extends ClassLoader implements GenerateRepository {
+class GenerateRepositoryImpl implements GenerateRepository {
 
 	private static final Logger LOG = Logger.getLogger(GenerateRepositoryImpl.class);
 	
@@ -79,33 +79,12 @@ class GenerateRepositoryImpl extends ClassLoader implements GenerateRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Repository> T generate(Class<T> repositoryClazz) {
-
 		String name = repositoryClazz.getName()+ suffix;
-		
-		Class<T> clazz = (Class<T>) findLoadedClass(name);
-		
-		if(clazz == null) { // 等待生成的类,不存在才能生成.
+		if( FqClassLoader.findLoadedClassByName(name) == null ) {
+			
 			byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
-			try {
-				return (T) defineClass(name,bytes, 0, bytes.length).newInstance();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (ClassFormatError e) {
-				e.printStackTrace();
-			}
-		} else { // 表明已经生成了
-			LOG.info(name + "这个类已经生成并装载!");
-			try {
-				return clazz.newInstance();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			T t = (T) new FqClassLoader(this.getClass().getClassLoader()).defineClassByName(name, bytes, 0, bytes.length);
+			return t;
 		}
 		return null;
 	}
@@ -113,14 +92,7 @@ class GenerateRepositoryImpl extends ClassLoader implements GenerateRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Repository> T getProxyRepository(Class<T> clazz) {
-		T t = null;
-		try {
-			t = (T) this.findLoadedClass(clazz.getName() + suffix).newInstance();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		return t;
+		return (T) FqClassLoader.findLoadedClassByName(clazz.getName() + suffix);
 	}
+	
 }
