@@ -241,6 +241,7 @@ Primarykey saveUserInfo(String name,Integer age);
 // 把主键id修改为1,目前主键id=1是存在的.这行会报错.那么前两行所做的操作全部失效.
 @Query("update `userinfo` set `id`=1 where `id`=?3")
 int updateBatch(String name,Integer age,Integer id);
+// 注意: 返回值如果是int类型,表示这个事务成功提交后所影响的行数.
 ```
 
 
