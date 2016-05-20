@@ -266,7 +266,7 @@ int updateBatch(String name,Integer age,Integer id);
  		// method: 当前拦截到的方法
  		// args: 当前传递进来的参数
  		
- 		// this.abortWith(returnVal); // 中断拦截器
+ 		// this.abortWith(returnVal); // 中断拦截器,并指定返回值
 		
  	}
  }
