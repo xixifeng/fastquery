@@ -28,11 +28,11 @@ jdk1.8+
         <!-- 配置第二个数据源 -->
         <named-config name="shtest_db">  
         <property name="driverClass">com.mysql.jdbc.Driver</property>  <!-- jdbc 驱动 -->
-        <property name="databaseName">dbname</property>  <!-- 数据库的名称 -->
-        <property name="user">username</property>  <!-- 数据库用户名称 -->
-        <property name="password">userpasswd</property>  <!-- 数据库用户的密码 --> 
-        <property name="portNumber">3306</property>   <!-- 端口 -->
-        <property name="serverName">192.168.1.1</property> <!-- 数据库主机地址 -->
+        <property name="databaseName">dbname</property>                <!-- 数据库的名称 -->
+        <property name="user">username</property>                      <!-- 数据库用户名称 -->
+        <property name="password">userpasswd</property>                <!-- 数据库用户的密码 --> 
+        <property name="portNumber">3306</property>                    <!-- 端口 -->
+        <property name="serverName">192.168.1.1</property>             <!-- 数据库主机地址 -->
     </named-config>
 </jdbc-config>
 ```
