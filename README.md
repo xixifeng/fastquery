@@ -55,7 +55,8 @@ jdk1.8+
         <property name="minPoolSize">5</property>  
         <property name="maxStatements">200</property>  
     </default-config> 
--->   
+    -->  
+     
     <named-config name="xk-c3p0">  
         <property name="driverClass">com.mysql.jdbc.Driver</property>  
         <property name="jdbcUrl">jdbc:mysql://192.168.1.1:3306/xk</property>  
@@ -67,7 +68,7 @@ jdk1.8+
         <property name="maxPoolSize">1000</property>
         <property name="maxStatements">0</property>  
         <property name="maxStatementsPerConnection">5</property>     
-        </named-config> 
+    </named-config> 
 </c3p0-config>
 ```
 
@@ -134,12 +135,12 @@ jdk1.8+
  **注意**:不用去实现StudentDBService接口.
 
 ```java
- // get porxy impl
- StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
- // call findAll
- JSONArray jsonArray = studentDBService.findAll();
- // call find
- Student[] students = studentDBService.find(); 
+   // get porxy impl
+   StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
+   // call findAll
+   JSONArray jsonArray = studentDBService.findAll();
+   // call find
+   Student[] students = studentDBService.find(); 
 ```
 
 ## 带条件查询
@@ -168,8 +169,8 @@ List<Map<String, Object>> findBy(String sex,Integer age);
 // 增加一些条件
 @Condition(l="no",o=Operator.LIKE,r="?1") // ?1的值,如果是null, 该行条件将不参与运算
 @Condition(c=COperator.AND,l="name",o=Operator.LIKE,r="?2") // 参数 ?2,如果接收到的值为null,该条件不参与运算
-//通过 ignoreNull=false 开启条件值即使是null也参与运算
-//下行?3接收到的值若为null,该条件也参与运算.
+// 通过 ignoreNull=false 开启条件值即使是null也参与运算
+// 下行?3接收到的值若为null,该条件也参与运算.
 @Condition(c=COperator.AND,l="age",o=Operator.GT,r="?3",ignoreNull=false)
 @Condition(c=COperator.OR,l="dept",o=Operator.IN,r="(?4,?5,?6)")// dept in(?4,?5,?6)
 @Condition(c=COperator.AND,l="name",o={Operator.NOT,Operator.LIKE},r="?7") // 等效于 name not like ?7
@@ -279,7 +280,7 @@ int updateBatch(String name,Integer age,Integer id);
 @Before(MyBeforeFilter2.class)
 @Before(MyBeforeFilter3.class)
 public interface StudentDBService extends QueryRepository {
- // some code ... ...
+   // some code ... ...
 }
 ```
 
@@ -316,7 +317,7 @@ public interface StudentDBService extends QueryRepository {
 ```
 
 ## 控制拦截器的作用域
-若: 有一个拦截器叫`A<T>`,那么:这个拦截器的作用范围只能在T类或T的子类里.<br />
+若: 有一个拦截器叫`A<T>`,那么:这个拦截器的作用范围只能在`T`类或`T`的子类里.<br />
 举例:
 ```java
 // 这个拦截器的作用范围在 DataAcquireDbService里或在DataAcquireDbService子类里.
