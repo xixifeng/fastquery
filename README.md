@@ -97,7 +97,7 @@ jdk1.8+
         "dataSourceName": "shtest_db", // 数据源的名称
         "basePackages": [              // 该数据源的作用范围
             "org.fastquery.example.DataAcquireDbService"
-                // 在这可以配置多个DB接口,以","号隔开
+             // 在这可以配置多个DB接口,以","号隔开
         ]
     }
 ]
