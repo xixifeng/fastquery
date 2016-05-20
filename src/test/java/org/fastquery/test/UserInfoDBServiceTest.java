@@ -67,7 +67,7 @@ public class UserInfoDBServiceTest {
 	public void testUpdateBatch2() {
 		int effect = userInfoDBService.updateBatch2("小不点", 6, 2);
 		// updateBatch2 中途会报错,因此修改影响的行数为0
-		assertThat(effect, equalTo(0));
+		assertThat(effect, equalTo(0)); // 在不支持事务的前提下 
 	}
 	
 	@Test
