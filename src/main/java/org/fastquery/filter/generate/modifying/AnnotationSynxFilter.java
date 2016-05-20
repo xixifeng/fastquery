@@ -45,12 +45,15 @@ public class AnnotationSynxFilter implements MethodFilter {
 		
 		Class<?> returnType = method.getReturnType();
 		
+		Modifying modifying = method.getAnnotation(Modifying.class);
+		
+		Query[] queries = method.getAnnotationsByType(Query.class);
+		
+		String id = modifying.id(); // 不可能为null 因此是使用前不用判断是否为null
+		String table = modifying.table();
+		
 		// 当返回值为Map 或 JSONObject 或 bean时, Modifying中的id和table值是必选的
 		if(returnType==Map.class || returnType==JSONObject.class || TypeUtil.hasDefaultConstructor(returnType)) {
-			Modifying modifying = method.getAnnotation(Modifying.class);
-			String id = modifying.id(); // 不可能为null 因此是使用前不用判断是否为null
-			String table = modifying.table();
-			Query[] queries = method.getAnnotationsByType(Query.class);
 			for (Query query : queries) {
 				String sql = query.value();
 				// 1). id 或 table 不能为""
@@ -67,7 +70,6 @@ public class AnnotationSynxFilter implements MethodFilter {
 					this.abortWith(method, "返回值是:"+returnType+" 因此要求:"+modifying+"中指定当前要修改的表与\""+sql+"\"语句实际要修改的表不一致.");
 				}
 				
-				
 				// 3) @Modifying 必须中的id 和 table值,在数据库中是存在的.
 				// 参考:SHOW COLUMNS from student where `KEY`='PRI'
 				//String packageName = method.getDeclaringClass().getPackage().getName();
@@ -77,6 +79,19 @@ public class AnnotationSynxFilter implements MethodFilter {
 					this.abortWith(method, "返回值是:"+returnType+" 因此要求:"+modifying + String.format("中描述:%s是%s表的主键,与实际不符.", id,table));
 				}	
 			}	
+		}
+		
+		for (Query query : queries) {
+			String s = query.value();
+			// 4) 如果SQL中存在 #{#table}, 而@Modifying中的table属性为"",这属于语法错误.
+			if( (s.indexOf(Placeholder.TABLE) != -1) && table.equals("")) {
+				this.abortWith(method, s+"中存在"+Placeholder.TABLE+", 那么,@Modifying中的table属性为不能为空");
+			}
+			
+			// 5) 如果SQL中存在 #{#id}, 而@Modifying中的id属性为"",这属于语法错误.	
+			if( (s.indexOf(Placeholder.ID) != -1) && id.equals("")) {
+				this.abortWith(method, s+"中存在"+Placeholder.ID+", 那么,@Modifying中的id属性为不能为空");
+			}
 		}
 		
 		return method;
