@@ -93,9 +93,9 @@ jdk1.8+
      再配置一个数据源作用域
     */
     {
-        "config" : "jdbc",            // 表示由jdbc驱动负责提供数据源
-        "dataSourceName": "shtest_db",
-        "basePackages": [ // 该数据源的作用范围
+        "config" : "jdbc",             // 表示由jdbc驱动负责提供数据源
+        "dataSourceName": "shtest_db", // 数据源的名称
+        "basePackages": [              // 该数据源的作用范围
             "org.fastquery.example.DataAcquireDbService"
                 // 在这可以配置多个DB接口,以","号隔开
         ]
