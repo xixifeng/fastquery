@@ -104,6 +104,7 @@ public class TypeUtilTest implements Opcodes {
 	}
 
 	@Test
+	// 测试 TypeUtil.getMethod
 	public void testGetMethod() {
 		List<Class<?>> clazzs = JarListClass.jarClasses("/web/progm/java/jdk1.8.0_45/jre/lib");
 		clazzs.addAll( JarListClass.jarClasses("/web/progm/java/jdk1.8.0_45/jre/lib"));		
@@ -126,23 +127,6 @@ public class TypeUtilTest implements Opcodes {
 			}
 		}
 		System.out.println( "testGetMethod,共测试了"+clazzs.size()+"个类, 用时: " + (System.currentTimeMillis() - start) +" 毫秒!");
-	}
-
-	// 重大发现
-	@Test
-	public void testClass(){
-		List<Class<?>> clazzs = JarListClass.jarClasses("/web/progm/java/jdk1.8.0_45/jre/lib");
-		clazzs.addAll( JarListClass.jarClasses("/web/progm/java/jdk1.8.0_45/jre/lib"));
-		for (Class<?> clazz : clazzs) {
-			Method[] methods = clazz.getDeclaredMethods();
-			for (Method method : methods) {
-				if(method.getDeclaringClass()!=clazz){
-					System.out.println("当前方法的声明类为:" + method.getDeclaringClass());
-					System.out.println("当前clazz为:" + clazz);
-					System.exit(2);
-				}
-			}
-		}
 	}
 	
 	@Test
