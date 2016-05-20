@@ -172,7 +172,7 @@ List<Map<String, Object>> findBy(String sex,Integer age);
 // 通过 ignoreNull=false 开启条件值即使是null也参与运算
 // 下行?3接收到的值若为null,该条件也参与运算.
 @Condition(c=COperator.AND,l="age",o=Operator.GT,r="?3",ignoreNull=false)
-@Condition(c=COperator.OR,l="dept",o=Operator.IN,r="(?4,?5,?6)")            // dept in(?4,?5,?6)
+@Condition(c=COperator.OR,l="dept",o=Operator.IN,r="(?4,?5,?6)")           // dept in(?4,?5,?6)
 @Condition(c=COperator.AND,l="name",o={Operator.NOT,Operator.LIKE},r="?7") // 等效于 name not like ?7
 @Condition(c=COperator.OR,l="age",o=Operator.BETWEEN,r="?8 and ?9")        // 等效于 age between ?8 and ?9
 Student[] findAllStudent(... args ...);
