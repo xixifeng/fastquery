@@ -56,6 +56,17 @@ public interface UserInfoDBService extends QueryRepository {
 	int updateBatch2(String name,Integer age,Integer id);
 	
 	
+	// 返回值如果是int[]类型,表示这个事务成功提交后,每个最小修改单元所影响行数的集合.
+    // 举例说明: 若有个事务T,它里面有3条改操作,分别叫U1,U2,U3. T成功提交后,U1,U2,U3所影响的数据行数分别为N1,N2,N3.
+    // 则: 返回值为: new int[]{N1,N2,N3}
+	@Transactional
+	@Modifying
+	@Query("update `userinfo` set `name`=?1 where id=?3")
+	@Query("update `userinfo` set `age`=?2 where id=?3")
+	@Query("update `userinfo` set `name`=?1,`age`=?2 where id=?3")
+	@Query("update `userinfo` set `name`=?1 where age > ?2")
+	int[] updateBatch3(String name,Integer age,Integer id);
+	
 }
 
 

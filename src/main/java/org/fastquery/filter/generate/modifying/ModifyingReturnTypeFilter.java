@@ -92,6 +92,8 @@ public class ModifyingReturnTypeFilter implements MethodFilter {
 				return method;
 			} else if (returnType == int.class) {
 				return method;
+			} else if (returnType == int[].class) {
+				return method;
 			} else if (ParameterizedType.class.isAssignableFrom(genericReturnType.getClass())) {
 				// 如果type是ParameterizedType的子类,并且返回值的类型是Map,并且该Map中的<>里分别是类型String.class和Object.class
 				ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;

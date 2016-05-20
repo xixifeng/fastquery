@@ -174,6 +174,8 @@ public class QueryProcess {
 			return mh.voidType();
 		} else if(returnType == int.class) {
 			return sumIntArray(effects);
+		} else if(returnType == int[].class ){
+			return effects;
 		} else if(returnType == Map.class) { // 如果然会值是Map,那么一定是insert或update,在生成实现的时候已经做安全检测
 			return mh.mapType(packageName,table,id,pk.getPrimarykey(),pk.getSpecifyPrimarykey());
 		} else if(returnType == JSONObject.class) {

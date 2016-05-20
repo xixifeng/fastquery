@@ -65,7 +65,7 @@ public final class ModifyingHandler {
 
 	// 对于改操作可根据其返回值分类如下(也就是说只允许这这些类型,在生成类之前已经做预处理,越界类型是进来不了的)
 	// 1). 返回值是void
-	// 2). 返回值是int
+	// 2). 返回值是int,int[]
 	// 3). 返回值是Map<String,Object> 只对insert或update有效
 	// 4). 返回值是JSONObject类型 只对insert或update有效
 	// 5). 返回值是Primarykey

@@ -69,5 +69,15 @@ public class UserInfoDBServiceTest {
 		// updateBatch2 中途会报错,因此修改影响的行数为0
 		assertThat(effect, equalTo(0));
 	}
+	
+	@Test
+	public void testUpdateBatch3() {
+		int[] effects = userInfoDBService.updateBatch3("白云", 66, 2);
+		// updateBatch2 中途会报错,因此修改影响的行数为0
+		for (int effect : effects) {
+			assertThat(effect, greaterThanOrEqualTo(1));
+		}
+	}
 
+	
 }
