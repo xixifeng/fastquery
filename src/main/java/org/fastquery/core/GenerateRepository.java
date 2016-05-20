@@ -23,7 +23,8 @@
 package org.fastquery.core;
 
 /**
- * 生成Repository的实现
+ * 
+ * 生成Repository实例规范接口
  * @author xixifeng (fastquery@126.com)
  */
 public  interface GenerateRepository {
