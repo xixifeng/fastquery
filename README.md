@@ -333,6 +333,7 @@ public class MyBeforeFilter3 extends BeforeFilter<DataAcquireDbService> {
 
 ### @SkipFilter
 跳过当前接口绑定的所有非默认的Filter(系统默认的Filter不会跳过).
+
 举例:
 
 ```java
