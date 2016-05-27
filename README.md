@@ -331,6 +331,16 @@ public class MyBeforeFilter3 extends BeforeFilter<DataAcquireDbService> {
 }
 ```
 
+### @SkipFilter
+跳过当前接口绑定的所有非默认的Filter(系统默认的Filter不会跳过).
+举例:
+
+```java
+@SkipFilter
+@Query("select no from `course` limit 1")
+String findOneCourse();
+```
+
 ### 注意:
 - `@Before`和`@After`不仅可以标注在接口类上,也可以标注在方法上
 - 标识在类的上方:表示其拦截的作用范围是整个类的方法
