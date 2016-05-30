@@ -110,12 +110,12 @@ public class PropertiesUtil {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RepositoryException(e.getMessage(),e);
 		} finally {
 				try {
 					inputStream.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					throw new RepositoryException(e.getMessage(),e);
 				}
 		}
 
@@ -190,12 +190,12 @@ public class PropertiesUtil {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RepositoryException(e.getMessage(),e);
 		} finally {
 				try {
 					inputStream.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					throw new RepositoryException(e.getMessage(),e);
 				}
 		}
 		
@@ -229,17 +229,17 @@ public class PropertiesUtil {
 			fquery_json = byteArrayOutputStream.toString();
 			fquery_json = TypeUtil.filterComments(fquery_json);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RepositoryException(e.getMessage(),e);
 		} finally {
 			try {
 				byteArrayOutputStream.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw new RepositoryException(e.getMessage(),e);
 			} finally {
 				try {
 					fqueryjson.close(); // 在此不用判断是否为null, 如果它为null 早就返回了
 				} catch (IOException e) {
-					e.printStackTrace();
+					throw new RepositoryException(e.getMessage(),e);
 				}
 			}
 		}

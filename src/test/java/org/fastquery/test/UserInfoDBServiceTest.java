@@ -22,6 +22,7 @@
 
 package org.fastquery.test;
 
+import org.fastquery.core.RepositoryException;
 import org.fastquery.example.UserInfoDBService;
 import org.fastquery.service.FQuery;
 import org.junit.Before;
@@ -63,7 +64,8 @@ public class UserInfoDBServiceTest {
 		assertThat("断言该行修改操作一共影响了3行",effect, equalTo(3));
 	}
 	
-	@Test
+	// 断言: 它会抛出RepositoryException异常
+	@Test(expected=RepositoryException.class)
 	public void testUpdateBatch2() {
 		int effect = userInfoDBService.updateBatch2("小不点", 6, 2);
 		// updateBatch2 中途会报错,因此修改影响的行数为0

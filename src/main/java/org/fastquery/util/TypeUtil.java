@@ -248,8 +248,7 @@ public class TypeUtil implements Opcodes{
 			} catch (NoSuchMethodException e) {
 				return false;
 			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new RepositoryException(e.getMessage(),e);
 			}
 	    return true;
 	}

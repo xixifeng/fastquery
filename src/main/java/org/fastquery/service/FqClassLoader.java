@@ -25,6 +25,8 @@ package org.fastquery.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.fastquery.core.RepositoryException;
+
 /**
  * 
  * @author xixifeng (fastquery@126.com)
@@ -43,11 +45,9 @@ public class FqClassLoader extends ClassLoader {
 		try {
 			obj = clazz.newInstance();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RepositoryException(e.getMessage(),e);
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RepositoryException(e.getMessage(),e);
 		}
 		
 		beans.put(clazz.getName(), obj);

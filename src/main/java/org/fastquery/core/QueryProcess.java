@@ -154,14 +154,14 @@ public class QueryProcess {
 			// 逐个执行修改操作 End
 			conn.commit();
 		} catch (Exception e) {
-			e.printStackTrace();
 			effects = new int[sqlCount]; // 影响行数集合
 			primarykeys = new Primarykey[sqlCount];// 主键集合
 			try {
 				conn.rollback();
 			} catch (SQLException e1) {
-				e1.printStackTrace();
+				throw new RepositoryException(e1.getMessage(),e1);
 			}
+			throw new RepositoryException(e.getMessage(),e);
 		} finally {
 			// 释放资源
 			close(rs, stat, conn);
@@ -229,7 +229,7 @@ public class QueryProcess {
 			rs = stat.executeQuery();
 			keyvals = rs2Map(rs);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new RepositoryException(e.getMessage(),e);
 		} finally {
 			close(rs, stat, conn);
 		}
@@ -323,21 +323,21 @@ public class QueryProcess {
 				rs.close();
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new RepositoryException(e.getMessage(),e);
 		} finally {
 			try {
 				if (stat != null) {
 					stat.close();
 				}
 			} catch (SQLException e) {
-				e.printStackTrace();
+				throw new RepositoryException(e.getMessage(),e);
 			} finally {
 				try {
 					if (conn != null) {
 						conn.close();
 					}
 				} catch (SQLException e) {
-					e.printStackTrace();
+					throw new RepositoryException(e.getMessage(),e);
 				} finally {
 
 				}

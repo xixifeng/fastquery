@@ -111,7 +111,7 @@ public final class ModifyingHandler {
 				keyval = keyvals.get(0);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new RepositoryException(e.getMessage(),e);
 		} finally {
 			qp.close(rs, stat, conn);
 		}		

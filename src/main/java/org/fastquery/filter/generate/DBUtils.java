@@ -90,7 +90,7 @@ public class DBUtils {
 				throw new RepositoryException("该方法暂不支持 " + databaseProductName + " 数据库");
 			}			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new RepositoryException(e.getMessage(),e);
 		} finally {
 			close(rs, stat, conn);
 		}
@@ -111,24 +111,24 @@ public class DBUtils {
 				rs.close();
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new RepositoryException(e.getMessage(),e);
 		} finally {
 			try {
 				if (stat != null) {
 					stat.close();
 				}
 			} catch (SQLException e) {
-				e.printStackTrace();
+				throw new RepositoryException(e.getMessage(),e);
 			} finally {
 				try {
 					if (conn != null) {
 						conn.close();
 					}
 				} catch (SQLException e) {
-					e.printStackTrace();
-				} finally {
+					throw new RepositoryException(e.getMessage(),e);
+				} /*finally {
 
-				}
+				}*/
 			}
 		}
 	}
