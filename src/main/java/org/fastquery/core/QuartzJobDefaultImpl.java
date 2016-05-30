@@ -29,7 +29,7 @@ package org.fastquery.core;
 public class QuartzJobDefaultImpl implements QuartzJob {
 	@Override
 	public void executeInternal() {
-		throw new RuntimeException(" You don't provide the target job ! ");
+		throw new RepositoryException(" You don't provide the target job ! ");
 	}
 
 }
