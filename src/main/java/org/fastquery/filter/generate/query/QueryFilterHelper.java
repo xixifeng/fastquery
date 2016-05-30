@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
+import org.fastquery.core.RepositoryException;
 import org.fastquery.util.TypeUtil;
 import org.fastquery.where.Condition;
 import org.fastquery.where.Operator;
@@ -71,7 +72,7 @@ class QueryFilterHelper {
 			
 			String where = sb.toString();
 			if(!where.equals("") && TypeUtil.matches(query.value(),Placeholder.WHERE_REG).size()!=1) {
-				throw new RuntimeException(method + " 如果有条件注解,那么@Query中的value值,必须存在#{#where},有且只能出现一次");
+				throw new RepositoryException(method + " 如果有条件注解,那么@Query中的value值,必须存在#{#where},有且只能出现一次");
 			}
 			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, sb.toString()));
 		}

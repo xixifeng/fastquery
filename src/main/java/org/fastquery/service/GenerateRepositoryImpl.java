@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.fastquery.asm.AsmRepository;
 import org.fastquery.core.GenerateRepository;
 import org.fastquery.core.Repository;
+import org.fastquery.core.RepositoryException;
 import org.fastquery.dsm.FastQueryJson;
 import org.fastquery.util.LoadPrperties;
 
@@ -58,7 +59,7 @@ class GenerateRepositoryImpl implements GenerateRepository {
 					generate(clazz);
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
-					throw new ExceptionInInitializerError(e.getMessage());
+					throw new RepositoryException(e.getMessage());
 				}
 			}
 		}

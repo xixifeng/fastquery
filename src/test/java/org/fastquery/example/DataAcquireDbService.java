@@ -53,9 +53,5 @@ public interface DataAcquireDbService extends QueryRepository{
 	JSONArray findAllParkingOutLog();
 	
 	@Query("select c.inTime,c.chargeTime,c.cardTypeId,c.carTypeId,c.plateNum,c.money,c.saleMoney,c.vipMoney,c.chargeMoney,c.feeType,c.passType,c.realName,d.dname from parkcardchargelog c left join device d on c.cpcId=d.id order by c.id desc")
-	JSONArray findAllChargeLog();
-	
-	@Query("select * from (select id,inTime as outintime,cardTypeId,plateNum,0 as inouttype from ParkCardInLog union all select id,outTime as outintime,cardTypeId,plateNum,1 as inouttype from ParkCardOutLog ) d order by d.id desc")
-	JSONArray findAllParkingData();
-	
+	JSONArray findAllChargeLog();	
 }

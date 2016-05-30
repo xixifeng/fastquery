@@ -37,7 +37,6 @@ import org.fastquery.service.FQuery;
 import static org.hamcrest.Matchers.*;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.alibaba.fastjson.JSON;
@@ -87,7 +86,7 @@ public class StudentDBServiceTest {
 	}
 
 	
-	//@Query("select * from student")
+	//@Query("select no, name, sex from student")
 	//JSONArray findAll();
 	@Test
 	public void findAll() {
@@ -206,22 +205,6 @@ public class StudentDBServiceTest {
 			assertThat(Integer.valueOf(m.get("age").toString()), greaterThan(18));
 		} );
 	}
-
-	@Ignore
-	@Test
-	public void testRsy(){
-		String sql = "update select * lkjgw uPdAte lkg";
-		LOG.debug( sql.replaceAll("(?i) update ", "?#-") );
-		LOG.debug( sql.replaceAll("(?i)^update ", "?#-") );
-		try {
-			QueryRepository.class.getMethod("abc");
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		}
-		
-	}
 	
 	@Test
 	public void findColumnKey(){
@@ -294,10 +277,8 @@ public class StudentDBServiceTest {
 	
 	@Test
 	public void findAllStudent(){
-		// select * from Student s  where no LIKE "9%" AND name LIKE "%张" AND age > 15 OR dept IN ("化学系", "数学系", "无派系") order by age desc
-		// name2, age2, age3
 		Student[] students = studentDBService.findAllStudent("9921103", "张", 16, "化学系", "数学系", "无派系", null, null, null);
-		// select * from Student where no LIKE '9921103' AND name LIKE '张' AND age > 16 OR dept IN ('化学系', '数学系', '无派系') order by age desc
+		// select no, name, sex from Student where no LIKE '9921103' AND name LIKE '张' AND age > 16 OR dept IN ('化学系', '数学系', '无派系') order by age desc
 		if(students!=null){
 			for (int i = 0; i < students.length; i++) {
 				System.out.println(students[i]);

@@ -25,6 +25,7 @@ package org.fastquery.util;
 import java.util.Map;
 import java.util.Set;
 
+import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
 import org.fastquery.dsm.FastQueryJson;
 import org.fastquery.dsm.FQueryProperties;
@@ -64,7 +65,7 @@ public class LoadPrperties {
 				jdbcConfig = jdbcConfigs.get(namedConfig);
 
 				if (jdbcConfig == null) {
-					throw new RuntimeException("配置错误!!!");
+					throw new RepositoryException("配置错误!!!");
 				}
 
 				// 根据不同的jdbc的驱动,选择不同的数据源实现

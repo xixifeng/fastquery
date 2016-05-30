@@ -33,6 +33,7 @@ import javax.sql.DataSource;
 
 import org.fastquery.core.Primarykey;
 import org.fastquery.core.QueryProcess;
+import org.fastquery.core.RepositoryException;
 import org.fastquery.dsm.DataSourceManage;
 
 import com.alibaba.fastjson.JSON;
@@ -92,7 +93,7 @@ public final class ModifyingHandler {
 			sql = "select * from " + tableName + " where " + keyFieldName + "='" + pkey + "'";
 		} else {
 			// 返回map, 是需要主键值的,要而没有,那么就报错.
-			throw new RuntimeException("没有找到主键值,请在方法参数中用@Id标识哪个是主键.");
+			throw new RepositoryException("没有找到主键值,请在方法参数中用@Id标识哪个是主键.");
 		}
 		QueryProcess qp = QueryProcess.getInstance();
 		DataSource dataSource = DataSourceManage.getDataSource(packageName);

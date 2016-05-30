@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.fastquery.core.RepositoryException;
 import org.fastquery.util.TypeUtil;
 
 import java.util.Set;
@@ -79,17 +80,17 @@ public class QueryHandler {
 	public long longType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
 
 		if (keyvals.size() > 1) {
-			throw new ClassCastException(method + " 不能把一个集合赋值给long");
+			throw new RepositoryException(method + " 不能把一个集合赋值给long");
 		}
 
 		Map<String, Object> map = keyvals.get(0);
 		Set<Entry<String, Object>> entries = map.entrySet();
 		if (entries.size() > 1) {
-			throw new ClassCastException(method + " 不能把" + map + "赋值给long");
+			throw new RepositoryException(method + " 不能把" + map + "赋值给long");
 		}
 		Iterator<Entry<String, Object>> iterator = entries.iterator();
 		if (!iterator.hasNext()) {
-			throw new ClassCastException(method + " 不能把" + map + "赋值给long");
+			throw new RepositoryException(method + " 不能把" + map + "赋值给long");
 		}
 
 		return Long.valueOf(iterator.next().getValue().toString()).longValue();
@@ -105,7 +106,7 @@ public class QueryHandler {
 
 	public Map<String, Object> mapType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
 		if (keyvals.size() > 1) {
-			throw new ClassCastException(method + "不能把多条记录赋值给Map");
+			throw new RepositoryException(method + "不能把多条记录赋值给Map");
 		}
 		return keyvals.get(0);
 	}
@@ -116,7 +117,7 @@ public class QueryHandler {
 
 	public JSONObject jsonObjeType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
 		if (keyvals.size() > 1) {
-			throw new ClassCastException(method + "不能把多条记录赋值给JSONObject");
+			throw new RepositoryException(method + "不能把多条记录赋值给JSONObject");
 		}
 		return new JSONObject(mapType(method, returnType, keyvals));
 	}
@@ -128,16 +129,16 @@ public class QueryHandler {
 
 	public Object wrapperType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
 		if (keyvals.size() > 1) {
-			throw new ClassCastException(method + "不能把多条记录赋值给" + returnType);
+			throw new RepositoryException(method + "不能把多条记录赋值给" + returnType);
 		}
 		Map<String, Object> map = keyvals.get(0);
 		Set<Entry<String, Object>> entries = map.entrySet();
 		if (entries.size() > 1) {
-			throw new ClassCastException(method + " 不能把" + map + "赋值给" + returnType);
+			throw new RepositoryException(method + " 不能把" + map + "赋值给" + returnType);
 		}
 		Iterator<Entry<String, Object>> iterator = entries.iterator();
 		if (!iterator.hasNext()) {
-			throw new ClassCastException(method + " 不能把" + map + "赋值给" + returnType);
+			throw new RepositoryException(method + " 不能把" + map + "赋值给" + returnType);
 		}
 
 		Object val = iterator.next().getValue();
@@ -155,7 +156,7 @@ public class QueryHandler {
 		} else if (returnType == Character.class) {
 			String strs = val.toString();
 			if (strs.length() > 1) {
-				throw new ClassCastException(method + " 不能把" + strs + "赋值给" + returnType);
+				throw new RepositoryException(method + " 不能把" + strs + "赋值给" + returnType);
 			}
 			val = Character.valueOf(val.toString().charAt(0));
 		} else if (returnType == Float.class) {
@@ -190,7 +191,7 @@ public class QueryHandler {
 					key = keys.iterator().next();
 					Array.set(array, index, map.get(key));
 				} else {
-					throw new RuntimeException(method + " 执行的结果集" + keyvals + "不能转换成" + returnType);
+					throw new RepositoryException(method + " 执行的结果集" + keyvals + "不能转换成" + returnType);
 				}
 			}
 		}
@@ -200,7 +201,7 @@ public class QueryHandler {
 
 	public Object beanType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
 		if (keyvals.size() != 1) {
-			throw new RuntimeException(method + "不能把一个集合转换成" + returnType);
+			throw new RepositoryException(method + "不能把一个集合转换成" + returnType);
 		}
 
 		if (TypeUtil.hasDefaultConstructor(returnType)) {

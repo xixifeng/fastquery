@@ -91,7 +91,7 @@ public class Prepared {
 				return QueryProcess.getInstance().query(method,returnType, querys,packageName, args);
 			} //else if(iclazz.getAnnotation(Modifying.class)!=null) {
 			  //Modifying 不能独存,要么不要加, 在生成Repository实现之前已经做了检测
-			  //throw new RuntimeException(method+"@Modifying不能独存,依赖@Query!");
+			  //throw new RepositoryException(method+"@Modifying不能独存,依赖@Query!");
 			  //}
 			 else {
 				 return QueryProcess.getInstance().methodQuery(method,methodName,returnType, querys,packageName, args);
@@ -129,7 +129,7 @@ public class Prepared {
 				}*/
 				clazz = (Class<? extends Repository>) classLoader.loadClass(interfaceClazz);
 			} catch (ClassNotFoundException e) {
-				throw new RuntimeException(e.getMessage(),e);
+				throw new RepositoryException(e.getMessage(),e);
 			}
 			return clazz;
 	}

@@ -30,6 +30,7 @@ import org.fastquery.core.QuartzRepository;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Repository;
+import org.fastquery.core.RepositoryException;
 import org.fastquery.filter.generate.common.MethodFilterChain;
 import org.fastquery.filter.generate.global.InterceptorFilter;
 import org.fastquery.filter.generate.global.ReturnTypeFilter;
@@ -145,7 +146,7 @@ class GenerateExtends {
 				}
 				
 			} else {
-				throw new RuntimeException(repositoryClazz+"不能解析");
+				throw new RepositoryException(repositoryClazz+"不能解析");
 			}
 			
 			

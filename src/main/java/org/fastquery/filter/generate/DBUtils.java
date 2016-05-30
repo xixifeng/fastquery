@@ -30,6 +30,7 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
+import org.fastquery.core.RepositoryException;
 import org.fastquery.dsm.DataSourceManage;
 
 /**
@@ -86,7 +87,7 @@ public class DBUtils {
 					return true;
 				}
 			} else {
-				throw new RuntimeException("该方法暂不支持 " + databaseProductName + " 数据库");
+				throw new RepositoryException("该方法暂不支持 " + databaseProductName + " 数据库");
 			}			
 		} catch (SQLException e) {
 			e.printStackTrace();

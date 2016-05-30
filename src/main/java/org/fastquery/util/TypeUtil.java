@@ -37,6 +37,7 @@ import org.fastquery.core.Id;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
 import org.fastquery.core.Repository;
+import org.fastquery.core.RepositoryException;
 import org.fastquery.where.Condition;
 import org.fastquery.where.Operator;
 import org.objectweb.asm.Opcodes;
@@ -133,7 +134,7 @@ public class TypeUtil implements Opcodes{
 				return method;
 			}
 		}
-		throw new RuntimeException("致命错误,没有找到方法!");
+		throw new RepositoryException("致命错误,没有找到方法!");
 	}
 	
 	
@@ -198,7 +199,7 @@ public class TypeUtil implements Opcodes{
 		/*
 		历史写法保留
 		if(sql==null || keyword==null) {
-			throw new IllegalArgumentException("参数不能为null");
+			throw new RepositoryException("参数不能为null");
 		}
 		String custom = ":?#-"; 
 		

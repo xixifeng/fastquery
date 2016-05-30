@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.fastquery.core.Repository;
+import org.fastquery.core.RepositoryException;
 
 /**
  * 
@@ -59,7 +60,7 @@ public class FilterChainHandler {
 				try {
 					beforeFilterChain.addFilter(clazz.newInstance());
 				} catch (Exception e) {
-					throw new RuntimeException(e.getMessage(),e);
+					throw new RepositoryException(e.getMessage(),e);
 				} 
 			}
 		}
@@ -81,7 +82,7 @@ public class FilterChainHandler {
 				try {
 					afterFilterChain.addFilter(clazz.newInstance());
 				} catch (Exception e) {
-					throw new RuntimeException(e.getMessage(),e);
+					throw new RepositoryException(e.getMessage(),e);
 				} 
 			}
 		}

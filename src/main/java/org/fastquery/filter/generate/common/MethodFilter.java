@@ -24,6 +24,8 @@ package org.fastquery.filter.generate.common;
 
 import java.lang.reflect.Method;
 
+import org.fastquery.core.RepositoryException;
+
 /**
  * Method 检测过滤器
  * @author xixifeng (fastquery@126.com)
@@ -43,8 +45,7 @@ public interface MethodFilter {
 	 * @param errorMsg 终止理由
 	 */
 	default void abortWith(Method method,String msg){
-		throw new Error(String.format("%s->: %s ", method.toString(),msg));
-		//throw new RuntimeException(String.format("%s->: %s ", method.toString(),msg));
+		throw new RepositoryException(String.format("%s->: %s ", method.toString(),msg));
 	}
 	
 }

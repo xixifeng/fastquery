@@ -127,9 +127,9 @@ jdk1.8+
 
 ```java
  public interface StudentDBService extends QueryRepository {
-    @Query("select * from student")
+    @Query("select no, name, sex from student")
     JSONArray findAll();
-    @Query("select * from student")
+    @Query("select no as no,name,sex,age,dept from student")
     Student[] find();      
  }
 ```
@@ -159,17 +159,17 @@ jdk1.8+
 Student[] find(Integer age,String sex);
  	
 // 查询返回JSON格式
-@Query("select * from student s where s.sex=?1 and s.age > ?2")
+@Query("select no, name, sex from student s where s.sex=?1 and s.age > ?2")
 JSONArray find(String sex,Integer age);
 	
 // 查询返回List Map
-@Query("select * from student s where s.sex=?1 and s.age > ?2")
+@Query("select no, name, sex from student s where s.sex=?1 and s.age > ?2")
 List<Map<String, Object>> findBy(String sex,Integer age);
 ```
 
 ## 动态条件查询
 ```java
-@Query("select * from Student #{#where} order by age desc")
+@Query("select no, name, sex from Student #{#where} order by age desc")
 // 增加一些条件
 @Condition(l="no",o=Operator.LIKE,r="?1")                   // ?1的值,如果是null, 该行条件将不参与运算
 @Condition(c=COperator.AND,l="name",o=Operator.LIKE,r="?2") // 参数 ?2,如果接收到的值为null,该条件不参与运算
@@ -194,7 +194,7 @@ long count();
 
 判断是否存在
 ```java
-@Query("select * from student s where s.no=?1")
+@Query("select no from student s where s.no=?1")
 boolean exists(String no);
 ```
 

@@ -36,6 +36,7 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
 import org.fastquery.dsm.FastQueryJson;
 import org.fastquery.dsm.JdbcConfig;
@@ -97,10 +98,10 @@ public class PropertiesUtil {
 						key = jdbcConfigElement.getAttribute("name");
 						val = jdbcConfigElement.getTextContent();
 						if(key == null || key.equals("")) {
-							throw new RuntimeException("c3p0-config.xml 中的property其name属性不能是空字符且不能为null");
+							throw new RepositoryException("c3p0-config.xml 中的property其name属性不能是空字符且不能为null");
 						}
 						if(val == null || val.equals("")) {
-							throw new RuntimeException("c3p0-config.xml 中的property其值不能是空字符且不能为null");
+							throw new RepositoryException("c3p0-config.xml 中的property其值不能是空字符且不能为null");
 						}
 						jsonObject.put(key, val);
 					}
@@ -161,10 +162,10 @@ public class PropertiesUtil {
 						key = jdbcConfigElement.getAttribute("name");
 						val = jdbcConfigElement.getTextContent();
 						if(key == null || key.equals("")) {
-							throw new RuntimeException("jdbc-config.xml 中的property其name属性不能是空字符且不能为null");
+							throw new RepositoryException("jdbc-config.xml 中的property其name属性不能是空字符且不能为null");
 						}
 						if(val == null || val.equals("")) {
-							throw new RuntimeException("jdbc-config.xml 中的property其值不能是空字符且不能为null");
+							throw new RepositoryException("jdbc-config.xml 中的property其值不能是空字符且不能为null");
 						}
 						if (key.equals("databaseName")) {
 							jdbcConfig.setDatabaseName(val);
@@ -181,7 +182,7 @@ public class PropertiesUtil {
 						} else if (key.equals("driverClass")) {
 							jdbcConfig.setDriverClass(val);
 						} else {
-							throw new RuntimeException("jdbc-config.xml 中不支持该属性值: name=" + key);
+							throw new RepositoryException("jdbc-config.xml 中不支持该属性值: name=" + key);
 						}
 					}
 				}
@@ -216,7 +217,7 @@ public class PropertiesUtil {
 		
 		//InputStream inputStream = ResourceUtil.getResourceAsStream("fastquery.json");
 		if(fqueryjson==null) {
-			throw new RuntimeException("没有找到fastquery.json .");
+			throw new RepositoryException("没有找到fastquery.json .");
 		}
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		int b = 0;
@@ -244,7 +245,7 @@ public class PropertiesUtil {
 		}
 		
 		if(fquery_json==null) { // 表明没有fastquery.json 配置文件,直接报错
-			throw new RuntimeException("没有找到fastquery.json .");
+			throw new RepositoryException("没有找到fastquery.json .");
 		}
 		
 		fqs = new HashSet<>();
@@ -262,17 +263,17 @@ public class PropertiesUtil {
 			dataSourceName = fQueryPropertie.getDataSourceName();
 			basePackages = fQueryPropertie.getBasePackages(); 
 			if(config == null || config.equals("")) {
-				throw new RuntimeException("fastquery.json 中的config属性配置错误,提示,不能是空字符且不能为null");
+				throw new RepositoryException("fastquery.json 中的config属性配置错误,提示,不能是空字符且不能为null");
 			}
 			if(dataSourceName==null || dataSourceName.equals("")){
-				throw new RuntimeException("fastquery.json 中的dataSourceName配置错误,提示,不能是空字符且不能为null");
+				throw new RepositoryException("fastquery.json 中的dataSourceName配置错误,提示,不能是空字符且不能为null");
 			}
 			if(basePackages==null || basePackages.size()<1) {
-				throw new RuntimeException("fastquery.json 中的basePackage配置错误,提示basePackages不能配置成空");
+				throw new RepositoryException("fastquery.json 中的basePackage配置错误,提示basePackages不能配置成空");
 			}
 			for (String basePackage : basePackages) {
 				if(basePackage==null || basePackage.equals("")){
-					throw new RuntimeException("fastquery.json 中的basePackage配置错误,提示,不能是空字符且不能为null");
+					throw new RepositoryException("fastquery.json 中的basePackage配置错误,提示,不能是空字符且不能为null");
 				}
 				bpNames.add(basePackage); // 把所有的basePackage收集在一个集合里,方便校验是否有重复
 			}
@@ -281,26 +282,26 @@ public class PropertiesUtil {
 			case "c3p0":
 				// 校验是否存在 c3p0-config.xml 文件
 				if(!fqueryResource.exist("c3p0-config.xml")) {
-					throw new RuntimeException("fastquery.json 配置文件中, config设置了c3p0,因此依赖c3p0-config.xml配置文件,可是没有找到.");
+					throw new RepositoryException("fastquery.json 配置文件中, config设置了c3p0,因此依赖c3p0-config.xml配置文件,可是没有找到.");
 				}
 				// 校验指定的数据源名称是否正确
 				if(!getC3p0Configs(fqueryResource.getResourceAsStream("c3p0-config.xml")).containsKey(dataSourceName)) {
-					throw new RuntimeException("fastquery.json 配置文件中, 指定了数据源为"+dataSourceName+",而在c3p0-config.xml中,找不到对该数据源的配置.");
+					throw new RepositoryException("fastquery.json 配置文件中, 指定了数据源为"+dataSourceName+",而在c3p0-config.xml中,找不到对该数据源的配置.");
 				}
 				break;
 			case "jdbc":
 				// 校验是否存在 jdbc-config.xml 文件
 				if(!fqueryResource.exist("jdbc-config.xml")){
-					throw new RuntimeException("fastquery.json 配置文件中, config设置了jdbc,因此依赖jdbc-config.xml配置文件,可是没有找到.");
+					throw new RepositoryException("fastquery.json 配置文件中, config设置了jdbc,因此依赖jdbc-config.xml配置文件,可是没有找到.");
 				}
 				// getJdbcConfigs 里面有对流进行关闭
 				if(!getJdbcConfigs(fqueryResource.getResourceAsStream("jdbc-config.xml")).containsKey(dataSourceName)){
-					throw new RuntimeException("fastquery.json 配置文件中, 指定了数据源为"+dataSourceName+",而在jdbc-config.xml中,找不到对该数据源的配置.");
+					throw new RepositoryException("fastquery.json 配置文件中, 指定了数据源为"+dataSourceName+",而在jdbc-config.xml中,找不到对该数据源的配置.");
 				}
 				// 校验指定的数据源名称是否正确
 				break;
 			default:
-				throw new RuntimeException("fastquery.json 配置文件中, config设置了"+config+",不支持该属性值");
+				throw new RepositoryException("fastquery.json 配置文件中, config设置了"+config+",不支持该属性值");
 				//break;
 			}
 			
@@ -320,12 +321,12 @@ public class PropertiesUtil {
 		// 校验 fastquery.json
 		for (int i = 0; i < dataSourceNames.size(); i++) {
 			if(Collections.frequency(dataSourceNames, dataSourceNames.get(i))>1) {
-				throw new RuntimeException("fastquery.json 配置文件中 \"dataSourceName\"=\""+dataSourceNames.get(i) + "\" 不能重复出现.");
+				throw new RepositoryException("fastquery.json 配置文件中 \"dataSourceName\"=\""+dataSourceNames.get(i) + "\" 不能重复出现.");
 			}
 		}
 		for (int j = 0; j < bpNames.size(); j++) {
 			if( Collections.frequency(bpNames, bpNames.get(j)) >1) {
-				throw new RuntimeException("fastquery.json 配置文件中, basePackages中的元素\""+bpNames.get(j)+"\"不能重复出现.");
+				throw new RepositoryException("fastquery.json 配置文件中, basePackages中的元素\""+bpNames.get(j)+"\"不能重复出现.");
 			}
 		}
 		// 校验 fastquery.json End

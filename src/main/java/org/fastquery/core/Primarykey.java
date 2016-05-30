@@ -49,7 +49,7 @@ public class Primarykey {
 	public <T> T getPrimarykey(Class<T> keyType) {
 		if ((keyType != int.class) && (keyType != long.class) && (keyType != Integer.class)
 				&& (keyType != Long.class)) {
-			throw new RuntimeException("类型不允许!");
+			throw new RepositoryException("类型不允许!");
 		}
 		T val = (T) keys.get(0).get("GENERATED_KEY");	
 		return val;
