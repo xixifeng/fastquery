@@ -58,7 +58,7 @@ class GenerateRepositoryImpl implements GenerateRepository {
 					Class<? extends Repository> clazz = (Class<? extends Repository>) Class.forName(basePackage);
 					generate(clazz);
 				} catch (ClassNotFoundException e) {
-					throw new RepositoryException(e.getMessage());
+					throw new RepositoryException(e.getMessage(),e);
 				}
 			}
 		}

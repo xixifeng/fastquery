@@ -30,6 +30,7 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dsm.DataSourceManage;
 
@@ -39,6 +40,7 @@ import org.fastquery.dsm.DataSourceManage;
  */
 public class DBUtils {
 
+	private static final Logger LOG = Logger.getLogger(DBUtils.class);
 	private volatile static DBUtils dbUtils;
 
 	private DBUtils() {
@@ -118,14 +120,14 @@ public class DBUtils {
 					stat.close();
 				}
 			} catch (SQLException e) {
-				throw new RepositoryException(e.getMessage(),e);
+				LOG.error(e.getMessage(),e);
 			} finally {
 				try {
 					if (conn != null) {
 						conn.close();
 					}
 				} catch (SQLException e) {
-					throw new RepositoryException(e.getMessage(),e);
+					LOG.error(e.getMessage(),e);
 				} /*finally {
 
 				}*/

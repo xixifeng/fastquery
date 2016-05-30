@@ -245,10 +245,8 @@ public class TypeUtil implements Opcodes{
 		}
 	        try {
 				clazz.getConstructor();
-			} catch (NoSuchMethodException e) {
+			}catch (Exception e) {
 				return false;
-			} catch (SecurityException e) {
-				throw new RepositoryException(e.getMessage(),e);
 			}
 	    return true;
 	}

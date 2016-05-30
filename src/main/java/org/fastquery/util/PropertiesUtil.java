@@ -36,6 +36,7 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.log4j.Logger;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
 import org.fastquery.dsm.FastQueryJson;
@@ -55,6 +56,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class PropertiesUtil {
 
+	private static final Logger LOG = Logger.getLogger(PropertiesUtil.class);
 	
 	/**
 	 * 解析 c3p0-config.xml
@@ -115,7 +117,7 @@ public class PropertiesUtil {
 				try {
 					inputStream.close();
 				} catch (IOException e) {
-					throw new RepositoryException(e.getMessage(),e);
+					LOG.error(e.getMessage(),e);
 				}
 		}
 
@@ -195,7 +197,7 @@ public class PropertiesUtil {
 				try {
 					inputStream.close();
 				} catch (IOException e) {
-					throw new RepositoryException(e.getMessage(),e);
+					LOG.error(e.getMessage(),e);
 				}
 		}
 		
@@ -234,12 +236,12 @@ public class PropertiesUtil {
 			try {
 				byteArrayOutputStream.close();
 			} catch (IOException e) {
-				throw new RepositoryException(e.getMessage(),e);
+				LOG.error(e.getMessage(),e);
 			} finally {
 				try {
 					fqueryjson.close(); // 在此不用判断是否为null, 如果它为null 早就返回了
 				} catch (IOException e) {
-					throw new RepositoryException(e.getMessage(),e);
+					LOG.error(e.getMessage(),e);
 				}
 			}
 		}

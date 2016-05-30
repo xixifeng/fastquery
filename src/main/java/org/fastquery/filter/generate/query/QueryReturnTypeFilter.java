@@ -39,7 +39,7 @@ public class QueryReturnTypeFilter implements MethodFilter {
 
 	@Override
 	public Method doFilter(Method method) {
-		String errmsg = String.format("为这个方法设置的返回值错误,其返回值类型支持类型如下:\n%s \n%s \n%s \n%s \n%s \n%s \n%s \n%s \n%s \n%s \n",
+		String errmsg = String.format("为这个方法设置的返回值错误,其返回值类型支持类型如下:%n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n",
 				"1). long 用于统计总行数",
 				"2). boolean 判断是否存在",
 				"3). Map<String,Object>", 

@@ -330,17 +330,17 @@ public class QueryProcess {
 					stat.close();
 				}
 			} catch (SQLException e) {
-				throw new RepositoryException(e.getMessage(),e);
+				LOG.error(e.getMessage(),e);
 			} finally {
 				try {
 					if (conn != null) {
 						conn.close();
 					}
 				} catch (SQLException e) {
-					throw new RepositoryException(e.getMessage(),e);
-				} finally {
+					LOG.error(e.getMessage(),e);
+				} /*finally {
 
-				}
+				}*/
 			}
 		}
 	}
