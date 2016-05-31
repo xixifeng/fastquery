@@ -84,7 +84,7 @@ public class DBUtils {
 			if(databaseProductName.equals("MySQL")) { 
 				sql = "SHOW COLUMNS from "+table+" where `KEY`='PRI'";
 			} else {
-				throw new RepositoryException("该方法暂不支持 " + databaseProductName + " 数据库");
+				//throw new RepositoryException("该方法暂不支持 " + databaseProductName + " 数据库");
 			}			
 			stat = conn.createStatement();
 			rs = stat.executeQuery(sql);
