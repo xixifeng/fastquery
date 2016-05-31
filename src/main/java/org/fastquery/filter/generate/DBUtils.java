@@ -91,10 +91,8 @@ public class DBUtils {
 			if(rs.next() && rs.getString("Field").equals(field)) {
 				return true;
 			}
-			rs.close();
-			stat.close();
 		} catch (SQLException e) {
-			throw new RepositoryException(e.getMessage(),e);
+			LOG.error(e.getMessage(),e);
 		} finally {
 			close(rs, stat, conn);
 		}
@@ -115,7 +113,8 @@ public class DBUtils {
 				rs.close();
 			}
 		} catch (SQLException e) {
-			throw new RepositoryException(e.getMessage(),e);
+			//throw new RepositoryException(e.getMessage(),e);
+			LOG.error(e.getMessage(),e);
 		} finally {
 			try {
 				if (stat != null) {
