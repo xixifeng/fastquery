@@ -88,9 +88,9 @@ public class DBUtils {
 			}			
 			stat = conn.createStatement();
 			rs = stat.executeQuery(sql);
-			if(rs.next() && rs.getString("Field").equals(field)) {
-				return true;
-			}
+			//if(rs.next() && rs.getString("Field").equals(field)) {
+			//	return true;
+			//}
 		} catch (SQLException e) {
 			LOG.error(e.getMessage(),e);
 		} finally {
