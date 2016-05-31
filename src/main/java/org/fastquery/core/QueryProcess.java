@@ -53,7 +53,7 @@ public class QueryProcess {
 	
 	private static final Logger LOG = Logger.getLogger(QueryProcess.class);
 	
-	private volatile static QueryProcess queryProcess;
+	private static QueryProcess queryProcess;
 	
 	private QueryProcess(){
 		
@@ -106,9 +106,9 @@ public class QueryProcess {
 				showArgs(ints,args);
 				LOG.info(sql);
 				
-				//try {
+				try {
 					// Statement.RETURN_GENERATED_KEYS
-					stat = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+					stat = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS); // stat 已经在下面的finally里关闭了.
 					// 注意: preparedStatement的参数索引是从1开始的!
 					for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 						// ints[i-1] 表示当前SQL参数对应方法的第几个参数. 从1开始计数
@@ -128,10 +128,10 @@ public class QueryProcess {
 					}
 					// XXXXXXXXXXXX End
 					
-				//} finally {
+				} finally {
 					// rs 在这个for循环中可能会创建多个.
 					close(rs, stat, null);  // 这个不能省略
-				//}	
+				}	
 				
 				// yyyyyyyyyyyyyyyyyyyyyyy
 				if(autoIncKey == -1) {
@@ -209,7 +209,6 @@ public class QueryProcess {
 	// 查操作
 	Object query(Method method,Class<?> returnType, Query[] query, String packageName,Object...args) {
 		// 获取sql
-		//String sql = query.value();
 		String sql = TypeUtil.getQuerySQL(method, query, args).get(0);
 		int[] ints = TypeUtil.getSQLParameter(sql);
 		showArgs(ints,args);
@@ -224,7 +223,7 @@ public class QueryProcess {
 		try {
 			// 获取链接
 			conn = dataSource.getConnection();
-			stat = conn.prepareStatement(sql);
+			stat = conn.prepareStatement(sql); // stat 已经在下面的finally里关闭了.
 			for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 				stat.setObject(i, args[ints[i-1]-1]);
 			}
@@ -236,7 +235,7 @@ public class QueryProcess {
 			close(rs, stat, conn);
 		}
 		
-		if(keyvals==null || keyvals.size() == 0) { // 没有找到返回null. 返回类型已经在生成代码时做了全面检测
+		if(keyvals==null || keyvals.isEmpty()) { // 没有找到返回null. 返回类型已经在生成代码时做了全面检测
 			if(returnType == boolean.class){
 				return false;
 			}
@@ -269,13 +268,10 @@ public class QueryProcess {
 			return qh.beanType(method,returnType,keyvals);
 		}
 		// 返回类型分析===================================== End
-		//return conversion(method,returnType,keyvals);
-		//return null;
 	}
 	
 
 	Object methodQuery(Method method,String methodName, Class<?> returnType, Query[] query, String packageName,Object[] args) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -307,7 +303,7 @@ public class QueryProcess {
 			}
 			keyvals.add(keyval);
 		}
-		if( keyvals.size() == 0) {
+		if(keyvals.isEmpty()) {
 			return null;
 		}
 		return keyvals;
@@ -340,9 +336,7 @@ public class QueryProcess {
 					}
 				} catch (SQLException e) {
 					LOG.error(e.getMessage(),e);
-				} /*finally {
-
-				}*/
+				}
 			}
 		}
 	}

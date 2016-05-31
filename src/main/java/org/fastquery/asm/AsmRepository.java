@@ -53,7 +53,7 @@ public class AsmRepository implements Opcodes {
 		String[] interfaces = new String[] { Type.getType(repositoryClazz).getInternalName() };
 
 		// 给待生成的实现类取个名字
-		String proxyName = Type.getType(repositoryClazz).getInternalName() + GenerateRepository.suffix;
+		String proxyName = Type.getType(repositoryClazz).getInternalName() + GenerateRepository.SUFFIX;
 
 		// 生成类
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);

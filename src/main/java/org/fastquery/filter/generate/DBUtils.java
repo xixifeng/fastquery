@@ -41,7 +41,7 @@ import org.fastquery.dsm.DataSourceManage;
 public class DBUtils {
 
 	private static final Logger LOG = Logger.getLogger(DBUtils.class);
-	private volatile static DBUtils dbUtils;
+	private static DBUtils dbUtils;
 
 	private DBUtils() {
 	}
@@ -56,12 +56,6 @@ public class DBUtils {
 		}
 		return dbUtils;
 	}
-	
-	/*
-	public List<Map<String, Object>> query(String sql){
-		
-	} 
-	*/
 	
 	/**
 	 * 判断 field 是否是 table 表的主键
@@ -81,19 +75,20 @@ public class DBUtils {
 			conn = dataSource.getConnection();
 			DatabaseMetaData databaseMetaData = conn.getMetaData(); // 获取数据库信息
 			String databaseProductName = databaseMetaData.getDatabaseProductName();
-			if(databaseProductName.equals("MySQL")) { 
+			if("MySQL".equals(databaseProductName)) { 
 				sql = "SHOW COLUMNS from "+table+" where `KEY`='PRI'";
+				stat = conn.createStatement(); // stat 已经在下面的finally里关闭了.
+				rs = stat.executeQuery(sql);   // rs 已经在下面的finally里关闭了.
+				if(rs.next() && rs.getString("Field").equals(field)) {
+					return true;
+				}
 			} else {
-				//throw new RepositoryException("该方法暂不支持 " + databaseProductName + " 数据库");
+				throw new RepositoryException("该方法暂不支持 " + databaseProductName + " 数据库");
 			}			
-			stat = conn.createStatement();
-			rs = stat.executeQuery(sql);
-			//if(rs.next() && rs.getString("Field").equals(field)) {
-			//	return true;
-			//}
 		} catch (SQLException e) {
-			LOG.error(e.getMessage(),e);
+			throw new RepositoryException(e.getMessage(),e);
 		} finally {
+			// 如果上面发生异常,或向上抛出了异常,或上面返回了, 这个finally都会执行
 			close(rs, stat, conn);
 		}
 		
@@ -109,26 +104,25 @@ public class DBUtils {
 	 */
 	private void close(ResultSet rs, Statement stat, Connection conn) {
 		try {
-			//if (rs != null) {
+			if (rs != null) {
 				rs.close();
-			//}
+			}
 		} catch (SQLException e) {
-			//throw new RepositoryException(e.getMessage(),e);
-			LOG.error(e.getMessage(),e);
+			throw new RepositoryException(e.getMessage(), e);
 		} finally {
 			try {
-				//if (stat != null) {
+				if (stat != null) {
 					stat.close();
-				//}
+				}
 			} catch (SQLException e) {
-				LOG.error(e.getMessage(),e);
+				LOG.error(e.getMessage(), e);
 			} finally {
 				try {
-				//	if (conn != null) {
+					if (conn != null) {
 						conn.close();
-				//	}
+					}
 				} catch (SQLException e) {
-					LOG.error(e.getMessage(),e);
+					LOG.error(e.getMessage(), e);
 				}
 			}
 		}

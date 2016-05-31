@@ -79,7 +79,7 @@ class GenerateRepositoryImpl implements GenerateRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Repository> T generate(Class<T> repositoryClazz) {
-		String name = repositoryClazz.getName()+ suffix;
+		String name = repositoryClazz.getName()+ SUFFIX;
 		if( FqClassLoader.findLoadedClassByName(name) == null ) {
 			
 			byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
@@ -92,7 +92,7 @@ class GenerateRepositoryImpl implements GenerateRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Repository> T getProxyRepository(Class<T> clazz) {
-		return (T) FqClassLoader.findLoadedClassByName(clazz.getName() + suffix);
+		return (T) FqClassLoader.findLoadedClassByName(clazz.getName() + SUFFIX);
 	}
 	
 }

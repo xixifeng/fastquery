@@ -27,18 +27,12 @@ package org.fastquery.core;
  * 生成Repository实例规范接口
  * @author xixifeng (fastquery@126.com)
  */
-public  interface GenerateRepository {
-	
-	//String c3p0Config="c3p0-config.xml";
-
-	//String fastquery="fastquery.json";
-
-	//String jdbcConfig="jdbc-config.xml";
+public interface GenerateRepository {
 	
 	/**
 	 * 生成类的默认后缀名称
 	 */
-	String suffix = "$ProxyImpl";
+	String SUFFIX = "$ProxyImpl";
 	
 	/**
 	 * 生成 Repository 接口的实现
