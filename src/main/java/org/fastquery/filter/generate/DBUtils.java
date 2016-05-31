@@ -83,14 +83,14 @@ public class DBUtils {
 			String databaseProductName = databaseMetaData.getDatabaseProductName();
 			if(databaseProductName.equals("MySQL")) { 
 				sql = "SHOW COLUMNS from "+table+" where `KEY`='PRI'";
-				stat = conn.createStatement();
-				rs = stat.executeQuery(sql);
-				if(rs.next() && rs.getString("Field").equals(field)) {
-					return true;
-				}
 			} else {
 				throw new RepositoryException("该方法暂不支持 " + databaseProductName + " 数据库");
 			}			
+			stat = conn.createStatement();
+			rs = stat.executeQuery(sql);
+			if(rs.next() && rs.getString("Field").equals(field)) {
+				return true;
+			}
 		} catch (SQLException e) {
 			throw new RepositoryException(e.getMessage(),e);
 		} finally {

@@ -156,10 +156,12 @@ public class QueryProcess {
 		} catch (Exception e) {
 			effects = new int[sqlCount]; // 影响行数集合
 			primarykeys = new Primarykey[sqlCount];// 主键集合
-			try {
-				conn.rollback();
-			} catch (SQLException e1) {
-				throw new RepositoryException(e1.getMessage(),e1);
+			if (conn != null) {
+				try {
+					conn.rollback();
+				} catch (SQLException e1) {
+					throw new RepositoryException(e1.getMessage(), e1);
+				}
 			}
 			throw new RepositoryException(e.getMessage(),e);
 		} finally {
