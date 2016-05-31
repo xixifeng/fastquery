@@ -106,7 +106,7 @@ public class QueryProcess {
 				showArgs(ints,args);
 				LOG.info(sql);
 				
-				try {
+				//try {
 					// Statement.RETURN_GENERATED_KEYS
 					stat = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
 					// 注意: preparedStatement的参数索引是从1开始的!
@@ -128,10 +128,10 @@ public class QueryProcess {
 					}
 					// XXXXXXXXXXXX End
 					
-				} finally {
+				//} finally {
 					// rs 在这个for循环中可能会创建多个.
 					close(rs, stat, null);  // 这个不能省略
-				}	
+				//}	
 				
 				// yyyyyyyyyyyyyyyyyyyyyyy
 				if(autoIncKey == -1) {
