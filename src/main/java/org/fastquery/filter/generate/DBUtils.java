@@ -91,34 +91,12 @@ public class DBUtils {
 			if(rs.next() && rs.getString("Field").equals(field)) {
 				return true;
 			}
+			rs.close();
+			stat.close();
 		} catch (SQLException e) {
 			throw new RepositoryException(e.getMessage(),e);
 		} finally {
-			try {
-				if (rs != null) {
-					rs.close();
-				}
-			} catch (SQLException e) {
-				throw new RepositoryException(e.getMessage(),e);
-			} finally {
-				try {
-					if (stat != null) {
-						stat.close();
-					}
-				} catch (SQLException e) {
-					LOG.error(e.getMessage(),e);
-				} finally {
-					try {
-						if (conn != null) {
-							conn.close();
-						}
-					} catch (SQLException e) {
-						LOG.error(e.getMessage(),e);
-					} /*finally {
-
-					}*/
-				}
-			}
+			close(rs, stat, conn);
 		}
 		
 		return false;
@@ -152,9 +130,7 @@ public class DBUtils {
 					}
 				} catch (SQLException e) {
 					LOG.error(e.getMessage(),e);
-				} /*finally {
-
-				}*/
+				}
 			}
 		}
 	}
