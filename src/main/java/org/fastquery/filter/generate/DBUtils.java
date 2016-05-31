@@ -109,24 +109,24 @@ public class DBUtils {
 	 */
 	private void close(ResultSet rs, Statement stat, Connection conn) {
 		try {
-			if (rs != null) {
+			//if (rs != null) {
 				rs.close();
-			}
+			//}
 		} catch (SQLException e) {
 			//throw new RepositoryException(e.getMessage(),e);
 			LOG.error(e.getMessage(),e);
 		} finally {
 			try {
-				if (stat != null) {
+				//if (stat != null) {
 					stat.close();
-				}
+				//}
 			} catch (SQLException e) {
 				LOG.error(e.getMessage(),e);
 			} finally {
 				try {
-					if (conn != null) {
+				//	if (conn != null) {
 						conn.close();
-					}
+				//	}
 				} catch (SQLException e) {
 					LOG.error(e.getMessage(),e);
 				}
