@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.fastquery.core.Id;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
@@ -49,6 +50,8 @@ import org.objectweb.asm.Type;
  */
 public class TypeUtil implements Opcodes{
 
+	private static final Logger LOG = Logger.getLogger(TypeUtil.class);
+	
 	/**
 	 * 根据基本类型标识符取出类型信息<br>
 	 * [0]: 基本类型所对应的包转类型; [1]:解包方法 [3]:默认构造方法 [4]:asm操作码.
@@ -246,6 +249,7 @@ public class TypeUtil implements Opcodes{
 	        try {
 				clazz.getConstructor();
 			}catch (Exception e) {
+				LOG.info(e.getMessage(), e);
 				return false;
 			}
 	    return true;
