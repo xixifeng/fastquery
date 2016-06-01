@@ -22,6 +22,8 @@
 
 package org.fastquery.example;
 
+import java.util.Map;
+
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
@@ -35,9 +37,11 @@ import com.alibaba.fastjson.JSONArray;
  */
 public interface UserInfoDBService extends QueryRepository {
 
-	@Query("select * from `userinfo` as u where u.age>?1")
+	@Query("select id,name,age from `userinfo` as u where u.age>?1")
 	JSONArray findUserInfoByAge(Integer age);
 	
+	@Query("select id,name,age from `userinfo` as u where u.age>?1")
+	Map<String, Object> findOne(Integer age);
 	
 	@Transactional
 	@Modifying

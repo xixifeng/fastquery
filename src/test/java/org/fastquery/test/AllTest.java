@@ -23,6 +23,7 @@
 package org.fastquery.test;
 
 import org.fastquery.util.TypeUtilTest;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -35,6 +36,10 @@ import org.junit.runners.Suite.SuiteClasses;
 //指定运行器
 @RunWith(Suite.class)
 @SuiteClasses({StudentDBServiceTest.class,DataAcquireDbServiceTest.class,UserInfoDBServiceTest.class,TypeUtilTest.class})
-public class AllTest {
+class AllTest {
+	
+	@Test
+	public void todo(){}
+	
 }
 

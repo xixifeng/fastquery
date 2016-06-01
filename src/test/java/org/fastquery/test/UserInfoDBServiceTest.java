@@ -33,6 +33,8 @@ import com.alibaba.fastjson.JSONObject;
 
 import static org.junit.Assert.assertThat;
 
+import java.util.Map;
+
 import static org.hamcrest.Matchers.*;
 
 /**
@@ -56,6 +58,27 @@ public class UserInfoDBServiceTest {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 			assertThat(jsonObject.getInteger("age"),greaterThan(age));
 		}
+	}
+	
+	@Test
+	public void testFindUserInfoByAge2(){
+		int age = 1000;
+		// 数据库中age没有大于1千的记录
+		// 断言: 查询返回的值应该是一个空对象,不是null.
+		JSONArray jsonArray = userInfoDBService.findUserInfoByAge(age);
+		assertThat(jsonArray, notNullValue());
+		assertThat(jsonArray.isEmpty(),is(true));
+	}
+	
+	
+	@Test
+	public void findOne(){
+		int age = 1000;
+		// 数据库中age没有大于1千的记录
+		// 断言: 查询返回的值应该是一个空对象,不是null.
+		Map<String, Object> map = userInfoDBService.findOne(age);
+		assertThat(map, notNullValue());
+		assertThat(map.isEmpty(), is(true));
 	}
 	
 	@Test

@@ -24,6 +24,7 @@ package org.fastquery.handler;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,11 @@ public class QueryHandler {
 	// 如果全部集中处理的话,代码堆积会很多,可读性差,不利于扩展.
 	// 对于复杂的事情,一定要找适合的模式,尽可能地分化成的小的模块
 
-	public long longType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
+	public long longType(Method method, List<Map<String, Object>> keyvals) {
+		
+		if(keyvals.isEmpty()) {
+			return 0;
+		}
 
 		if (keyvals.size() > 1) {
 			throw new RepositoryException(method + " 不能把一个集合赋值给long");
@@ -96,26 +101,29 @@ public class QueryHandler {
 		return Long.parseLong(iterator.next().getValue().toString());
 	}
 
-	public boolean booleanType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
+	public boolean booleanType(List<Map<String, Object>> keyvals) {
        return !keyvals.isEmpty();
 	}
 
-	public Map<String, Object> mapType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
+	public Map<String, Object> mapType(Method method, List<Map<String, Object>> keyvals) {
+		if( keyvals.isEmpty() ) {
+			return new HashMap<>();
+		}
 		if (keyvals.size() > 1) {
 			throw new RepositoryException(method + "不能把多条记录赋值给Map");
 		}
 		return keyvals.get(0);
 	}
 
-	public List<Map<String, Object>> listType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
+	public List<Map<String, Object>> listType(List<Map<String, Object>> keyvals) {
 		return keyvals;
 	}
 
-	public JSONObject jsonObjeType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
+	public JSONObject jsonObjeType(Method method, List<Map<String, Object>> keyvals) {
 		if (keyvals.size() > 1) {
 			throw new RepositoryException(method + "不能把多条记录赋值给JSONObject");
 		}
-		return new JSONObject(mapType(method, returnType, keyvals));
+		return new JSONObject(mapType(method, keyvals));
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -123,7 +131,14 @@ public class QueryHandler {
 		return new JSONArray((List) keyvals);
 	}
 
+	// 基本包装类型
 	public Object wrapperType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
+		
+		// 包装类型没有空
+		if(keyvals.isEmpty()){
+			return null;
+		}
+		
 		if (keyvals.size() > 1) {
 			throw new RepositoryException(method + "不能把多条记录赋值给" + returnType);
 		}
@@ -163,7 +178,9 @@ public class QueryHandler {
 		return val;
 	}
 
+	// 基本包装类型,数组格式
 	public Object wrapperAarryType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
+				
 		// 该数组元素的类型
 		Class<?> componentType = returnType.getComponentType();
 
@@ -196,6 +213,9 @@ public class QueryHandler {
 	}
 
 	public Object beanType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
+		if(keyvals.isEmpty()) {
+			return null;
+		}
 		if (keyvals.size() != 1) {
 			throw new RepositoryException(method + "不能把一个集合转换成" + returnType);
 		}

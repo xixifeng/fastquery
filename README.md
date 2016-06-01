@@ -167,6 +167,23 @@ JSONArray find(String sex,Integer age);
 List<Map<String, Object>> findBy(String sex,Integer age);
 ```
 
+**注意**: 在没有查询到数据的情况下,如果返回值是集合类型或者是数组类型.不会得到null,而是一个空集合或长度为0的数组.   
+举例说明: 
+
+```java
+// 针对该方法,如果没有查询到数据,返回值的结果是一个长度为0的Student[]
+@Query("sql statements")
+Student[] find(Integer age,String sex); 
+
+// 针对该方法,如果没有查询到数据,返回值的结果是一个空Map(非null)
+@Query("sql statements")
+Map<String,Object> find(Integer id);
+
+// 针对该方法,如果没有查询到数据,返回值的结果是一个空List<Map>(非null)
+@Query("sql statements")
+List<Map<String, Object>> find(String sex);
+```
+
 ## 动态条件查询
 ```java
 @Query("select no, name, sex from Student #{#where} order by age desc")

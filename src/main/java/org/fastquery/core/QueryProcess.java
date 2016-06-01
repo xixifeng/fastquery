@@ -235,28 +235,19 @@ public class QueryProcess {
 			close(rs, stat, conn);
 		}
 		
-		if(keyvals==null || keyvals.isEmpty()) { // 没有找到返回null. 返回类型已经在生成代码时做了全面检测
-			if(returnType == boolean.class){
-				return false;
-			}
-			if(returnType == long.class) {
-				return 0;
-			}
-			return null;
-		} 
-		
+		// 上面的try发生异常了,才会导致keyvals为null, 不过异常一旦捕获到就throw了,因此,程序执行到这里keyvals不可能为null.
 		// 返回类型分析=====================================
 		QueryHandler qh = QueryHandler.getInstance();
 		if(returnType == long.class) {
-			return qh.longType(method,returnType,keyvals);
+			return qh.longType(method,keyvals);
 		} else if(returnType == boolean.class) {
-			return qh.booleanType(method,returnType,keyvals);
+			return qh.booleanType(keyvals);
 		} else if(returnType == Map.class){
-			return qh.mapType(method,returnType,keyvals);
+			return qh.mapType(method,keyvals);
 		}else if(returnType == List.class){
-			return qh.listType(method,returnType,keyvals);
+			return qh.listType(keyvals);
 		}else if(returnType == JSONObject.class){
-			return qh.jsonObjeType(method,returnType,keyvals);
+			return qh.jsonObjeType(method,keyvals);
 		}else if(returnType == JSONArray.class){
 			return qh.jsonArrayType(method,returnType,keyvals);
 		}else if(isWarrp(returnType)){
@@ -277,7 +268,7 @@ public class QueryProcess {
 	
 	
 	/**
-	 * 将 rs 的结果集 转换成 List<Map>, rs没有结果则返回null
+	 * 将 rs 的结果集 转换成 List<Map>, rs没有结果则返回空对象(该方法永不返回null).
 	 * @param rs
 	 * @return
 	 * @throws SQLException
@@ -302,9 +293,6 @@ public class QueryProcess {
 				keyval.put(key, rs.getObject(i));
 			}
 			keyvals.add(keyval);
-		}
-		if(keyvals.isEmpty()) {
-			return null;
 		}
 		return keyvals;
 	}
