@@ -233,7 +233,7 @@ public class TypeUtil implements Opcodes{
 	        try {
 				clazz.getConstructor();
 			}catch (Exception e) {
-				LOG.info(e.getMessage(), e);
+				LOG.trace(e);
 				return false;
 			}
 	    return true;

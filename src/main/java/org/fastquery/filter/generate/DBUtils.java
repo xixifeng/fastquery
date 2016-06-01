@@ -77,8 +77,8 @@ public class DBUtils {
 			String databaseProductName = databaseMetaData.getDatabaseProductName();
 			if("MySQL".equals(databaseProductName)) { 
 				sql = "SHOW COLUMNS from "+table+" where `KEY`='PRI'";
-				stat = conn.createStatement(); // stat 已经在下面的finally里关闭了.
-				rs = stat.executeQuery(sql);   // rs 已经在下面的finally里关闭了.
+				stat = conn.createStatement(); // stat 会在下面的finally里关闭
+				rs = stat.executeQuery(sql);   // stat 会在下面的finally里关闭
 				if(rs.next() && rs.getString("Field").equals(field)) {
 					return true; // 即使在这里return了, 下面的finally也会执行,怎么会把rs阻断呢? 发现sonar的检测有问题.
 				}

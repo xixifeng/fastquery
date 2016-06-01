@@ -33,14 +33,14 @@ import org.fastquery.util.TypeUtil;
  */
 public class Prepared {
 	
-	private Prepared(){}
-
 	private static ThreadLocal<ClassLoader> clsloadThread = new ThreadLocal<ClassLoader>(){
 		@Override
         public ClassLoader initialValue() {  
             return this.getClass().getClassLoader();
         }  
     }; 
+    
+	private Prepared(){}
     
 	/**
 	 * 

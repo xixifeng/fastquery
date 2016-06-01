@@ -108,7 +108,7 @@ public class QueryProcess {
 				
 				try {
 					// Statement.RETURN_GENERATED_KEYS
-					stat = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS); // stat 已经在下面的finally里关闭了.
+					stat = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS); // stat 会在下面的finally里关闭.
 					// 注意: preparedStatement的参数索引是从1开始的!
 					for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 						// ints[i-1] 表示当前SQL参数对应方法的第几个参数. 从1开始计数
@@ -223,7 +223,7 @@ public class QueryProcess {
 		try {
 			// 获取链接
 			conn = dataSource.getConnection();
-			stat = conn.prepareStatement(sql); // stat 已经在下面的finally里关闭了.
+			stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
 			for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 				stat.setObject(i, args[ints[i-1]-1]);
 			}

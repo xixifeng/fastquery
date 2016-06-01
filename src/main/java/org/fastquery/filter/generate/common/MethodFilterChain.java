@@ -41,7 +41,7 @@ public class MethodFilterChain implements MethodFilter {
 	
 	@Override
 	public Method doFilter(Method method) {
-		Method m = null;
+		Method m = method;
 		for(MethodFilter methodFilter : methodFilters){
 			m = methodFilter.doFilter(method);
 		}
