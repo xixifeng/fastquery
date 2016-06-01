@@ -24,7 +24,6 @@ package org.fastquery.test;
 
 import org.fastquery.core.RepositoryException;
 import org.fastquery.example.UserInfoDBService;
-import org.fastquery.example.UserInfoDBServiceProxyImpl;
 import org.fastquery.service.FQuery;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,11 +49,6 @@ public class UserInfoDBServiceTest {
 	}
 	
 	@Test
-	public void userInfoDBServiceNotNull(){
-		assertThat(userInfoDBService, notNullValue());
-	}
-	
-	@Test
 	public void testFindUserInfoByAge(){
 		int age = 20;
 		JSONArray jsonArray = userInfoDBService.findUserInfoByAge(age);
@@ -66,7 +60,8 @@ public class UserInfoDBServiceTest {
 	
 	@Test
 	public void testUpdateBatch() {
-		new UserInfoDBServiceProxyImpl().updateBatch("小张张", 26, 1);
+		int effect = userInfoDBService.updateBatch("小张张", 26, 1);
+		assertThat("断言该行修改操作一共影响了3行",effect, equalTo(3));
 	}
 	
 	// 断言: 它会抛出RepositoryException异常
