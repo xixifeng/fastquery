@@ -24,67 +24,84 @@ package org.fastquery.dsm;
 
 /**
  * jdbc-config.xml 的实体
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public class JdbcConfig {
-	
+
 	private String driverClass;
-    private String databaseName;
-    private String password;  
-    private int portNumber;  
-    private String serverName; 
-    private String user;
-    private String url;
-    private String named; // 重写hashCode和equals
-    public JdbcConfig(){}
+	private String databaseName;
+	private String password;
+	private int portNumber;
+	private String serverName;
+	private String user;
+	private String url;
+	private String named; // 重写hashCode和equals
+
 	public String getDatabaseName() {
 		return databaseName;
 	}
+
 	public void setDatabaseName(String databaseName) {
 		this.databaseName = databaseName;
 	}
+
 	public String getPassword() {
 		return password;
 	}
+
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
 	public int getPortNumber() {
 		return portNumber;
 	}
+
 	public void setPortNumber(int portNumber) {
 		this.portNumber = portNumber;
 	}
+
 	public String getServerName() {
 		return serverName;
 	}
+
 	public void setServerName(String serverName) {
 		this.serverName = serverName;
 	}
+
 	public String getUser() {
 		return user;
 	}
+
 	public void setUser(String user) {
 		this.user = user;
 	}
+
 	public String getUrl() {
 		return url;
 	}
+
 	public void setUrl(String url) {
 		this.url = url;
 	}
+
 	public String getNamed() {
 		return named;
 	}
+
 	public void setNamed(String named) {
 		this.named = named;
 	}
+
 	public String getDriverClass() {
 		return driverClass;
 	}
+
 	public void setDriverClass(String driverClass) {
 		this.driverClass = driverClass;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -92,6 +109,7 @@ public class JdbcConfig {
 		result = prime * result + ((named == null) ? 0 : named.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

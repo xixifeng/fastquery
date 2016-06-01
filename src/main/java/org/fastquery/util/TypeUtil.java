@@ -52,6 +52,8 @@ public class TypeUtil implements Opcodes{
 
 	private static final Logger LOG = Logger.getLogger(TypeUtil.class);
 	
+	private TypeUtil(){}
+	
 	/**
 	 * 根据基本类型标识符取出类型信息<br>
 	 * [0]: 基本类型所对应的包转类型; [1]:解包方法 [3]:默认构造方法 [4]:asm操作码.
@@ -69,49 +71,49 @@ public class TypeUtil implements Opcodes{
 	 */
 	public static Object[] getTypeInfo(String d){
 		Object[] strs = new Object[4];
-	     if (d.equals("I")) {
+	     if ("I".equals(d)) {
 	    	 strs[0] = "java/lang/Integer"; 
 	    	 strs[1] = "intValue"; // 用于解包的方法
 	    	 strs[2] = "()I";     // 默认构造方法
 	    	 strs[3] = IRETURN;   // 返回类型
 	    	 return strs;
-         } else if (d.equals("Z")) {
+         } else if ("Z".equals(d)) {
 	    	 strs[0] = "java/lang/Boolean";
 	    	 strs[1] = "booleanValue";
 	    	 strs[2] = "()Z";
 	    	 strs[3] = IRETURN;
 	    	 return strs;
-         } else if (d.equals("B")) {
+         } else if ("B".equals(d)) {
 	    	 strs[0] = "java/lang/Byte";
 	    	 strs[1] = "byteValue";
 	    	 strs[2] = "()B";
 	    	 strs[3] = IRETURN;
 	    	 return strs;
-         } else if (d.equals("C")) {
+         } else if ("C".equals(d)) {
 	    	 strs[0] = "java/lang/Character";
 	    	 strs[1] = "charValue";
 	    	 strs[2] = "()C";
 	    	 strs[3] = IRETURN;
 	    	 return strs;
-         } else if (d.equals("S")) {
+         } else if ("S".equals(d)) {
 	    	 strs[0] = "java/lang/Short";
 	    	 strs[1] = "shortValue";
 	    	 strs[2] = "()S";
 	    	 strs[3] = IRETURN;
 	    	 return strs;
-         } else if (d.equals("D")) {
+         } else if ("D".equals(d)) {
 	    	 strs[0] = "java/lang/Double";
 	    	 strs[1] = "doubleValue";
 	    	 strs[2] = "()D";
 	    	 strs[3] = DRETURN;
 	    	 return strs;
-         } else if (d.equals("F")) {
+         } else if ("F".equals(d)) {
 	    	 strs[0] = "java/lang/Float";
 	    	 strs[1] = "floatValue";
 	    	 strs[2] = "()F";
 	    	 strs[3] = FRETURN;
 	    	 return strs;
-         } else  if (d.equals("J")){
+         } else  if ("J".equals(d)){
 	    	 strs[0] = "java/lang/Long";
 	    	 strs[1] = "longValue";
 	    	 strs[2] = "()J";
@@ -159,7 +161,7 @@ public class TypeUtil implements Opcodes{
 	    Pattern p = Pattern.compile(regex);
 	    //创建匹配给定输入与此模式的匹配器。
 	    Matcher m = p.matcher(str);
-	    String val = null;    
+	    String val;    
 	    //尝试查找与该模式匹配的输入序列的下一个子序列。
 	    while (m.find()){
 	      //返回由以前匹配操作所匹配的输入子序列。
@@ -186,7 +188,7 @@ public class TypeUtil implements Opcodes{
 		int len = subs.size();
 		int[] ints = new int[len];
 		for (int i = 0; i < len; i++) {
-			ints[i] = Integer.valueOf(subs.get(i).replace("?","")).intValue();
+			ints[i] = Integer.parseInt(subs.get(i).replace("?",""));
 		}
 		return ints;
 	}
@@ -198,25 +200,7 @@ public class TypeUtil implements Opcodes{
 	 * @return
 	 */
 	public static boolean containsIgnoreCase(String str,String word) {
-		
-		/*
-		历史写法保留
-		if(sql==null || keyword==null) {
-			throw new RepositoryException("参数不能为null");
-		}
-		String custom = ":?#-"; 
-		
-		sql = sql.trim();
-		
-		// 将sql中的 "update " 不区分大小写替换成"?#-"
-		sql = sql.replaceFirst("(?i)^"+keyword+" ", custom);
-		
-		// 将sql中的 " update " 不区分大小写全部替换成"?#-"
-		sql = sql.replaceAll("(?i) "+keyword+" ", custom);
-		
-		return sql.contains(custom);
-		*/
-		
+	
 	    //将给定的正则表达式编译到模式中。
 		// 在不区分大小写的前提下,匹配是否包含有单词 word
 		// 注意:单词的分隔不仅是空格,例如: hello{good<yes(ok)jetty 123abc  包含有单词 hello good yes ok 等等. (已验证)
@@ -289,9 +273,9 @@ public class TypeUtil implements Opcodes{
 				if(conditions[i].ignoreNull()){ // 忽略null,那么就要看参数是否传递null啦
 					// r 属性中包含的参数,必须去重
 					Set<String> pars = TypeUtil.matchesNotrepeat(conditions[i].r(), "\\?\\d+");
-					if(pars.size()!=0){ // 表明这个条件有"?"占位符号
+					if(!pars.isEmpty()){ // 表明这个条件有"?"占位符号
 						for (String par : pars) {
-							int index = Integer.valueOf(par.replace("?", "")); // 计数是1开始的
+							int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
 							if(args[index-1] == null){ //如果传递了参数null, 那么这个条件就不加入
 								continue o; // 跳出最外层的当次循环
 							}
@@ -299,7 +283,7 @@ public class TypeUtil implements Opcodes{
 					}
 				}
 				sb.append(' ');
-				if(sb.length() > 1){ // 第一个条件不能加上条件连接符,请特别注意:此处的条件不能用if(i!=0),因为上面会中途跳出循环.
+				if(sb.length() > 1){ // 第一个条件不能加上条件连接符,请特别注意:此处的条件不能用如果(i!=0),因为上面会中途跳出循环.
 					sb.append(conditions[i].c().getVal());	
 				}
 				sb.append(' ');	
@@ -313,7 +297,7 @@ public class TypeUtil implements Opcodes{
 				sb.append(conditions[i].r());
 			}
 			// 追加条件 End
-			if(!sb.toString().equals("")){ // 特别注意: 此处不能写成 !sb.equals("")
+			if(!"".equals(sb.toString())){ // 特别注意: 此处不能写成 !sb.equals("")
 				sb.replace(0, 1, "where");
 			}
 			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, sb.toString()));
@@ -329,10 +313,10 @@ public class TypeUtil implements Opcodes{
 	 */
 	public static String filterComments(String str){
 		// 过滤 // 
-		str = str.replaceAll("//(.)+\\n", "");
+		String s = str.replaceAll("//(.)+\\n", "");
 		// 过滤多行注释
-		str = str.replaceAll("\\/\\*[\\s\\S]*?\\*\\/", "");
-		return str;
+		s = s.replaceAll("\\/\\*[\\s\\S]*?\\*\\/", "");
+		return s;
 	}
 	
 	/**
@@ -344,24 +328,7 @@ public class TypeUtil implements Opcodes{
 		if(type==null){
 			return false;
 		}
-		
-		if(type.toString().equals("java.util.Map<java.lang.String, java.lang.Object>")){
-			return true;
-		} else {
-			return false;
-		}
-		/*if(ParameterizedType.class.isAssignableFrom(type.getClass())){
-			ParameterizedType parameterizedType = (ParameterizedType) type;
-			java.lang.reflect.Type[] types = parameterizedType.getActualTypeArguments(); // 获取<>中的参数类型
-			if ((parameterizedType.getRawType() == Map.class) && (types[0] == String.class)
-					&& (types[1] == Object.class)){
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}*/
+		return "java.util.Map<java.lang.String, java.lang.Object>".equals(type.toString());
 	}
 	/**
 	 * 判断是否是List<Map<String,Object>>
@@ -372,11 +339,7 @@ public class TypeUtil implements Opcodes{
 		if(type==null){
 			return false;
 		}
-		if(type.toString().equals("java.util.List<java.util.Map<java.lang.String, java.lang.Object>>")) {
-			return true;
-		} else {
-			return false;
-		}
+		return "java.util.List<java.util.Map<java.lang.String, java.lang.Object>>".equals(type.toString());
 	}
 	
 	// 假设: 有两个类,其class分别为c1和c2. c1的直接父类的范型为X

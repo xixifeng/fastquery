@@ -44,10 +44,8 @@ import com.alibaba.fastjson.JSONObject;
  * @author xixifeng (fastquery@126.com)
  */
 public final class ModifyingHandler {
-
-	//private static final Logger LOG = Logger.getLogger(ModifyingHandler.class);
 	
-	private volatile static ModifyingHandler mh;
+	private static ModifyingHandler mh;
 	
 	private ModifyingHandler() {
 	}
@@ -79,12 +77,6 @@ public final class ModifyingHandler {
 		return null;
 	}
 	
-	/*
-	public int intType(){
-		return null;
-	}
-	*/
-	
 	public Map<String, Object> mapType(String packageName,String tableName, String keyFieldName, long autoIncKey, String pkey){
 		String sql = null;
 		if (autoIncKey != -1) {
@@ -104,7 +96,7 @@ public final class ModifyingHandler {
 		Map<String, Object> keyval = null;
 		try {
 			conn = dataSource.getConnection();
-			stat = conn.prepareStatement(sql);
+			stat = conn.prepareStatement(sql); // stat会在下面的finally中关闭
 			rs = stat.executeQuery();
 			keyvals = qp.rs2Map(rs);
 			if(keyvals!=null) {
@@ -119,7 +111,7 @@ public final class ModifyingHandler {
 	}
 	
 	public JSONObject jsonObjectType(String packageName,String tableName, String keyFieldName, long autoIncKey, String pkey){
-		Map<String, Object> map =  (Map<String, Object>) mapType(packageName, tableName, keyFieldName, autoIncKey, pkey);
+		Map<String, Object> map = mapType(packageName, tableName, keyFieldName, autoIncKey, pkey);
 		return new JSONObject(map);
 	}
 
@@ -137,7 +129,7 @@ public final class ModifyingHandler {
 	
 	
 	public Object beanType(String packageName,String tableName, String keyFieldName, long autoIncKey, String pkey,Class<?> returnType){
-		Map<String, Object> map =  (Map<String, Object>) mapType(packageName, tableName, keyFieldName, autoIncKey, pkey);
+		Map<String, Object> map = mapType(packageName, tableName, keyFieldName, autoIncKey, pkey);
 		return JSON.toJavaObject(new JSONObject(map), returnType);	
 	}
 	

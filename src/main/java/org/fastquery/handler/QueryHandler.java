@@ -44,7 +44,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class QueryHandler {
 
-	private volatile static QueryHandler queryHandler;
+	private static QueryHandler queryHandler;
 
 	private QueryHandler() {
 	}
@@ -92,16 +92,12 @@ public class QueryHandler {
 		if (!iterator.hasNext()) {
 			throw new RepositoryException(method + " 不能把" + map + "赋值给long");
 		}
-
-		return Long.valueOf(iterator.next().getValue().toString()).longValue();
+		
+		return Long.parseLong(iterator.next().getValue().toString());
 	}
 
 	public boolean booleanType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
-		if (keyvals.size() > 0) {
-			return true;
-		} else {
-			return false;
-		}
+       return !keyvals.isEmpty();
 	}
 
 	public Map<String, Object> mapType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
@@ -178,9 +174,9 @@ public class QueryHandler {
 		// 创建componentType类型的数组
 		Object array = Array.newInstance(componentType, count);
 
-		Map<String, Object> map = null;
-		Set<String> keys = null;
-		String key = null;
+		Map<String, Object> map;
+		Set<String> keys;
+		String key;
 		for (int index = 0; index < count; index++) {
 			if (hasConstructor) { // 存在默认构造方法,表明是一个bean
 				Array.set(array, index, JSON.toJavaObject(new JSONObject(keyvals.get(index)), componentType));

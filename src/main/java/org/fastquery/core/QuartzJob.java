@@ -26,6 +26,7 @@ package org.fastquery.core;
  * 作业
  * @author xixifeng (fastquery@126.com)
  */
+@FunctionalInterface
 public interface QuartzJob {
 	
 	/**

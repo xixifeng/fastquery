@@ -49,9 +49,10 @@ class AfterFilterChain<R extends Repository> extends AfterFilter<R> {
 	@Override
 	protected Object doFilter(R repository,Method method, Object[] args,Object returnVal) {
 		Set<Entry<Class<?>, AfterFilter<R>>> entries = afterFilters.entrySet();
+		Object rv = null;
 		for (Entry<Class<?>, AfterFilter<R>> entry : entries) {
-			returnVal = entry.getValue().doFilter(repository,method,args,returnVal);
+			rv = entry.getValue().doFilter(repository,method,args,returnVal);
 		}
-		return returnVal;
+		return rv;
 	}
 }

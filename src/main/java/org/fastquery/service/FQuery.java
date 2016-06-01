@@ -30,6 +30,8 @@ import org.fastquery.core.Repository;
  */
 public class FQuery {
 	
+	private FQuery(){}
+	
 	/**
 	 * 获取 Repository
 	 * @param clazz

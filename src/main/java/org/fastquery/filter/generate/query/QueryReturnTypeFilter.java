@@ -64,19 +64,7 @@ public class QueryReturnTypeFilter implements MethodFilter {
 		} else if(TypeUtil.isMapSO(genericReturnType) || TypeUtil.isListMapSO(genericReturnType)){
 			return method;
 		}
-			/*if(ParameterizedType.class.isAssignableFrom(genericReturnType.getClass())) { // Map<String,Object>   List<Map<String,Object>>
-			if(returnType == Map.class || returnType == List.class) {
-				// 如果type是ParameterizedType的子类,并且返回值的类型是Map,并且该Map中的<>里分别是类型String.class和Object.class
-				ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
-				Type[] types = parameterizedType.getActualTypeArguments(); // 获取<>中的参数类型
-				if ((parameterizedType.getRawType() == Map.class) && (types[0] == String.class)
-						&& (types[1] == Object.class)) {
-					return method;
-				} else {
-					this.abortWith(method, errmsg);
-				}	
-			}
-		}*/ else if(returnType == JSONObject.class) {
+		else if(returnType == JSONObject.class) {
 			return method;
 		} else if(returnType == JSONArray.class) {
 			return method;

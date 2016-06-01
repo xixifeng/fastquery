@@ -37,43 +37,19 @@ import java.util.Set;
  */
 class  BeforeFilterChain<R extends Repository> extends BeforeFilter<R>  {
 	
-	private static ThreadLocal<Object> threadLocal = new ThreadLocal<Object>(); // 存储中断时流下的返回值
+	private static ThreadLocal<Object> threadLocal = new ThreadLocal<>(); // 存储中断时流下的返回值
 	
 	// 在此用map 主要目的是为了去重,相同的class后面覆盖前面的.
 	// 用LinkedHashMap而不用hashMap 是为了有顺序
 	private Map<Class<?>,BeforeFilter<R>> beforeFilters = new LinkedHashMap<>();
 	
 	public BeforeFilterChain<R> addFilter(BeforeFilter<R> f) {
-		
 		beforeFilters.put(f.getClass(), f);
-		
-		// Java8 Lambda
-		//f.forEach(beforeFilter -> beforeFilters.put(beforeFilter.getClass(), beforeFilter));
-		
-		// 显然 Lambda 语法更为优雅
-		
-		/*
-		for (BeforeFilter<R> beforeFilter : f) {
-			beforeFilters.put(beforeFilter.getClass(), beforeFilter);
-		}*/
-		
 		return this;
 	}
 	
 	@Override
 	protected void doFilter(R repository, Method method, Object[] args) {
-		
-		/*
-		// Java8 Lambda
-		beforeFilters.forEach((k,v)->{
-			if(threadLocal.get()!=void.class) { // 如果是非void.class 表明中断啦
-				//return; // return在lambda中等效于for循环中的continue
-			}
-			v.doFilter(repository,method,args);
-		});
-		*/
-			
-		// 显然 Lambda 语法更为优雅
 		
 		// 这里的循环需要中途跳出循环,用Lambda语法,还不知道如何跳出循环,因此不能用
 		

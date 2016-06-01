@@ -30,6 +30,7 @@ import org.fastquery.core.RepositoryException;
  * Method 检测过滤器
  * @author xixifeng (fastquery@126.com)
  */
+@FunctionalInterface
 public interface MethodFilter {
 
 	/**

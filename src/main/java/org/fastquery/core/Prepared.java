@@ -32,8 +32,11 @@ import org.fastquery.util.TypeUtil;
  * @author xixifeng (fastquery@126.com)
  */
 public class Prepared {
+	
+	private Prepared(){}
 
-	private static ThreadLocal<ClassLoader> clsloadThread = new ThreadLocal<ClassLoader>(){  
+	private static ThreadLocal<ClassLoader> clsloadThread = new ThreadLocal<ClassLoader>(){
+		@Override
         public ClassLoader initialValue() {  
             return this.getClass().getClassLoader();
         }  
@@ -50,7 +53,7 @@ public class Prepared {
 	public static Object excute(String interfaceClazz, String methodName,String methodDescriptor,Object[] args,Repository target) {
 		final Class<? extends Repository> iclazz = getInterfaceClass(interfaceClazz);
 		final Method method = TypeUtil.getMethod(iclazz, methodName,methodDescriptor);
-		// return businessProcess(iclazz,method, args);
+		// return businessProcess(iclazz,method, args)
 		
 		// 在businessProcess的先后加拦截器 ==================
 		// 注入BeforeFilter
@@ -73,7 +76,7 @@ public class Prepared {
 		
 		String methodName = method.getName();
 		Class<?> returnType = method.getReturnType();
-		//String packageName = iclazz.getPackage().getName();
+		//String packageName = iclazz.getPackage().getName()
 		String packageName = iclazz.getName();
 		// 目前有两种可能: 1).Query Interface 2).Quartz Interface
 		// 在这里是一个分水岭
@@ -89,10 +92,7 @@ public class Prepared {
 				return QueryProcess.getInstance().modifying(method,returnType, querys, packageName,args);
 			} else if(querys.length>0) {
 				return QueryProcess.getInstance().query(method,returnType, querys,packageName, args);
-			} //else if(iclazz.getAnnotation(Modifying.class)!=null) {
-			  //Modifying 不能独存,要么不要加, 在生成Repository实现之前已经做了检测
-			  //throw new RepositoryException(method+"@Modifying不能独存,依赖@Query!");
-			  //}
+			} 
 			 else {
 				 return QueryProcess.getInstance().methodQuery(method,methodName,returnType, querys,packageName, args);
 			}
@@ -121,7 +121,7 @@ public class Prepared {
 			Class<? extends Repository> clazz = null;
 			ClassLoader classLoader = clsloadThread.get(); // 有默认值,因此 classLoader 不为null
 			try {
-				/*
+				/**
 				if(classLoader==null) {
 					clazz = (Class<? extends Repository>) Class.forName(interfaceClazz);	
 				} else {

@@ -39,7 +39,7 @@ public class SQLFilter implements MethodFilter {
 		for (Query query : queries) {
 			String sql = query.value();
 			
-			if(sql.equals("")) {
+			if("".equals(sql)) {
 				this.abortWith(method, sql+"该方法,没有标注任何SQL语句");
 			}
 			

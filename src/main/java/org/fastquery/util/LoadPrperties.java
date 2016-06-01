@@ -36,19 +36,21 @@ import org.fastquery.dsm.JdbcConfig;
  */
 public class LoadPrperties {
 	
+	private LoadPrperties(){}
+	
 	/**
 	 * 装载配置并且初始化数据源,该方法的消耗成本较大.把它用在频繁调用的地方,显然是不合理的!
 	 * @param fqueryResource
 	 * @return
 	 */
-	public synchronized static Set<FastQueryJson> load(Resource fqueryResource) {
+	public static synchronized Set<FastQueryJson> load(Resource fqueryResource) {
 		Set<FastQueryJson> fqProperties = PropertiesUtil.getFQueryProperties(fqueryResource.getResourceAsStream("fastquery.json"),fqueryResource);
-		String namedConfig = null;
-		Set<String> basePackages = null;
+		String namedConfig;
+		Set<String> basePackages;
 		Map<String, JdbcConfig> jdbcConfigs = PropertiesUtil.getJdbcConfigs(fqueryResource.getResourceAsStream("jdbc-config.xml"));
-		JdbcConfig jdbcConfig = null;
-		String url = null;
-		String config = null;
+		JdbcConfig jdbcConfig;
+		String url;
+		String config;
 		
 		for (FastQueryJson fQueryPropertie : fqProperties) {
 			config = fQueryPropertie.getConfig(); // 获取fastquery.json 中的config属性

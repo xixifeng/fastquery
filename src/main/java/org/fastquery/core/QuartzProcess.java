@@ -29,12 +29,10 @@ package org.fastquery.core;
 class QuartzProcess {
 
 	static Object quartz(Class<?> returnType, Quartz quartz, Object...args) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	static Object methodQuartz(String methodName, Class<?> returnType, Quartz quartz, Object...args) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

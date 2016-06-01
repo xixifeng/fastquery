@@ -25,6 +25,7 @@ package org.fastquery.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.fastquery.core.RepositoryException;
 
 /**
@@ -32,6 +33,8 @@ import org.fastquery.core.RepositoryException;
  * @author xixifeng (fastquery@126.com)
  */
 public class FqClassLoader extends ClassLoader {
+	
+	private static final Logger LOG = Logger.getLogger(FqClassLoader.class);
 	
 	private static Map<String, Object> beans = new HashMap<>();
 
@@ -47,6 +50,7 @@ public class FqClassLoader extends ClassLoader {
 		} catch (InstantiationException e) {
 			throw new RepositoryException(e.getMessage(),e);
 		} catch (IllegalAccessException e) {
+			LOG.error(e);
 			throw new RepositoryException(e.getMessage(),e);
 		}
 		

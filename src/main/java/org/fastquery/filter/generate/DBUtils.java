@@ -80,7 +80,7 @@ public class DBUtils {
 				stat = conn.createStatement(); // stat 已经在下面的finally里关闭了.
 				rs = stat.executeQuery(sql);   // rs 已经在下面的finally里关闭了.
 				if(rs.next() && rs.getString("Field").equals(field)) {
-					return true;
+					return true; // 即使在这里return了, 下面的finally也会执行,怎么会把rs阻断呢? 发现sonar的检测有问题.
 				}
 			} else {
 				throw new RepositoryException("该方法暂不支持 " + databaseProductName + " 数据库");

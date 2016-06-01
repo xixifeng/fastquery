@@ -38,7 +38,7 @@ public class ArgsFilter implements MethodFilter {
 	public Method doFilter(Method method) {
 		// 1). 校验: 方法的参数如果标识有@Id,那么该参数的类型必须是如下类int,Integer,long,Long,String
 		Parameter[] parameters = method.getParameters();
-		Class<?> currentType = null;
+		Class<?> currentType;
 		int count = 0; // 统计@Id设置的目标在没有错误的前提下,共出现的次数.(如果出错,程序就中断了,下面的校验都不会执行)
 		for (int i = 0; i < parameters.length; i++) {
 			currentType = parameters[i].getType();
@@ -47,7 +47,7 @@ public class ArgsFilter implements MethodFilter {
 				if ((currentType != int.class) && (currentType != Integer.class) && (currentType != long.class)
 						&& (currentType != Long.class) && (currentType != String.class)) {
 					this.abortWith(method,
-							String.format("这个方法的第%s个参数用@Id标识了,因此这个参数的可选类型范围为:[int,Integer,long,Long,String],而当前设置的类型是:%s", (i + 1),currentType.getName()));
+							String.format("这个方法的第%s个参数用@Id标识了,因此这个参数的可选类型范围为:[int,Integer,long,Long,String],而当前设置的类型是:%s", i + 1,currentType.getName()));
 					break;
 				}
 			}

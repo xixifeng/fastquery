@@ -41,20 +41,6 @@ public class Primarykey {
 		this.autoIncKey = autoIncKey;
 		this.pkey = pkey;
 	}
-
-	/*
-	// 有待扩展
-	// 比如插入一条数据库后返回其primary key
-	// 主键目前只支持int,long,Integer,Long 着四种类型
-	public <T> T getPrimarykey(Class<T> keyType) {
-		if ((keyType != int.class) && (keyType != long.class) && (keyType != Integer.class)
-				&& (keyType != Long.class)) {
-			throw new RepositoryException("类型不允许!");
-		}
-		T val = (T) keys.get(0).get("GENERATED_KEY");	
-		return val;
-	}
-	*/
 	
 	/**
 	 * 获取主键

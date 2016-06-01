@@ -30,6 +30,8 @@ import javax.sql.DataSource;
  */
 public class DataSourceManage {
 	
+	private DataSourceManage(){}
+	
 	/**
 	 * 获取数据源
 	 * @param packageName

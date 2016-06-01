@@ -40,6 +40,9 @@ import org.objectweb.asm.commons.GeneratorAdapter;
  */
 public class AsmRepository implements Opcodes {
 
+	private AsmRepository(){
+	}
+	
 	/**
 	 * 自动生成Repository接口的实现类并以字节的形式返回, 该方法是线程安全的.
 	 * @param repositoryClazz
@@ -70,7 +73,7 @@ public class AsmRepository implements Opcodes {
 		// 根据接口clazz 生成实现的方法
 		Method[] methods = repositoryClazz.getMethods();
 		for (Method method : methods) {
-			cw = generateMethod(cw, method, null, repositoryClazz.getName(), Prepared.class);
+			cw = generateMethod(cw, method,repositoryClazz.getName(), Prepared.class);
 		}
 		cw.visitEnd();
 
@@ -84,7 +87,7 @@ public class AsmRepository implements Opcodes {
 	 * @param exceptions
 	 * @param interfaceClazz
 	 */
-	private static ClassWriter generateMethod(ClassWriter cw,java.lang.reflect.Method method, Type[] exceptions,String interfaceClazz,Class<Prepared> prepared){
+	private static ClassWriter generateMethod(ClassWriter cw,java.lang.reflect.Method method,String interfaceClazz,Class<Prepared> prepared){
 		
 		org.objectweb.asm.commons.Method m = new org.objectweb.asm.commons.Method(method.getName(), Type.getMethodDescriptor(method));
 		GeneratorAdapter mv = new GeneratorAdapter(ACC_PUBLIC, m, null, null,cw);
@@ -115,14 +118,15 @@ public class AsmRepository implements Opcodes {
 			String type = objs[0].toString();
 			mv.visitTypeInsn(CHECKCAST, type);
 			mv.visitMethodInsn(INVOKEVIRTUAL, type, objs[1].toString(), objs[2].toString(), false);
-			mv.visitInsn(Integer.valueOf(objs[3].toString()).intValue());
+			// Integer.parseInt(objs[3].toString()) 比 Integer.valueOf(objs[3].toString()).intValue()更优.
+			mv.visitInsn(Integer.parseInt(objs[3].toString()));
 			
 		} else { //sort==9 表述数组类型int[]或Integer[], srot=10表示包装类型
 			mv.visitTypeInsn(CHECKCAST, internalName);
 			mv.visitInsn(ARETURN);
 		}
 		
-		//mv.visitEnd();
+		// mv.visitEnd()
 		mv.endMethod();	
 		return cw;
 	}
@@ -143,7 +147,7 @@ public class AsmRepository implements Opcodes {
 		}
 		mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
 		
-		int next_index = 1; // 指定下一次?LOAD应该的使用的索引
+		int nextIndex = 1; // 指定下一次?LOAD应该的使用的索引
 		for (int i = 0; i < size; i++) {
 			mv.visitInsn(DUP);
 			if(i<6) {
@@ -174,42 +178,43 @@ public class AsmRepository implements Opcodes {
 			// 计算当前遍历的参数的类型
 			Class<?> currentType = parameters[i].getType();
 			// int","double","long","short","byte","boolean","char","float"
+			String valueOf = "valueOf";
 			if(currentType == int.class) {
-				mv.visitVarInsn(ILOAD, next_index);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+				mv.visitVarInsn(ILOAD, nextIndex);
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", valueOf, "(I)Ljava/lang/Integer;", false);
 				// 指定下一次?LOAD应该的使用的索引
-				next_index = next_index + 1;
+				nextIndex = nextIndex + 1;
 			} else if(currentType == double.class){
-				mv.visitVarInsn(DLOAD, next_index);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
-				next_index = next_index + 2;
+				mv.visitVarInsn(DLOAD, nextIndex);
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", valueOf, "(D)Ljava/lang/Double;", false);
+				nextIndex = nextIndex + 2;
 			}else if(currentType == long.class){
-				mv.visitVarInsn(LLOAD, next_index);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;", false);
-				next_index = next_index + 2;
+				mv.visitVarInsn(LLOAD, nextIndex);
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", valueOf, "(J)Ljava/lang/Long;", false);
+				nextIndex = nextIndex + 2;
 			}else if(currentType == short.class){
-				mv.visitVarInsn(ILOAD, next_index);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Short", "valueOf", "(S)Ljava/lang/Short;", false);
-				next_index = next_index + 1;
+				mv.visitVarInsn(ILOAD, nextIndex);
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Short", valueOf, "(S)Ljava/lang/Short;", false);
+				nextIndex = nextIndex + 1;
 			}else if(currentType == byte.class){
-				mv.visitVarInsn(ILOAD, next_index);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;", false);
-				next_index = next_index + 1;
+				mv.visitVarInsn(ILOAD, nextIndex);
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Byte", valueOf, "(B)Ljava/lang/Byte;", false);
+				nextIndex = nextIndex + 1;
 			}else if(currentType == boolean.class){
-				mv.visitVarInsn(ILOAD, next_index);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
-				next_index = next_index + 1;
+				mv.visitVarInsn(ILOAD, nextIndex);
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", valueOf, "(Z)Ljava/lang/Boolean;", false);
+				nextIndex = nextIndex + 1;
 			}else if(currentType == char.class){
-				mv.visitVarInsn(ILOAD, next_index);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;", false);
-				next_index = next_index + 1;
+				mv.visitVarInsn(ILOAD, nextIndex);
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Character", valueOf, "(C)Ljava/lang/Character;", false);
+				nextIndex = nextIndex + 1;
 			}else if(currentType == float.class){
-				mv.visitVarInsn(FLOAD, next_index);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
-				next_index = next_index + 1;
+				mv.visitVarInsn(FLOAD, nextIndex);
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", valueOf, "(F)Ljava/lang/Float;", false);
+				nextIndex = nextIndex + 1;
 			}else {
-				mv.visitVarInsn(ALOAD, next_index);
-				next_index = next_index + 1;
+				mv.visitVarInsn(ALOAD, nextIndex);
+				nextIndex = nextIndex + 1;
 			}
 			mv.visitInsn(AASTORE);
 		}

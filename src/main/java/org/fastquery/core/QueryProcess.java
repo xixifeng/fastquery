@@ -285,13 +285,13 @@ public class QueryProcess {
 	public List<Map<String, Object>> rs2Map(ResultSet rs) throws SQLException {
 
 		List<Map<String, Object>> keyvals = new ArrayList<>();
-		Map<String, Object> keyval = null;
+		Map<String, Object> keyval;
 		// 获取列信息
-		ResultSetMetaData resultSetMetaData = null;
+		ResultSetMetaData resultSetMetaData;
 		// 总列数
-		int columnCount = 0;
+		int columnCount;
 
-		String key = null;
+		String key;
 		while (rs.next()) {
 			resultSetMetaData = rs.getMetaData();
 			columnCount = resultSetMetaData.getColumnCount();

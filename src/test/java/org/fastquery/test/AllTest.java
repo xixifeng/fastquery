@@ -36,6 +36,5 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({StudentDBServiceTest.class,DataAcquireDbServiceTest.class,UserInfoDBServiceTest.class,TypeUtilTest.class})
 public class AllTest {
-
 }
 

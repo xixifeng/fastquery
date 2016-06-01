@@ -55,8 +55,10 @@ import com.alibaba.fastjson.JSONObject;
  * @author xixifeng (fastquery@126.com)
  */
 public class PropertiesUtil {
-
+	
 	private static final Logger LOG = Logger.getLogger(PropertiesUtil.class);
+	
+	private PropertiesUtil(){}
 	
 	/**
 	 * 解析 c3p0-config.xml
@@ -99,10 +101,10 @@ public class PropertiesUtil {
 						jdbcConfigElement = (Element) node;
 						key = jdbcConfigElement.getAttribute("name");
 						val = jdbcConfigElement.getTextContent();
-						if(key == null || key.equals("")) {
+						if(key == null || "".equals(key)) {
 							throw new RepositoryException("c3p0-config.xml 中的property其name属性不能是空字符且不能为null");
 						}
-						if(val == null || val.equals("")) {
+						if(val == null || "".equals(val)) {
 							throw new RepositoryException("c3p0-config.xml 中的property其值不能是空字符且不能为null");
 						}
 						jsonObject.put(key, val);
@@ -163,25 +165,25 @@ public class PropertiesUtil {
 						jdbcConfigElement = (Element) node;
 						key = jdbcConfigElement.getAttribute("name");
 						val = jdbcConfigElement.getTextContent();
-						if(key == null || key.equals("")) {
+						if(key == null || "".equals(key)) {
 							throw new RepositoryException("jdbc-config.xml 中的property其name属性不能是空字符且不能为null");
 						}
-						if(val == null || val.equals("")) {
+						if(val == null || "".equals(val)) {
 							throw new RepositoryException("jdbc-config.xml 中的property其值不能是空字符且不能为null");
 						}
-						if (key.equals("databaseName")) {
+						if ("databaseName".equals(key)) {
 							jdbcConfig.setDatabaseName(val);
-						} else if (key.equals("password")) {
+						} else if ("password".equals(key)) {
 							jdbcConfig.setPassword(val);
-						} else if (key.equals("portNumber")) {
+						} else if ("portNumber".equals(key)) {
 							jdbcConfig.setPortNumber(Integer.parseInt(val));
-						} else if (key.equals("serverName")) {
+						} else if ("serverName".equals(key)) {
 							jdbcConfig.setServerName(val);
-						} else if (key.equals("user")) {
+						} else if ("user".equals(key)) {
 							jdbcConfig.setUser(val);
-						} else if (key.equals("url")) {
+						} else if ("url".equals(key)) {
 							jdbcConfig.setUrl(val);
-						} else if (key.equals("driverClass")) {
+						} else if ("driverClass".equals(key)) {
 							jdbcConfig.setDriverClass(val);
 						} else {
 							throw new RepositoryException("jdbc-config.xml 中不支持该属性值: name=" + key);
@@ -217,19 +219,18 @@ public class PropertiesUtil {
 				
 		Set<FastQueryJson> fqs = null; 
 		
-		//InputStream inputStream = ResourceUtil.getResourceAsStream("fastquery.json");
 		if(fqueryjson==null) {
 			throw new RepositoryException("没有找到fastquery.json .");
 		}
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		int b = 0;
-		String fquery_json=null;
+		String fqueryJson=null;
 		try {
 			while( (b=fqueryjson.read()) != -1){
 				byteArrayOutputStream.write(b);
 			}
-			fquery_json = byteArrayOutputStream.toString();
-			fquery_json = TypeUtil.filterComments(fquery_json);
+			fqueryJson = byteArrayOutputStream.toString();
+			fqueryJson = TypeUtil.filterComments(fqueryJson);
 		} catch (IOException e) {
 			throw new RepositoryException(e.getMessage(),e);
 		} finally {
@@ -246,12 +247,12 @@ public class PropertiesUtil {
 			}
 		}
 		
-		if(fquery_json==null) { // 表明没有fastquery.json 配置文件,直接报错
+		if(fqueryJson==null) { // 表明没有fastquery.json 配置文件,直接报错
 			throw new RepositoryException("没有找到fastquery.json .");
 		}
 		
 		fqs = new HashSet<>();
-		JSONArray json = JSONArray.parseArray(fquery_json);
+		JSONArray json = JSONArray.parseArray(fqueryJson);
 		FastQueryJson[] fqProperties = JSON.toJavaObject(json, FastQueryJson[].class);
 		String config = null;
 		String dataSourceName = null;
@@ -264,17 +265,17 @@ public class PropertiesUtil {
 			config = fQueryPropertie.getConfig();
 			dataSourceName = fQueryPropertie.getDataSourceName();
 			basePackages = fQueryPropertie.getBasePackages(); 
-			if(config == null || config.equals("")) {
+			if(config == null || "".equals(config)) {
 				throw new RepositoryException("fastquery.json 中的config属性配置错误,提示,不能是空字符且不能为null");
 			}
-			if(dataSourceName==null || dataSourceName.equals("")){
+			if(dataSourceName==null || "".equals(dataSourceName)){
 				throw new RepositoryException("fastquery.json 中的dataSourceName配置错误,提示,不能是空字符且不能为null");
 			}
-			if(basePackages==null || basePackages.size()<1) {
+			if(basePackages==null || basePackages.isEmpty()) {
 				throw new RepositoryException("fastquery.json 中的basePackage配置错误,提示basePackages不能配置成空");
 			}
 			for (String basePackage : basePackages) {
-				if(basePackage==null || basePackage.equals("")){
+				if(basePackage==null || "".equals(basePackage)){
 					throw new RepositoryException("fastquery.json 中的basePackage配置错误,提示,不能是空字符且不能为null");
 				}
 				bpNames.add(basePackage); // 把所有的basePackage收集在一个集合里,方便校验是否有重复
@@ -304,7 +305,6 @@ public class PropertiesUtil {
 				break;
 			default:
 				throw new RepositoryException("fastquery.json 配置文件中, config设置了"+config+",不支持该属性值");
-				//break;
 			}
 			
 			// 校验数据源的名称是否配置正确

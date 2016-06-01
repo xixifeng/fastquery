@@ -29,6 +29,9 @@ import javax.sql.DataSource;
 public class FQueryFactoryImpl implements FQueryFactory {
 
 	private static FQueryFactoryImpl instance;
+	
+	private FQueryFactoryImpl() {
+	}
 
 	// 这个方法禁止外界访问
 	static FQueryFactory getInstance() {
@@ -40,9 +43,6 @@ public class FQueryFactoryImpl implements FQueryFactory {
 			}
 		}
 		return instance;
-	}
-	
-	private FQueryFactoryImpl() {
 	}
 	
 	@Override

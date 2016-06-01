@@ -39,6 +39,8 @@ import org.fastquery.where.Operator;
  */
 class QueryFilterHelper {
 	
+	private QueryFilterHelper(){}
+	
 	/**
 	 * 获取SQL语句,不考虑条件是否参与运算问题.
 	 * @param method
@@ -71,7 +73,7 @@ class QueryFilterHelper {
 			// 追加条件 End
 			
 			String where = sb.toString();
-			if(!where.equals("") && TypeUtil.matches(query.value(),Placeholder.WHERE_REG).size()!=1) {
+			if(!"".equals(where) && TypeUtil.matches(query.value(),Placeholder.WHERE_REG).size()!=1) {
 				throw new RepositoryException(method + " 如果有条件注解,那么@Query中的value值,必须存在#{#where},有且只能出现一次");
 			}
 			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, sb.toString()));

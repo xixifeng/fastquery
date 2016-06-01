@@ -53,7 +53,7 @@ public class ConditionParameterFilter implements MethodFilter {
 		// 注意: sql参数与方法参数个数匹配问题,已经在 ParameterFilter里做了安全校验.
 		// 0). @Condition 中的l值 不能为空
 		// 1). @Query中的value值,有且只能出现一次#{#where} (允许不出现). 换言之,出现"#{#where}"的个数不能大于1
-		// 2). 如果有条件注解,那么@Query中的value值,必须有#{#where}
+		// 2). 如果有条件注解,那么@Query中的value值,必须有#where
 		// 3). 第1个条件(@Condition)的条件连接符号必须为"",其余条件必须有条件连接符号.并且不能为""
 		// 4). 条件运算符如果是Operator.IN,那么r()的值必须符合正则: "(?4,?5,?6)"
 		// 5). 条件运算符如果是Operator.BETWEEN,那么r()的值必须符合正则: "?8 and ?9"
@@ -73,23 +73,21 @@ public class ConditionParameterFilter implements MethodFilter {
 		int countCondition = conditions.length;
 		// >2).
 		// 已经在 QueryFilterHelper 里做校验了
-		//if((countCondition>0) && (countWhere==0)) { // 如果存在条件语句 并且 @Query中的value值,没有出现"#{#where}"
-		//	this.abortWith(method, "如果有条件注解,那么@Query中的value值,必须有#{#where}");
-		//}
+		// 如果存在条件语句 并且 @Query中的value值,没有出现"#{#where}"
 		
 		if( countCondition > 0 ){
 	     	// >3).
-			if( !conditions[0].c().getVal().equals("") ){
+			if( !"".equals(conditions[0].c().getVal()) ){
 				this.abortWith(method, "第1个条件(@Condition)的条件连接符号必须为默认值:c=COperator.NONE");
 			} else {
-				check_r(conditions[0].c().getVal(),conditions[0].l(), conditions[0].r(),1, method);
+				checkR(conditions[0].c().getVal(),conditions[0].l(), conditions[0].r(),1, method);
 			}
 			for (int i = 1; i < countCondition; i++) {
 				String c = conditions[i].c().getVal();
-				if(c.equals("")){
-				   this.abortWith(method, String.format("%s 第%s个条件的条件连接符号不能为默认值:c=COperator.NONE",conditions[i],(i+1)));
+				if("".equals(c)){
+				   this.abortWith(method, String.format("%s 第%s个条件的条件连接符号不能为默认值:c=COperator.NONE",conditions[i],i+1));
 				}
-				check_r(c,conditions[i].l(), conditions[i].r(), i+1, method);
+				checkR(c,conditions[i].l(), conditions[i].r(), i+1, method);
 			}
 		}
 		
@@ -103,21 +101,21 @@ public class ConditionParameterFilter implements MethodFilter {
 	 * @param index 第几个条件(从1开始计数)
 	 * @param method 当前方法
 	 */
-	private void check_r(String c,String l,String r,int index,Method method){
+	private void checkR(String c,String l,String r,int index,Method method){
 		// >0).
-		if(l.equals("")) // l永远不可能为null
+		if("".equals(l)) // l永远不可能为null
 		{
 			this.abortWith(method, String.format("第%s个条件的l的值不能为\"\"", index));
 		}
 		
 		// >4).
-		if( c.equalsIgnoreCase("IN") && !Pattern.matches(Placeholder.INV_REG, r)){
+		if( "IN".equalsIgnoreCase(c) && !Pattern.matches(Placeholder.INV_REG, r)){
 			this.abortWith(method, "条件运算符如果是Operator.IN,那么r()的值必须符合格式: \"(?4,?5,?6)\"");
 			// >5).
-		} else if(c.equalsIgnoreCase("BETWEEN") && !Pattern.matches(Placeholder.ANDV_REG, r)){
+		} else if("BETWEEN".equalsIgnoreCase(c) && !Pattern.matches(Placeholder.ANDV_REG, r)){
 			this.abortWith(method, "条件运算符如果是Operator.BETWEEN,那么r()的值必须符合格式: \"?8 and ?9\"");
 			// >6).
-		} else if( c.equals("") && !Pattern.matches(Placeholder.SP2_REG, r) ){
+		} else if( "".equals(c) && !Pattern.matches(Placeholder.SP2_REG, r) ){
 			this.abortWith(method, String.format("第%s个条件的r的值必须符合格式: \"?8\"", index));
 		}
 	}

@@ -41,10 +41,11 @@ public class MethodFilterChain implements MethodFilter {
 	
 	@Override
 	public Method doFilter(Method method) {
+		Method m = null;
 		for(MethodFilter methodFilter : methodFilters){
-			method = methodFilter.doFilter(method);
+			m = methodFilter.doFilter(method);
 		}
-		return method;
+		return m;
 	}
 
 }

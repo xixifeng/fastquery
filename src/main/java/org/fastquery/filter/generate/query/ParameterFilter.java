@@ -40,9 +40,7 @@ public class ParameterFilter implements MethodFilter {
 	public Method doFilter(Method method) {
 		StringBuilder sb = new StringBuilder();
 		List<String> list = QueryFilterHelper.getQuerySQL(method);
-		list.forEach( str -> {
-			sb.append(str);
-		});
+		list.forEach(sb::append);
 		String sql = sb.toString();
 			
 			// 1). 检测SQL参数的书写规则
@@ -59,17 +57,17 @@ public class ParameterFilter implements MethodFilter {
 			
 			// 2).检测SQL语句中指定的参数,需要方法多少个参数去支持
 			// 计算出sql语句中的参数个数,去重.(例如:同时SQL中同时出现两次?1,算一个)
-			int sqlParameterCount_NoRepeat = TypeUtil.matchesNotrepeat(sql, "\\?\\d+").size();
+			int sqlParameterCountNoRepeat = TypeUtil.matchesNotrepeat(sql, "\\?\\d+").size();
 			int methodParameterCount = method.getParameterCount();
 			// 如果sql中的参数个数(去重) > 方法中的参数个数
-			if (sqlParameterCount_NoRepeat > methodParameterCount) {
+			if (sqlParameterCountNoRepeat > methodParameterCount) {
 				this.abortWith(method,
-						String.format("%s SQL语句中的参数已经明确指明,该方法必须需要有%s个参数, 但是方法的参数个数是:%s,注意:SQL中的参数设置必须是\"?\"后紧跟数字!", sql,sqlParameterCount_NoRepeat, methodParameterCount));
+						String.format("%s SQL语句中的参数已经明确指明,该方法必须需要有%s个参数, 但是方法的参数个数是:%s,注意:SQL中的参数设置必须是\"?\"后紧跟数字!", sql,sqlParameterCountNoRepeat, methodParameterCount));
 			}
 
 			// 3). 检测SQL语句中的参数所指定的方法索引是否越界.
 			int[] ints = TypeUtil.getSQLParameter(sql);
-			int methodIndex = 0; // 计算从1开始
+			int methodIndex; // 计算从1开始
 			for (int i = 0; i < ints.length; i++) { 
 				// 如果该for sqlParameterCount,可能会导致ints数组越界 因为sqlParameterCount长度有可能大于ints的长度
 				// 例如 sql "...?1 ?2 ?1..." 只需要方法带两个参数即可满足 

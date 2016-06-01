@@ -40,7 +40,7 @@ class GenerateRepositoryImpl implements GenerateRepository {
 
 	private static final Logger LOG = Logger.getLogger(GenerateRepositoryImpl.class);
 	
-	private volatile static GenerateRepositoryImpl instance;
+	private static GenerateRepositoryImpl instance;
 
 	private GenerateRepositoryImpl() {
 		LOG.debug("GenerateRepositoryImpl 已实例化.");
@@ -83,8 +83,8 @@ class GenerateRepositoryImpl implements GenerateRepository {
 		if( FqClassLoader.findLoadedClassByName(name) == null ) {
 			
 			byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
-			T t = (T) new FqClassLoader(this.getClass().getClassLoader()).defineClassByName(name, bytes, 0, bytes.length);
-			return t;
+			
+			return (T) new FqClassLoader(this.getClass().getClassLoader()).defineClassByName(name, bytes, 0, bytes.length);
 		}
 		return null;
 	}

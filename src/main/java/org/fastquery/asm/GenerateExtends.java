@@ -25,7 +25,6 @@ package org.fastquery.asm;
 import java.lang.reflect.Method;
 
 import org.fastquery.core.Modifying;
-import org.fastquery.core.Quartz;
 import org.fastquery.core.QuartzRepository;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
@@ -53,6 +52,9 @@ import org.fastquery.filter.generate.querya.ModifyingDependencyFilter;
 // 该方法只为AsmRepository 服务
 class GenerateExtends {
 	
+	private GenerateExtends() {
+	}
+	
 	/**
 	 * 在生成Repository实现类之前,做安全检测
 	 * @param repositoryClazz
@@ -62,25 +64,25 @@ class GenerateExtends {
 		// 要时能做sql语法检测,预处理,那就好了!!!
 		
 		// 创建一个公共过滤链条
-		MethodFilterChain globalFilterChain = null;		
+		MethodFilterChain globalFilterChain;		
 		// 增加公共过滤器
 		
 		// 主要是针对QueryRepository的过滤链条
-		MethodFilterChain queryFilterChain = null;
+		MethodFilterChain queryFilterChain;
 		
 		// 主要是针对QuartzRepository的过滤链条
-		MethodFilterChain quartzFilterChain = null;
+		MethodFilterChain quartzFilterChain;
 		
-		Modifying modifying = null;
-		Query[] querys = null;
-		Quartz quartz = null;
+		Modifying modifying;
+		Query[] querys;
+		//Quartz quartz
 		
 		Method[] methods = repositoryClazz.getMethods();
 		for (Method method : methods) {
 			
 			modifying = method.getAnnotation(Modifying.class);
 			querys = method.getAnnotationsByType(Query.class);
-			quartz = method.getAnnotation(Quartz.class);
+			//quartz = method.getAnnotation(Quartz.class)
 			
 			// 对过滤器做8个分类
 			// filter/global          拦截全局的方法
@@ -135,7 +137,7 @@ class GenerateExtends {
 			} else if(QuartzRepository.class.isAssignableFrom(repositoryClazz)) { // 若: QuartzRepository 是 repositoryClazz的父类
 				// filter/quartza
 				quartzFilterChain.addFilter(new IllegalAnnotation());
-				
+				/**
 				// filter/quartz 
 				if(quartz!=null) {
 					
@@ -144,6 +146,7 @@ class GenerateExtends {
 				// filter/mquartz
 				// 有待扩展...	
 				}
+				*/
 				
 			} else {
 				throw new RepositoryException(repositoryClazz+"不能解析");
@@ -156,12 +159,5 @@ class GenerateExtends {
 			globalFilterChain.addFilter(queryFilterChain).addFilter(quartzFilterChain).doFilter(method);
 			
 		}
-	}
-	
-	/**
-	 * 在生成Repository之前,做一些初始化工作
-	 */
-	static void initCache(){
-		
 	}
 }

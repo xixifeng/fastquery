@@ -74,7 +74,7 @@ public class FilterChainHandler {
 			afters = new ArrayList<>(Arrays.asList(iclazz.getAnnotationsByType(After.class))); // 获取当前类级别的after's	
 		}
 		afters.addAll(Arrays.asList(method.getAnnotationsByType(After.class)));// 获取当前方法上的after's
-		AfterFilterChain<R> afterFilterChain = new AfterFilterChain<R>();
+		AfterFilterChain<R> afterFilterChain = new AfterFilterChain<>();
 		for (After after : afters) {
 			@SuppressWarnings("unchecked")
 			Class<AfterFilter<R>>[] clazzs = (Class<AfterFilter<R>>[]) after.value();
