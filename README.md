@@ -11,7 +11,7 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 4. 支持与主流数据库连接池框架集成,如集成c3p0,dbcp等等
 5. 支持 `@Query` 查询,使用 `@Condition`,可实现动态 `where` 条件查询.
 6. 支持查询结果集以JSON类型返回
-7. 支持`AOP`,注入拦截器只需标识几个简单的注解,如: `@Before` , `@After`
+7. 支持`AOP`,注入拦截器只需要标识几个简单的注解,如: `@Before` , `@After`
 
 ## 运行环境要求
 jdk1.8+
@@ -170,7 +170,7 @@ List<Map<String, Object>> findBy(String sex,Integer age);
 ## 动态条件查询
 ```java
 @Query("select no, name, sex from Student #{#where} order by age desc")
-// 增加一些条件
+// 增加若干个条件
 @Condition(l="no",o=Operator.LIKE,r="?1")                   // ?1的值,如果是null, 该行条件将不参与运算
 @Condition(c=COperator.AND,l="name",o=Operator.LIKE,r="?2") // 参数 ?2,如果接收到的值为null,该条件不参与运算
 // 通过 ignoreNull=false 开启条件值即使是null也参与运算
@@ -342,6 +342,7 @@ public interface StudentDBService extends QueryRepository {
 ```java
 // 这个拦截器的作用范围在 DataAcquireDbService里或在DataAcquireDbService子类里.
 // 换言之: MyBeforeFilter3这个拦截器只能标注在DataAcquireDbService里或标注在DataAcquireDbService的子类里.
+// 否则,程序不能顺利通过初始化阶段.
 public class MyBeforeFilter3 extends BeforeFilter<DataAcquireDbService> { 
      // some code ... ...
 }

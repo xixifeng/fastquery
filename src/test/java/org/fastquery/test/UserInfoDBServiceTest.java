@@ -40,7 +40,7 @@ import static org.hamcrest.Matchers.*;
  * @author xixifeng (fastquery@126.com)
  */
 public class UserInfoDBServiceTest {
-
+	
 	private UserInfoDBService userInfoDBService;
 	
 	@Before
@@ -66,18 +66,20 @@ public class UserInfoDBServiceTest {
 	
 	// 断言: 它会抛出RepositoryException异常
 	@Test(expected=RepositoryException.class)
-	public void testUpdateBatch2() {
+	public void testUpdateBatch2_a() {
 		int effect = userInfoDBService.updateBatch2("小不点", 6, 2);
 		// updateBatch2 中途会报错,因此修改影响的行数为0
 		assertThat(effect, equalTo(0));
 	}
 	
 	@Test
-	public void testUpdateBatch3() {
-		int[] effects = userInfoDBService.updateBatch3("白云", 66, 2);
-		// updateBatch2 中途会报错,因此修改影响的行数为0
-		for (int effect : effects) {
-			assertThat(effect, greaterThanOrEqualTo(1));
+	public void testUpdateBatch2_b() {
+		try {
+			int effect = userInfoDBService.updateBatch2("小不点", 6, 2);
+			assertThat(effect, equalTo(0));	
+		} catch (RepositoryException e) {
+			//  Handle exceptional condition
+			// TODO ...
 		}
 	}
 }
