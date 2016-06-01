@@ -253,6 +253,22 @@ int updateBatch(String name,Integer age,Integer id);
 //    则: 返回值为: new int[]{N1,N2,N3}
 ```
 
+## 处理异常
+
+捕获和处理`Repository`实例在运行期抛出的异常.
+例如: 捕获UserInfoDBService中的updateBatch在运行期间可能抛出的异常.
+
+```java
+// 获取 Repository
+UserInfoDBService udb = FQuery.getRepository(UserInfoDBService.class);
+
+try {
+	int effect = udb.updateBatch("小不点", 6, 2);
+} catch (RepositoryException e) {
+	// Handle exceptional condition
+	// TODO ... ...
+}
+```
 
 ## @Before拦截器
 - 准备一个BeforeFilter
