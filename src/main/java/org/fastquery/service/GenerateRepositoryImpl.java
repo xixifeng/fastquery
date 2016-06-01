@@ -22,8 +22,6 @@
 
 package org.fastquery.service;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -85,16 +83,7 @@ class GenerateRepositoryImpl implements GenerateRepository {
 		if( FqClassLoader.findLoadedClassByName(name) == null ) {
 			
 			byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
-			// ---- 把字节存储到硬盘 ----------
-			try {
-				FileOutputStream fileOutputStream = new FileOutputStream("/tmp/tmp-root/" + repositoryClazz.getSimpleName()+SUFFIX +".class");
-				fileOutputStream.write(bytes);
-				fileOutputStream.flush();
-				fileOutputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			// ---- 把字节存储到硬盘 ---------- End
+
 			return (T) new FqClassLoader(this.getClass().getClassLoader()).defineClassByName(name, bytes, 0, bytes.length);
 		}
 		return null;
