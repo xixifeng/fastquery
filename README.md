@@ -167,7 +167,7 @@ JSONArray find(String sex,Integer age);
 List<Map<String, Object>> findBy(String sex,Integer age);
 ```
 
-**注意**: 在没有查询到数据的情况下,如果返回值是集合类型或者是数组类型.不会得到null,而是一个空集合或长度为0的数组.   
+**注意**: 在没有查询到数据的情况下,如果返回值是集合类型或`JSON`类型或者是数组类型.具体的值不会是`null`,而是一个空集合或空`JSON`或者是长度为0的数组.   
 举例说明: 
 
 ```java
