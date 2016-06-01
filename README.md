@@ -255,7 +255,7 @@ int updateBatch(String name,Integer age,Integer id);
 
 ## 处理异常
 
-捕获和处理`Repository`实例在运行期抛出的异常.
+捕获和处理`Repository`实例在运行期抛出的异常.   
 例如: 捕获UserInfoDBService中的updateBatch在运行期间可能抛出的异常.
 
 ```java
