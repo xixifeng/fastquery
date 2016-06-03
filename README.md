@@ -305,7 +305,8 @@ public interface UserInfoDBService extends QueryRepository {
 	Page<UserInfo> find(Integer age,Integer id,Pageable pageable);
 	
 	// countQuery : 指定自定义求和语句
-	@Query(value = "select id,name,age from `userinfo` #{#where}", countQuery = "select count(id) from `userinfo` #{#where}")
+	@Query(value = "select id,name,age from `userinfo` #{#where}", 
+	       countQuery = "select count(id) from `userinfo` #{#where}")
 	@Condition(l = "age", o = Operator.GT, r = "?1")        // age > ?1
 	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2
 	Page<UserInfo> findSome(Integer age,Integer id,Pageable pageable);
@@ -314,6 +315,7 @@ public interface UserInfoDBService extends QueryRepository {
 
 Run it.       
 `Page`是分页的抽象.通过它可以获取分页中的各种属性. 并且开发者不用去实现.
+
 ```java
 Integer age = 10;
 Integer id = 50;
@@ -331,7 +333,7 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 
 ```js
 {
-	"content":[                 // 这页的数据
+	"content":[                  // 这页的数据
 		{
 			"name":"查尔斯·巴贝奇",
 			"id":2,
