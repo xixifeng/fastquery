@@ -20,26 +20,31 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.page;
 
 /**
- * Repository Exception
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-public class RepositoryException extends RuntimeException {
-	
-	private static final long serialVersionUID = 1L;
+public interface Pageable {
+	/**
+	 * Returns the page to be returned.
+	 * 
+	 * @return the page to be returned.
+	 */
+	int getPageNumber();
 
-	public RepositoryException(Throwable cause) {
-		super(cause);
-	}
-	
-	public RepositoryException(String message) {
-		super(message);
-	}
-	
-	public RepositoryException(String message, Throwable cause) {
-		super(message, cause);
-	}
-	
+	/**
+	 * Returns the number of items to be returned.
+	 * 
+	 * @return the number of items of that page
+	 */
+	int getPageSize();
+
+	/**
+	 * Returns the offset to be taken according to the underlying page and page size.
+	 * 
+	 * @return the offset to be taken
+	 */
+	int getOffset();
 }

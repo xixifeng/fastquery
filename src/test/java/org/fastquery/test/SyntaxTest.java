@@ -20,26 +20,24 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Test;
 
 /**
- * Repository Exception
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-public class RepositoryException extends RuntimeException {
-	
-	private static final long serialVersionUID = 1L;
+public class SyntaxTest {
 
-	public RepositoryException(Throwable cause) {
-		super(cause);
-	}
-	
-	public RepositoryException(String message) {
-		super(message);
-	}
-	
-	public RepositoryException(String message, Throwable cause) {
-		super(message, cause);
-	}
-	
+	@Test
+	public void listEmpty(){
+		List<Map<String, Object>> maps = new ArrayList<>();
+		maps.get(0); // 这样是错误的
+		}
+
 }

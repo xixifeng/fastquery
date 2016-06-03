@@ -127,7 +127,7 @@ public class QueryHandler {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public JSONArray jsonArrayType(Method method, Class<?> returnType, List<Map<String, Object>> keyvals) {
+	public JSONArray jsonArrayType(List<Map<String, Object>> keyvals) {
 		return new JSONArray((List) keyvals);
 	}
 
@@ -226,4 +226,5 @@ public class QueryHandler {
 			return keyvals.get(0).entrySet().iterator().next().getValue();
 		}
 	}
+
 }

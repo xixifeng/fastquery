@@ -35,7 +35,8 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 //指定运行器
 @RunWith(Suite.class)
-@SuiteClasses({StudentDBServiceTest.class,DataAcquireDbServiceTest.class,UserInfoDBServiceTest.class,TypeUtilTest.class})
+// DataAcquireDbServiceTest.class,
+@SuiteClasses({StudentDBServiceTest.class,UserInfoDBServiceTest.class,TypeUtilTest.class})
 class AllTest {
 	
 	@Test

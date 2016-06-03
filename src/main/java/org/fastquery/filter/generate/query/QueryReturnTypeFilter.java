@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import org.fastquery.filter.generate.common.MethodFilter;
+import org.fastquery.page.Page;
 import org.fastquery.util.TypeUtil;
 
 import com.alibaba.fastjson.JSONArray;
@@ -39,17 +40,18 @@ public class QueryReturnTypeFilter implements MethodFilter {
 
 	@Override
 	public Method doFilter(Method method) {
-		String errmsg = String.format("为这个方法设置的返回值错误,其返回值类型支持类型如下:%n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n",
+		String errmsg = String.format("为这个方法设置的返回值错误,其返回值类型支持类型如下:%n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n",
 				"1). long 用于统计总行数",
 				"2). boolean 判断是否存在",
 				"3). Map<String,Object>", 
 				"4). List<Map<String,Object>>",
-				"5). JSONObject",
-				"6). JSONArray",
-				"7). Integer,Double,Long,Short,Byte,Character,Float,String 八种基本类型(除了Boolean)",
-				"8). Integer[],Double[],Long[],Short[],Byte[],Character[],Float[]",
-				"9). 自定义实体数组",
-				"10).自定义实体,必须包含有默认的构造函数"
+				"5). Page",
+				"6). JSONObject",
+				"7). JSONArray",
+				"8). Integer,Double,Long,Short,Byte,Character,Float,String 八种基本类型(除了Boolean)",
+				"9). Integer[],Double[],Long[],Short[],Byte[],Character[],Float[]",
+				"10). 自定义实体数组",
+				"11).自定义实体,必须包含有默认的构造函数"
 				);
 		
 		Type genericReturnType = method.getGenericReturnType();
@@ -62,6 +64,8 @@ public class QueryReturnTypeFilter implements MethodFilter {
 		} else if(returnType == boolean.class) {
 			return method;
 		} else if(TypeUtil.isMapSO(genericReturnType) || TypeUtil.isListMapSO(genericReturnType)){
+			return method;
+		} else if(returnType == Page.class){
 			return method;
 		}
 		else if(returnType == JSONObject.class) {

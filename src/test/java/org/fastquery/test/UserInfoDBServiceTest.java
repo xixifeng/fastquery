@@ -23,16 +23,23 @@
 package org.fastquery.test;
 
 import org.fastquery.core.RepositoryException;
+import org.fastquery.example.UserInfo;
 import org.fastquery.example.UserInfoDBService;
+import org.fastquery.page.Page;
+import org.fastquery.page.Pageable;
+import org.fastquery.page.PageableImpl;
+import org.fastquery.page.Slice;
 import org.fastquery.service.FQuery;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.*;
@@ -59,6 +66,14 @@ public class UserInfoDBServiceTest {
 			assertThat(jsonObject.getInteger("age"),greaterThan(age));
 		}
 	}
+	
+	/*@Test
+	public void findSome(){
+		List<UserInfo> userInfos = userInfoDBService.findSome(30);
+		userInfos.forEach( userInfo -> {
+			assertThat(userInfo.getId(), greaterThan(30));
+		});
+	}*/
 	
 	@Test
 	public void testFindUserInfoByAge2(){
@@ -105,4 +120,62 @@ public class UserInfoDBServiceTest {
 			// TODO ...
 		}
 	}
+	
+	@Test
+	public void findAll() {
+		
+		int p = 1;
+		int size = 6;
+		Page<Map<String, Object>> page = userInfoDBService.findAll(new PageableImpl(p, size));
+		assertThat(String.format("断言: 当前是第%s页", p), page.getNumber(), is(p));
+		assertThat(page.getNumberOfElements(), lessThanOrEqualTo(size));
+		
+		
+		// 打印出来看看
+		String str = JSON.toJSONString(page,true);
+		System.out.println(str);
+		
+	}
+	
+	@Test
+	public void find(){
+		Page<UserInfo> page = userInfoDBService.find(100, 50,new PageableImpl(1, 3));
+		List<UserInfo> userInfos = page.getContent();
+		if(page.isHasContent()){
+			userInfos.forEach(System.out::println);
+		}
+		assertThat(page.isFirst(), is(true));
+		
+		String str = JSON.toJSONString(page,true);
+		
+		System.out.println(str);
+		
+	}
+	
+	
+	@Test
+	public void findSome(){
+		Integer age = 10;
+		Integer id = 50;
+		int p = 1;    // 指定访问的是第几页
+		int size = 3; // 设定每一页最多显示几条记录
+		Pageable pageable = new PageableImpl(p, size);
+		Page<UserInfo> page  = userInfoDBService.findSome(10, 50,pageable);
+		List<UserInfo> userInfos = page.getContent(); // 获取这页的数据
+		Slice slice = page.getNextPageable();         // 下一页
+		int number = page.getNumber();                // 当前页数(当前是第几页)
+		// 更多 page.? 就不赘述了.
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+

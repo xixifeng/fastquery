@@ -20,26 +20,44 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.page;
 
 /**
- * Repository Exception
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-public class RepositoryException extends RuntimeException {
-	
-	private static final long serialVersionUID = 1L;
+public class PageableImpl implements Pageable {
 
-	public RepositoryException(Throwable cause) {
-		super(cause);
-	}
+	private final int page;
+	private final int size;
 	
-	public RepositoryException(String message) {
-		super(message);
+	public PageableImpl(int page, int size) {
+		
+		if (page < 1) {
+			throw new IllegalArgumentException("页码索引不能小于1 !");
+		}
+
+		if (size < 1) {
+			throw new IllegalArgumentException("Page size 不能小于1 !");
+		}
+		
+		this.page = page;
+		this.size = size;
 	}
-	
-	public RepositoryException(String message, Throwable cause) {
-		super(message, cause);
+
+	@Override
+	public int getPageNumber() {
+		return page;
 	}
-	
+
+	@Override
+	public int getPageSize() {
+		return size;
+	}
+
+	@Override
+	public int getOffset() {
+		return page * size - size;
+	}
+
 }

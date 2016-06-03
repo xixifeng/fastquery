@@ -25,6 +25,7 @@ package org.fastquery.core;
 import java.lang.reflect.Method;
 
 import org.fastquery.filter.FilterChainHandler;
+import org.fastquery.page.Page;
 import org.fastquery.util.TypeUtil;
 
 /**
@@ -91,6 +92,9 @@ public class Prepared {
 			if( querys.length>0 && modifying !=null) {
 				return QueryProcess.getInstance().modifying(method,returnType, querys, packageName,args);
 			} else if(querys.length>0) {
+				if(returnType == Page.class) {
+					return QueryProcess.getInstance().queryPage(method,returnType, querys,packageName, args);
+				}
 				return QueryProcess.getInstance().query(method,returnType, querys,packageName, args);
 			} 
 			 else {

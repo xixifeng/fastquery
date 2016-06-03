@@ -26,10 +26,10 @@
         <property name="password">abc123</property>  
         <property name="idleConnectionTestPeriod">3</property>
         
-        <property name="acquireIncrement">50</property>  
-        <property name="initialPoolSize">100</property>  
-        <property name="minPoolSize">50</property>  
-        <property name="maxPoolSize">1000</property><!-- intergalactoApp adopts a different approach to configuring statement caching -->  
+        <property name="acquireIncrement">5</property>  
+        <property name="initialPoolSize">10</property>  
+        <property name="minPoolSize">5</property>  
+        <property name="maxPoolSize">10</property><!-- intergalactoApp adopts a different approach to configuring statement caching -->  
         <property name="maxStatements">0</property>  
         <property name="maxStatementsPerConnection">5</property> 
         

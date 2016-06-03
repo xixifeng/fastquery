@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.fastquery.core.Id;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
@@ -154,6 +155,15 @@ public class TypeUtilTest implements Opcodes {
 	public void testHasDefaultConstructor() {
 	}
 
+	public void todo(@Id Integer page,Integer size){
+	}
+	@Test
+	public void findAnnotationIndex() throws NoSuchMethodException, SecurityException{
+		Method method = TypeUtilTest.class.getMethod("todo",Integer.class,Integer.class);
+		Parameter[] parameters = method.getParameters();
+		assertThat(TypeUtil.findAnnotationIndex(Id.class, parameters), is(0));
+	}
+	
 	@Test
 	public void testFindId() {
 	}

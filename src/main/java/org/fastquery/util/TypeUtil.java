@@ -22,6 +22,7 @@
 
 package org.fastquery.util;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +45,9 @@ import org.fastquery.where.Condition;
 import org.fastquery.where.Operator;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * 
@@ -239,6 +244,20 @@ public class TypeUtil implements Opcodes{
 	    return true;
 	}
 	
+	/**
+	 * 从给定的参数列表中,搜寻出是第几个参数带有指定的注解.注意:从0开始计数
+	 * @param annotation 需要查询的注解
+	 * @param parameters 被查的参数列表
+	 * @return
+	 */
+	public static int findAnnotationIndex(Class<? extends Annotation> clazz,Parameter[] parameters){
+		for (int i = 0; i < parameters.length; i++) {
+			if(parameters[i].getAnnotation(clazz)!=null){
+				return i;
+			}
+		}
+		return -1;
+	}
 	
 	/**
 	 * 从给定的参数列表中,搜寻出是第几个参数带有@Id注解.注意:从0开始计数
@@ -246,12 +265,7 @@ public class TypeUtil implements Opcodes{
 	 * @return 若返回 -1 表示没有找到
 	 */
 	public static int findId(Parameter[] parameters) {
-		for (int i = 0; i < parameters.length; i++) {
-			if(parameters[i].getAnnotation(Id.class)!=null){
-				return i;
-			}
-		}
-		return -1;
+		return findAnnotationIndex(Id.class, parameters);
 	}
 	
 	/**
@@ -303,6 +317,48 @@ public class TypeUtil implements Opcodes{
 			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, sb.toString()));
 		}
 		return sqls;
+	}
+	
+	
+	public static String getCountQuerySQL(Method method,String sql,Object[] args){
+			StringBuilder sb = new StringBuilder();
+			// 追加条件
+			Condition[] conditions = method.getAnnotationsByType(Condition.class);
+			o:for (int i = 0; i < conditions.length; i++) {
+				
+				if(conditions[i].ignoreNull()){ // 忽略null,那么就要看参数是否传递null啦
+					// r 属性中包含的参数,必须去重
+					Set<String> pars = TypeUtil.matchesNotrepeat(conditions[i].r(), "\\?\\d+");
+					if(!pars.isEmpty()){ // 表明这个条件有"?"占位符号
+						for (String par : pars) {
+							int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
+							if(args[index-1] == null){ //如果传递了参数null, 那么这个条件就不加入
+								continue o; // 跳出最外层的当次循环
+							}
+						}
+					}
+				}
+				
+				sb.append(' ');
+				if(sb.length() > 1){ // 第一个条件不能加上条件连接符,请特别注意:此处的条件不能用如果(i!=0),因为上面会中途跳出循环.
+					sb.append(conditions[i].c().getVal());	
+				}
+				sb.append(' ');	
+				sb.append(conditions[i].l());
+				sb.append(' ');
+				Operator[] operators = conditions[i].o();
+				for (Operator operator : operators) {
+					sb.append(operator.getVal());
+					sb.append(' ');
+				}
+				sb.append(conditions[i].r());
+			}
+			// 追加条件 End
+			if(!"".equals(sb.toString())){ // 特别注意: 此处不能写成 !sb.equals("")
+				sb.replace(0, 1, "where");
+			}
+			
+		return sql.replaceFirst(Placeholder.WHERE_REG, sb.toString());
 	}
 	
 	
@@ -384,6 +440,12 @@ public class TypeUtil implements Opcodes{
 		
 		// 如果以上都不满足
 		return true;
+	}
+	
+	public static <B> List<B> listMap2ListBean(List<Map<String, Object>> maps,Class<B> b){
+		List<B> bs = new ArrayList<>();
+		maps.forEach( map -> bs.add( JSON.toJavaObject(new JSONObject(map), b) ) );
+		return bs;
 	}
 }
 

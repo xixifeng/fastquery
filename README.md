@@ -11,7 +11,8 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 4. 支持与主流数据库连接池框架集成,如集成c3p0,dbcp等等
 5. 支持 `@Query` 查询,使用 `@Condition`,可实现动态 `where` 条件查询.
 6. 支持查询结果集以JSON类型返回
-7. 支持`AOP`,注入拦截器只需要标识几个简单的注解,如: `@Before` , `@After`
+7. 拥有非常优雅的`Page`(分页)设计
+8. 支持`AOP`,注入拦截器只需要标识几个简单的注解,如: `@Before` , `@After`
 
 ## 运行环境要求
 jdk1.8+
@@ -284,6 +285,102 @@ try {
 } catch (RepositoryException e) {
 	// Handle exceptional condition
 	// TODO ... ...
+}
+```
+
+## 分页
+
+`Repository`
+
+```java
+public interface UserInfoDBService extends QueryRepository {
+	// countField : 明确指定求和字段count(countField),默认值是"id"
+	@Query(value="select id,name,age from `userinfo` where 1",countField="id")
+	Page<Map<String, Object>> findAll(Pageable pageable);
+	
+	// 如果没有指定求和语句,那么由fastquery分析出最优的求和语句
+	@Query("select id,name,age from `userinfo` #{#where}")
+	@Condition(l="age",o=Operator.GT,r="?1")                // age > ?1
+	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2
+	Page<UserInfo> find(Integer age,Integer id,Pageable pageable);
+	
+	// countQuery : 指定自定义求和语句
+	@Query(value = "select id,name,age from `userinfo` #{#where}", countQuery = "select count(id) from `userinfo` #{#where}")
+	@Condition(l = "age", o = Operator.GT, r = "?1")        // age > ?1
+	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2
+	Page<UserInfo> findSome(Integer age,Integer id,Pageable pageable);
+}
+```
+
+Run it.       
+`Page`是分页的抽象.通过它可以获取分页中的各种属性. 并且开发者不用去实现.
+```java
+Integer age = 10;
+Integer id = 50;
+int p = 1;    // 指定访问的是第几页
+int size = 3; // 设定每一页最多显示几条记录
+Pageable pageable = new PageableImpl(p, size);
+Page<UserInfo> page  = userInfoDBService.findSome(10, 50,pageable);
+List<UserInfo> userInfos = page.getContent(); // 获取这页的数据
+Slice slice = page.getNextPageable();         // 下一页
+int number = page.getNumber();                // 当前页数(当前是第几页)
+// 更多 page.? 就不赘述了.
+``` 
+
+她转换成`JSON`后的结构如下:
+
+```js
+{
+	"content":[                 // 这页的数据
+		{
+			"name":"查尔斯·巴贝奇",
+			"id":2,
+			"year":1792
+		},
+		{
+			"name":"约翰·冯·诺依曼",
+			"id":3,
+			"year":1903
+		},
+		{                     
+			"name":"阿兰·麦席森·图灵",
+			"id":1,
+			"year":1912
+		},
+		{
+			"name":"约翰·麦卡锡",
+			"id":4,
+			"year":1927
+		},
+		{
+			"name":"丹尼斯·里奇",
+			"id":5,
+			"year":1941
+		},
+		{
+			"name":"蒂姆·伯纳斯·李",
+			"id":6,
+			"year":1955
+		}
+	],
+    "first": true,           	// 是否是第一页
+    "hasContent": true,      	// 这页是否有数据
+    "hasNext": true,         	// 是否有下一页
+    "hasPrevious": false,    	// 是否有上一页
+    "last": false,           	// 是否是最后一页
+    "nextPageable": {        	// 下一页的基本属性
+        "number": 1,         	// 定位的页码
+        "size": 15           	// 每页多少条数据
+    },
+    "number": 1,             	// 当前页码,从1开始
+    "numberOfElements": 6,  	// 当前页的真实记录行数
+    "previousPageable": {    	// 上一页的基本属性
+        "number": 0,         	// 定位的页码
+        "size": 15           	// 每页多少条数据
+    },
+    "size": 15,              	// 每页行数
+    "totalElements": 188,    	// 总行数
+    "totalPages": 13         	// 总页码
 }
 ```
 

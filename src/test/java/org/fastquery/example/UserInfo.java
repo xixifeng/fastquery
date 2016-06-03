@@ -20,26 +20,38 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.example;
 
 /**
- * Repository Exception
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-public class RepositoryException extends RuntimeException {
+public class UserInfo {
 	
-	private static final long serialVersionUID = 1L;
-
-	public RepositoryException(Throwable cause) {
-		super(cause);
+	private Integer id;
+	private String name;
+	private Integer age;
+	
+	public Integer getId() {
+		return id;
 	}
-	
-	public RepositoryException(String message) {
-		super(message);
+	public String getName() {
+		return name;
 	}
-	
-	public RepositoryException(String message, Throwable cause) {
-		super(message, cause);
+	public Integer getAge() {
+		return age;
 	}
-	
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public void setAge(Integer age) {
+		this.age = age;
+	}
+	@Override
+	public String toString() {
+		return "UserInfo [id=" + id + ", name=" + name + ", age=" + age + "]";
+	}
 }

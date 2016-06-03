@@ -26,6 +26,12 @@ public @interface Query {
 	String countQuery() default "";
 	
 	/**
+	 * 求和字段
+	 * @return
+	 */
+	String countField() default "id";
+	
+	/**
 	 * 是否采用本地查询
 	 */
 	boolean nativeQuery() default true;

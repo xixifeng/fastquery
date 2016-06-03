@@ -28,6 +28,11 @@ import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Transactional;
+import org.fastquery.page.Page;
+import org.fastquery.page.Pageable;
+import org.fastquery.where.COperator;
+import org.fastquery.where.Condition;
+import org.fastquery.where.Operator;
 
 import com.alibaba.fastjson.JSONArray;
 
@@ -42,6 +47,9 @@ public interface UserInfoDBService extends QueryRepository {
 	
 	@Query("select id,name,age from `userinfo` as u where u.age>?1")
 	Map<String, Object> findOne(Integer age);
+	
+	//@Query("select id,name,age from `userinfo` as u where u.id>?1")
+	//List<UserInfo> findSome(Integer id);
 	
 	@Transactional
 	@Modifying
@@ -70,6 +78,22 @@ public interface UserInfoDBService extends QueryRepository {
 	@Query("update `userinfo` set `name`=?1,`age`=?2 where id=?3")
 	@Query("update `userinfo` set `name`=?1 where age > ?2")
 	int[] updateBatch3(String name,Integer age,Integer id);
+	
+	// countField : 明确指定求和字段count(countField),默认值是"id"
+	@Query(value="select id,name,age from `userinfo` where 1",countField="id")
+	Page<Map<String, Object>> findAll(Pageable pageable);
+	
+	// 如果没有指定求和语句,那么`fastquery`自动为分析出最优的求和语句.
+	@Query("select id,name,age from `userinfo` #{#where}")
+	@Condition(l="age",o=Operator.GT,r="?1")                // age > ?1
+	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2
+	Page<UserInfo> find(Integer age,Integer id,Pageable pageable);
+	
+	// countQuery : 指定自定义求和语句
+	@Query(value = "select id,name,age from `userinfo` #{#where}", countQuery = "select count(name) from `userinfo` #{#where}")
+	@Condition(l = "age", o = Operator.GT, r = "?1")        // age > ?1
+	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2
+	Page<UserInfo> findSome(Integer age,Integer id,Pageable pageable);
 	
 }
 

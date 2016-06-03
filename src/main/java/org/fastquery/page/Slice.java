@@ -20,26 +20,40 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.page;
 
 /**
- * Repository Exception
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-public class RepositoryException extends RuntimeException {
+public class Slice {
 	
-	private static final long serialVersionUID = 1L;
+	private int number;  // 当前页码
+	private int size;    // 每页多少条数据
+		
+	/**
+	 * 构造 TenetPageable
+	 * @param number 当前页码
+	 * @param size   每页多少条数据
+	 */
+	public Slice(int number, int size) {
+		this.number = number;
+		this.size = size;
+	}
 
-	public RepositoryException(Throwable cause) {
-		super(cause);
+	public int getNumber() {
+		return number;
 	}
-	
-	public RepositoryException(String message) {
-		super(message);
+
+	public int getSize() {
+		return size;
 	}
-	
-	public RepositoryException(String message, Throwable cause) {
-		super(message, cause);
+
+	public void setNumber(int number) {
+		this.number = number;
 	}
-	
+
+	public void setSize(int size) {
+		this.size = size;
+	}
 }
