@@ -313,7 +313,7 @@ public interface UserInfoDBService extends QueryRepository {
 }
 ```
 
-Run it.       
+**Run it**       
 `Page`是分页的抽象.通过它可以获取分页中的各种属性. 并且开发者不用去实现.
 
 ```java
@@ -485,6 +485,11 @@ String findOneCourse();
 - http://git.oschina.net/xixifeng.com/fastquery
 - https://github.com/xixifeng/fastquery
 - https://code.aliyun.com/xixifeng/fastquery
+
+## 开发环境
+仅仅是建议,并不局限于此
+  IDE: eclipse
+build: maven 
 
 ## 联系作者
 fastquery#126.com
