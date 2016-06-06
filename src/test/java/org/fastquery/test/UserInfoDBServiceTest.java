@@ -26,9 +26,7 @@ import org.fastquery.core.RepositoryException;
 import org.fastquery.example.UserInfo;
 import org.fastquery.example.UserInfoDBService;
 import org.fastquery.page.Page;
-import org.fastquery.page.Pageable;
 import org.fastquery.page.PageableImpl;
-import org.fastquery.page.Slice;
 import org.fastquery.service.FQuery;
 import org.junit.Before;
 import org.junit.Test;
@@ -150,21 +148,6 @@ public class UserInfoDBServiceTest {
 		
 		System.out.println(str);
 		
-	}
-	
-	
-	@Test
-	public void findSome(){
-		Integer age = 10;
-		Integer id = 50;
-		int p = 1;    // 指定访问的是第几页
-		int size = 3; // 设定每一页最多显示几条记录
-		Pageable pageable = new PageableImpl(p, size);
-		Page<UserInfo> page  = userInfoDBService.findSome(10, 50,pageable);
-		List<UserInfo> userInfos = page.getContent(); // 获取这页的数据
-		Slice slice = page.getNextPageable();         // 下一页
-		int number = page.getNumber();                // 当前页数(当前是第几页)
-		// 更多 page.? 就不赘述了.
 	}
 }
 
