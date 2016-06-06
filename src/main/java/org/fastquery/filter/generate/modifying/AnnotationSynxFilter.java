@@ -72,8 +72,8 @@ public class AnnotationSynxFilter implements MethodFilter {
 				
 				// 3) @Modifying 必须中的id 和 table值,在数据库中是存在的.
 				// 参考:SHOW COLUMNS from student where `KEY`='PRI'
-				//String packageName = method.getDeclaringClass().getPackage().getName()
-				String packageName = method.getDeclaringClass().getName();
+				String packageName = method.getDeclaringClass().getPackage().getName();
+				//String packageName = method.getDeclaringClass().getName()
 				// id 是 table表的主键吗?
 				if( !DBUtils.getInstance().findColumnKey(packageName, table, id) ) { // 如果Modifying描述错误!
 					this.abortWith(method, String.format("返回值是:%s 因此要求:%s中描述:%s是%s表的主键,与实际不符.", returnType,modifying,id,table));

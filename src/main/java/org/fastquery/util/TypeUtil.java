@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -447,6 +448,26 @@ public class TypeUtil implements Opcodes{
 		maps.forEach( map -> bs.add( JSON.toJavaObject(new JSONObject(map), b) ) );
 		return bs;
 	}
+	
+	public static List<String> tokenizeToStringArray(String str, String delimiters) {
+		if (str == null) {
+			return new ArrayList<>();
+		}
+		
+		StringTokenizer st = new StringTokenizer(str, delimiters);
+		List<String> tokens = new ArrayList<>();
+		while (st.hasMoreTokens()) {
+			String token = st.nextToken();
+				token = token.trim();
+			if (token.length() > 0) {
+				tokens.add(token);
+			}
+		}
+		return tokens;
+	}
+	
+	
+	
 }
 
 

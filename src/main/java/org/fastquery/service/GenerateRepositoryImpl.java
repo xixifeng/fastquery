@@ -22,14 +22,15 @@
 
 package org.fastquery.service;
 
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.fastquery.asm.AsmRepository;
 import org.fastquery.core.GenerateRepository;
 import org.fastquery.core.Repository;
-import org.fastquery.core.RepositoryException;
 import org.fastquery.dsm.FastQueryJson;
+import org.fastquery.util.ClassUtil;
 import org.fastquery.util.LoadPrperties;
 
 /**
@@ -53,13 +54,8 @@ class GenerateRepositoryImpl implements GenerateRepository {
 		for (FastQueryJson fQueryPropertie : fqPropertie) {
 			basePackages = fQueryPropertie.getBasePackages();
 			for (String basePackage : basePackages) {
-				try {
-					@SuppressWarnings("unchecked")
-					Class<? extends Repository> clazz = (Class<? extends Repository>) Class.forName(basePackage);
-					generate(clazz);
-				} catch (ClassNotFoundException e) {
-					throw new RepositoryException(e.getMessage(),e);
-				}
+				List<Class<Repository>> classes = ClassUtil.getClasses(basePackage);
+				classes.forEach(this::generate);
 			}
 		}
 	}

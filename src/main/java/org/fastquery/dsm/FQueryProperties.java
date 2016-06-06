@@ -24,6 +24,7 @@ package org.fastquery.dsm;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -57,7 +58,20 @@ public class FQueryProperties {
 	 * @return
 	 */
 	public static String findDataSourceName(String packageName) {
-		return dataSourceIndexs.get(packageName);
+		String dataSourceName = dataSourceIndexs.get(packageName);
+		if(dataSourceName == null) {
+			Set<String> packageNames = dataSourceIndexs.keySet();
+			for (String pkn : packageNames) {
+				// 注意:可能出现这种情况
+				// map中存在 "A.B.C"
+				// packageName 可能是B.C
+				// 因此需要做如下处理
+				if(pkn.substring(0, packageName.length()).equals(packageName)){
+					return dataSourceIndexs.get(pkn);
+				}
+			}
+		}
+		return dataSourceName;
 	}
 
 	/**

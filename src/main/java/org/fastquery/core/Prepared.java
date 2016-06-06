@@ -77,8 +77,8 @@ public class Prepared {
 		
 		String methodName = method.getName();
 		Class<?> returnType = method.getReturnType();
-		//String packageName = iclazz.getPackage().getName()
-		String packageName = iclazz.getName();
+		String packageName = iclazz.getPackage().getName();
+		//String packageName = iclazz.getName()
 		// 目前有两种可能: 1).Query Interface 2).Quartz Interface
 		// 在这里是一个分水岭
 		if(QueryRepository.class.isAssignableFrom(iclazz)){ // 判断iclazz 是否就是QueryRepository.class,或是其子类
