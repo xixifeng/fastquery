@@ -1,0 +1,6 @@
+cd /root/git/fastquery/fastquery
+# /web/progm/java/apache-maven-3.3.9/bin/mvn install
+rm -rf /root/git/fastquery/fastquery/lib/required/fastquery-*
+cp -r /root/git/fastquery/fastquery/target/fastquery-*  /root/git/fastquery/fastquery/lib/required/
+git commit -a -m 
+git push -u origin master

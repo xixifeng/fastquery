@@ -1,0 +1,77 @@
+Page (Tenet分页JSON数据结构) 
+{
+        "content": [{},{}... ...],  // 这页的数据
+        "first": true,           	// 是否是第一页
+        "hasContent": true,      	// 这页是否有数据
+        "hasNext": true,         	// 是否有下一页
+        "hasPrevious": false,    	// 是否有上一页
+        "last": false,           	// 是否是最后一页
+        "nextPageable": {        	// 下一页的基本属性
+            "number": 1,         	// 定位的页码
+            "size": 15           	// 每页多少条数据
+        },
+        "number": 0,             	// 当前页码,从1开始
+        "numberOfElements": 15,  	// 当前页的真实记录行数
+        "previousPageable": {    	// 上一页的基本属性
+            "number": 0,         	// 定位的页码
+            "size": 15           	// 每页多少条数据
+        },
+        "size": 15,              	// 每页行数
+        "totalElements": 188,    	// 总行数
+        "totalPages": 13         	// 总页码
+}
+
+
+Page示例 (6条数据):  
+{
+	"content":[
+		{
+			"name":"小张张",
+			"id":1,
+			"age":26
+		},
+		{
+			"name":"王五",
+			"id":2,
+			"age":36
+		},
+		{
+			"name":"李四",
+			"id":3,
+			"age":82
+		},
+		{
+			"name":"网五",
+			"id":4,
+			"age":31
+		},
+		{
+			"name":"小丽丽",
+			"id":5,
+			"age":8
+		},
+		{
+			"name":"张三",
+			"id":6,
+			"age":36
+		}
+	],
+	"first":true,
+	"hasContent":true,
+	"hasNext":true,
+	"hasPrevious":false,
+	"last":false,
+	"nextPageable":{
+		"number":2,
+		"size":6
+	},
+	"number":1,
+	"numberOfElements":6,
+	"previousPageable":{
+		"number":1,
+		"size":6
+	},
+	"size":6,
+	"totalElements":31,
+	"totalPages":6
+}

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<c3p0-config>  
+
+
+	<!-- 
+    <default-config>  
+        <property name="driverClass">com.mysql.jdbc.Driver</property>  
+        <property name="jdbcUrl">jdbc:mysql://...</property>
+        <property name="user">root</property>  
+        
+        <property name="password">root</property>  
+        <property name="initialPoolSize">10</property>  
+        <property name="maxIdleTime">30</property>  
+        <property name="maxPoolSize">20</property>  
+        <property name="minPoolSize">5</property>  
+        <property name="maxStatements">200</property>  
+    </default-config>  
+    -->
+     
+    <named-config name="xk-c3p0">  
+        <property name="driverClass">com.mysql.jdbc.Driver</property>  
+        <!-- 在这里需要把 & 替换成 &amp; 不然会报错: XML configuration disabled! Verify that standard XML libs are available-->
+        <!-- 如果前后台数据库编码一致,不必加?useUnicode=true&amp;characterEncoding=UTF-8 -->
+        <property name="jdbcUrl">jdbc:mysql://192.168.8.10:3306/xk</property>  
+        <property name="user">xk</property>  
+        <property name="password">abc123</property>  
+        <property name="idleConnectionTestPeriod">3</property>
+        
+        <property name="acquireIncrement">5</property>  
+        <property name="initialPoolSize">10</property>  
+        <property name="minPoolSize">5</property>  
+        <property name="maxPoolSize">10</property><!-- intergalactoApp adopts a different approach to configuring statement caching -->  
+        <property name="maxStatements">0</property>  
+        <property name="maxStatementsPerConnection">5</property> 
+        
+        </named-config>  
+</c3p0-config>
+
+
+   

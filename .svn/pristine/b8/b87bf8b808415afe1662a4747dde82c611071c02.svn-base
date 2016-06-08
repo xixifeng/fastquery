@@ -1,0 +1,13 @@
+log4j.rootLogger=WARN,A2
+
+#配置A2 *****************************
+# 指定日志的输出目的地为控制台
+log4j.appender.A2=org.apache.log4j.ConsoleAppender
+# 日志要求有指定格式
+log4j.appender.A2.layout=org.apache.log4j.PatternLayout
+#配置日志的指定格式
+log4j.appender.A2.layout.ConversionPattern=\u7EA7\u522B\:\u3010%p\u3011 \u4FE1\u606F\:%m \u4F4D\u7F6E\: %l  \u7EBF\u7A0B\:%t \u53D1\u751F\u65F6\u95F4\:%d{yyyy-MM-dd HH\:mm\:ss} \u8017\u65F6\:%r\u6BEB\u79D2%n
+
+#指定包的日志级别
+log4j.logger.org.fastquery = DEBUG
+

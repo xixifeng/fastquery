@@ -1,0 +1,115 @@
+
+-- 账户xk
+-- 密码abc123
+
+-- drop database if exists `xk`;
+-- create database `xk` character set utf8;
+-- use `xk`;
+
+create table Student (
+    no char(7) primary key,
+    name char(10) not null,
+    sex char(2),
+    age tinyint,
+    -- 系别
+    dept char(20) default '计算机系'
+);
+
+-- 课程表
+drop table if exists Course;
+create table Course (
+    no char(10) primary key,
+    name char(20) not null,
+    -- 学分
+    credit tinyint,
+    -- 学期
+    semester tinyint,
+    -- 课时
+    period int
+);
+
+-- 选课
+drop table if exists `SC`;
+create table `SC` (
+    studentNo char(7) not null,
+    courseNo char(10) not null,
+    -- 成绩
+    grade tinyint,
+    category char(10) default '必修',
+    primary key (studentNo , courseNo),
+    foreign key (studentNo)
+        references Student (no),
+    foreign key (courseNo)
+        references Course (no)
+);
+
+-- 初始化一些数据库
+-- use xk;
+delete from Student;
+insert into Student(no,name,sex,age,dept) values('9512101','李勇','男',18,'计算机系');
+insert into Student(no,name,sex,age,dept) values('9512102','刘晨','女',19,'计算机系');
+insert into Student(no,name,sex,age,dept) values('9512103','王敏','女',20,'计算机系');
+insert into Student(no,name,sex,age,dept) values('9521101','张立','男',21,'数学系');
+insert into Student(no,name,sex,age,dept) values('9521102','吴斌','男',19,'物理系');
+insert into Student(no,name,sex,age,dept) values('9521103','张海','男',18,'化学系');
+insert into Student(no,name,sex,age,dept) values('9531101','钱大平','女',19,'数学系');
+insert into Student(no,name,sex,age,dept) values('9531102','王小力','男',20,'物理系');
+delete from Course;
+insert into Course(no,name,credit,semester,period) values('c01','数据库原理',3,1,20);
+insert into Course(no,name,credit,semester,period) values('c02','VB',2,3,21);
+insert into Course(no,name,credit,semester,period) values('c03','计算机网络',4,7,22);
+insert into Course(no,name,credit,semester,period) values('c04','数据库基础',6,6,18);
+insert into Course(no,name,credit,semester,period) values('c05','高等数学',8,2,16);
+insert into Course(no,name,credit,semester,period) values('c06','线性代数',5,4,14);
+insert into Course(no,name,credit,semester,period) values('c07','数据结构',3,7,16);
+insert into Course(no,name,credit,semester,period) values('c08','计算机算法',2,6,18);
+delete from SC;
+insert into SC(studentNo,courseNo,grade,category) values('9512101','c01',90,'必修');
+insert into SC(studentNo,courseNo,grade,category) values('9512101','c02',86,'选修');
+insert into SC(studentNo,courseNo,grade,category) values('9512101','c06',null,'必修');
+insert into SC(studentNo,courseNo,grade,category) values('9512102','c02',78,'选修');
+insert into SC(studentNo,courseNo,grade,category) values('9512102','c04',66,'必修');
+insert into SC(studentNo,courseNo,grade,category) values('9521102','c01',82,'选修');
+insert into SC(studentNo,courseNo,grade,category) values('9521102','c02',75,'必修');
+insert into SC(studentNo,courseNo,grade,category) values('9521102','c04',92,'选修');
+insert into SC(studentNo,courseNo,grade,category) values('9521102','c05',50,'必修');
+insert into SC(studentNo,courseNo,grade,category) values('9512103','c02',68,'选修');
+insert into SC(studentNo,courseNo,grade,category) values('9512103','c06',null,'必修');
+insert into SC(studentNo,courseNo,grade,category) values('9531101','c01',80,'选修');
+insert into SC(studentNo,courseNo,grade,category) values('9531101','c05',95,'必修');
+insert into SC(studentNo,courseNo,grade,category) values('9531102','c05',85,'必修');
+-- =============== xk.sql End========= --;
+
+
+--
+-- 表的结构 `userinfo`
+--
+CREATE TABLE `userinfo` (
+  `id` int(11) primary key auto_increment NOT NULL,
+  `name` varchar(6) NOT NULL,
+  `age` int(11) DEFAULT NULL
+);
+-- ALTER TABLE `userinfo` ADD PRIMARY KEY (`id`);
+--
+-- 转存表中的数据 `userinfo`
+--
+INSERT INTO `userinfo` (`id`, `name`, `age`) VALUES(1, '张三', 16),(2, '王五', 36),(3, '李四', 82);
+
+
+-- 联合主键的一个例子
+CREATE TABLE product (
+  `pid` int(11) NOT NULL,
+  `lid` int(11) NOT NULL default '1',
+  `pname` varchar(64) NOT NULL default '',
+  `description` text,
+  PRIMARY KEY  (`pid`,`lid`),
+  KEY `products_name` (`pname`)
+);
+
+INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES
+(882, 79, 'kljgwlk', NULL),
+(1122, 1, 'zhangsan', NULL),
+(2233, 1, 'kljgwlk', NULL);
+
+
+
