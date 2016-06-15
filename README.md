@@ -309,6 +309,9 @@ try {
 
 ```java
 public interface UserInfoDBService extends QueryRepository {
+
+     // Pageable 用做描述当前页的索引和页数.
+    
 	// countField : 明确指定求和字段count(countField),默认值是"id"
 	@Query(value="select id,name,age from `userinfo` where 1",countField="id")
 	Page<Map<String, Object>> findAll(Pageable pageable);
@@ -328,7 +331,20 @@ public interface UserInfoDBService extends QueryRepository {
 }
 ```
 
-**Run it**       
+### @PageIndex和@PageSize
+`@PageIndex` 用来指定当前页索引   
+`@PageSize`  用来指定当前页应该显示多少条数据   
+**注意**: 该注解组合不能和`Pageable`一起使用  
+例如:
+
+```java
+@NotCount // 分页不统计总行数. 上百万的数据里求和会让人感觉慢
+@Query(value = "select id,name,age from `userinfo`")
+Page<Map<String,Object>> findSome(Integer age, Integer id,@PageIndex int pageIndex, @PageSize int pageSize);
+```
+
+
+### 使用分页     
 `Page`是分页的抽象.通过它可以获取分页中的各种属性. 并且开发者不用去实现.
 
 ```java
@@ -350,34 +366,22 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 {
 	"content":[                  // 这页的数据
 		{
-			"name":"查尔斯·巴贝奇",
-			"id":2,
-			"year":1792
+			"name":"查尔斯·巴贝奇","id":2,"year":1792
 		},
 		{
-			"name":"约翰·冯·诺依曼",
-			"id":3,
-			"year":1903
+			"name":"约翰·冯·诺依曼","id":3,"year":1903
 		},
 		{                     
-			"name":"阿兰·麦席森·图灵",
-			"id":1,
-			"year":1912
+			"name":"阿兰·麦席森·图灵","id":1,"year":1912
 		},
 		{
-			"name":"约翰·麦卡锡",
-			"id":4,
-			"year":1927
+			"name":"约翰·麦卡锡","id":4,"year":1927
 		},
 		{
-			"name":"丹尼斯·里奇",
-			"id":5,
-			"year":1941
+			"name":"丹尼斯·里奇","id":5,"year":1941
 		},
 		{
-			"name":"蒂姆·伯纳斯·李",
-			"id":6,
-			"year":1955
+			"name":"蒂姆·伯纳斯·李","id":6,"year":1955
 		}
 	],
     "first": true,           	// 是否是第一页
@@ -400,9 +404,11 @@ int number = page.getNumber();                // 当前页数(当前是第几页
     "totalPages": 13         	// 总页码
 }
 ```
-如果在分页函数上标识`@NotCount`,表示在分页中不统计总行数.那么分页对象中的`totalElements`的值为-1L,`totalPages`为-1.其他属性都有效且真实.    
-如果明确指定不统计行数,那么设置`countField`和`nativeQuery`就会变得无意义.    
-通常分页的区间控制默认放在`SQL`语句的末尾. 在符合`SQL`语法的前提下,通过`#{#limit}`可以把分页区间放在`SQL`里的任何地方.
+
+### 注意:
+- 如果在分页函数上标识`@NotCount`,表示在分页中不统计总行数.那么分页对象中的`totalElements`的值为-1L,`totalPages`为-1.其他属性都有效且真实.    
+- 如果明确指定不统计行数,那么设置`countField`和`nativeQuery`就会变得无意义.    
+- 通常分页的区间控制默认是放在`SQL`语句的末尾. 在符合`SQL`语法的前提下,通过`#{#limit}`可以把分页区间放在`SQL`里的任何地方.
 
 ## 动态适配数据源
 ### 创建数据源
