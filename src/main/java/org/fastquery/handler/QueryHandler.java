@@ -24,6 +24,8 @@ package org.fastquery.handler;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +36,6 @@ import org.fastquery.core.RepositoryException;
 import org.fastquery.util.TypeUtil;
 
 import java.util.Set;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -117,6 +118,21 @@ public class QueryHandler {
 
 	public List<Map<String, Object>> listType(List<Map<String, Object>> keyvals) {
 		return keyvals;
+	}
+	
+
+	public Object list(List<Map<String, Object>> keyvals,Method method) { // list bean
+		List<Object> list = new ArrayList<>();
+		if(keyvals.isEmpty()) {
+			return list;
+		}
+		
+		Class<?> beanType = (Class<?>) ((ParameterizedType)(method.getGenericReturnType())).getActualTypeArguments()[0];
+		
+		for (Map<String, Object> map : keyvals) {
+			list.add(JSON.toJavaObject(new JSONObject(map), beanType));
+		}
+		return list;
 	}
 
 	public JSONObject jsonObjeType(Method method, List<Map<String, Object>> keyvals) {
@@ -226,5 +242,4 @@ public class QueryHandler {
 			return keyvals.get(0).entrySet().iterator().next().getValue();
 		}
 	}
-
 }

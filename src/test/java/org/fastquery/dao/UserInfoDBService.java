@@ -22,6 +22,7 @@
 
 package org.fastquery.dao;
 
+import java.util.List;
 import java.util.Map;
 
 import org.fastquery.bean.UserInfo;
@@ -30,7 +31,10 @@ import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Transactional;
+import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
+import org.fastquery.page.PageIndex;
+import org.fastquery.page.PageSize;
 import org.fastquery.page.Pageable;
 import org.fastquery.where.COperator;
 import org.fastquery.where.Condition;
@@ -50,8 +54,8 @@ public interface UserInfoDBService extends QueryRepository {
 	@Query("select id,name,age from `userinfo` as u where u.age>?1")
 	Map<String, Object> findOne(Integer age,@Source String dataSource);
 	
-	//@Query("select id,name,age from `userinfo` as u where u.id>?1")
-	//List<UserInfo> findSome(Integer id);
+	@Query("select id,name,age from `userinfo` as u where u.id>?1")
+	List<UserInfo> findSome(Integer id);
 	
 	@Transactional
 	@Modifying
@@ -95,7 +99,16 @@ public interface UserInfoDBService extends QueryRepository {
 	@Query(value = "select id,name,age from `userinfo` #{#where}", countQuery = "select count(name) from `userinfo` #{#where}")
 	@Condition(l = "age", o = Operator.GT, r = "?1")        // age > ?1
 	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2
-	Page<UserInfo> findSome(Integer age,Integer id,Pageable pageable);
+	Page<UserInfo> findSome1(Integer age,Integer id,Pageable pageable);
+	
+	@NotCount // 标识分页不统计总行数. 从上百万的数据里求和很消耗性能.
+	@Query(value = "select id,name,age from `userinfo` #{#where}")
+	@Condition(l = "age", o = Operator.GT, r = "?1")        // age > ?1
+	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2
+	Page<Map<String,Object>> findSome2(Integer age, Integer id,@PageIndex int pageIndex, @PageSize int pageSize);
+	
+	@Query("select count(id) from `userinfo` where age > ?1 AND id < ?2")
+	long count(Integer age, Integer id);
 }
 
 

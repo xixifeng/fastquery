@@ -37,6 +37,9 @@ public interface Placeholder {
 	String WHERE="#{#where}";
 	String WHERE_REG="\\#\\{\\#where\\}";
 	
+	String LIMIT="#{#limit}";
+	String LIMIT_RGE="\\#\\{\\#limit\\}";
+	
 	// 匹配 (?4,?5,?6)的正则(允许有首尾空格)
 	String INV_REG = "\\s*\\(\\s*\\?\\d+\\s*,\\s*\\?\\d+\\s*,\\s*\\?\\d+\\s*\\)\\s*"; 
 	

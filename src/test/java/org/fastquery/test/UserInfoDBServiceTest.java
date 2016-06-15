@@ -27,6 +27,7 @@ import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.page.Page;
 import org.fastquery.page.PageableImpl;
+import org.fastquery.page.Slice;
 import org.fastquery.service.FQuery;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +40,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import static org.hamcrest.Matchers.*;
 
@@ -48,7 +50,7 @@ import static org.hamcrest.Matchers.*;
  */
 public class UserInfoDBServiceTest {
 	
-	private UserInfoDBService userInfoDBService;
+	UserInfoDBService userInfoDBService;
 	
 	@Before
 	public void before(){
@@ -65,13 +67,13 @@ public class UserInfoDBServiceTest {
 		}
 	}
 	
-	/*@Test
+	@Test
 	public void findSome(){
 		List<UserInfo> userInfos = userInfoDBService.findSome(30);
 		userInfos.forEach( userInfo -> {
 			assertThat(userInfo.getId(), greaterThan(30));
 		});
-	}*/
+	}
 	
 	@Test
 	public void testFindUserInfoByAge2(){
@@ -147,7 +149,84 @@ public class UserInfoDBServiceTest {
 		String str = JSON.toJSONString(page,true);
 		
 		System.out.println(str);
+	}
+	
+	@Test
+	public void findSome1(){
+		Page<UserInfo> page = userInfoDBService.findSome1(1, 100, new PageableImpl(1, 15));
+		assertThat(page, notNullValue());
+	}
+	
+	@Test
+	public void findSome2(){
 		
+		// pageIndex:5  pageSize:24
+		// pageIndex:1  pageSize:99  totalPages:1
+		// pageIndex:3  pageSize:49  totalPages:3
+		// pageIndex:4  pageSize:49  totalPages:3
+		
+		int pageIndex = 3;
+		int pageSize = 5;
+		
+		int age = 1;
+		int id = 100;
+		// 总行数
+		long totalElements = userInfoDBService.count(age, id);
+		for (int i = 1; i <= totalElements; i++) {
+			pageIndex = i%10;
+			pageSize = new Random().nextInt(1000)%(int)10;
+			
+			if(pageSize*pageIndex>totalElements) { // 显然是错的
+				pageSize = 1;
+			}
+			
+			if(pageSize==0){
+				pageSize +=1;
+			}
+	
+			int totalPages;       // 总页码
+			totalPages = (int)totalElements/pageSize;
+			if(totalElements%pageSize!=0){
+				totalPages += 1;
+			}
+			if(pageIndex>totalPages) {
+				pageIndex = new Random().nextInt(1000)%totalPages;
+			}
+			if(pageIndex==0) {
+				pageIndex += 1; 
+			}
+			System.out.println("totalElements:"+totalElements + " pageIndex:" + pageIndex + "  pageSize:" + pageSize + "  totalPages:" + totalPages);
+			
+			Page<Map<String, Object>> page = userInfoDBService.findSome2(age, id, pageIndex, pageSize);
+			assertThat(page, notNullValue());
+			assertThat(page.getNumber(), equalTo(pageIndex));
+			assertThat(page.getSize(), equalTo(pageSize));
+			assertThat(page.getTotalElements(), equalTo(-1L));
+			assertThat(page.getTotalPages(), equalTo(-1));
+			assertThat(page.getNumberOfElements(), lessThanOrEqualTo(pageSize));
+			//System.out.println(JSON.toJSONString(page, true));
+			
+			boolean hasContent=pageIndex<=totalPages;   // 是否有结果集
+			boolean isFirst=pageIndex==1;      // 是否是第一页
+			boolean isLast=pageIndex == totalPages;       // 是否是最后一页
+			boolean hasNext=pageIndex<totalPages;      // 是否有下一页
+			boolean hasPrevious=(pageIndex > 1) && hasContent;  // 是否有上一页
+			Slice previousPageable = new Slice((!isFirst) ? (pageIndex - 1) : pageIndex, pageSize);  // 上一页的Pageable对象
+			Slice nextPageable = new Slice((!isLast) ? (pageIndex + 1) : pageIndex, pageSize);      // 下一页的Pageable对象
+
+			
+			assertThat(page.isHasContent(),is(hasContent));
+			assertThat(page.isFirst(), is(isFirst));
+			assertThat(page.isLast(), is(isLast));
+			assertThat(page.isHasNext(), is(hasNext));
+			assertThat(page.isHasPrevious(), is(hasPrevious));
+			assertThat(page.getPreviousPageable().getNumber(), is(previousPageable.getNumber()));
+			assertThat(page.getPreviousPageable().getSize(), is(previousPageable.getSize()));
+			assertThat(page.getNextPageable().getNumber(), is(nextPageable.getNumber()));
+			assertThat(page.getNextPageable().getSize(), is(nextPageable.getSize()));
+			
+			
+		}
 	}
 }
 

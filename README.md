@@ -177,6 +177,10 @@ JSONArray find(String sex,Integer age);
 // 查询返回List Map
 @Query("select no, name, sex from student s where s.sex=?1 and s.age > ?2")
 List<Map<String, Object>> findBy(String sex,Integer age);
+
+// 查询返回List 实体
+@Query("select id,name,age from `userinfo` as u where u.id>?1")
+List<UserInfo> findSome(Integer id);
 ```
 
 **注意**: 在没有查询到数据的情况下,如果返回值是集合类型或`JSON`类型或者是数组类型.具体的值不会是`null`,而是一个空集合或空`JSON`或者是长度为0的数组.   
@@ -396,6 +400,9 @@ int number = page.getNumber();                // 当前页数(当前是第几页
     "totalPages": 13         	// 总页码
 }
 ```
+如果在分页函数上标识`@NotCount`,表示在分页中不统计总行数.那么分页对象中的`totalElements`的值为-1L,`totalPages`为-1.其他属性都有效且真实.    
+如果明确指定不统计行数,那么设置`countField`和`nativeQuery`就会变得无意义.    
+通常分页的区间控制默认放在`SQL`语句的末尾. 在符合`SQL`语法的前提下,通过`#{#limit}`可以把分页区间放在`SQL`里的任何地方.
 
 ## 动态适配数据源
 ### 创建数据源
@@ -419,12 +426,15 @@ FQuery.createDataSource(dataSourceName, properties);
 ### 适配数据源
 使用`@Source`动态适配当前`Repository`的方法应该采用哪个数据源. 显然这个功能很有用.      
 在多租户系统中,数据库彼此隔离,数据库结构一样.那么使用这个特性是非常方便的.    
-**注意:** `@Source`如果标识在参数上,那么该参数只能是字符串类型.
+**注意:** `@Source`如果标识在参数前面,那么该参数只能是字符串类型.
 
 ```java
 @Query("select id,name,age from `userinfo` as u where u.age>?1")
-Map<String, Object> findOne(Integer age,@Source String dataSource);
+Map<String, Object> findOne(Integer age,@Source String dataSourceName);
 ```
+
+### 适配数据源的优先级
+如果在fastquery.json中明确指定了数据源的作用域,同时接口函数也存在`@Source`,那么`@Source`指定的优先,其次是配置文件.
 
 ## @Before拦截器
 - 准备一个BeforeFilter
@@ -440,9 +450,10 @@ Map<String, Object> findOne(Integer age,@Source String dataSource);
  	
  		// repository: 当前拦截到的实例
  		// method: 当前拦截到的方法
- 		// args: 当前传递进来的参数
+ 		// args: 当前传递进来的参数值,args[N]表示第N个参数,从第0开始计数.
  		
  		// this.abortWith(returnVal); // 中断拦截器,并指定返回值
+ 		// 中断后立马返回,当前方法后面的所有Filter将不会执行
 		
  	}
  }
@@ -472,7 +483,7 @@ public class MyAfterFilter extends AfterFilter<Repository> {
 		
 		// repository: 当前拦截到的实例
 		// method: 当前拦截到的method
-		// args: 当前传递进来的参数
+		// args: 当前传递进来的参数值,args[N]表示第N个参数,从第0开始计数.
 		// returnVal 即将返回的值
 		
 		// 在这里可以中途修改 returnVal

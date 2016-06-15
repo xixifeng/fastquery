@@ -22,43 +22,18 @@
 
 package org.fastquery.page;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
+ * 
+ * 标识每页显示多少条数据
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageableImpl implements Pageable {
-
-	// 这个给默认值是没有意义的, 当前访问的是第几页和每页显示多少条数据,应该让客户端决定.
-	private final int page; 
-	private final int size;
-	
-	public PageableImpl(int page, int size) {
-		
-		if (page < 1) {
-			throw new IllegalArgumentException("页码索引不能小于1 !");
-		}
-
-		if (size < 1) {
-			throw new IllegalArgumentException("Page size 不能小于1 !");
-		}
-		
-		this.page = page;
-		this.size = size;
-	}
-
-	@Override
-	public int getPageNumber() {
-		return page;
-	}
-
-	@Override
-	public int getPageSize() {
-		return size;
-	}
-
-	@Override
-	public int getOffset() {
-		return page * size - size;
-	}
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.PARAMETER})
+public @interface PageSize {
 }

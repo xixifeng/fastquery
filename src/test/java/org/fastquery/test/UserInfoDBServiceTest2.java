@@ -23,7 +23,6 @@
 package org.fastquery.test;
 
 import org.fastquery.dao2.UserInfoDBService2;
-import org.fastquery.dsm.FQueryProperties;
 import org.fastquery.service.FQuery;
 import org.junit.Before;
 import org.junit.BeforeClass;

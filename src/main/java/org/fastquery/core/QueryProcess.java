@@ -23,6 +23,7 @@
 package org.fastquery.core;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -43,8 +44,10 @@ import org.apache.log4j.Logger;
 import org.fastquery.dsm.DataSourceManage;
 import org.fastquery.handler.ModifyingHandler;
 import org.fastquery.handler.QueryHandler;
+import org.fastquery.page.NotCount;
 import org.fastquery.page.PageImpl;
 import org.fastquery.page.Pageable;
+import org.fastquery.page.PageableImpl;
 import org.fastquery.page.Slice;
 import org.fastquery.util.TypeUtil;
 
@@ -252,8 +255,10 @@ public class QueryProcess {
 			return qh.booleanType(keyvals);
 		} else if(returnType == Map.class){
 			return qh.mapType(method,keyvals);
-		}else if(returnType == List.class){
+		} else if(TypeUtil.isListMapSO(method.getGenericReturnType())){
 			return qh.listType(keyvals);
+		}else if(returnType == List.class){
+			return qh.list(keyvals,method);
 		}else if(returnType == JSONObject.class){
 			return qh.jsonObjeType(method,keyvals);
 		}else if(returnType == JSONArray.class){
@@ -282,12 +287,15 @@ public class QueryProcess {
 				break;
 			}
 		}
+		Parameter[] parameters = method.getParameters();
 		if(pageable == null ) {
-			throw new RepositoryException(method + " pageable 不能为 null");
-		}	
-		// 在初始化会检测是否传递Pageable,因此在这里Pageable永不为null
+			pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
+		}
+		
 		int firstResult = pageable.getOffset();
 		int maxResults = pageable.getPageSize();
+		
+		LOG.debug("firstResult:"+firstResult+" maxResults:" + maxResults);
 		
 		// 针对 mysql 分页
 		// 获取limit
@@ -297,13 +305,20 @@ public class QueryProcess {
 		sb.append(maxResults);
 		String limit = sb.toString();
 		
-		sql += limit;
+		List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE);
+		if(strs.isEmpty()) { // 如果没有#{#limit}, 默认在末尾增加.
+			sql += Placeholder.LIMIT;
+		}
+		
+		String ssql = new String(sql);
+		
+		sql = sql.replaceFirst(Placeholder.LIMIT_RGE, limit);
 		
 		showArgs(ints,args);
-		LOG.info(sql);
 		sql = sql.replaceAll(Placeholder.SP1_REG, "?");
+		LOG.info(sql);
 		// 获取数据源
-		String sourceName = TypeUtil.findSource(method.getParameters(), args);
+		String sourceName = TypeUtil.findSource(parameters, args);
 		DataSource dataSource = DataSourceManage.getDataSource(sourceName,packageName);
 		List<Map<String, Object>> keyvals = null;
 		Connection conn = null;
@@ -327,72 +342,102 @@ public class QueryProcess {
 		
 		
 		Query query = querys[0];
-		// 紧接着求和
-		String countField = query.countField();
-		// 获取求和sql
-		String countQuery = query.countQuery();
-		if("".equals(countQuery)) { // 表明在声明时没有指定求和语句
-			// 计算求和语句
-			// 把select 与 from 之间的 内容变为 count(countField)
-			 // (?i)表示正则中不区分大小写 \\b 表示单词的分界
-			 int beginIndex = ignoreCaseWordEndIndex("(?i)\\bselect ", sql);
-			 // 作为substring中的endIndex
-			 int endIndex = ignoreCaseWordStartIndex("(?i) from ", sql);
-			 if(beginIndex!=-1 && endIndex!=-1) {
-				// 注意: 求和字段默认为 "id"
-				// 重要: sqlStr.substring(selectStart+6,fromStart) 的值 很可能包含正则表达式, 因此必须用Pattern.quote
-				sql = sql.replaceFirst(Pattern.quote(sql.substring(beginIndex,endIndex)),new StringBuilder("count(").append(countField).append(')').toString());
-			 } else {
-				 throw new RepositoryException("求和SQL错误:" + sql);
-			 }
-			 
-			 sql = TypeUtil.getCountQuerySQL(method, sql, args);
-		} else {
-			sql = TypeUtil.getCountQuerySQL(method, countQuery, args);
-		}
+
+		int size = pageable.getPageSize();      // 每页多少条数据
+		long totalElements = -1L;               // 总行数,如果不求和默认-1L
+		int totalPages = -1;                    // 总页数,如果不求和默认-1
+		int numberOfElements = keyvals.size();  // 每页实际显示多少条数据
+		int number = pageable.getPageNumber();  // 当前页码
+		boolean hasContent = !keyvals.isEmpty();// 这页有内容吗?
+		boolean hasPrevious = (number > 1) && hasContent;// number不是第1页且当前页有数据,就可以断言它有上一页.
+		boolean hasNext;                                 // 有下一页吗? 在这里不用给默认值,如下一定会给他赋值.
+		boolean isLast;
 		
-		 // 求和语句不需要order by 和 limit
-		 // (?i) : 表示不区分大小写
-		 // 过滤order by 后面的字符串(包含本身)
-		 sql = sql.replaceFirst("(?i)(order by )(.|\n)+", ""); 
-		 // 过滤limit后面的字符串(包含自身)
-		 sql = sql.replaceFirst("(?i)(limit )(.|\n)+", "");
-		 
-		LOG.debug("求和语句: " + sql);
-		
-		long totalElements; // 需要通过运算出来
-		try {
-			stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
-			for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
-				stat.setObject(i, args[ints[i-1]-1]);
+		if(method.getAnnotation(NotCount.class)==null) {
+			// 求和 ---------------------------------------------------
+			String countField = query.countField();
+			// 获取求和sql
+			String countQuery = query.countQuery();
+			if("".equals(countQuery)) { // 表明在声明时没有指定求和语句
+				// 计算求和语句
+				// 把select 与 from 之间的 内容变为 count(countField)
+				 // (?i)表示正则中不区分大小写 \\b 表示单词的分界
+				 int beginIndex = ignoreCaseWordEndIndex("(?i)\\bselect ", sql);
+				 // 作为substring中的endIndex
+				 int endIndex = ignoreCaseWordStartIndex("(?i) from ", sql);
+				 if(beginIndex!=-1 && endIndex!=-1) {
+					// 注意: 求和字段默认为 "id"
+					// 重要: sqlStr.substring(selectStart+6,fromStart) 的值 很可能包含正则表达式, 因此必须用Pattern.quote
+					sql = sql.replaceFirst(Pattern.quote(sql.substring(beginIndex,endIndex)),new StringBuilder("count(").append(countField).append(')').toString());
+				 } else {
+					 throw new RepositoryException("求和SQL错误:" + sql);
+				 }
+				 
+				 sql = TypeUtil.getCountQuerySQL(method, sql, args);
+			} else {
+				sql = TypeUtil.getCountQuerySQL(method, countQuery, args);
 			}
-			rs = stat.executeQuery();
-			rs.next();
-			totalElements = rs.getLong(1);
-		} catch (SQLException e) {
-			throw new RepositoryException(e);
-		} finally {
-			close(rs, stat, conn);
-		}
 			
-		int size = pageable.getPageSize();
-		int numberOfElements = keyvals.size();
-		int number = pageable.getPageNumber();
-		int totalPages = ((int) totalElements) / size;
-		if (((int) totalElements) % size != 0) {
-			totalPages += 1;
+			 // 求和语句不需要order by 和 limit
+			 // (?i) : 表示不区分大小写
+			 // 过滤order by 后面的字符串(包含本身)
+			 sql = sql.replaceFirst("(?i)(order by )(.|\n)+", ""); 
+			 // 过滤limit后面的字符串(包含自身)
+			 sql = sql.replaceFirst("(?i)(limit )(.|\n)+", "");
+			 
+			LOG.debug("求和语句: " + sql);
+			try {
+				close(rs, stat, null); // 在新创建rs,stat 先把之前的关闭掉
+				stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+				for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
+					stat.setObject(i, args[ints[i-1]-1]);
+				}
+				rs = stat.executeQuery();
+				rs.next();
+				totalElements = rs.getLong(1);
+			} catch (SQLException e) {
+				throw new RepositoryException(e);
+			} finally {
+				close(rs, stat, conn);
+			}
+			
+			// 计算总页数
+			totalPages = ((int) totalElements) / size;
+			if (((int) totalElements) % size != 0) {
+				totalPages += 1;
+			}
+			hasNext = number < totalPages;
+			isLast = number == totalPages;
+			// 求和 --------------------------------------------------- End
+		} else {
+			// 在查一下推算出下一页是否有数据, 要不要把下一页的数据存储起来,有待考虑...
+			firstResult = pageable.getOffset()+pageable.getPageSize();
+			sb = new StringBuilder(" limit ");
+			sb.append(firstResult);
+			sb.append(',');
+			sb.append(maxResults);
+			limit = sb.toString();
+			sql = ssql.replaceFirst(Placeholder.LIMIT_RGE, limit);
+			sql = sql.replaceAll(Placeholder.SP1_REG, "?");
+			LOG.debug("下一页的SQL:" + sql);
+			try {
+				close(rs, stat, null); // 在新创建rs,stat 先把之前的关闭掉
+				stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+				for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
+					stat.setObject(i, args[ints[i-1]-1]);
+				}
+				rs = stat.executeQuery();
+				boolean next = rs.next();
+				hasNext = next; // 下一页有数据
+				isLast = !next; // 下一页没有数据了,表明这是最后一页了.
+			} catch (SQLException e) {
+				throw new RepositoryException(e.getMessage(),e);
+			} finally {
+				close(rs, stat, conn);
+			}
 		}
 		
-		boolean hasContent = !keyvals.isEmpty(); // 这页有内容吗?
-
-		boolean hasNext = number < totalPages;             // number 是从1开始的
-		boolean hasPrevious = (number > 1) && (totalPages>1);  // 总页数大于1 且
-														       // number不是第一页
-														       // 就可以断言它有上一页.
-
 		boolean isFirst = number == 1;
-		boolean isLast = number == totalPages;
-		
 		Slice nextPageable = new Slice((!isLast) ? (number + 1) : number, size);
 		Slice previousPageable = new Slice((!isFirst) ? (number - 1) : number, size);
 		

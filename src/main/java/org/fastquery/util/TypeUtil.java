@@ -43,6 +43,8 @@ import org.fastquery.core.Query;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Source;
+import org.fastquery.page.PageIndex;
+import org.fastquery.page.PageSize;
 import org.fastquery.where.Condition;
 import org.fastquery.where.Operator;
 import org.objectweb.asm.Opcodes;
@@ -259,6 +261,52 @@ public class TypeUtil implements Opcodes{
 			}
 		}
 		return -1;
+	}
+	
+	/**
+	 * 查询标识有指定注解的参数
+	 * @param clazz
+	 * @param parameters
+	 * @return
+	 */
+	public static Parameter findParameter(Class<? extends Annotation> clazz,Parameter[] parameters){
+		for (Parameter parameter : parameters) {
+			if(parameter.getAnnotation(clazz)!=null){
+				return parameter;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * parameters 中是否存在 clazz,存在就返回true,反之返回false
+	 * @param clazz
+	 * @param parameters
+	 * @return
+	 */
+	public static boolean hasType(Class<?> clazz,Parameter[] parameters){
+		for (Parameter parameter : parameters) {
+			if(parameter.getType() == clazz) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * 统计一个注解在参数列表中出现的次数
+	 * @param clazz
+	 * @param parameters
+	 * @return
+	 */
+	public static int countRepeated(Class<? extends Annotation> clazz,Parameter[] parameters) {
+		int count = 0;
+		for (Parameter parameter : parameters) {
+			if(parameter.getAnnotation(clazz) != null){
+				count += 1;
+			}
+		}
+		return count;
 	}
 	
 	/**
@@ -486,10 +534,37 @@ public class TypeUtil implements Opcodes{
 		return null;
 	}
 	
-	
+	/**
+	 * 标识有Source注解的参数的具体的实参.
+	 * @param parameters 类型集合
+	 * @param args 实参
+	 * @return
+	 */
 	public static String findSource(Parameter[] parameters,Object...args){
 		Object obj = findAnnotationParameterVal(Source.class, parameters, args);
 		return obj !=null ? obj.toString() : null;
+	}
+	
+	/**
+	 * 标识有PageIndex注解的参数的具体的实参.
+	 * @param parameters 类型集合
+	 * @param args 实参
+	 * @return
+	 */
+	public static int findPageIndex(Parameter[] parameters,Object...args){
+		Object obj = findAnnotationParameterVal(PageIndex.class, parameters, args);
+		return obj !=null ? (int)obj : null;
+	}
+	
+	/**
+	 * 标识有PageSize注解的参数的具体的实参.
+	 * @param parameters 类型集合
+	 * @param args 实参
+	 * @return
+	 */
+	public static int findPageSize(Parameter[] parameters,Object...args){
+		Object obj = findAnnotationParameterVal(PageSize.class, parameters, args);
+		return obj !=null ? (int)obj : null;
 	}
 	
 	

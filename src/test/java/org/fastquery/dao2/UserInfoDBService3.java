@@ -20,45 +20,40 @@
  * 
  */
 
-package org.fastquery.page;
+package org.fastquery.dao2;
+
+import java.util.Map;
+
+import org.fastquery.core.Source;
+import org.fastquery.core.Modifying;
+import org.fastquery.core.Query;
+import org.fastquery.core.QueryRepository;
+import org.fastquery.core.Transactional;
+
+import com.alibaba.fastjson.JSONArray;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageableImpl implements Pageable {
+public interface UserInfoDBService3 extends QueryRepository {
 
-	// 这个给默认值是没有意义的, 当前访问的是第几页和每页显示多少条数据,应该让客户端决定.
-	private final int page; 
-	private final int size;
+	@Query("select id,name,age from `userinfo` as u where u.age>?1")
+	JSONArray findUserInfoByAge(Integer age,@Source String source);
 	
-	public PageableImpl(int page, int size) {
+	@Query("select id,name,age from `userinfo` as u where u.age>?1")
+	Map<String, Object> findOne(Integer age,@Source String dataSource);
+	
+	//@Query("select id,name,age from `userinfo` as u where u.id>?1")
+	//List<UserInfo> findSome(Integer id);
+	
+	@Transactional
+	@Modifying
+	@Query("update `userinfo` set `name`=?1 where id=?3")
+	@Query("update `userinfo` set `age`=?2 where id=?3")
+	@Query("update `userinfo` set `name`=?1,`age`=?2 where id=?3")
+	int updateBatch(String name,Integer age,Integer id,@Source String dataSource);
 		
-		if (page < 1) {
-			throw new IllegalArgumentException("页码索引不能小于1 !");
-		}
-
-		if (size < 1) {
-			throw new IllegalArgumentException("Page size 不能小于1 !");
-		}
-		
-		this.page = page;
-		this.size = size;
-	}
-
-	@Override
-	public int getPageNumber() {
-		return page;
-	}
-
-	@Override
-	public int getPageSize() {
-		return size;
-	}
-
-	@Override
-	public int getOffset() {
-		return page * size - size;
-	}
-
 }
+
+

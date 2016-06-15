@@ -38,6 +38,7 @@ import org.fastquery.filter.generate.modifying.ArgsFilter;
 import org.fastquery.filter.generate.modifying.ModifyingReturnTypeFilter;
 import org.fastquery.filter.generate.quartza.IllegalAnnotation;
 import org.fastquery.filter.generate.query.NotAllowedRepeat;
+import org.fastquery.filter.generate.query.PageFilter;
 import org.fastquery.filter.generate.query.ParameterFilter;
 import org.fastquery.filter.generate.query.QueryReturnTypeFilter;
 import org.fastquery.filter.generate.query.SQLFilter;
@@ -128,6 +129,7 @@ class GenerateExtends {
 					queryFilterChain.addFilter(new SQLFilter());
 					queryFilterChain.addFilter(new ParameterFilter());
 					queryFilterChain.addFilter(new NotAllowedRepeat());
+					queryFilterChain.addFilter(new PageFilter());
 				}
 				
 				// filter/mquery

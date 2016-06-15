@@ -59,16 +59,17 @@ public interface Page<E> {
 	public List<E> getContent();
 
 	/**
-	 * 总行数
+	 * 总行数,注意:如果在不求和的情况下,返回-1.
 	 * 
 	 * @return 总行数
 	 */
 	public long getTotalElements();
 
 	/**
-	 * 总页码
+	 * 总页码,注意:如果在不求和的情况下,返回-1.<br>
+	 * 不求总行数,总页数没有办法推算出来.
 	 * 
-	 * @return 总页码
+	 * @return 总页数
 	 */
 	public int getTotalPages();
 

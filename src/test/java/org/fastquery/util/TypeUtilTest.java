@@ -24,8 +24,10 @@ package org.fastquery.util;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -107,8 +109,20 @@ public class TypeUtilTest implements Opcodes {
 	@Test
 	// 测试 TypeUtil.getMethod
 	public void testGetMethod() {
-		List<Class<?>> clazzs = JarListClass.jarClasses("/web/progm/java/jdk1.8.0_45/jre/lib");
-		clazzs.addAll( JarListClass.jarClasses("/web/progm/java/jdk1.8.0_45/jre/lib"));		
+		
+		// 找一些jar包来测试TypeUtil.getMethod这个方法
+		String dir1 = "/web/progm/java/jdk1.8.0_45/jre/lib";
+		String dir2 = "/web/progm/java/jdk1.8.0_45/jre/lib";
+		
+		// 这两个目录的jar包中,大概有16744个类,如果能通过,表明这个TypeUtil.getMethod方法还是比较强壮的.
+		
+		List<Class<?>> clazzs = new ArrayList<>();
+		if(new File(dir1).exists()) {
+			clazzs.addAll( JarListClass.jarClasses(dir1));		
+		}	
+		if(new File(dir2).exists()) {
+			clazzs.addAll( JarListClass.jarClasses(dir2));		
+		}	
 		
 		long start = System.currentTimeMillis();
 		for (Class<?> clazz : clazzs) {
@@ -132,7 +146,10 @@ public class TypeUtilTest implements Opcodes {
 	
 	@Test
 	public void testMatches() throws ClassNotFoundException {
-
+			String sql = "select id,name,age from #{#limit} `userinfo` #{#where}";
+			List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE);
+			assertThat(strs.size(), equalTo(1));
+			assertThat(strs.get(0), equalTo("#{#limit}"));
 	}
 
 	@Test

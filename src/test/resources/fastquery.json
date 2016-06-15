@@ -41,4 +41,13 @@
              "org.fastquery.dao2.UserInfoDBService2"
         ]
     }
+    
+    ,
+    {
+        "config": "jdbc",            // 表示由jdbc负责提供数据源
+        "dataSourceName": "xk3",     // 数据源的名称
+        "basePackages": [   
+             "org.fastquery.dao2.UserInfoDBService3"
+        ]
+    }
 ]

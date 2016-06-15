@@ -23,6 +23,7 @@
 package org.fastquery.filter.generate.querya;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 import org.fastquery.core.Source;
 import org.fastquery.dsm.FQueryProperties;
@@ -44,10 +45,13 @@ public class SourceFilter implements MethodFilter {
 		
 		Class<?> clazz = method.getDeclaringClass();
 		
+		Parameter[] parameters = method.getParameters();
+		
+		//1). 在fastquery.json文件中,如果已经正确配置了basePackages,而没有配置数据源.
+		//那么必须通过@Source来获得相应的数据源. Source注解如果标识在方法的参数上,那么该参数只能是字符串类型.
 		String dataSourceName = FQueryProperties.findDataSourceName(clazz.getName());
-			
 		if(dataSourceName==null){ // 表明在fastquery.json中没有配置相应的数据源名称
-			int index = TypeUtil.findAnnotationIndex(Source.class, method.getParameters());
+			int index = TypeUtil.findAnnotationIndex(Source.class, parameters);
 			if(index == -1) {
 				this.abortWith(method, "* 在fastquery.json文件中,如果已经正确配置了basePackages,而没有配置数据源.\n* 那么必须通过@Source来获得相应的数据源. Source注解如果标识在方法的参数上,那么该参数只能是字符串类型.");
 			}
@@ -55,6 +59,11 @@ public class SourceFilter implements MethodFilter {
 			if(ptype!=String.class){
 				this.abortWith(method, "Source注解如果标识在方法的参数上,那么该参数只能是String类型.");
 			}
+		}
+		
+		// 2). @Source不能重复出现
+		if(TypeUtil.countRepeated(Source.class, parameters)>1) {
+			this.abortWith(method, "@Source 只能出现一次.");
 		}
 		
 		return method;

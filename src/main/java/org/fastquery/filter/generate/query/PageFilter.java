@@ -1,0 +1,126 @@
+/*
+ * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ * For more information, please see http://www.fastquery.org/.
+ * 
+ */
+
+package org.fastquery.filter.generate.query;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
+
+import org.fastquery.core.Placeholder;
+import org.fastquery.core.Query;
+import org.fastquery.filter.generate.common.MethodFilter;
+import org.fastquery.page.NotCount;
+import org.fastquery.page.Page;
+import org.fastquery.page.PageIndex;
+import org.fastquery.page.PageSize;
+import org.fastquery.page.Pageable;
+import org.fastquery.util.TypeUtil;
+
+/**
+ * 
+ * Page 语法安全检测
+ * 
+ * @author xixifeng (fastquery@126.com)
+ */
+public class PageFilter implements MethodFilter {
+
+	@Override
+	public Method doFilter(Method method) {
+		if(method.getReturnType() == Page.class) {
+			// 1). Page<T> 中的T要么是Map,要么是一个实体.
+			ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
+			
+			Type[] types = type.getActualTypeArguments();
+			Type t = types[0];
+			if(ParameterizedType.class.isAssignableFrom(t.getClass()) && !("org.fastquery.page.Page<java.util.Map<java.lang.String, java.lang.Object>>".equals( type.getTypeName()))){
+				this.abortWith(method, "Page<T> 中的T要么是Map<String,Object>,要么是一个实体.");
+			}
+				
+			if(Class.class.isAssignableFrom(t.getClass()) && !(TypeUtil.hasDefaultConstructor((Class<?>)t))){
+				this.abortWith(method, "Page<T> 中的T要么是Map<String,Object>,要么是一个实体.");
+			}
+			
+			Parameter[] parameters = method.getParameters();
+			
+			// 2). 方法参数中,要么出现Pageable类型,要么存在@PageIndex和@PageSize
+			if(!TypeUtil.hasType(Pageable.class, parameters) &&  !hasPageAnn(parameters)) {
+				this.abortWith(method, "这是分页,参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize");
+			}
+			
+			// 3). 参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize,不能同时都出现
+			if(TypeUtil.hasType(Pageable.class, parameters) &&  hasPageAnn(parameters)) {
+				this.abortWith(method, "这是分页,参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize,不能同时都出现.");
+			}			
+			
+			// 4). @PageIndex或@PageSize 最多只能出现一次
+			if(TypeUtil.countRepeated(PageIndex.class, parameters)>1){
+				this.abortWith(method, "@PageIndex 最多只能出现一次");
+			}
+			if(TypeUtil.countRepeated(PageSize.class, parameters)>1) {
+				this.abortWith(method, "@PageSize 最多只能出现一次");
+			}
+			
+			// 5). @PageIndex或@PageSize 不能独存
+			int cou = TypeUtil.countRepeated(PageIndex.class, parameters) + TypeUtil.countRepeated(PageSize.class, parameters);
+			if( cou == 1 ) {
+				this.abortWith(method, "@PageIndex或@PageSize 不能独存,要么都不要出现.");
+			}
+			
+			// 6). @PageIndex或@PageSize 只能标识在int类型上
+			if(TypeUtil.findAnnotationIndex(PageIndex.class, parameters)!=-1 && TypeUtil.findParameter(PageIndex.class, parameters).getType()!=int.class){
+				this.abortWith(method, "@PageIndex 只能标识在int类型的参数上");
+			}
+			if(TypeUtil.findAnnotationIndex(PageSize.class, parameters)!=-1 && TypeUtil.findParameter(PageSize.class, parameters).getType()!=int.class){
+				this.abortWith(method, "@PageSize 只能标识在int类型的参数上");
+			}
+			
+			// 7). 如果用@NotCount标识,那么@Query中的countId必须是默认值"id",countQuery的值必须为"". 不求总行数,countId和countQuery设置值是没有意义的.
+			Query query = method.getAnnotation(Query.class);
+			if(method.getAnnotation(NotCount.class)!=null) {
+				// 这里query不可能为null的,若为null根本就进入不了该filter
+				String countId = query.countField();
+				String countQuery = query.countQuery();
+				if(!"id".equals(countId) || !"".equals(countQuery)) {
+					this.abortWith(method, "如果用@NotCount标识,不能设置@Query中的countId的值和countQuery的值.不求总行数,设置countId和countQuery的值是没有意义的.");
+				}
+			}
+			
+			// 8). #{#limit} 禁止重复出现
+			String sql = query.value();
+			List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE);
+			if(strs.size()>1) {
+				this.abortWith(method, String.format("%s中,禁止重复出现%s",sql,Placeholder.LIMIT));
+			}
+			
+			
+		}
+		
+		return method;
+	}
+
+	private boolean hasPageAnn(Parameter[] parameters) {
+		return (TypeUtil.findAnnotationIndex(PageIndex.class, parameters) != -1) && TypeUtil.findAnnotationIndex(PageSize.class, parameters) != -1;
+	}
+}

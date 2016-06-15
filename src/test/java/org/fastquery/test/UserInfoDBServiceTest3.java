@@ -20,45 +20,49 @@
  * 
  */
 
-package org.fastquery.page;
+package org.fastquery.test;
+
+import org.fastquery.dao2.UserInfoDBService3;
+import org.fastquery.service.FQuery;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertThat;
+
+import static org.hamcrest.Matchers.*;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageableImpl implements Pageable {
-
-	// 这个给默认值是没有意义的, 当前访问的是第几页和每页显示多少条数据,应该让客户端决定.
-	private final int page; 
-	private final int size;
+public class UserInfoDBServiceTest3 {
 	
-	public PageableImpl(int page, int size) {
+	private UserInfoDBService3 userInfoDBService;
+	
+	@Before
+	public void before() throws ClassNotFoundException{
+		userInfoDBService = FQuery.getRepository(UserInfoDBService3.class);
+	}
+	
+	@Test
+	public void testUpdateBatch() {
 		
-		if (page < 1) {
-			throw new IllegalArgumentException("页码索引不能小于1 !");
-		}
-
-		if (size < 1) {
-			throw new IllegalArgumentException("Page size 不能小于1 !");
-		}
-		
-		this.page = page;
-		this.size = size;
+		// 修改 xk3 里的数据 (xk3是用jdbc连接的,未使用到连接池)
+		int effect = userInfoDBService.updateBatch("大张张", 66, 1,"xk3");
+		assertThat("断言该行修改操作一共影响了3行",effect, equalTo(3));
 	}
-
-	@Override
-	public int getPageNumber() {
-		return page;
-	}
-
-	@Override
-	public int getPageSize() {
-		return size;
-	}
-
-	@Override
-	public int getOffset() {
-		return page * size - size;
-	}
-
+	
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
