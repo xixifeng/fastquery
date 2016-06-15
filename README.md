@@ -162,9 +162,9 @@ jdk1.8+
 ## 带条件查询
 
 ```java
-// sql中的?1 表示当前方法的第一个参数
-// sql中的?2 表示当前方法的第二个参数
-//       ?N 表示当前方法的第N个参数
+// sql中的?1 表示对应当前方法的第1个参数
+// sql中的?2 表示对应当前方法的第2个参数
+//       ?N 表示对应当前方法的第N个参数
 	
 // 查询返回数组格式
 @Query("select no as no,name,sex,age,dept from student s where s.sex=?2 and s.age > ?1")
@@ -305,12 +305,10 @@ try {
 
 ## 分页
 
-`Repository`
-
 ```java
 public interface UserInfoDBService extends QueryRepository {
 
-     // Pageable 用做描述当前页的索引和页数.
+     // Pageable 用做描述当前页的索引和每页条数.
     
 	// countField : 明确指定求和字段count(countField),默认值是"id"
 	@Query(value="select id,name,age from `userinfo` where 1",countField="id")
@@ -348,8 +346,6 @@ Page<Map<String,Object>> findSome(Integer age, Integer id,@PageIndex int pageInd
 `Page`是分页的抽象.通过它可以获取分页中的各种属性. 并且开发者不用去实现.
 
 ```java
-Integer age = 10;
-Integer id = 50;
 int p = 1;    // 指定访问的是第几页
 int size = 3; // 设定每一页最多显示几条记录
 Pageable pageable = new PageableImpl(p, size);
@@ -360,7 +356,7 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 // 更多 page.? 就不赘述了.
 ``` 
 
-她转换成`JSON`后的结构如下:
+`Page`转换成`JSON`后的结构如下:
 
 ```js
 {
@@ -401,14 +397,14 @@ int number = page.getNumber();                // 当前页数(当前是第几页
     },
     "size": 15,              	// 每页行数
     "totalElements": 188,    	// 总行数
-    "totalPages": 13         	// 总页码
+    "totalPages": 13         	// 总页数(指明一共有多少页)
 }
 ```
 
 ### 注意:
 - 如果在分页函数上标识`@NotCount`,表示在分页中不统计总行数.那么分页对象中的`totalElements`的值为-1L,`totalPages`为-1.其他属性都有效且真实.    
 - 如果明确指定不统计行数,那么设置`countField`和`nativeQuery`就会变得无意义.    
-- 通常分页的区间控制默认是放在`SQL`语句的末尾. 在符合`SQL`语法的前提下,通过`#{#limit}`可以把分页区间放在`SQL`里的任何地方.
+- 通常分页的**区间控制**默认是放在`SQL`语句的末尾. 在符合`SQL`语法的前提下,通过`#{#limit}`可以把分页区间放在`SQL`里的任何地方.
 
 ## 动态适配数据源
 ### 创建数据源
