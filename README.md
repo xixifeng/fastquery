@@ -316,15 +316,15 @@ public interface UserInfoDBService extends QueryRepository {
 	
 	// 如果没有指定求和语句,那么由fastquery分析出最优的求和语句
 	@Query("select id,name,age from `userinfo` #{#where}")
-	@Condition(l="age",o=Operator.GT,r="?1")                // age > ?1
-	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2
+	@Condition(l="age",o=Operator.GT,r="?1")                // age > ?1 若age的值传递null,该条件将不参与运算
+	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2 若id的值传递null,该条件将不参与运算
 	Page<UserInfo> find(Integer age,Integer id,Pageable pageable);
 	
 	// countQuery : 指定自定义求和语句
 	@Query(value = "select id,name,age from `userinfo` #{#where}", 
 	       countQuery = "select count(id) from `userinfo` #{#where}")
-	@Condition(l = "age", o = Operator.GT, r = "?1")        // age > ?1
-	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2
+	@Condition(l = "age", o = Operator.GT, r = "?1")        // age > ?1 若age的值传递null,该条件将不参与运算
+	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2 若id的值传递null,该条件将不参与运算
 	Page<UserInfo> findSome(Integer age,Integer id,Pageable pageable);
 }
 ```
@@ -404,7 +404,7 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 ### 注意:
 - 如果在分页函数上标识`@NotCount`,表示在分页中不统计总行数.那么分页对象中的`totalElements`的值为-1L,`totalPages`为-1.其他属性都有效且真实.    
 - 如果明确指定不统计行数,那么设置`countField`和`nativeQuery`就会变得无意义.    
-- 通常分页的**区间控制**默认是放在`SQL`语句的末尾. 在符合`SQL`语法的前提下,通过`#{#limit}`可以把分页区间放在`SQL`里的任何地方.
+- 通常分页的 **区间控制** 默认是放在`SQL`语句的末尾. 在符合`SQL`语法的前提下,通过`#{#limit}`可以把分页区间放在`SQL`里的任何地方.
 
 ## 动态适配数据源
 ### 创建数据源
