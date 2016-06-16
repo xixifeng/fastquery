@@ -310,7 +310,7 @@ public interface UserInfoDBService extends QueryRepository {
 
      // Pageable 用做描述当前页的索引和每页条数.
     
-	// countField : 明确指定求和字段count(countField),默认值是"id"
+	// countField : 明确指定用来统计总行数的字段,count(countField)中的countField默认值是"id"
 	@Query(value="select id,name,age from `userinfo` where 1",countField="id")
 	Page<Map<String, Object>> findAll(Pageable pageable);
 	
@@ -506,7 +506,7 @@ public interface StudentDBService extends QueryRepository {
 ```
 
 ## 控制拦截器的作用域
-若: 有一个拦截器叫`A<T>`,那么:这个拦截器的作用范围只能在`T`类或`T`的子类里.<br />
+若: 一个拦截器继承自`F<T>`,那么:这个拦截器的作用范围只能在`T`类或`T`的子类里.<br />
 举例:
 ```java
 // 这个拦截器的作用范围在 DataAcquireDbService里或在DataAcquireDbService子类里.
