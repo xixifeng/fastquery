@@ -206,7 +206,7 @@ List<Map<String, Object>> find(String sex);
 
 ## 动态条件查询
 
-### 采用注解形式实现简单动态条件
+### 采用`Annotation`实现简单动态条件
 ```java
 @Query("select no, name, sex from Student #{#where} order by age desc")
 // 增加若干个条件
@@ -254,7 +254,7 @@ NativeSpec spec = new NativeSpec() {
 
 // 2). 调用find
 String countField = "s.no"; // 求和字段,默认是"id"
-String countsql = null;   // 求和语句
+String countsql = null;     // 求和语句
 Page<Map<String, Object>> maps = studentDBService.find(spec, new PageableImpl(1, 5), countField, countsql, false);
 System.out.println(JSON.toJSONString(maps, true));
 ```
@@ -450,6 +450,14 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 - 如果在分页函数上标识`@NotCount`,表示在分页中不统计总行数.那么分页对象中的`totalElements`的值为-1L,`totalPages`为-1.其他属性都有效并且真实.    
 - 如果明确指定不统计行数,那么设置`countField`和`nativeQuery`就会变得无意义.    
 - 通常分页的 **区间控制** 默认是放在`SQL`语句的末尾. 在符合`SQL`语法的前提下,通过`#{#limit}`可以把分页区间放在`SQL`里的任何地方.
+
+## 执行SQL文件
+```java
+studentDBService.executeBatch("update.sql", "out.txt");
+```
+
+- sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置
+- output 指定执行SQL后的输出将放在哪个文件里. 注意: 会在基准目录里寻找output文件
 
 ## 动态适配数据源
 ### 创建数据源
