@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.fastquery.core.BeanType;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.util.TypeUtil;
 
@@ -121,13 +122,15 @@ public class QueryHandler {
 	}
 	
 
-	public Object list(List<Map<String, Object>> keyvals,Method method) { // list bean
+	public Object list(List<Map<String, Object>> keyvals,Method method,Object[] iargs) { // list bean
 		List<Object> list = new ArrayList<>();
 		if(keyvals.isEmpty()) {
 			return list;
 		}
-		
-		Class<?> beanType = (Class<?>) ((ParameterizedType)(method.getGenericReturnType())).getActualTypeArguments()[0];
+		Class<?> beanType = (Class<?>) TypeUtil.findAnnotationParameterVal(BeanType.class, method.getParameters(), iargs);
+		if(beanType == null) {
+			beanType = (Class<?>) ((ParameterizedType)(method.getGenericReturnType())).getActualTypeArguments()[0];
+		}
 		
 		for (Map<String, Object> map : keyvals) {
 			list.add(JSON.toJavaObject(new JSONObject(map), beanType));

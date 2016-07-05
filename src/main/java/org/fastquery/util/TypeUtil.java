@@ -424,6 +424,21 @@ public class TypeUtil implements Opcodes{
 	public static String filterComments(String str){
 		// 过滤 // 
 		String s = str.replaceAll("//(.)+\\n", "");
+		s = s.replaceAll("//(.)?\\n", "");
+		// 过滤多行注释
+		s = s.replaceAll("\\/\\*[\\s\\S]*?\\*\\/", "");
+		return s;
+	}
+	
+	/**
+	 * 过滤SQL语法中的注释
+	 * @param str 等待过滤的字符串
+	 * @return
+	 */
+	public static String filterSQLComments(String str){
+		// 过滤 // 
+		String s = str.replaceAll("--(.)+\\n", "");
+		s = s.replaceAll("--(.)?\\n", "");
 		// 过滤多行注释
 		s = s.replaceAll("\\/\\*[\\s\\S]*?\\*\\/", "");
 		return s;

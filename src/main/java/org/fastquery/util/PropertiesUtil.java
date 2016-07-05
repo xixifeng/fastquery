@@ -47,7 +47,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -252,8 +251,9 @@ public class PropertiesUtil {
 		}
 		
 		fqs = new HashSet<>();
-		JSONArray json = JSONArray.parseArray(fqueryJson);
-		FastQueryJson[] fqProperties = JSON.toJavaObject(json, FastQueryJson[].class);
+		JSONObject json = JSONObject.parseObject(fqueryJson);
+		FastQueryJSONObject.setJsonObject(json);
+		FastQueryJson[] fqProperties = JSON.toJavaObject(json.getJSONArray("scope"), FastQueryJson[].class);
 		String config = null;
 		String dataSourceName = null;
 		Set<String> basePackages = null;

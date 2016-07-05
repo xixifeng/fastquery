@@ -22,17 +22,27 @@
 
 package org.fastquery.core;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * 标识是表的主键
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-@Target({ElementType.PARAMETER,ElementType.METHOD})
-@Retention(value=RetentionPolicy.RUNTIME)
-public @interface Id {
-	byte value() default 0X00;
+public class MethodId {
+	
+	public static final byte QUERY0 = 0X00;
+	
+	public static final byte QUERY1 = 0X01;
+	
+	public static final byte QUERY2 = 0X02;
+	
+	public static final byte QUERY3 = 0X03;
+	
+	public static final byte QUERY4 = 0X04;
+	
+	public static final byte QUERY5 = 0X05;
+	
+	public static final byte QUERY6 = 0X06;
+	
+	public static final byte QUERY7 = 0X07;
+	
+	private MethodId(){}
 }

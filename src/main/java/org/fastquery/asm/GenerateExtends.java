@@ -82,6 +82,13 @@ class GenerateExtends {
 		Method[] methods = repositoryClazz.getMethods();
 		for (Method method : methods) {
 			
+			Class<?> declaringClass = method.getDeclaringClass();
+			
+			// 规范接口中的方法不参与校验
+			if(declaringClass == QueryRepository.class || declaringClass == Repository.class || declaringClass == QuartzRepository.class) {
+				continue;
+			}
+			
 			modifying = method.getAnnotation(Modifying.class);
 			querys = method.getAnnotationsByType(Query.class);
 			//quartz = method.getAnnotation(Quartz.class)

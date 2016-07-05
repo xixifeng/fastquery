@@ -367,15 +367,16 @@ public class TypeUtilTest implements Opcodes {
 	// 这些内部类,用做测试
 	class DB1 implements Repository {
 	}
-	class DB2 implements QueryRepository {
+	abstract class DB2 implements QueryRepository {
 	}
 	class DB3 implements Repository {
 	}
-	class DB4 implements QueryRepository {
+	abstract class DB4 implements QueryRepository {
+		
 	}
 	class DB5 implements Repository {
 	}
-	class DB6 implements QueryRepository {
+	abstract class DB6 implements QueryRepository {
 	}
 	
 	@Test

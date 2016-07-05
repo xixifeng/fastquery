@@ -20,19 +20,25 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.sql;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.healthmarketscience.sqlbuilder.SelectQuery;
 
 /**
- * 标识是表的主键
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-@Target({ElementType.PARAMETER,ElementType.METHOD})
-@Retention(value=RetentionPolicy.RUNTIME)
-public @interface Id {
-	byte value() default 0X00;
+public abstract class NativeSpec {
+	
+	/**
+	 * 构建查询限制
+	 * @param selectQuery 用做构建select语句
+	 * @param args 当前传递的实参
+	 * @return SelectQuery
+	 */
+	public abstract Predicate toPredicate(SelectQuery selectQuery);
+	
+	protected Predicate build(SelectQuery selectQuery,Object... parameters) {
+		return new Predicate(selectQuery, parameters);
+	}
 }

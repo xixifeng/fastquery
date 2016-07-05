@@ -20,19 +20,26 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.spec;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.fastquery.sql.NativeSpec;
+import org.fastquery.sql.Predicate;
+
+import com.healthmarketscience.sqlbuilder.SelectQuery;
 
 /**
- * 标识是表的主键
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-@Target({ElementType.PARAMETER,ElementType.METHOD})
-@Retention(value=RetentionPolicy.RUNTIME)
-public @interface Id {
-	byte value() default 0X00;
+public class MyNativeSpec2 extends NativeSpec {
+
+	// select * from student s JOIN sc on s.no = sc.studentNo JOIN course c on c.no = sc.courseNo;
+	@Override
+	public Predicate toPredicate(SelectQuery selectQuery) {
+		selectQuery.addCustomFromTable("student s");
+		selectQuery.addCustomColumns("*");
+		selectQuery.addCustomJoin(" JOIN sc on s.no = sc.studentNo JOIN course c on c.no = sc.courseNo");
+		return this.build(selectQuery);
+	}
+
 }

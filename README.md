@@ -84,38 +84,42 @@ jdk1.8+
 ```js
 // @author xixifeng (fastquery@126.com)
 // 配置必须遵循标准的json语法.
-[
-    // config目前支持的可选值有"jdbc","c3p0"
-    {
-        "config": "c3p0",            // 表示由c3p0负责提供数据源
-        "dataSourceName": "xk-c3p0", // 数据源的名称
-        "basePackages": [            // 该数据源的作用范围
-            "org.fastquery.example",              // 包地址
-            "org.fastquery.dao.UserInfoDBService" // 完整类名称. 
-            // 在这可以配置多个DB接口或包地址,以","号隔开
-            // 提醒:在json结构中,数组的最后一个元素的后面不能加","
-        ]
-    },
-    
-    /*
-     再配置一个数据源作用域
-    */
-    {
-        "config" : "jdbc",             // 表示由jdbc驱动负责提供数据源
-        "dataSourceName": "shtest_db", // 数据源的名称
-        "basePackages": [              // 该数据源的作用范围
-            "org.fastquery.example.DataAcquireDbService"
-             // 在这可以配置多个DB接口,以","号隔开
-        ]
-    },
-    
-    {
-        "config": "c3p0",              // 表示由c3p0负责提供数据源
-        "basePackages": [   
-             "org.fastquery.dao2.UserInfoDBService2"
-        ]
-    }
-]
+{
+  "scope":[
+		    // config目前支持的可选值有"jdbc","c3p0"
+		    {
+		        "config": "c3p0",            // 表示由c3p0负责提供数据源
+		        "dataSourceName": "xk-c3p0", // 数据源的名称
+		        "basePackages": [            // 该数据源的作用范围
+		            "org.fastquery.example",              // 包地址
+		            "org.fastquery.dao.UserInfoDBService" // 完整类名称. 
+		            // 在这可以配置多个DB接口或包地址,以","号隔开
+		            // 提醒:在json结构中,数组的最后一个元素的后面不能加","
+		        ]
+		    },
+		    
+		     /*
+		      再配置一个数据源作用域
+		     */
+		     {
+		        "config" : "jdbc",             // 表示由jdbc驱动负责提供数据源
+		        "dataSourceName": "shtest_db", // 数据源的名称
+		        "basePackages": [              // 该数据源的作用范围
+		            "org.fastquery.example.DataAcquireDbService"
+		             // 在这可以配置多个DB接口,以","号隔开
+		        ]
+		     },
+		    
+		     {
+		        "config": "c3p0",              // 表示由c3p0负责提供数据源
+		        "basePackages": [   
+		             "org.fastquery.dao2.UserInfoDBService2"
+		        ]
+		     }
+		  ],
+  // 基准目录,注意: 后面记得加上 "/"
+  "basedir" : "/root/git/fastquery/fastquery/tmp/"
+}
 ```
 **注意**: 在fastquery.json中配置作用域,其中"dataSourceName"不是必须的,"dataSourceName"要么不指定,要指定的话那么必须正确.      
 如果没有指定"dataSourceName",那么在调用接口的时候必须指定数据源的名称.下面的适配数据源章节会讲到.
@@ -201,6 +205,8 @@ List<Map<String, Object>> find(String sex);
 ```
 
 ## 动态条件查询
+
+### 采用注解形式实现简单动态条件
 ```java
 @Query("select no, name, sex from Student #{#where} order by age desc")
 // 增加若干个条件
@@ -213,6 +219,42 @@ List<Map<String, Object>> find(String sex);
 @Condition(c=COperator.AND,l="name",o={Operator.NOT,Operator.LIKE},r="?7") // 等效于 name not like ?7
 @Condition(c=COperator.OR,l="age",o=Operator.BETWEEN,r="?8 and ?9")        // 等效于 age between ?8 and ?9
 Student[] findAllStudent(... args ...);
+```
+
+### 采用`NativeSpec`实现动态构建语句
+`QueryRepository`接口中提供了若干个方法,用来动态构建查询语句.
+凡是继承自`QueryRepository`的接口,都能直接使用`QueryRepository`中的所用方法.
+举例:`QueryRepository`中有一个find方法如下:
+Page<Map<String, Object>> find(NativeSpec spec, Pageable pageable,String countField,String countsql,boolean closeCount);
+StudentDBService接口的实例使用`QueryRepository`接口中的find方法
+```java
+// 1). 准备一个 NativeSpec
+NativeSpec spec = new NativeSpec() {
+	@Override
+	public Predicate toPredicate(SelectQuery selectQuery) {
+		// 待查询的列
+		selectQuery.addCustomColumns("s.name,s.sex,s.age,s.dept,c.name as courseName");
+		// 待查询的表
+		selectQuery.addCustomFromTable("student s");
+		// 增加一个自定义关联
+		selectQuery.addCustomJoin(" JOIN sc on s.no = sc.studentNo");
+		// 再增加一个自定义关联
+		selectQuery.addCustomJoin(" JOIN course c on c.no = sc.courseNo");
+		// 增加一个自定义条件,下行等价于: (s.age >= ?1) AND (s.sex = ?2) 
+		selectQuery.addCondition(ComboCondition.and(BinaryCondition.greaterThan("s.age", "?1", true),BinaryCondition.equalTo("s.sex", "?2")));
+		// 注意:build(SelectQuery selectQuery,Object... parameters),其中parameters表示SQL语句中所需的参数.
+		// 参数通常都是有外界传递进来的,在此采用prepared模式,目的是为了防止SQL注入.
+		// 3 对应 ?1
+		// "男" 对应 ?2
+		return this.build(selectQuery,3,"男"); 
+	}
+};
+
+// 2). 调用find
+String countField = "s.no"; // 求和字段,默认是"id"
+String countsql = null;   // 求和语句
+Page<Map<String, Object>> maps = studentDBService.find(spec, new PageableImpl(1, 5), countField, countsql, false);
+System.out.println(JSON.toJSONString(maps, true));
 ```
 
 ## count
@@ -402,7 +444,7 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 ```
 
 ### 注意:
-- 如果在分页函数上标识`@NotCount`,表示在分页中不统计总行数.那么分页对象中的`totalElements`的值为-1L,`totalPages`为-1.其他属性都有效且真实.    
+- 如果在分页函数上标识`@NotCount`,表示在分页中不统计总行数.那么分页对象中的`totalElements`的值为-1L,`totalPages`为-1.其他属性都有效并且真实.    
 - 如果明确指定不统计行数,那么设置`countField`和`nativeQuery`就会变得无意义.    
 - 通常分页的 **区间控制** 默认是放在`SQL`语句的末尾. 在符合`SQL`语法的前提下,通过`#{#limit}`可以把分页区间放在`SQL`里的任何地方.
 
@@ -543,6 +585,9 @@ String findOneCourse();
 仅仅是建议,并不局限于此         
   IDE: eclipse          
 build: maven 
+
+## 反馈问题
+http://git.oschina.net/xixifeng.com/fastquery/issues
 
 ## 联系作者
 fastquery#126.com

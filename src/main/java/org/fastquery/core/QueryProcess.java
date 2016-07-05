@@ -22,6 +22,7 @@
 
 package org.fastquery.core;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
@@ -41,6 +42,9 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.SQLExec;
+import org.apache.tools.ant.types.EnumeratedAttribute;
 import org.fastquery.dsm.DataSourceManage;
 import org.fastquery.handler.ModifyingHandler;
 import org.fastquery.handler.QueryHandler;
@@ -49,10 +53,15 @@ import org.fastquery.page.PageImpl;
 import org.fastquery.page.Pageable;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.page.Slice;
+import org.fastquery.sql.NativeSpec;
+import org.fastquery.sql.Predicate;
+import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.healthmarketscience.sqlbuilder.SelectQuery;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 /**
  * 
@@ -217,15 +226,11 @@ public class QueryProcess {
 	}
 	
 	// 查操作
-	Object query(Method method,Class<?> returnType, Query[] query, String packageName,Object...args) {
-		// 获取sql
-		String sql = TypeUtil.getQuerySQL(method, query, args).get(0);
+	Object query(Method method,Class<?> returnType, String sql,String sourceName, String packageName,Object[] iargs,Object...args) {
 		int[] ints = TypeUtil.getSQLParameter(sql);
 		showArgs(ints,args);
-		LOG.info(sql);
 		sql = sql.replaceAll(Placeholder.SP1_REG, "?");
-		// 获取数据源
-		String sourceName = TypeUtil.findSource(method.getParameters(), args);
+		LOG.info(sql);
 		DataSource dataSource = DataSourceManage.getDataSource(sourceName,packageName);
 		List<Map<String, Object>> keyvals = null;
 		Connection conn = null;
@@ -258,7 +263,7 @@ public class QueryProcess {
 		} else if(TypeUtil.isListMapSO(method.getGenericReturnType())){
 			return qh.listType(keyvals);
 		}else if(returnType == List.class){
-			return qh.list(keyvals,method);
+			return qh.list(keyvals,method,iargs);
 		}else if(returnType == JSONObject.class){
 			return qh.jsonObjeType(method,keyvals);
 		}else if(returnType == JSONArray.class){
@@ -276,7 +281,7 @@ public class QueryProcess {
 	
 	// 分页查询
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	Object queryPage(Method method, Class<?> returnType, Query[] querys, String packageName, Object[] args) {
+	Object queryPage(Method method, Query[] querys, String packageName, Object[] args) {
 		// 获取sql
 		String sql = TypeUtil.getQuerySQL(method, querys, args).get(0);
 		int[] ints = TypeUtil.getSQLParameter(sql);
@@ -461,7 +466,235 @@ public class QueryProcess {
 
 	
 	
-	Object methodQuery(Method method,String methodName, Class<?> returnType, Query[] query, String packageName,Object[] args) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	Object methodQuery(Method method,String packageName,Object[] iargs) {		
+		Id id = method.getAnnotation(Id.class);
+		byte methodId = id.value();
+		
+		NativeSpec spec;
+		Predicate predicate;
+		String sourceName;
+		switch (methodId) {
+		case MethodId.QUERY0:
+			spec = (NativeSpec) iargs[0];
+			predicate = spec.toPredicate(new SelectQuery());
+			sourceName = TypeUtil.findSource(method.getParameters(), iargs);
+			// 注意: iargs 表示是QueryRepository中的方法的具体实参! 并不是sql需要的实参.
+			return query(method, method.getReturnType(), predicate.getSQL(),sourceName,packageName, iargs,predicate.getParameters());
+		case MethodId.QUERY1:
+			break;
+		case MethodId.QUERY2:
+			break;
+		case MethodId.QUERY3:
+			// 获取数据源
+			sourceName = TypeUtil.findSource(method.getParameters(), iargs);
+			com.mchange.v2.c3p0.ComboPooledDataSource ds = (ComboPooledDataSource) DataSourceManage.getDataSource(sourceName,packageName);
+			
+			SQLExec sqlExec = new SQLExec();
+			
+			// 设置数据库参数
+			sqlExec.setDriver(ds.getDriverClass());
+			sqlExec.setUrl(ds.getJdbcUrl());
+			sqlExec.setUserid(ds.getUser());
+			sqlExec.setPassword(ds.getPassword());
+			
+			String basedir = FastQueryJSONObject.getBasedir();
+			
+			// 要执行的脚本
+			sqlExec.setSrc(new File(basedir + (String)iargs[0]));
+			
+			sqlExec.setOnerror((SQLExec.OnError)(EnumeratedAttribute.getInstance(   
+					SQLExec.OnError.class, "abort")));  
+			sqlExec.setPrint(true); // 设置是否输出
+
+			// 输出到文件 sql.out 中；不设置该属性，默认输出到控制台
+			sqlExec.setOutput(new File(basedir + (String)iargs[1]));
+			
+			sqlExec.setProject(new Project()); // 要指定这个属性，不然会出错 
+			
+			try {
+				sqlExec.execute();
+			} catch (Exception e) {
+				LOG.error(String.format("执行%s发生致命错误", iargs[0]),e);
+			}
+			
+			break;
+		case MethodId.QUERY4:
+			break;
+		case MethodId.QUERY5:
+			break;
+		case MethodId.QUERY6:
+			break;
+		case MethodId.QUERY7:
+
+			// NativeSpec spec, Pageable pageable,String countField,String countsql,boolean closeCount,String dataSourceName
+			spec = (NativeSpec) iargs[0];
+			Pageable pageable = (Pageable) iargs[1];
+			if(pageable==null) {
+				throw new RepositoryException("pageable 不能为null!");
+			}
+			String countField = (String) iargs[2];
+			if(countField==null) {
+				countField = "id";
+			}
+			String countQuery = (String) iargs[3];
+			boolean closeCount = (boolean) iargs[4];
+			sourceName = TypeUtil.findSource(method.getParameters(), iargs);			
+			
+			predicate = spec.toPredicate(new SelectQuery());
+			String where = predicate.getWhereClause();
+			// 获取sql
+			String sql = predicate.getSQL();
+			
+			// SQL需要的实参
+			Object[] args = predicate.getParameters();
+			int[] ints = TypeUtil.getSQLParameter(sql);
+
+			
+			int firstResult = pageable.getOffset();
+			int maxResults = pageable.getPageSize();
+			
+			LOG.debug("firstResult:"+firstResult+" maxResults:" + maxResults);
+			
+			// 针对 mysql 分页
+			// 获取limit
+			StringBuilder sb = new StringBuilder(" limit ");
+			sb.append(firstResult);
+			sb.append(',');
+			sb.append(maxResults);
+			String limit = sb.toString();
+			
+			List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE);
+			if(strs.isEmpty()) { // 如果没有#{#limit}, 默认在末尾增加.
+				sql += Placeholder.LIMIT;
+			}
+			
+			String ssql = new String(sql);
+			
+			sql = sql.replaceFirst(Placeholder.LIMIT_RGE, limit);
+			
+			showArgs(ints,args);
+			sql = sql.replaceAll(Placeholder.SP1_REG, "?");
+			LOG.info(sql);
+			DataSource dataSource = DataSourceManage.getDataSource(sourceName,packageName);
+			List<Map<String, Object>> keyvals = null;
+			Connection conn = null;
+			PreparedStatement stat = null;
+			ResultSet rs  = null;
+			try {
+				// 获取链接
+				conn = dataSource.getConnection();
+				stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+				for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
+					stat.setObject(i, args[ints[i-1]-1]);
+				}
+				rs = stat.executeQuery();
+				keyvals = rs2Map(rs);
+			} catch (SQLException e) {
+				throw new RepositoryException(e.getMessage(),e);
+			} finally {
+				// conn 先不放到连接池里,还需要用
+				close(rs, stat, null);
+			}
+						
+			int size = pageable.getPageSize();      // 每页多少条数据
+			long totalElements = -1L;               // 总行数,如果不求和默认-1L
+			int totalPages = -1;                    // 总页数,如果不求和默认-1
+			int numberOfElements = keyvals.size();  // 每页实际显示多少条数据
+			int number = pageable.getPageNumber();  // 当前页码
+			boolean hasContent = !keyvals.isEmpty();// 这页有内容吗?
+			boolean hasPrevious = (number > 1) && hasContent;// number不是第1页且当前页有数据,就可以断言它有上一页.
+			boolean hasNext;                                 // 有下一页吗? 在这里不用给默认值,如下一定会给他赋值.
+			boolean isLast;
+			
+			if(!closeCount) {
+				if(countQuery == null || "".equals(countQuery)) { // 表明在声明时没有指定求和语句
+					// 计算求和语句
+					// 把select 与 from 之间的 内容变为 count(countField)
+					 // (?i)表示正则中不区分大小写 \\b 表示单词的分界
+					 int beginIndex = ignoreCaseWordEndIndex("(?i)\\bselect ", sql);
+					 // 作为substring中的endIndex
+					 int endIndex = ignoreCaseWordStartIndex("(?i) from ", sql);
+					 if(beginIndex!=-1 && endIndex!=-1) {
+						// 注意: 求和字段默认为 "id"
+						// 重要: sqlStr.substring(selectStart+6,fromStart) 的值 很可能包含正则表达式, 因此必须用Pattern.quote
+						sql = sql.replaceFirst(Pattern.quote(sql.substring(beginIndex,endIndex)),new StringBuilder("count(").append(countField).append(')').toString());
+					 } else {
+						 throw new RepositoryException("求和SQL错误:" + sql);
+					 }
+					 
+					sql = sql + where;
+				} else {
+					sql = countQuery + where;
+				}
+				
+				 // 求和语句不需要order by 和 limit
+				 // (?i) : 表示不区分大小写
+				 // 过滤order by 后面的字符串(包含本身)
+				 sql = sql.replaceFirst("(?i)(order by )(.|\n)+", ""); 
+				 // 过滤limit后面的字符串(包含自身)
+				 sql = sql.replaceFirst("(?i)(limit )(.|\n)+", "");
+				 
+				LOG.debug("求和语句: " + sql);
+				try {
+					close(rs, stat, null); // 在新创建rs,stat 先把之前的关闭掉
+					stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+					for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
+						stat.setObject(i, args[ints[i-1]-1]);
+					}
+					rs = stat.executeQuery();
+					rs.next();
+					totalElements = rs.getLong(1);
+				} catch (SQLException e) {
+					throw new RepositoryException(e);
+				} finally {
+					close(rs, stat, conn);
+				}
+				
+				// 计算总页数
+				totalPages = ((int) totalElements) / size;
+				if (((int) totalElements) % size != 0) {
+					totalPages += 1;
+				}
+				hasNext = number < totalPages;
+				isLast = number == totalPages;
+				// 求和 --------------------------------------------------- End
+			} else {
+				// 在查一下推算出下一页是否有数据, 要不要把下一页的数据存储起来,有待考虑...
+				firstResult = pageable.getOffset()+pageable.getPageSize();
+				sb = new StringBuilder(" limit ");
+				sb.append(firstResult);
+				sb.append(',');
+				sb.append(maxResults);
+				limit = sb.toString();
+				sql = ssql.replaceFirst(Placeholder.LIMIT_RGE, limit);
+				sql = sql.replaceAll(Placeholder.SP1_REG, "?");
+				LOG.debug("下一页的SQL:" + sql);
+				try {
+					close(rs, stat, null); // 在新创建rs,stat 先把之前的关闭掉
+					stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+					for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
+						stat.setObject(i, args[ints[i-1]-1]);
+					}
+					rs = stat.executeQuery();
+					boolean next = rs.next();
+					hasNext = next; // 下一页有数据
+					isLast = !next; // 下一页没有数据了,表明这是最后一页了.
+				} catch (SQLException e) {
+					throw new RepositoryException(e.getMessage(),e);
+				} finally {
+					close(rs, stat, conn);
+				}
+			}
+			
+			boolean isFirst = number == 1;
+			Slice nextPageable = new Slice((!isLast) ? (number + 1) : number, size);
+			Slice previousPageable = new Slice((!isFirst) ? (number - 1) : number, size);
+			
+			return new PageImpl(size, numberOfElements, number, keyvals,totalElements, totalPages, hasContent, hasNext, hasPrevious,isFirst, isLast, nextPageable, previousPageable);
+		default:
+			break;
+		}
 		return null;
 	}
 	

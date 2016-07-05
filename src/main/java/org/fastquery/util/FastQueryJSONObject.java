@@ -20,19 +20,31 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.util;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.alibaba.fastjson.JSONObject;
 
 /**
- * 标识是表的主键
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-@Target({ElementType.PARAMETER,ElementType.METHOD})
-@Retention(value=RetentionPolicy.RUNTIME)
-public @interface Id {
-	byte value() default 0X00;
+public class FastQueryJSONObject {
+	private static JSONObject jsonObject;
+	private FastQueryJSONObject(){}
+	public static JSONObject getJSONObject() {
+		return jsonObject;
+	}
+	static void  setJsonObject(JSONObject o){// 只允许对jsonObject赋值一次
+		if(jsonObject==null) {
+			jsonObject = o;	
+		}
+	}
+	
+	/**
+	 * 获取基准路径
+	 * @return
+	 */
+	public static String getBasedir(){
+		return jsonObject.getString("basedir");
+	}
 }

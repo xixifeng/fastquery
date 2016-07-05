@@ -93,12 +93,16 @@ public class Prepared {
 				return QueryProcess.getInstance().modifying(method,returnType, querys, packageName,args);
 			} else if(querys.length>0) {
 				if(returnType == Page.class) {
-					return QueryProcess.getInstance().queryPage(method,returnType, querys,packageName, args);
+					return QueryProcess.getInstance().queryPage(method,querys,packageName, args);
 				}
-				return QueryProcess.getInstance().query(method,returnType, querys,packageName, args);
+				// 获取sql
+				String sql = TypeUtil.getQuerySQL(method, querys, args).get(0);
+				// 获取数据源的名称
+				String sourceName = TypeUtil.findSource(method.getParameters(), args);
+				return QueryProcess.getInstance().query(method,returnType, sql,sourceName, packageName,null,args); // new Object[0] 这个null暂时不能省
 			} 
 			 else {
-				 return QueryProcess.getInstance().methodQuery(method,methodName,returnType, querys,packageName, args);
+				 return QueryProcess.getInstance().methodQuery(method,packageName, args);
 			}
 			
 		} else {

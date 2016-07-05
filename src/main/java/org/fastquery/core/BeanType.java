@@ -28,11 +28,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 标识是表的主键
+ * 标识实体类型
  * @author xixifeng (fastquery@126.com)
  */
-@Target({ElementType.PARAMETER,ElementType.METHOD})
+@Target({ElementType.PARAMETER})
 @Retention(value=RetentionPolicy.RUNTIME)
-public @interface Id {
-	byte value() default 0X00;
+public @interface BeanType {
 }

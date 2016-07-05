@@ -37,7 +37,7 @@ import java.util.Set;
  */
 class  BeforeFilterChain<R extends Repository> extends BeforeFilter<R>  {
 	
-	private static ThreadLocal<Object> threadLocal = new ThreadLocal<>(); // 存储中断时流下的返回值
+	private static ThreadLocal<Object> threadLocal = new ThreadLocal<>(); // 存储:中断时留下的返回值
 	
 	// 在此用map 主要目的是为了去重,相同的class后面覆盖前面的.
 	// 用LinkedHashMap而不用hashMap 是为了有顺序

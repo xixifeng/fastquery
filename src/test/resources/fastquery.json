@@ -23,7 +23,9 @@
 // @author xixifeng (fastquery@126.com)
 
 // 配置必须遵循标准的json语法.
-[
+{
+
+  "scope":[
     // config目前支持的可选值有"jdbc","c3p0"
     {
         "config": "c3p0",            // 表示由c3p0负责提供数据源
@@ -50,4 +52,9 @@
              "org.fastquery.dao2.UserInfoDBService3"
         ]
     }
-]
+ ],
+ 
+  // 基准目录,注意: 后面记得加上 "/"
+ "basedir" : "/root/git/fastquery/fastquery/tmp/"
+
+}

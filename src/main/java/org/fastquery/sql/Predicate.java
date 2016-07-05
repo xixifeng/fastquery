@@ -20,19 +20,40 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.sql;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.healthmarketscience.sqlbuilder.SelectQuery;
 
 /**
- * 标识是表的主键
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-@Target({ElementType.PARAMETER,ElementType.METHOD})
-@Retention(value=RetentionPolicy.RUNTIME)
-public @interface Id {
-	byte value() default 0X00;
+public class Predicate {
+
+	private SelectQuery selectQuery;
+	private Object[] parameters;
+	
+	Predicate(SelectQuery selectQuery,Object... parameters) {
+		this.selectQuery = selectQuery;
+		this.parameters = parameters;
+	}
+	
+	public String getSQL() {
+		String sql = selectQuery.validate().toString();
+		return sqlPro(sql);
+	}
+	
+	public String getWhereClause() {
+		return sqlPro(selectQuery.getWhereClause().toString());
+	}
+	public Object[] getParameters(){
+		return parameters;
+	}
+	
+	private String sqlPro(String sql){
+		// 把''换成"
+		// 把 ' 换成空字符串
+		// 再把 " 换成 '
+		return sql.replace("''", "\"").replace("'", "").replace("\"", "'");
+	}
 }

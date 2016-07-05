@@ -33,14 +33,14 @@ import org.junit.runners.Suite.SuiteClasses;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-//指定运行器
+// 指定运行器
 @RunWith(Suite.class)
-@SuiteClasses({StudentDBServiceTest.class,UserInfoDBServiceTest.class,UserInfoDBServiceTest2.class,UserInfoDBServiceTest3.class,TypeUtilTest.class})
+@SuiteClasses({ StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class,
+		UserInfoDBServiceTest3.class, TypeUtilTest.class,MethodQueryTest.class })
 class AllTest {
-	
-	@Test
-	public void todo(){}
-	
-	
-}
 
+	@Test
+	public void todo() {
+	}
+
+}
