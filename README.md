@@ -224,9 +224,7 @@ Student[] findAllStudent(... args ...);
 ### 采用`NativeSpec`实现动态构建语句
 `QueryRepository`接口中提供了若干个方法,用来动态构建查询语句.            
 凡是继承自`QueryRepository`的接口,都能直接使用`QueryRepository`中的所用方法.                
-举例:`QueryRepository`中有一个find方法如下:                        
-`Page<Map<String, Object>> find(NativeSpec spec, Pageable pageable,String countField,String countsql,boolean closeCount);`             
-StudentDBService接口的实例使用`QueryRepository`接口中的find方法
+举例:StudentDBService接口的实例使用`QueryRepository`接口中的find方法
 
 ```java
 // 1). 准备一个 NativeSpec
