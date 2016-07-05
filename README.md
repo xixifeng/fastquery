@@ -453,10 +453,10 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 
 ## 执行SQL文件
 ```java
-studentDBService.executeBatch("update.sql", "out.txt");
+  studentDBService.executeBatch("update.sql", "out.txt");
 ```
 
-- sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置
+- sqlName 基准目录下的SQL文件名称. 注意: 基准目录在fastquery.json里配置
 - output 指定执行SQL后的输出将放在哪个文件里. 注意: 会在基准目录里寻找output文件
 
 ## 动态适配数据源
