@@ -240,7 +240,10 @@ NativeSpec spec = new NativeSpec() {
 		// 再增加一个自定义关联
 		selectQuery.addCustomJoin(" JOIN course c on c.no = sc.courseNo");
 		// 增加一个自定义条件,下行等价于: (s.age >= ?1) AND (s.sex = ?2) 
-		selectQuery.addCondition(ComboCondition.and(BinaryCondition.greaterThan("s.age", "?1", true),BinaryCondition.equalTo("s.sex", "?2")));
+		selectQuery.addCondition(ComboCondition.and(
+		                         BinaryCondition.greaterThan("s.age", "?1", true),
+		                         BinaryCondition.equalTo("s.sex", "?2"))
+		                         );
 		// 注意:build(SelectQuery selectQuery,Object... parameters),其中parameters表示SQL语句中所需的参数.
 		// 参数通常都是有外界传递进来的,在此采用prepared模式,目的是为了防止SQL注入.
 		// 3 对应 ?1
