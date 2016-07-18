@@ -448,12 +448,14 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 
 ### 注意:
 - 如果在分页函数上标识`@NotCount`,表示在分页中不统计总行数.那么分页对象中的`totalElements`的值为-1L,`totalPages`为-1.其他属性都有效并且真实.    
-- 如果明确指定不统计行数,那么设置`countField`和`nativeQuery`就会变得无意义.    
+- 如果明确指定不统计行数,那么设置`countField`和`countQuery`就会变得无意义.    
 - 通常分页的 **区间控制** 默认是放在`SQL`语句的末尾. 在符合`SQL`语法的前提下,通过`#{#limit}`可以把分页区间放在`SQL`里的任何地方.
 
 ## 执行SQL文件
 ```java
- studentDBService.executeBatch("update.sql", "out.txt");
+String sqlName = "update.sql";
+String output = "out.txt";
+studentDBService.executeBatch(sqlName, output);
 ```
 
 - sqlName 基准目录下的SQL文件名称. 注意: 基准目录在fastquery.json里配置
@@ -610,7 +612,7 @@ UserInformation findUserInfoById(Integer id);
 
 ## 源码
 
-- http://git.oschina.net/xixifeng.com/fastquery
+- https://git.oschina.net/xixifeng.com/fastquery
 - https://github.com/xixifeng/fastquery
 - https://code.aliyun.com/xixifeng/fastquery
 
