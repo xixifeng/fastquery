@@ -23,6 +23,7 @@
 package org.fastquery.test;
 
 import org.fastquery.bean.UserInfo;
+import org.fastquery.bean.UserInformation;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.page.Page;
@@ -55,6 +56,12 @@ public class UserInfoDBServiceTest {
 	@Before
 	public void before(){
 		userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
+	}
+	
+	@Test
+	public void findUserInfoById(){
+		UserInformation userInformation = userInfoDBService.findUserInfoById(1);
+		System.out.println(userInformation);
 	}
 	
 	@Test

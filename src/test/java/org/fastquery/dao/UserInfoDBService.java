@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.fastquery.bean.UserInfo;
+import org.fastquery.bean.UserInformation;
 import org.fastquery.core.Source;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
@@ -48,6 +49,10 @@ import com.alibaba.fastjson.JSONArray;
  */
 public interface UserInfoDBService extends QueryRepository {
 
+	// 类属性名称与表字段不一致时，如何映射？
+	@Query("select id as uid,name as myname,age as myage from UserInfo u where u.id = ?1")
+	UserInformation findUserInfoById(Integer id);
+	
 	@Query("select id,name,age from `userinfo` as u where u.age>?1")
 	JSONArray findUserInfoByAge(Integer age);
 	

@@ -453,7 +453,7 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 
 ## 执行SQL文件
 ```java
-  studentDBService.executeBatch("update.sql", "out.txt");
+ studentDBService.executeBatch("update.sql", "out.txt");
 ```
 
 - sqlName 基准目录下的SQL文件名称. 注意: 基准目录在fastquery.json里配置
@@ -585,6 +585,26 @@ String findOneCourse();
 - 标识在类的上方:表示其拦截的作用范围是整个类的方法
 - 标识在方法上:表示其拦截的作用范围是当前方法
 - 一个方法的拦截器总和=它的所属类的拦截器+自己的拦截器
+
+## FAQ
+1. 类属性名称与表字段不一致时,如何映射?
+答: 为了说明这个问题先准备一个实体
+```java
+public class UserInformation {
+	private Integer uid;
+	private String myname;
+	private Integer myage;
+	// getters / setters
+	// ... ...
+}
+```
+
+而数据库中的表字段分别是id,name,age,通过`SQL`别名的方式,可以解决类属性名称与表字段不一致的映射问题.如下:
+```java
+// 把查询到的结果映射给UserInformation
+@Query("select id as uid,name as myname,age as myage from UserInfo u where u.id = ?1")
+UserInformation findUserInfoById(Integer id);
+```
 
 ## 源码
 
