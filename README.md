@@ -587,8 +587,9 @@ String findOneCourse();
 - 一个方法的拦截器总和=它的所属类的拦截器+自己的拦截器
 
 ## FAQ
-1. 类属性名称与表字段不一致时,如何映射?
-答: 为了说明这个问题先准备一个实体
+1. 类属性名称与表字段不一致时,如何映射?  
+答: 为了说明这个问题先准备一个实体  
+
 ```java
 public class UserInformation {
 	private Integer uid;
@@ -599,7 +600,8 @@ public class UserInformation {
 }
 ```
 
-而数据库中的表字段分别是id,name,age,通过`SQL`别名的方式,可以解决类属性名称与表字段不一致的映射问题.如下:
+而数据库中的表字段分别是id,name,age,通过`SQL`别名的方式,可以解决类属性名称与表字段不一致的映射问题.如下:  
+
 ```java
 // 把查询到的结果映射给UserInformation
 @Query("select id as uid,name as myname,age as myage from UserInfo u where u.id = ?1")
