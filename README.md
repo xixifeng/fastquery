@@ -331,7 +331,7 @@ int updateBatch(String name,Integer age,Integer id);
 //    则: 返回值为: new int[]{N1,N2,N3}
 ```
 
-## @Param 参数模板
+## @Param参数模板
 
 ```java
 @Query("select * from `userinfo` where {one} {orderby}")
