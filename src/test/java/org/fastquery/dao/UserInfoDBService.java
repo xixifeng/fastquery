@@ -29,6 +29,7 @@ import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInformation;
 import org.fastquery.core.Source;
 import org.fastquery.core.Modifying;
+import org.fastquery.core.Param;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Transactional;
@@ -49,6 +50,10 @@ import com.alibaba.fastjson.JSONArray;
  */
 public interface UserInfoDBService extends QueryRepository {
 
+	// 
+	@Query("select * from `userinfo` where {one} {orderby}")
+	JSONArray findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
+	
 	// 类属性名称与表字段不一致时，如何映射？
 	@Query("select id as uid,name as myname,age as myage from UserInfo u where u.id = ?1")
 	UserInformation findUserInfoById(Integer id);

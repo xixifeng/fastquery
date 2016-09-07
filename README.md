@@ -13,7 +13,7 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 6. 支持查询结果集以JSON类型返回
 7. 拥有非常优雅的`Page`(分页)设计
 8. 支持`AOP`,注入拦截器只需要标识几个简单的注解,如: `@Before` , `@After`
-9. 使用`@Source`可实现动态适配数据源.这个特性特别适应于多租户系统中要求数据库彼此隔离其结构相同的场景里.
+9. 使用`@Source`可实现动态适配数据源.这个特性特别适合多租户系统中要求数据库彼此隔离其结构相同的场景里.
 
 ## 运行环境要求
 jdk1.8+
@@ -330,6 +330,25 @@ int updateBatch(String name,Integer age,Integer id);
 //    举例说明: 若有个事务T,它里面有3条改操作,分别叫U1,U2,U3. T成功提交后,U1,U2,U3所影响的数据行数分别为N1,N2,N3.
 //    则: 返回值为: new int[]{N1,N2,N3}
 ```
+
+## @Param 参数模板
+
+```java
+@Query("select * from `userinfo` where {one} {orderby}")
+UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
+// String orderby 这个形参接受到的值会取代掉 "{orderby}"
+// int i 接受到的值会取代掉 "{one}"
+
+// 假设: orderby的值为: "order by age desc", i的值为:1
+// 则: 最终的SQL为: "select * from `userinfo` where 1 order by age desc"
+```
+
+### 注意 
+- 参数模板仅仅用来辅助开发者构建SQL语句
+- 请堤防使用不当,引发SQL注入问题
+- 请避免模板参数的值完全来源于用户层的输入
+- 请确保参数值可控.
+
 
 ## 处理异常
 

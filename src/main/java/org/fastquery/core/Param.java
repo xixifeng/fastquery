@@ -20,36 +20,20 @@
  * 
  */
 
-package org.fastquery.test;
+package org.fastquery.core;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.fastquery.core.Param;
-import org.junit.Test;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class SyntaxTest {
 
-	@Test
-	public void listEmpty(){
-		List<Map<String, Object>> maps = new ArrayList<>();
-		maps.get(0); // 这样是错误的
-		}
-
-	public void todo(@Param("abc") String sx,@Param("efg") String efg,int s){
-	}
-	
-	@Test
-	public void test1() throws NoSuchMethodException, SecurityException{
-		Method method = SyntaxTest.class.getMethod("todo");
-		int i = 123;
-		System.out.println(  );
-	}
-	
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Param {
+	String value();
 }

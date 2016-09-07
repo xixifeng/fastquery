@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.fastquery.core.Id;
+import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
 import org.fastquery.core.Repository;
@@ -333,6 +334,23 @@ public class TypeUtil implements Opcodes{
 		List<String> sqls = new ArrayList<>();
 		for (Query query : queries) {
 			String sql = query.value();
+			
+			// 替换@Param
+			Annotation[][] annotations = method.getParameterAnnotations();
+			int len = annotations.length;
+			for (int i = 0; i < len; i++) {
+				Annotation[] anns = annotations[i];
+				for (Annotation ann : anns) {
+					if(ann.annotationType() == Param.class) {
+						Param param = (Param) ann;
+						Object objx = args[i];
+						// '{' 是正则语法的关键字,必须转义
+						sql = sql.replaceAll("\\{"+param.value()+"\\}", objx!=null?objx.toString():"");
+					}
+				}
+			}
+			// 替换@Param End
+			
 			StringBuilder sb = new StringBuilder();
 			// 追加条件
 			Condition[] conditions = method.getAnnotationsByType(Condition.class);

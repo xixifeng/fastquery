@@ -105,7 +105,9 @@ public enum Operator {
 	/**
 	 * SOME
 	 */
-	SOME("SOME");
+	SOME("SOME"),
+	
+	NONE("");
 	
 	// http://www.cnblogs.com/libingql/p/4097460.html
 	// http://www.jb51.net/article/57342.htm
