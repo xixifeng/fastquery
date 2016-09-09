@@ -287,7 +287,7 @@ public class QueryProcess {
 		int[] ints = TypeUtil.getSQLParameter(sql);
 		Pageable pageable = null;
 		for (Object arg : args) {
-			if(Pageable.class.isAssignableFrom(arg.getClass())) {
+			if(arg instanceof Pageable) { // 如果当前arg是Pageable接口的一个实例
 				pageable = (Pageable) arg;
 				break;
 			}
