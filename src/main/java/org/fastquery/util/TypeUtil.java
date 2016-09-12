@@ -335,21 +335,7 @@ public class TypeUtil implements Opcodes{
 		for (Query query : queries) {
 			String sql = query.value();
 			
-			// 替换@Param
-			Annotation[][] annotations = method.getParameterAnnotations();
-			int len = annotations.length;
-			for (int i = 0; i < len; i++) {
-				Annotation[] anns = annotations[i];
-				for (Annotation ann : anns) {
-					if(ann.annotationType() == Param.class) {
-						Param param = (Param) ann;
-						Object objx = args[i];
-						// '{' 是正则语法的关键字,必须转义
-						sql = sql.replaceAll("\\{"+param.value()+"\\}", objx!=null?objx.toString():"");
-					}
-				}
-			}
-			// 替换@Param End
+			sql = paramFilter(method, args, sql);
 			
 			StringBuilder sb = new StringBuilder();
 			// 追加条件
@@ -389,6 +375,34 @@ public class TypeUtil implements Opcodes{
 			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, sb.toString()));
 		}
 		return sqls;
+	}
+
+	/**
+	 * 处理 @Param 模板参数
+	 * 
+	 * @param method
+	 * @param args
+	 * @param sql
+	 * @return
+	 */
+	public static String paramFilter(Method method, Object[] args, String sql) {
+		String s = sql;
+		// 替换@Param
+		Annotation[][] annotations = method.getParameterAnnotations();
+		int len = annotations.length;
+		for (int i = 0; i < len; i++) {
+			Annotation[] anns = annotations[i];
+			for (Annotation ann : anns) {
+				if(ann.annotationType() == Param.class) {
+					Param param = (Param) ann;
+					Object objx = args[i];
+					// '{' 是正则语法的关键字,必须转义
+					s = s.replaceAll("\\{"+param.value()+"\\}", objx!=null?objx.toString():param.defaultVal());
+				}
+			}
+		}
+		// 替换@Param End
+		return s;
 	}
 	
 	

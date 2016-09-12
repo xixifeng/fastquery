@@ -50,9 +50,17 @@ import com.alibaba.fastjson.JSONArray;
  */
 public interface UserInfoDBService extends QueryRepository {
 
+	@Query("select * from `userinfo` where id in ({ids})")
+	JSONArray findUserInfoByIds(@Param("ids") String ids);
+	
 	// 
 	@Query("select * from `userinfo` where {one} {orderby}")
 	JSONArray findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
+	
+	// 通过defaultVal属性指定:若参数接受到null值,应该采用的默认值(该属性不是必须的,默认为"").
+	@Query("select * from `userinfo` {orderby}")
+	// orderby 若为null, 那么 {orderby}的值,就取defaultVal的值
+	JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") String orderby);
 	
 	// 类属性名称与表字段不一致时，如何映射？
 	@Query("select id as uid,name as myname,age as myage from UserInfo u where u.id = ?1")

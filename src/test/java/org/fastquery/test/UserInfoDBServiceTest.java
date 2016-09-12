@@ -59,6 +59,12 @@ public class UserInfoDBServiceTest {
 	}
 	
 	@Test
+	public void findUserInfoByIds(){
+		JSONArray json = userInfoDBService.findUserInfoByIds("4,5,6");
+		System.out.println(JSON.toJSONString(json,true));
+	}
+	
+	@Test
 	public void findUserInfo(){		
 		String orderby = "order by age desc";
 		int i = 1;

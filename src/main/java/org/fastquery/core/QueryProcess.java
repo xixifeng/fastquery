@@ -117,6 +117,8 @@ public class QueryProcess {
 			for (int jk = 0; jk < sqlCount; jk++) { 
 				// 获取sql
 				String sql = queries[jk].value();
+				// @Param 参数模板处理 
+				sql = TypeUtil.paramFilter(method, args, sql);
 				int[] ints = TypeUtil.getSQLParameter(sql);
 				sql = sql.replaceAll(Placeholder.SP1_REG, "?");
 				// 替换SQL中的占位变量符

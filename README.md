@@ -336,7 +336,7 @@ int updateBatch(String name,Integer age,Integer id);
 ```java
 @Query("select * from `userinfo` where {one} {orderby}")
 UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
-// String orderby 这个形参接受到的值会取代掉 "{orderby}"
+// String orderby 这个形参接受到的值会取代掉 "{orderby}", orderby 如果接受到的值为null,那么{orderby}默认为""
 // int i 接受到的值会取代掉 "{one}"
 
 // 假设: orderby的值为: "order by age desc", i的值为:1
@@ -344,10 +344,19 @@ UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
 ```
 
 ### 注意 
+- 传递null值,模板变量默认取""
 - 参数模板仅仅用来辅助开发者构建SQL语句
 - 请堤防使用不当,引发SQL注入问题
 - 请避免模板参数的值完全来源于用户层的输入
-- 请确保参数值可控.
+- 请确保参数值可控.  
+
+通过`defaultVal`属性指定:若参数接受到null值,应该采用的默认值(该属性不是必须的,默认为"").例如:
+
+```java
+@Query("select * from `userinfo` {orderby}")
+// orderby 若为null, 那么 {orderby}的值,就取defaultVal的值
+JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") String orderby);
+```
 
 
 ## 处理异常
