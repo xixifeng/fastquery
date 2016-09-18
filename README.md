@@ -333,17 +333,80 @@ int updateBatch(String name,Integer age,Integer id);
 
 ## @Param参数模板
 
+**SQL中的变量用命名式**
+ 
 ```java
-@Query("select * from `userinfo` where {one} {orderby}")
+@Query("select name,age from UserInfo u where u.name = :name or u.age = :age")
+UserInfo[] findUserInfoByNameOrAge(@Param("name") String name, @Param("age")Integer age);
+```
+
+其中`:name`对应`@Param("name")`所指定的方法变量值;`:age`对应`@Param("age")`所指定的方法变量值.当然SQL中的变量也可以用`?N`(N={正整数})的形式来表达,且不用标识`@Param`.  
+`select name,age from UserInfo u where u.name = :name or u.age = :age`最终会编译成`select name,age from UserInfo u where u.name=? or u.age=?`因此很好地解决了SQL注入问题.  
+
+
+**SQL中的变量采用${name}表达式**  
+实现原样替换.不过请注意避免SQL注入问题.   
+
+```java
+@Query("select * from `userinfo` where ${one} ${orderby}")
 UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
-// String orderby 这个形参接受到的值会取代掉 "{orderby}", orderby 如果接受到的值为null,那么{orderby}默认为""
-// int i 接受到的值会取代掉 "{one}"
+// String orderby 这个形参接受到的值会原样取代掉 "${orderby}", orderby 如果接受到的值为null,那么${orderby}默认为""
+// int i 接受到的值会取代掉 "${one}"
 
 // 假设: orderby的值为: "order by age desc", i的值为:1
 // 则: 最终的SQL为: "select * from `userinfo` where 1 order by age desc"
 ```
 
-### 注意 
+## @QueryByNamed命名式查询
+就是把SQL语句写在配置文件里,然后用`@QueryByNamed`绑定配置文件中的id值,以便引用到SQL.    
+配置文件的命名格式: 类的长名称(包含包地址).queries.xml,每个类文件对应一个配置文件.  
+配置文件里的SQL代码段,会被Velocity的模板引擎所渲染,因此,很方便写出复杂的动态SQL语句.    
+例如: `org.fastquery.dao.QueryByNamedDBExample.queries.xml`  
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<queries>
+  <query id="findUserInfoAll">
+  select id,name,age from UserInfo
+  </query>
+
+  <query id="findUserInfoOne">
+    ## :id 最终会替换成 "?"
+    ## ${id} 不会替换还成"?",引用的是参数源值
+  	select id,name,age from UserInfo where id = :id
+  </query>
+  
+  <query id="findUserInfoByNameAndAge">
+	  
+     select id,name,age from UserInfo where 1 
+     #if(${name})  
+        and name = :name
+     #end
+      
+	 #if(${age})
+	    and age = :age
+     #end 
+      
+  </query>
+</queries>
+```
+
+```java
+public interface QueryByNamedDBExample extends QueryRepository {
+
+	// 从该类的配置文件里寻找id="findUserInfoAll"节点,然后绑定其SQL代码段
+	@QueryByNamed("findUserInfoAll")
+	JSONArray findUserInfoAll();
+	
+	@QueryByNamed("findUserInfoOne")
+	UserInfo findUserInfoOne(@Param("id")Integer id);
+	
+	@QueryByNamed("findUserInfoByNameAndAge")
+	JSONArray findUserInfoByNameAndAge(@Param("name") String name, @Param("age")Integer age);
+}
+```
+
+### 采用${name}时请注意: 
 - 传递null值,模板变量默认取""
 - 参数模板仅仅用来辅助开发者构建SQL语句
 - 请堤防使用不当,引发SQL注入问题
@@ -353,8 +416,8 @@ UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
 通过`defaultVal`属性指定:若参数接受到null值,应该采用的默认值(该属性不是必须的,默认为"").例如:
 
 ```java
-@Query("select * from `userinfo` {orderby}")
-// orderby 若为null, 那么 {orderby}的值,就取defaultVal的值
+@Query("select * from `userinfo` ${orderby}")
+// orderby 若为null, 那么 ${orderby}的值,就取defaultVal的值
 JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") String orderby);
 ```
 

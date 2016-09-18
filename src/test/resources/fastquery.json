@@ -55,6 +55,9 @@
  ],
  
   // 基准目录,注意: 后面记得加上 "/"
- "basedir" : "/root/git/fastquery/fastquery/tmp/"
+ "basedir" : "/root/git/fastquery/fastquery/tmp/",
+ 
+  // velocity.properties 的位置
+  "velocity" : "/root/git/fastquery/fastquery/src/test/resources/velocity.properties"
 
 }

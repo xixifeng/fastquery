@@ -20,39 +20,31 @@
  * 
  */
 
-package org.fastquery.util;
+package org.fastquery.dao;
 
-import com.alibaba.fastjson.JSONObject;
+
+import org.fastquery.bean.UserInfo;
+import org.fastquery.core.Param;
+import org.fastquery.core.QueryByNamed;
+import org.fastquery.core.QueryRepository;
+
+import com.alibaba.fastjson.JSONArray;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FastQueryJSONObject {
-	private static JSONObject jsonObject;
-	private FastQueryJSONObject(){}
-	public static JSONObject getJSONObject() {
-		return jsonObject;
-	}
-	static void  setJsonObject(JSONObject o){// 只允许对jsonObject赋值一次
-		if(jsonObject==null) {
-			jsonObject = o;	
-		}
-	}
+public interface QueryByNamedDBExample extends QueryRepository {
+
+	// 从该类的配置文件里寻找id="findUserInfoAll"节点,然后绑定其SQL代码段
+	@QueryByNamed("findUserInfoAll")
+	JSONArray findUserInfoAll();
 	
-	/**
-	 * 获取基准路径
-	 * @return
-	 */
-	public static String getBasedir(){
-		return jsonObject.getString("basedir");
-	}
+	@QueryByNamed("findUserInfoOne")
+	UserInfo findUserInfoOne(@Param("id")Integer id);
 	
-	/**
-	 * 获取velocity配置文件的路径 
-	 * @return
-	 */
-	public static String getVelocity(){
-		return jsonObject.getString("velocity");
-	}
+	@QueryByNamed("findUserInfoByNameAndAge")
+	JSONArray findUserInfoByNameAndAge(@Param("name") String name, @Param("age")Integer age);
 }
+
+

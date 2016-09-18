@@ -28,7 +28,6 @@ import org.fastquery.page.Page;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.service.FQuery;
 import org.fastquery.spec.MyNativeSpec1;
-import org.fastquery.spec.MyNativeSpec2;
 import org.fastquery.sql.NativeSpec;
 import org.fastquery.sql.Predicate;
 import org.junit.Before;
@@ -47,7 +46,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.healthmarketscience.sqlbuilder.BinaryCondition;
 import com.healthmarketscience.sqlbuilder.ComboCondition;
 import com.healthmarketscience.sqlbuilder.SelectQuery;
-import com.healthmarketscience.sqlbuilder.SelectQuery.JoinType;
 
 /**
  * 

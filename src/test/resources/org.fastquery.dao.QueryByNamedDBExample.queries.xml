@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<queries>
+  <query id="findUserInfoAll">
+  select id,name,age from UserInfo
+  </query>
+
+  <query id="findUserInfoOne">
+    ## :id 最终会替换成 ?
+    ## ${id} 不会替换还成"?",引用的是参数源值
+  	select id,name,age from UserInfo where id = :id
+  </query>
+  
+  <query id="findUserInfoByNameAndAge">
+  
+     select id,name,age from UserInfo where 1 
+     #if(${name})  
+        and name = :name
+     #end
+      
+	 #if(${age})
+	    and age = :age
+     #end 
+      
+  </query>
+</queries>

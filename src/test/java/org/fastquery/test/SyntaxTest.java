@@ -22,7 +22,9 @@
 
 package org.fastquery.test;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,26 +32,42 @@ import java.util.Map;
 import org.fastquery.core.Param;
 import org.junit.Test;
 
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
 public class SyntaxTest {
 
-	@Test
+	@Test(expected=IndexOutOfBoundsException.class)
 	public void listEmpty(){
 		List<Map<String, Object>> maps = new ArrayList<>();
-		maps.get(0); // 这样是错误的
+		maps.get(0); // 这样引用是错误的
 		}
-
-	public void todo(@Param("abc") String sx,@Param("efg") String efg,int s){
-	}
 	
 	@Test
 	public void test1() throws NoSuchMethodException, SecurityException{
-		Method method = SyntaxTest.class.getMethod("todo");
-		int i = 123;
-		System.out.println(  );
+		Method method = SyntaxTest.class.getMethod("todo", String.class,String.class,int.class);
+		Annotation[][] annotations = method.getParameterAnnotations();
+		Annotation annotation = annotations[0][0];
+		assertThat(annotation instanceof Param, is(true));
+		annotation = annotations[1][0];
+		assertThat(annotation instanceof Param, is(true));
+		
+		Parameter[] parameters =  method.getParameters();
+		Param param = parameters[0].getAnnotation(Param.class);
+		assertThat(param, notNullValue());
+		
+		param = parameters[1].getAnnotation(Param.class);
+		assertThat(param, notNullValue());
+		
+		param = parameters[2].getAnnotation(Param.class);
+		assertThat(param, nullValue());
 	}
 	
+	
+	public void todo(@Param("abc") String sx,@Param("efg") String efg,int s){
+	}
 }

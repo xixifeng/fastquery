@@ -20,39 +20,20 @@
  * 
  */
 
-package org.fastquery.util;
+package org.fastquery.core;
 
-import com.alibaba.fastjson.JSONObject;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FastQueryJSONObject {
-	private static JSONObject jsonObject;
-	private FastQueryJSONObject(){}
-	public static JSONObject getJSONObject() {
-		return jsonObject;
-	}
-	static void  setJsonObject(JSONObject o){// 只允许对jsonObject赋值一次
-		if(jsonObject==null) {
-			jsonObject = o;	
-		}
-	}
-	
-	/**
-	 * 获取基准路径
-	 * @return
-	 */
-	public static String getBasedir(){
-		return jsonObject.getString("basedir");
-	}
-	
-	/**
-	 * 获取velocity配置文件的路径 
-	 * @return
-	 */
-	public static String getVelocity(){
-		return jsonObject.getString("velocity");
-	}
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface QueryByNamed {
+	String value();
 }

@@ -22,6 +22,9 @@
 
 package org.fastquery.test;
 
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInformation;
 import org.fastquery.core.RepositoryException;
@@ -39,9 +42,11 @@ import com.alibaba.fastjson.JSONObject;
 
 import static org.junit.Assert.assertThat;
 
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
 
@@ -58,17 +63,72 @@ public class UserInfoDBServiceTest {
 		userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 	}
 	
+	
+	@Test
+	public void findUserInfoAll(){
+		JSONArray jsonArray = userInfoDBService.findUserInfoAll();
+		assertThat(jsonArray.isEmpty(), is(false));
+	}
+	
+	@Test
+	public void findUserInfoOne(){
+		UserInfo userInfo = userInfoDBService.findUserInfoOne(1);
+		assertThat(userInfo.getId().intValue(), is(1));
+	}
+	
+	@Test
+	public void findUserInfoByNameAndAge(){
+		String name = "张三";
+		Integer age = null;
+		JSONArray jsonArray = userInfoDBService.findUserInfoByNameAndAge(name, age);
+		for (Object object : jsonArray) {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = (Map<String, Object>) object;
+			Set<String> keys = map.keySet();
+			for (String key : keys) {
+				if("name".equals(key)){
+					assertThat(map.get(key).toString().equals(name), is(true));
+				}
+			}
+		}
+		
+		name = null;
+		age = 8;
+		jsonArray = userInfoDBService.findUserInfoByNameAndAge(name, age);
+		for (Object object : jsonArray) {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = (Map<String, Object>) object;
+			Set<String> keys = map.keySet();
+			for (String key : keys) {
+				if("age".equals(key)){
+					assertThat(map.get(key).toString().equals(age.toString()), is(true));
+				}
+			}
+		}
+	}
+	
+	
+	@Test
+	public void findUserInfoByNameOrAge(){
+		UserInfo[] userInfos = userInfoDBService.findUserInfoByNameOrAge("王五", 8);
+		for (UserInfo userInfo : userInfos) {
+			assertThat((userInfo.getName().equals("王五") || userInfo.getAge().intValue() == 8), is(true));
+		}
+	}
+	
 	@Test
 	public void findUserInfoByIds(){
 		JSONArray json = userInfoDBService.findUserInfoByIds("4,5,6");
-		System.out.println(JSON.toJSONString(json,true));
+		assertThat(JSONObject.parseObject(JSON.toJSONString(json.get(0))).getIntValue("id"), equalTo(4));
+		assertThat(JSONObject.parseObject(JSON.toJSONString(json.get(1))).getIntValue("id"), equalTo(5));
+		assertThat(JSONObject.parseObject(JSON.toJSONString(json.get(2))).getIntValue("id"), equalTo(6));
 	}
 	
 	@Test
 	public void findUserInfo(){		
 		String orderby = "order by age desc";
 		int i = 1;
-		JSONArray jsonArray = userInfoDBService.findUserInfo(orderby,i);
+		userInfoDBService.findUserInfo(orderby,i);
 	}
 	
 	@Test
@@ -247,6 +307,22 @@ public class UserInfoDBServiceTest {
 			
 			
 		}
+	}
+	
+	
+	@Test
+	public void initv(){
+		VelocityContext velocityContext = new VelocityContext();
+		
+		Template t = Velocity.getTemplate("hello4.vm");
+		
+		velocityContext.put("hi", "xxx");
+		
+	    StringWriter sw = new StringWriter();
+
+	    t.merge(velocityContext, sw);
+
+	    System.out.println( sw.toString() );
 	}
 }
 

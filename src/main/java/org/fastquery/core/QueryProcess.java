@@ -89,7 +89,7 @@ public class QueryProcess {
 	}
 	
 	// 改操作
-	Object modifying(Method method,Class<?> returnType,Query[] queries,String packageName,Object...args) {
+	Object modifying(Method method,Class<?> returnType,List<String> queries,String packageName,Object...args) {
 		// 获取数据源
 		String sourceName = TypeUtil.findSource(method.getParameters(), args);
 		DataSource dataSource = DataSourceManage.getDataSource(sourceName,packageName);
@@ -97,7 +97,7 @@ public class QueryProcess {
 		PreparedStatement stat = null;
 		ResultSet rs = null;
 		
-		int sqlCount = queries.length;
+		int sqlCount = queries.size();
 		int[] effects = new int[sqlCount]; // 影响行数集合
 		Primarykey[] primarykeys = new Primarykey[sqlCount];// 主键集合
 		
@@ -116,9 +116,7 @@ public class QueryProcess {
 			// 逐个执行修改操作
 			for (int jk = 0; jk < sqlCount; jk++) { 
 				// 获取sql
-				String sql = queries[jk].value();
-				// @Param 参数模板处理 
-				sql = TypeUtil.paramFilter(method, args, sql);
+				String sql = queries.get(jk);
 				int[] ints = TypeUtil.getSQLParameter(sql);
 				sql = sql.replaceAll(Placeholder.SP1_REG, "?");
 				// 替换SQL中的占位变量符

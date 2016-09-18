@@ -89,12 +89,15 @@ public class Prepared {
 			// 4. 没有Query,也没有@Modify
 			Query[] querys = method.getAnnotationsByType(Query.class);
 			Modifying modifying = method.getAnnotation(Modifying.class);
-			if( querys.length>0 && modifying !=null) {
-				return QueryProcess.getInstance().modifying(method,returnType, querys, packageName,args);
-			} else if(querys.length>0) {
-				if(returnType == Page.class) {
+			QueryByNamed queryById = method.getAnnotation(QueryByNamed.class);
+			if( (querys.length>0 || queryById!=null) && modifying !=null) {  // ->进入Modify
+				return QueryProcess.getInstance().modifying(method,returnType, TypeUtil.getQuerySQL(method, querys, args), packageName,args);
+			} else if(querys.length>0  || queryById!=null) {
+				if(returnType == Page.class) {  // ->进入Page
 					return QueryProcess.getInstance().queryPage(method,querys,packageName, args);
 				}
+				
+				// -> 进入query
 				// 获取sql
 				String sql = TypeUtil.getQuerySQL(method, querys, args).get(0);
 				// 获取数据源的名称

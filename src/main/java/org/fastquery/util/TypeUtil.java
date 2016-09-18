@@ -41,9 +41,11 @@ import org.fastquery.core.Id;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
+import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Source;
+import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.PageIndex;
 import org.fastquery.page.PageSize;
 import org.fastquery.where.Condition;
@@ -330,8 +332,17 @@ public class TypeUtil implements Opcodes{
 	 * @param args
 	 * @return
 	 */
-	public static List<String> getQuerySQL(Method method,Query[] queries,Object[] args){
+	public static List<String> getQuerySQL(Method method,Query[] queries,Object[] args) {
 		List<String> sqls = new ArrayList<>();
+		
+		// 如果是QueryByNamed
+		if(method.getAnnotation(QueryByNamed.class)!=null){
+			String s = QueryPool.render(method.getDeclaringClass().getName(), method, args);
+			s = paramFilter(method, args, s);
+			sqls.add(s);
+			return sqls;
+		}
+		
 		for (Query query : queries) {
 			String sql = query.value();
 			
@@ -397,7 +408,8 @@ public class TypeUtil implements Opcodes{
 					Param param = (Param) ann;
 					Object objx = args[i];
 					// '{' 是正则语法的关键字,必须转义
-					s = s.replaceAll("\\{"+param.value()+"\\}", objx!=null?objx.toString():param.defaultVal());
+					s = s.replaceAll("\\$\\{"+param.value()+"\\}", objx!=null?objx.toString():param.defaultVal());
+					s = s.replaceAll("\\:"+param.value(), "?"+(i+1));
 				}
 			}
 		}

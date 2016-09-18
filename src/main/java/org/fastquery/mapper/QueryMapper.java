@@ -20,39 +20,58 @@
  * 
  */
 
-package org.fastquery.util;
-
-import com.alibaba.fastjson.JSONObject;
+package org.fastquery.mapper;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FastQueryJSONObject {
-	private static JSONObject jsonObject;
-	private FastQueryJSONObject(){}
-	public static JSONObject getJSONObject() {
-		return jsonObject;
-	}
-	static void  setJsonObject(JSONObject o){// 只允许对jsonObject赋值一次
-		if(jsonObject==null) {
-			jsonObject = o;	
-		}
+class QueryMapper {
+
+	private String id;        // 重写id的hashCode和equals,用它作为唯一标识
+	private String template;  // 模板
+	
+	QueryMapper(String id, String template) {
+		this.id = id;
+		this.template = template;
 	}
 	
-	/**
-	 * 获取基准路径
-	 * @return
-	 */
-	public static String getBasedir(){
-		return jsonObject.getString("basedir");
+	String getId() {
+		return id;
+	}
+	String getTemplate() {
+		return template;
+	}
+	void setId(String id) {
+		this.id = id;
+	}
+	void setTemplate(String template) {
+		this.template = template;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		QueryMapper other = (QueryMapper) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 	
-	/**
-	 * 获取velocity配置文件的路径 
-	 * @return
-	 */
-	public static String getVelocity(){
-		return jsonObject.getString("velocity");
-	}
 }

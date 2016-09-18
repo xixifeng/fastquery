@@ -26,11 +26,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.apache.velocity.app.Velocity;
 import org.fastquery.asm.AsmRepository;
 import org.fastquery.core.GenerateRepository;
 import org.fastquery.core.Repository;
+import org.fastquery.core.Resource;
 import org.fastquery.dsm.FastQueryJson;
+import org.fastquery.mapper.QueryPool;
 import org.fastquery.util.ClassUtil;
+import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.LoadPrperties;
 
 /**
@@ -46,16 +50,25 @@ class GenerateRepositoryImpl implements GenerateRepository {
 	private GenerateRepositoryImpl() {
 		LOG.debug("GenerateRepositoryImpl 已实例化.");
 		
-		// 装载配置文件
-		Set<FastQueryJson> fqPropertie = LoadPrperties.load(new FQueryResourceImpl());
+		Resource resource = new FQueryResourceImpl();
 		
-		// 批量生成 Repository 的实现类
+		// 1). 装载配置文件
+		Set<FastQueryJson> fqPropertie = LoadPrperties.load(resource);
+		
+		// 2). 初始化velocity
+		Velocity.init(FastQueryJSONObject.getVelocity());
+		
+		// 3). 批量生成 Repository 的实现类
 		Set<String> basePackages = null;
 		for (FastQueryJson fQueryPropertie : fqPropertie) {
 			basePackages = fQueryPropertie.getBasePackages();
 			for (String basePackage : basePackages) {
 				List<Class<Repository>> classes = ClassUtil.getClasses(basePackage);
-				classes.forEach(this::generate);
+				// classes.forEach(this::generate)
+				for (Class<Repository> rcls : classes) {
+					generate(rcls); // 生成
+					QueryPool.put(rcls.getName(), resource);
+				}
 			}
 		}
 	}

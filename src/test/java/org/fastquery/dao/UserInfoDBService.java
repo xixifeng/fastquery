@@ -31,6 +31,7 @@ import org.fastquery.core.Source;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;
+import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Transactional;
 import org.fastquery.page.NotCount;
@@ -50,15 +51,27 @@ import com.alibaba.fastjson.JSONArray;
  */
 public interface UserInfoDBService extends QueryRepository {
 
-	@Query("select * from `userinfo` where id in ({ids})")
+	@QueryByNamed("findUserInfoAll")
+	JSONArray findUserInfoAll();
+	
+	@QueryByNamed("findUserInfoOne")
+	UserInfo findUserInfoOne(@Param("id")Integer id);
+	
+	@QueryByNamed("findUserInfoByNameAndAge")
+	JSONArray findUserInfoByNameAndAge(@Param("name") String name, @Param("age")Integer age);
+
+	@Query("select name,age from UserInfo u where u.name=:name or u.age=:age")
+	UserInfo[] findUserInfoByNameOrAge(@Param("name") String name, @Param("age")Integer age);
+	
+	@Query("select * from `userinfo` where id in (${ids})")
 	JSONArray findUserInfoByIds(@Param("ids") String ids);
 	
-	// 
-	@Query("select * from `userinfo` where {one} {orderby}")
+	
+	@Query("select * from `userinfo` where ${one} ${orderby}")
 	JSONArray findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
 	
 	// 通过defaultVal属性指定:若参数接受到null值,应该采用的默认值(该属性不是必须的,默认为"").
-	@Query("select * from `userinfo` {orderby}")
+	@Query("select * from `userinfo` ${orderby}")
 	// orderby 若为null, 那么 {orderby}的值,就取defaultVal的值
 	JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") String orderby);
 	
