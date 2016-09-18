@@ -357,6 +357,21 @@ UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
 // 则: 最终的SQL为: "select * from `userinfo` where 1 order by age desc"
 ```
 
+### 采用${name}时请注意: 
+- 传递null值,模板变量默认取""
+- 参数模板仅仅用来辅助开发者构建SQL语句
+- 请堤防使用不当,引发SQL注入问题
+- 请避免模板参数的值完全来源于用户层的输入
+- 请确保参数值可控.  
+
+通过`defaultVal`属性指定:若参数接受到null值,应该采用的默认值(该属性不是必须的,默认为"").例如:
+
+```java
+@Query("select * from `userinfo` ${orderby}")
+// orderby 若为null, 那么 ${orderby}的值,就取defaultVal的值
+JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") String orderby);
+```
+
 ## @QueryByNamed命名式查询
 就是把SQL语句写在配置文件里,然后用`@QueryByNamed`绑定配置文件中的id值,以便引用到SQL.    
 配置文件的命名格式: 类的长名称(包含包地址).queries.xml,每个类文件对应一个配置文件.  
@@ -405,22 +420,6 @@ public interface QueryByNamedDBExample extends QueryRepository {
 	JSONArray findUserInfoByNameAndAge(@Param("name") String name, @Param("age")Integer age);
 }
 ```
-
-### 采用${name}时请注意: 
-- 传递null值,模板变量默认取""
-- 参数模板仅仅用来辅助开发者构建SQL语句
-- 请堤防使用不当,引发SQL注入问题
-- 请避免模板参数的值完全来源于用户层的输入
-- 请确保参数值可控.  
-
-通过`defaultVal`属性指定:若参数接受到null值,应该采用的默认值(该属性不是必须的,默认为"").例如:
-
-```java
-@Query("select * from `userinfo` ${orderby}")
-// orderby 若为null, 那么 ${orderby}的值,就取defaultVal的值
-JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") String orderby);
-```
-
 
 ## 处理异常
 
