@@ -413,7 +413,7 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 </queries>
 ```
 
-如果想把一些公共的代码片段提取出来,以便重复使用,通过定义`&lt;parts&gt;`元素(零件集)可以达到效果. 在`&lt;value&gt;`,`&lt;countQuery&gt;`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件. 
+如果想把一些公共的代码片段提取出来,以便重复使用,通过定义`<parts>`元素(零件集)可以达到效果. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件. 
 
 ```java
 public interface QueryByNamedDBExample extends QueryRepository {
