@@ -1,25 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <queries>
-  <query id="findUserInfoAll">
-  select id,name,age from UserInfo
-  </query>
 
-  <query id="findUserInfoOne">
-    ## :id 最终会替换成 ?
-    ## ${id} 不会替换还成"?",引用的是参数源值
-  	select id,name,age from UserInfo where id = :id
-  </query>
-  
-  <query id="findUserInfoByNameAndAge">
-  
-     select id,name,age from UserInfo where 1 
-     #if(${name})  
-        and name = :name
-     #end
-      
-	 #if(${age})
-	    and age = :age
-     #end 
-      
-  </query>
+	<query id="findUserInfoAll">
+		select id,name,age from UserInfo
+	</query>
+
+
+	<query id="findUserInfoOne">
+		<value>
+			## :id 最终会替换成 ?
+			## ${id} 不会替换还成"?",引用的是参数源值
+			select id,name,age from UserInfo where id = :id
+		</value>
+	</query>
+
+	<query id="findUserInfoByNameAndAge">
+		<value>
+			select id,name,age from UserInfo where 1 #{#condition}
+		</value>
+
+		<parts>
+			<part name="condition">
+				#if(${name})
+				and name = :name
+				#end
+
+				#if(${age})
+				and age = :age
+				#end
+			</part>
+		</parts>
+	</query>
+
+	<query id="findPage">
+
+		<!-- 查询主体语句 -->
+		<!-- #{#limit} 内置零件,表示分页区间,#{#limit}可以放在SQL语句中的任何地方,前提是:必须符合SQL语法. #{#limit}默认在尾部. -->
+		<value>
+			select no, name, sex from Student where 1 #{#condition} #{#order}
+		</value>
+
+		<!-- 求和语句 -->
+		<countQuery>
+			select count(no) from Student where 1 #{#condition}
+		</countQuery>
+
+		<!-- 定义零件集,他们可以被value,countQuery节点引用,以达到复用的效果 -->
+		<parts>
+			<part name="condition">
+				#if($no)
+				or no like :no
+				#end
+
+				#if($name)
+				or name like :name
+				#end
+
+				#if($age)
+				or age > :age
+				#end
+			</part>
+
+			<part name="order">
+				order by age desc
+			</part>
+		</parts>
+
+	</query>
+
 </queries>
+
+
+
+
+
+

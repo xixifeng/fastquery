@@ -374,37 +374,46 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 
 ## @QueryByNamed命名式查询
 就是把SQL语句写在配置文件里,然后用`@QueryByNamed`绑定配置文件中的id值,以便引用到SQL.    
-配置文件的命名格式: 类的长名称(包含包地址).queries.xml,每个类文件对应一个配置文件.  
-配置文件里的SQL代码段,会被Velocity的模板引擎所渲染,因此,很方便写出复杂的动态SQL语句.    
+配置文件的命名格式: `类的长名称(包含包地址).queries.xml`,每个类文件对应一个配置文件.  
+配置文件里的SQL代码段,会被**Velocity**的模板引擎所渲染,因此,很方便写出复杂的动态SQL语句.    
 例如: `org.fastquery.dao.QueryByNamedDBExample.queries.xml`  
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <queries>
-  <query id="findUserInfoAll">
-  select id,name,age from UserInfo
-  </query>
+	<query id="findUserInfoAll">
+		select id,name,age from UserInfo
+	</query>
 
-  <query id="findUserInfoOne">
-    ## :id 最终会替换成 "?"
-    ## ${id} 不会替换还成"?",引用的是参数源值
-  	select id,name,age from UserInfo where id = :id
-  </query>
-  
-  <query id="findUserInfoByNameAndAge">
-	  
-     select id,name,age from UserInfo where 1 
-     #if(${name})  
-        and name = :name
-     #end
-      
-	 #if(${age})
-	    and age = :age
-     #end 
-      
-  </query>
+	<query id="findUserInfoOne">
+		<value>
+			## :id 最终会替换成 ?
+			## ${id} 不会替换还成"?",引用的是参数源值
+			select id,name,age from UserInfo where id = :id
+		</value>
+	</query>
+
+	<query id="findUserInfoByNameAndAge">
+		<value>
+			select id,name,age from UserInfo where 1 #{#condition}
+		</value>
+
+		<parts>
+			<part name="condition">
+				#if(${name})
+				and name = :name
+				#end
+
+				#if(${age})
+				and age = :age
+				#end
+			</part>
+		</parts>
+	</query>
 </queries>
 ```
+
+如果想把一些公共的代码片段提取出来,以便重复使用,通过定义`&lt;parts&gt;`元素(零件集)可以达到效果. 在`&lt;value&gt;`,`&lt;countQuery&gt;`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件. 
 
 ```java
 public interface QueryByNamedDBExample extends QueryRepository {
@@ -439,6 +448,53 @@ try {
 ```
 
 ## 分页
+
+- 通过`@QueryByNamed`实现分页
+
+```xml
+<query id="findPage">
+	<!-- 查询主体语句 -->
+	<value>
+		select no, name, sex from Student where 1 #{#condition} #{#order}
+	</value>
+
+	<!-- 求和语句 -->
+	<countQuery>
+		select count(no) from Student where 1 #{#condition}
+	</countQuery>
+
+	<!-- 定义零件集,他们可以被value,countQuery节点引用,以达到复用的效果 -->
+	<parts>
+		<part name="condition">
+			#if($no)
+			or no like :no
+			#end
+
+			#if($name)
+			or name like :name
+			#end
+
+			#if($age)
+			or age > :age
+			#end
+		</part>
+
+		<part name="order">
+			order by age desc
+		</part>
+	</parts>
+</query>
+```
+
+**注意:** `#{#limit}`是分页模板的内置零件,表示分页区间,`#{#limit}`可以放在SQL语句中的任何地方,不过,前提是:必须符合SQL语法. `#{#limit}`可以不用指定,默认在尾部.  
+DB接口:
+
+```java
+@QueryByNamed("findPage") // 引用id为"findPage"的分页SQL模板
+Page<Student> findPage(Pageable pageable,@Param("name")String no,@Param("name")String name,@Param("age")Integer age);
+```
+
+- 通过@Query实现分页
 
 ```java
 public interface UserInfoDBService extends QueryRepository {

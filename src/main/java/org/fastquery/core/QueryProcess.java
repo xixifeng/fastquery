@@ -294,6 +294,7 @@ public class QueryProcess {
 		}
 		Parameter[] parameters = method.getParameters();
 		if(pageable == null ) {
+			// 没有传递Pageable,那么必然有 pageIndex, pageSize 不然,不能通过初始化
 			pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
 		}
 		
@@ -464,7 +465,149 @@ public class QueryProcess {
 		
 	}
 
-	
+	    // 分页查询
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		Object queryPage(Method method,String query,String countQuery,String packageName, Object[] args) {
+			
+			// 获取 pageable
+			Pageable pageable = null;
+			for (Object arg : args) {
+				if(arg instanceof Pageable) { // 如果当前arg是Pageable接口的一个实例
+					pageable = (Pageable) arg;
+					break;
+				}
+			}
+			Parameter[] parameters = method.getParameters();
+			if(pageable == null ) {
+				// 没有传递Pageable,那么必然有 pageIndex, pageSize 不然,不能通过初始化
+				pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
+			}
+			// 获取 pageable End
+			
+			// 获取sql
+			String sql = TypeUtil.paramNameFilter(method, args, query);
+			int[] ints = TypeUtil.getSQLParameter(sql);
+			
+			showArgs(ints,args);
+			
+			sql = sql.replaceAll(Placeholder.SP1_REG, "?");
+			String limit = getLimit(pageable.getOffset(),pageable.getPageSize());
+			if(sql.indexOf(Placeholder.LIMIT)!=-1){ // 如果#{#limit}存在
+				sql = sql.replaceAll(Placeholder.LIMIT_RGE, limit);	
+			} else {
+				sql += limit;
+			}
+			LOG.info(sql);
+			
+			// 获取数据源
+			String sourceName = TypeUtil.findSource(parameters, args);
+			DataSource dataSource = DataSourceManage.getDataSource(sourceName,packageName);
+			List<Map<String, Object>> keyvals = null;
+			Connection conn = null;
+			PreparedStatement stat = null;
+			ResultSet rs  = null;
+			try {
+				// 获取链接
+				conn = dataSource.getConnection();
+				stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+				for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
+					stat.setObject(i, args[ints[i-1]-1]);
+				}
+				rs = stat.executeQuery();
+				keyvals = rs2Map(rs);
+			} catch (SQLException e) {
+				throw new RepositoryException(e.getMessage(),e);
+			} finally {
+				// conn 先不放到连接池里,还需要用
+				close(rs, stat, null);
+			}
+			
+			int size = pageable.getPageSize();      // 每页多少条数据
+			long totalElements = -1L;               // 总行数,如果不求和默认-1L
+			int totalPages = -1;                    // 总页数,如果不求和默认-1
+			int numberOfElements = keyvals.size();  // 每页实际显示多少条数据
+			int number = pageable.getPageNumber();  // 当前页码
+			boolean hasContent = !keyvals.isEmpty();// 这页有内容吗?
+			boolean hasPrevious = (number > 1) && hasContent;// number不是第1页且当前页有数据,就可以断言它有上一页.
+			boolean hasNext;                                 // 有下一页吗? 在这里不用给默认值,如下一定会给他赋值.
+			boolean isLast;
+			
+			if(method.getAnnotation(NotCount.class)==null) { // 需要求和
+				 sql = TypeUtil.paramNameFilter(method, args,countQuery);
+				 sql = sql.replaceAll(Placeholder.SP1_REG, "?");
+				 LOG.debug("求和语句: " + sql);
+				try {
+					close(rs, stat, null); // 在新创建rs,stat 先把之前的关闭掉
+					stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+					for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
+						stat.setObject(i, args[ints[i-1]-1]);
+					}
+					rs = stat.executeQuery();
+					rs.next();
+					totalElements = rs.getLong(1);
+				} catch (SQLException e) {
+					throw new RepositoryException(e);
+				} finally {
+					close(rs, stat, conn);
+				}
+				
+				// 计算总页数
+				totalPages = ((int) totalElements) / size;
+				if (((int) totalElements) % size != 0) {
+					totalPages += 1;
+				}
+				hasNext = number < totalPages;
+				isLast = number == totalPages;
+				// 求和 --------------------------------------------------- End
+			} else {
+				// 在查一下推算出下一页是否有数据, 要不要把下一页的数据存储起来,有待考虑...
+				int firstResult = pageable.getOffset()+pageable.getPageSize();
+				limit =  getLimit(firstResult, pageable.getPageSize());
+				if(sql.indexOf(Placeholder.LIMIT) != -1) {
+					sql = sql.replaceAll(Placeholder.LIMIT_RGE,limit);	
+				} else {
+					sql += limit;
+				}
+				sql = sql.replaceAll(Placeholder.SP1_REG, "?");
+				LOG.debug("下一页的SQL:" + sql);
+				try {
+					close(rs, stat, null); // 在新创建rs,stat 先把之前的关闭掉
+					stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+					for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
+						stat.setObject(i, args[ints[i-1]-1]);
+					}
+					rs = stat.executeQuery();
+					boolean next = rs.next();
+					hasNext = next; // 下一页有数据
+					isLast = !next; // 下一页没有数据了,表明这是最后一页了.
+				} catch (SQLException e) {
+					throw new RepositoryException(e.getMessage(),e);
+				} finally {
+					close(rs, stat, conn);
+				}
+			}
+			
+			boolean isFirst = number == 1;
+			Slice nextPageable = new Slice((!isLast) ? (number + 1) : number, size);
+			Slice previousPageable = new Slice((!isFirst) ? (number - 1) : number, size);
+			
+			
+			List<?> list = keyvals;
+			// Page<T> 中的 T如果是一个实体,那么需要把 HashMap 转换成实体
+			//method.getGenericReturnType()
+			if(!method.getGenericReturnType().getTypeName().contains("Page<java.util.Map<java.lang.String, java.lang.Object>>")){
+				// 则说明是一个T是一个实体
+				java.lang.reflect.Type type = method.getGenericReturnType();
+				if(type instanceof ParameterizedType){
+					ParameterizedType parameterizedType = (ParameterizedType) method.getGenericReturnType();
+					Class<?> bean = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+					list = TypeUtil.listMap2ListBean(keyvals, bean);
+				}
+			}
+							
+			return new PageImpl(size, numberOfElements, number, list,totalElements, totalPages, hasContent, hasNext, hasPrevious,isFirst, isLast, nextPageable, previousPageable);
+			
+		}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	Object methodQuery(Method method,String packageName,Object[] iargs) {		
@@ -814,5 +957,13 @@ public class QueryProcess {
 			 return m;
 		 }
 		 return null;
+	}
+	
+	private static String getLimit(int firstResult,int maxResults){
+		StringBuilder sb = new StringBuilder(" limit ");
+		sb.append(firstResult);
+		sb.append(',');
+		sb.append(maxResults);
+		return sb.toString();
 	}
 }

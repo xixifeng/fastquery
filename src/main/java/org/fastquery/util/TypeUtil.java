@@ -337,7 +337,7 @@ public class TypeUtil implements Opcodes{
 		
 		// 如果是QueryByNamed
 		if(method.getAnnotation(QueryByNamed.class)!=null){
-			String s = QueryPool.render(method.getDeclaringClass().getName(), method, args);
+			String s = QueryPool.render(method.getDeclaringClass().getName(), method,true,args);
 			s = paramFilter(method, args, s);
 			sqls.add(s);
 			return sqls;
@@ -417,6 +417,31 @@ public class TypeUtil implements Opcodes{
 		return s;
 	}
 	
+	/**
+	 * 处理 @Param 模板参数 仅仅只处理把 ":name" 替换成 "?数字" 
+	 * 
+	 * @param method
+	 * @param args
+	 * @param sql
+	 * @return
+	 */
+	public static String paramNameFilter(Method method, Object[] args, String sql) {
+		String s = sql;
+		// 替换@Param
+		Annotation[][] annotations = method.getParameterAnnotations();
+		int len = annotations.length;
+		for (int i = 0; i < len; i++) {
+			Annotation[] anns = annotations[i];
+			for (Annotation ann : anns) {
+				if(ann.annotationType() == Param.class) {
+					Param param = (Param) ann;
+					s = s.replaceAll(Pattern.quote(":"+param.value()), "?"+(i+1));
+				}
+			}
+		}
+		// 替换@Param End
+		return s;
+	}
 	
 	public static String getCountQuerySQL(Method method,String sql,Object[] args){
 			StringBuilder sb = new StringBuilder();
@@ -612,7 +637,7 @@ public class TypeUtil implements Opcodes{
 	 */
 	public static int findPageIndex(Parameter[] parameters,Object...args){
 		Object obj = findAnnotationParameterVal(PageIndex.class, parameters, args);
-		return obj !=null ? (int)obj : null;
+		return obj !=null ? (int)obj : -1;
 	}
 	
 	/**
@@ -623,7 +648,7 @@ public class TypeUtil implements Opcodes{
 	 */
 	public static int findPageSize(Parameter[] parameters,Object...args){
 		Object obj = findAnnotationParameterVal(PageSize.class, parameters, args);
-		return obj !=null ? (int)obj : null;
+		return obj !=null ? (int)obj : -1;
 	}
 	
 	

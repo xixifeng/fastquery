@@ -31,7 +31,6 @@ import org.fastquery.core.Source;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;
-import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Transactional;
 import org.fastquery.page.NotCount;
@@ -50,16 +49,7 @@ import com.alibaba.fastjson.JSONArray;
  * @author xixifeng (fastquery@126.com)
  */
 public interface UserInfoDBService extends QueryRepository {
-
-	@QueryByNamed("findUserInfoAll")
-	JSONArray findUserInfoAll();
 	
-	@QueryByNamed("findUserInfoOne")
-	UserInfo findUserInfoOne(@Param("id")Integer id);
-	
-	@QueryByNamed("findUserInfoByNameAndAge")
-	JSONArray findUserInfoByNameAndAge(@Param("name") String name, @Param("age")Integer age);
-
 	@Query("select name,age from UserInfo u where u.name=:name or u.age=:age")
 	UserInfo[] findUserInfoByNameOrAge(@Param("name") String name, @Param("age")Integer age);
 	

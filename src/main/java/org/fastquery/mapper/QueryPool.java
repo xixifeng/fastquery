@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -54,10 +55,28 @@ public class QueryPool {
 	private static final Logger LOG = Logger.getLogger(QueryPool.class);
 	
 	private static Resource resource;
-	
-	private QueryPool(){}
 
 	private static Map<String, Set<QueryMapper>> mapQueryMapper = new HashMap<>();
+	
+	private static Map<String, String> countQueryMap = new HashMap<>();
+	
+	private QueryPool(){}
+	
+	private static void putCountQuery(String key,String value){
+		if(value == null || key == null) {
+			return ;
+		}
+		countQueryMap.put(key, value);
+	}
+	
+	/**
+	 * 获取求和模板 key: "类的完整名称.id值"
+	 * @param key
+	 * @return
+	 */
+	public static String getCountQuery(String key){
+		return countQueryMap.get(key);
+	}
 
 	/**
 	 * 将*.querys.xml -> QueryMapper 并检测配置文件的正确性
@@ -84,19 +103,78 @@ public class QueryPool {
 			int len = nodeList.getLength();
 			for (int i = 0; i < len; i++) {
 				Node node = nodeList.item(i);
-				if("query".equals(node.getNodeName())) {
-					QueryMapper queryMapper = new QueryMapper(node.getAttributes().getNamedItem("id").getNodeValue(),  node.getTextContent().replaceAll("\\s+", " ").trim());
-					// id 或 template 有重复,说明配置文件是错误的
-					notDuplicate(queryMappers, queryMapper,xmlName);
+				if(node.getNodeType() == Document.ELEMENT_NODE && "query".equals(node.getNodeName())) {
+					element = (Element) node;
+					String id = element.getAttribute("id");
+					String template = fuseValTpl(element, "value",true);
+					String countQuery = fuseValTpl(element, "countQuery",false);
+					// countQuery 单独存储起来 (className + "." + id)可以确保唯一值,
+					putCountQuery(className + "." + id,countQuery); // 该方法接受到null值后,会视而不见
+					LOG.debug(String.format("id=%s , template=%s", id,template));
+					QueryMapper queryMapper = new QueryMapper(id, template);
+					// 边解析,边做合法校验
+					legalCheck(queryMappers, queryMapper,xmlName);
 					queryMappers.add(queryMapper);
 				}
 			}
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error(e.getMessage(),e);
 		}
 		return queryMappers;
 	}
 
+	/**
+	 * 融合模板 融合 <query>节点下的<XXX>和<parts> 然后返回字符串
+	 * @param element <query>节点元素
+	 * @param ele <XXX>节点元素
+	 * @param defaultText 如果没有找到<XXX>节点元素是否直接取<query>下的textContent, true表示是.
+	 * @return 注意: 如果既没有<XXX>又不允许defaultText为true, 那么就返回null.
+	 */
+	private static String fuseValTpl(Element element, String xxx,boolean defaultText) {
+		// 判断这个节点是否有子节点 value 
+		Element ele = getChildElement(element, xxx);
+		String template = null;
+		if(ele !=null) {
+			template = ele.getTextContent();
+			// 看<value> 节点是否有兄弟节点<parts>
+			Element parts = getChildElement(element, "parts");
+			if(parts == null){ // 若没有parts节点
+				return template;
+			}
+			
+			NodeList ps = parts.getChildNodes();
+			for (int j = 0; j < ps.getLength(); j++) {
+				if(ps.item(j).getNodeType() == Element.ELEMENT_NODE) {
+					Element p = (Element) ps.item(j);
+					String name = p.getAttribute("name");
+					// p.getTextContent() 里面很可能包含有$ 或 \ 如果不用Matcher.quoteReplacement进行处理,那么$表示反向引用,就会报错的
+					template = template.replaceAll("\\#\\{\\#"+name+"\\}",Matcher.quoteReplacement(p.getTextContent()));
+				}
+			}
+			
+		} else if(defaultText) {
+			template = element.getTextContent();
+		}
+		return template;
+	}
+
+	/**
+	 * 从给定节点中查询名称为nodeName的子元素. 没有找到返回null
+	 * @param node
+	 * @param nodeName
+	 * @return
+	 */
+	private static Element getChildElement(Node node,String nodeName) {
+		NodeList nodeList = node.getChildNodes();
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			Node n = nodeList.item(i); 
+			if( n.getNodeType() == Element.ELEMENT_NODE && n.getNodeName().equals(nodeName) ) {
+				return (Element) n;
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * 根据 className -> query配置文件 -> 获取模板,然后存储到QueryPool里.<br>
 	 * 注意: 这个方法开销较大,生产环境中最好做到项目初始时执行一次,不要执行多遍.
@@ -147,12 +225,18 @@ public class QueryPool {
 	    // 转换输出
 		Velocity.evaluate(context, writer, className+'.'+id, tpl);
 		
-		return writer.toString();
+		return writer.toString().replaceAll("\\s+", " ").trim();
 	}
 	
-	public static String render(String className,Method method,Object...args){
+	public static String render(String className,Method method,boolean isQuery,Object...args){
 		String id = method.getAnnotation(QueryByNamed.class).value();
-		String tpl = getTemplate(className, id);
+		
+		String tpl;
+		if(isQuery){
+			tpl = getTemplate(className, id);	
+		} else {
+			tpl = getCountQuery(className+'.'+id);
+		}
 		if(tpl==null || "".equals(tpl)){
 			return null;
 		}
@@ -178,7 +262,7 @@ public class QueryPool {
 	    // 转换输出
 		Velocity.evaluate(context, writer, className+'.'+id, tpl);
 		
-		return writer.toString();
+		return writer.toString().replaceAll("\\s+", " ").trim();
 	}
 
 	/**
@@ -218,18 +302,13 @@ public class QueryPool {
 		return null;
 	}
 	
-	// 在解析xml时校验是否用重复值,有的话表明违规
-	private static void notDuplicate(Set<QueryMapper> queryMappers, QueryMapper queryMapper,String xmlName) {
+	// 在解析xml时,合法性检查
+	private static void legalCheck(Set<QueryMapper> queryMappers, QueryMapper queryMapper,String xmlName) {
 		String id = queryMapper.getId();
 		String template = queryMapper.getTemplate();
 		
-		if(id ==null || "".equals(id.trim())) {
-			throw new ExceptionInInitializerError(xmlName + " 里面的id不能为\"\",且不能为null!");
-		}
-		
-		if(template ==null || "".equals(template.trim())){
-			throw new ExceptionInInitializerError(xmlName + " 配置的模板不能为\"\",且不能为null!");
-		}
+		notNullAndEmpty(id,xmlName + " 里面的id不能为\"\",且不能为null!");
+		notNullAndEmpty(template,xmlName + " 配置的模板不能为\"\",且不能为null!");
 		
 		for (QueryMapper qm : queryMappers) {
 			if(qm.getId().equals(id)){
@@ -239,6 +318,13 @@ public class QueryPool {
 				throw new ExceptionInInitializerError(xmlName + " 配置的模板不能重复!");
 			}
 		}
+		
+	}
+	
+	private static void notNullAndEmpty(String str,String msg){
+		if(str == null || "".equals(str.trim())) {
+			throw new ExceptionInInitializerError(msg);
+		}	
 	}
 	
 	/**

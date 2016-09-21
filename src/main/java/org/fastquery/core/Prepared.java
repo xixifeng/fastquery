@@ -25,6 +25,7 @@ package org.fastquery.core;
 import java.lang.reflect.Method;
 
 import org.fastquery.filter.FilterChainHandler;
+import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.Page;
 import org.fastquery.util.TypeUtil;
 
@@ -93,6 +94,14 @@ public class Prepared {
 			if( (querys.length>0 || queryById!=null) && modifying !=null) {  // ->进入Modify
 				return QueryProcess.getInstance().modifying(method,returnType, TypeUtil.getQuerySQL(method, querys, args), packageName,args);
 			} else if(querys.length>0  || queryById!=null) {
+				
+				if(returnType == Page.class && queryById != null) {  // ->进入Page
+					String query = QueryPool.render(iclazz.getName(), method,true,args);
+					String countQuery = QueryPool.render(iclazz.getName(), method,false,args);
+					return QueryProcess.getInstance().queryPage(method, query, countQuery,packageName, args);
+				}
+				
+				
 				if(returnType == Page.class) {  // ->进入Page
 					return QueryProcess.getInstance().queryPage(method,querys,packageName, args);
 				}

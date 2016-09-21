@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.QuartzRepository;
 import org.fastquery.core.Query;
+import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
@@ -45,7 +46,9 @@ import org.fastquery.filter.generate.query.SQLFilter;
 import org.fastquery.filter.generate.querya.ConditionParameterFilter;
 import org.fastquery.filter.generate.querya.MethodAnnotationFilter;
 import org.fastquery.filter.generate.querya.ModifyingDependencyFilter;
+import org.fastquery.filter.generate.querya.OutFilter;
 import org.fastquery.filter.generate.querya.SourceFilter;
+import org.fastquery.filter.generate.queryn.TplPageFilter;
 
 /**
  * 生成 Repository的实现扩展, 在生成的时候,额外要做的事情(extend)
@@ -78,6 +81,7 @@ class GenerateExtends {
 		Modifying modifying;
 		Query[] querys;
 		//Quartz quartz
+		QueryByNamed queryByNamed;
 		
 		Method[] methods = repositoryClazz.getMethods();
 		for (Method method : methods) {
@@ -92,9 +96,12 @@ class GenerateExtends {
 			modifying = method.getAnnotation(Modifying.class);
 			querys = method.getAnnotationsByType(Query.class);
 			//quartz = method.getAnnotation(Quartz.class)
+			queryByNamed = method.getAnnotation(QueryByNamed.class);
 			
-			// 对过滤器做8个分类
+			// 对过滤器做10个分类
 			// filter/global          拦截全局的方法
+			// filter/mqueryn         拦截标注有@QueryByNamed @modifying的方法,并且是QueryRepository的实现方法
+			// filter/queryn          拦截既标注有@QueryByNamed,没有标注@modifying的方法, 并且是QueryRepository的实现方法
 			// filter/modifying       拦截标注有@Query @modifying的方法,并且是QueryRepository的实现方法
 			// filter/mquartz         拦截没有标注@Quartz的方法,并且是QuartzRepository的实现方法
 			// filter/mquery          拦截既没有标注@Query,又没有标注@modifying的方法, 并且是QueryRepository的实现方法
@@ -121,6 +128,7 @@ class GenerateExtends {
 				queryFilterChain.addFilter(new MethodAnnotationFilter());
 				queryFilterChain.addFilter(new ConditionParameterFilter());
 				queryFilterChain.addFilter(new SourceFilter());
+				queryFilterChain.addFilter(new OutFilter());
 				
 				
 				// filter/modifying
@@ -138,6 +146,16 @@ class GenerateExtends {
 					queryFilterChain.addFilter(new NotAllowedRepeat());
 					queryFilterChain.addFilter(new PageFilter());
 				}
+				
+				// filter/mqueryn
+				if(modifying!=null && queryByNamed!=null){
+					
+				}
+				// filter/queryn
+				if(queryByNamed!=null && modifying==null){
+					queryFilterChain.addFilter(new TplPageFilter());
+				}
+				
 				
 				// filter/mquery
 				if(querys.length == 0 && modifying == null) {

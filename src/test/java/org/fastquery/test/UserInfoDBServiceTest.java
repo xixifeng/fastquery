@@ -46,7 +46,6 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
 
@@ -62,51 +61,6 @@ public class UserInfoDBServiceTest {
 	public void before(){
 		userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 	}
-	
-	
-	@Test
-	public void findUserInfoAll(){
-		JSONArray jsonArray = userInfoDBService.findUserInfoAll();
-		assertThat(jsonArray.isEmpty(), is(false));
-	}
-	
-	@Test
-	public void findUserInfoOne(){
-		UserInfo userInfo = userInfoDBService.findUserInfoOne(1);
-		assertThat(userInfo.getId().intValue(), is(1));
-	}
-	
-	@Test
-	public void findUserInfoByNameAndAge(){
-		String name = "张三";
-		Integer age = null;
-		JSONArray jsonArray = userInfoDBService.findUserInfoByNameAndAge(name, age);
-		for (Object object : jsonArray) {
-			@SuppressWarnings("unchecked")
-			Map<String, Object> map = (Map<String, Object>) object;
-			Set<String> keys = map.keySet();
-			for (String key : keys) {
-				if("name".equals(key)){
-					assertThat(map.get(key).toString().equals(name), is(true));
-				}
-			}
-		}
-		
-		name = null;
-		age = 8;
-		jsonArray = userInfoDBService.findUserInfoByNameAndAge(name, age);
-		for (Object object : jsonArray) {
-			@SuppressWarnings("unchecked")
-			Map<String, Object> map = (Map<String, Object>) object;
-			Set<String> keys = map.keySet();
-			for (String key : keys) {
-				if("age".equals(key)){
-					assertThat(map.get(key).toString().equals(age.toString()), is(true));
-				}
-			}
-		}
-	}
-	
 	
 	@Test
 	public void findUserInfoByNameOrAge(){

@@ -22,11 +22,13 @@
 
 package org.fastquery.dao;
 
-
+import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Param;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
+import org.fastquery.page.Page;
+import org.fastquery.page.Pageable;
 
 import com.alibaba.fastjson.JSONArray;
 
@@ -39,12 +41,14 @@ public interface QueryByNamedDBExample extends QueryRepository {
 	// 从该类的配置文件里寻找id="findUserInfoAll"节点,然后绑定其SQL代码段
 	@QueryByNamed("findUserInfoAll")
 	JSONArray findUserInfoAll();
-	
+
 	@QueryByNamed("findUserInfoOne")
-	UserInfo findUserInfoOne(@Param("id")Integer id);
-	
+	UserInfo findUserInfoOne(@Param("id") Integer id);
+
 	@QueryByNamed("findUserInfoByNameAndAge")
-	JSONArray findUserInfoByNameAndAge(@Param("name") String name, @Param("age")Integer age);
+	JSONArray findUserInfoByNameAndAge(@Param("name") String name, @Param("age") Integer age);
+
+	@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
+	Page<Student> findPage(Pageable pageable, @Param("no") String no, @Param("name") String name,
+			@Param("age") Integer age);
 }
-
-
