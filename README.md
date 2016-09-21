@@ -413,7 +413,7 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 </queries>
 ```
 
-如果想把一些公共的代码片段提取出来,以便重复使用,通过定义`<parts>`元素(零件集)可以达到效果. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件. 
+如果想把一些公用的SQL代码片段提取出来,以便重复使用,通过定义`<parts>`元素(零件集)可以达到效果. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件. 
 
 ```java
 public interface QueryByNamedDBExample extends QueryRepository {
@@ -490,8 +490,8 @@ try {
 DB接口:
 
 ```java
-@QueryByNamed("findPage") // 引用id为"findPage"的分页SQL模板
-Page<Student> findPage(Pageable pageable,@Param("name")String no,@Param("name")String name,@Param("age")Integer age);
+@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
+Page<Student> findPage(Pageable pageable, @Param("no") String no, @Param("name") String name,@Param("age") Integer age);
 ```
 
 - 通过@Query实现分页
