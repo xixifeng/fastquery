@@ -22,9 +22,6 @@
 
 package org.fastquery.test;
 
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInformation;
 import org.fastquery.core.RepositoryException;
@@ -42,7 +39,6 @@ import com.alibaba.fastjson.JSONObject;
 
 import static org.junit.Assert.assertThat;
 
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -263,7 +259,7 @@ public class UserInfoDBServiceTest {
 		}
 	}
 	
-	
+	/*
 	@Test
 	public void initv(){
 		VelocityContext velocityContext = new VelocityContext();
@@ -277,7 +273,7 @@ public class UserInfoDBServiceTest {
 	    t.merge(velocityContext, sw);
 
 	    System.out.println( sw.toString() );
-	}
+	}*/
 }
 
 

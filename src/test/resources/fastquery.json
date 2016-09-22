@@ -59,6 +59,7 @@
  "basedir" : "/root/git/fastquery/fastquery/tmp/",
  
   // velocity.properties 的位置
+  // 该行配置不是必须的, 请注意不要重复配置,如果在其他地方已配置velocity,请删除该行配置
   "velocity" : "/root/git/fastquery/fastquery/src/test/resources/velocity.properties"
 
 }
