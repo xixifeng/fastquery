@@ -1,6 +1,6 @@
 # FastQuery 数据持久层框架
 FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
-做为一个开发者, **仅仅只需要设计DAO接口即可**,其内部采用ASM动态生成实现,执行快. 因此,代码简洁而优雅.从而,大幅度提升开发效率.<br />
+做为一个开发者, **仅仅只需要设计DAO接口即可**,其内部采用ASM动态生成实现类,执行快. 因此,代码简洁而优雅.从而,大幅度提升开发效率.<br />
 遵循非侵入式原则设计,松耦合,很容易与其它容器或框架集成.<br />
 提供了一组简单的`Annotation`.消费者只用关心注解的含义.这就使得框架的核心便于重构,便于持续良性发展.<br />
 
@@ -13,7 +13,8 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 6. 支持查询结果集以JSON类型返回
 7. 拥有非常优雅的`Page`(分页)设计
 8. 支持`AOP`,注入拦截器只需要标识几个简单的注解,如: `@Before` , `@After`
-9. 使用`@Source`可实现动态适配数据源.这个特性特别适合多租户系统中要求数据库彼此隔离其结构相同的场景里.
+9. 使用`@Source`可实现动态适配数据源.这个特性特别适合多租户系统中要求数据库彼此隔离其结构相同的场景里
+10. 支持`@QueryByNamed`命名式查询,SQL动态模板.
 
 ## 运行环境要求
 jdk1.8+
@@ -341,7 +342,7 @@ UserInfo[] findUserInfoByNameOrAge(@Param("name") String name, @Param("age")Inte
 ```
 
 其中`:name`对应`@Param("name")`所指定的方法变量值;`:age`对应`@Param("age")`所指定的方法变量值.当然SQL中的变量也可以用`?N`(N={正整数})的形式来表达,且不用标识`@Param`.  
-`select name,age from UserInfo u where u.name = :name or u.age = :age`最终会编译成`select name,age from UserInfo u where u.name=? or u.age=?`因此很好地解决了SQL注入问题.  
+如:`select name,age from UserInfo u where u.name = :name or u.age = :age`最终会编译成`select name,age from UserInfo u where u.name=? or u.age=?`因此很好地解决了SQL注入问题.  
 
 
 **SQL中的变量采用${name}表达式**  
@@ -768,8 +769,9 @@ UserInformation findUserInfoById(Integer id);
 build: maven 
 
 ## 反馈问题
-http://git.oschina.net/xixifeng.com/fastquery/issues
+https://git.oschina.net/xixifeng.com/fastquery/issues  
+地球人都知道，开源中国秉承自由、开放、分享的精神，本项目每次升级之后，代码和文档手册都会在第一时间完全开源，以供大家查阅、批评、指正。笔者技术水平有限，bug或不周之处在所难免，所以，遇到有问题或更好的建议时，还请大家通过码云[issue](https://git.oschina.net/xixifeng.com/fastquery/issues)来向我们反馈。  
 
 ## 联系作者
-fastquery#126.com
+@习习风 fastquery#126.com  
 欢迎批评指正.
