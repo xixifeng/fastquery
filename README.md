@@ -222,45 +222,6 @@ List<Map<String, Object>> find(String sex);
 Student[] findAllStudent(... args ...);
 ```
 
-### 采用`NativeSpec`实现动态构建语句
-`QueryRepository`接口中提供了若干个方法,用来动态构建查询语句.            
-凡是继承自`QueryRepository`的接口,都能直接使用`QueryRepository`中的所用方法.                
-举例:StudentDBService接口的实例使用`QueryRepository`接口中的find方法
-
-```java
-// 1). 准备一个 NativeSpec
-NativeSpec spec = new NativeSpec() {
-	@Override
-	public Predicate toPredicate(SelectQuery selectQuery) {
-		// 待查询的列
-		selectQuery.addCustomColumns("s.name,s.sex,s.age,s.dept,c.name as courseName");
-		// 待查询的表
-		selectQuery.addCustomFromTable("student s");
-		// 增加一个自定义关联
-		selectQuery.addCustomJoin(" JOIN sc on s.no = sc.studentNo");
-		// 再增加一个自定义关联
-		selectQuery.addCustomJoin(" JOIN course c on c.no = sc.courseNo");
-		// 增加一个自定义条件,下行等价于: (s.age >= ?1) AND (s.sex = ?2) 
-		selectQuery.addCondition(ComboCondition.and(
-		                         BinaryCondition.greaterThan("s.age", "?1", true),
-		                         BinaryCondition.equalTo("s.sex", "?2"))
-		                         );
-		// 注意:build(SelectQuery selectQuery,Object... parameters),其中parameters表示SQL语句中所需的参数.
-		// 参数通常都是有外界传递进来的,在此采用prepared模式,目的是为了防止SQL注入.
-		// 3 对应 ?1
-		// "男" 对应 ?2
-		return this.build(selectQuery,3,"男"); 
-	}
-};
-
-// 2). 调用find
-String countField = "s.no"; // 求和字段,默认是"id"
-String countsql = null;     // 求和语句
-Page<Map<String, Object>> maps = studentDBService.find(spec, new PageableImpl(1, 5), countField, countsql, false);
-System.out.println(JSON.toJSONString(maps, true));
-```
-
-
 ## count
 
 统计查询行数
