@@ -42,7 +42,7 @@ public class QueryReturnTypeFilter implements MethodFilter {
 	@Override
 	public Method doFilter(Method method) {
 		String errmsg = String.format("为这个方法设置的返回值错误,其返回值类型支持类型如下:%n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n",
-				"1). long 用于统计总行数",
+				"1). long/int 用于统计总行数",
 				"2). boolean 判断是否存在",
 				"3). Map<String,Object>", 
 				"4). List<Map<String,Object>>",
@@ -61,7 +61,7 @@ public class QueryReturnTypeFilter implements MethodFilter {
 
 		
 		// 返回值所允许的类型
-		if(returnType == long.class) {
+		if(returnType == long.class || returnType == int.class) {
 			return method;
 		} else if(returnType == boolean.class) {
 			return method;

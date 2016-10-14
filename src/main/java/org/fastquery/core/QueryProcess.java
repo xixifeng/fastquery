@@ -53,6 +53,7 @@ import org.fastquery.page.PageImpl;
 import org.fastquery.page.Pageable;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.page.Slice;
+import org.fastquery.util.BeanUtil;
 import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
 
@@ -253,6 +254,8 @@ public class QueryProcess {
 		QueryHandler qh = QueryHandler.getInstance();
 		if(returnType == long.class) {
 			return qh.longType(method,keyvals);
+		} else if(returnType == int.class) {
+			return qh.intType(method,keyvals);
 		} else if(returnType == boolean.class) {
 			return qh.booleanType(keyvals);
 		} else if(returnType == Map.class){
@@ -612,8 +615,21 @@ public class QueryProcess {
 		
 		String sourceName;
 		switch (methodId) {
+		case MethodId.QUERY0:
+			Object bean = iargs[0];
+			// 获取数据源
+			sourceName = TypeUtil.findSource(method.getParameters(), iargs);
+			DataSource dataSource = DataSourceManage.getDataSource(sourceName,packageName);
+			try(Connection conn = dataSource.getConnection();Statement stat = conn.createStatement()) {
+				conn.setAutoCommit(false);
+				stat.executeUpdate(BeanUtil.toInsertSQL(bean));
+				conn.commit();
+			} catch (Exception e) {
+				throw new RepositoryException(e);
+			}
+			return bean;
 		case MethodId.QUERY1:
-			break;
+			return iargs[2];
 		case MethodId.QUERY2:
 			break;
 		case MethodId.QUERY3:

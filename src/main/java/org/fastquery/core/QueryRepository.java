@@ -26,7 +26,42 @@ package org.fastquery.core;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public interface QueryRepository extends Repository{
+public interface QueryRepository extends Repository {
+	
+	/**
+	 * 保存一个实体
+	 * @param entity
+	 * @return
+	 */
+	@Id(MethodId.QUERY0)
+	<S> S  save(S entity);
+	
+	/**
+	 * 往指定的数据源里保存一个实体
+	 * @param entity
+	 * @param dataSourceName
+	 * @return
+	 */
+	@Id(MethodId.QUERY0)
+	<S> S  save(S entity,@Source String dataSourceName);
+	
+	/**
+	 * 往指定的数据源里保存一个实体,并且指定数据库名称
+	 * @param dataSourceName
+	 * @param dbName
+	 * @param entity
+	 * @return
+	 */
+	@Id(MethodId.QUERY1)
+	<S> S  save(@Source String dataSourceName,String dbName,S entity);
+	
+	/**
+	 * 执行SQL文件
+	 * @param sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置
+	 * @param output 指定执行SQL后的输出将放在哪个文件里. 注意: 会在基准目录里寻找output
+	 */
+	@Id(MethodId.QUERY3)
+	void executeBatch(String sqlName,String output);
 	
 	/**
 	 * 执行SQL文件
@@ -37,13 +72,6 @@ public interface QueryRepository extends Repository{
 	 */
 	@Id(MethodId.QUERY3)
 	void executeBatch(String sqlName,String output,@Source String dataSourceName);
-	/**
-	 * 执行SQL文件
-	 * @param sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置
-	 * @param output 指定执行SQL后的输出将放在哪个文件里. 注意: 会在基准目录里寻找output
-	 */
-	@Id(MethodId.QUERY3)
-	void executeBatch(String sqlName,String output);
 	
 }
 

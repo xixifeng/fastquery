@@ -49,7 +49,6 @@ import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.PageIndex;
 import org.fastquery.page.PageSize;
 import org.fastquery.where.Condition;
-import org.fastquery.where.Operator;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
@@ -326,69 +325,6 @@ public class TypeUtil implements Opcodes{
 	}
 	
 	/**
-	 * 获取完整的SQL语句,考虑条件是否参与运算问题.
-	 * @param method
-	 * @param query
-	 * @param args
-	 * @return
-	 */
-	public static List<String> getQuerySQL(Method method,Query[] queries,Object[] args) {
-		List<String> sqls = new ArrayList<>();
-		
-		// 如果是QueryByNamed
-		if(method.getAnnotation(QueryByNamed.class)!=null){
-			String s = QueryPool.render(method.getDeclaringClass().getName(), method,true,args);
-			s = paramFilter(method, args, s);
-			sqls.add(s);
-			return sqls;
-		}
-		
-		for (Query query : queries) {
-			String sql = query.value();
-			
-			sql = paramFilter(method, args, sql);
-			
-			StringBuilder sb = new StringBuilder();
-			// 追加条件
-			Condition[] conditions = method.getAnnotationsByType(Condition.class);
-			o:for (int i = 0; i < conditions.length; i++) {
-				
-				if(conditions[i].ignoreNull()){ // 忽略null,那么就要看参数是否传递null啦
-					// r 属性中包含的参数,必须去重
-					Set<String> pars = TypeUtil.matchesNotrepeat(conditions[i].r(), "\\?\\d+");
-					if(!pars.isEmpty()){ // 表明这个条件有"?"占位符号
-						for (String par : pars) {
-							int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
-							if(args[index-1] == null){ //如果传递了参数null, 那么这个条件就不加入
-								continue o; // 跳出最外层的当次循环
-							}
-						}
-					}
-				}
-				sb.append(' ');
-				if(sb.length() > 1){ // 第一个条件不能加上条件连接符,请特别注意:此处的条件不能用如果(i!=0),因为上面会中途跳出循环.
-					sb.append(conditions[i].c().getVal());	
-				}
-				sb.append(' ');	
-				sb.append(conditions[i].l());
-				sb.append(' ');
-				Operator[] operators = conditions[i].o();
-				for (Operator operator : operators) {
-					sb.append(operator.getVal());
-					sb.append(' ');
-				}
-				sb.append(conditions[i].r());
-			}
-			// 追加条件 End
-			if(!"".equals(sb.toString())){ // 特别注意: 此处不能写成 !sb.equals("")
-				sb.replace(0, 1, "where");
-			}
-			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, sb.toString()));
-		}
-		return sqls;
-	}
-
-	/**
 	 * 处理 @Param 模板参数
 	 * 
 	 * @param method
@@ -443,15 +379,21 @@ public class TypeUtil implements Opcodes{
 		return s;
 	}
 	
-	public static String getCountQuerySQL(Method method,String sql,Object[] args){
+	/**
+	 * 考虑条件是否参与运算问题.
+	 * @param method
+	 * @param args
+	 * @return
+	 */
+	public static String getWhereSQL(Method method,Object[] args){
 			StringBuilder sb = new StringBuilder();
 			// 追加条件
 			Condition[] conditions = method.getAnnotationsByType(Condition.class);
 			o:for (int i = 0; i < conditions.length; i++) {
 				
 				if(conditions[i].ignoreNull()){ // 忽略null,那么就要看参数是否传递null啦
-					// r 属性中包含的参数,必须去重
-					Set<String> pars = TypeUtil.matchesNotrepeat(conditions[i].r(), "\\?\\d+");
+					// value 属性中包含的参数,必须去重
+					Set<String> pars = TypeUtil.matchesNotrepeat(conditions[i].value(), "\\?\\d+");
 					if(!pars.isEmpty()){ // 表明这个条件有"?"占位符号
 						for (String par : pars) {
 							int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
@@ -463,27 +405,54 @@ public class TypeUtil implements Opcodes{
 				}
 				
 				sb.append(' ');
-				if(sb.length() > 1){ // 第一个条件不能加上条件连接符,请特别注意:此处的条件不能用如果(i!=0),因为上面会中途跳出循环.
-					sb.append(conditions[i].c().getVal());	
+				if(sb.length() == 1 && i != 0 ){ // 条件成立,表示这个SQL条件的前面还不存在条件, 那么第一个条件的链接符,必须去掉. (where 后面不能直接跟运算符号)
+					sb.append(' ');	
+					sb.append(removePart(conditions[i].value()));
+				} else {
+					sb.append(' ');	
+					sb.append(conditions[i].value());
 				}
-				sb.append(' ');	
-				sb.append(conditions[i].l());
-				sb.append(' ');
-				Operator[] operators = conditions[i].o();
-				for (Operator operator : operators) {
-					sb.append(operator.getVal());
-					sb.append(' ');
-				}
-				sb.append(conditions[i].r());
+				
 			}
 			// 追加条件 End
 			if(!"".equals(sb.toString())){ // 特别注意: 此处不能写成 !sb.equals("")
 				sb.replace(0, 1, "where");
 			}
-			
-		return sql.replaceFirst(Placeholder.WHERE_REG, sb.toString());
+		return sb.toString();
 	}
 	
+
+	/**
+	 * 获取完整的SQL语句
+	 * @param method
+	 * @param query
+	 * @param args
+	 * @return
+	 */
+	public static List<String> getQuerySQL(Method method,Query[] queries,Object[] args) {
+		List<String> sqls = new ArrayList<>();
+		
+		// 如果是QueryByNamed
+		if(method.getAnnotation(QueryByNamed.class)!=null){
+			String s = QueryPool.render(method.getDeclaringClass().getName(), method,true,args);
+			s = paramFilter(method, args, s);
+			sqls.add(s);
+			return sqls;
+		}
+		
+		for (Query query : queries) {
+			String sql = query.value();
+			
+			sql = paramFilter(method, args, sql);
+			
+			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, getWhereSQL(method, args)));
+		}
+		return sqls;
+	}
+
+	public static String getCountQuerySQL(Method method, String sql, Object[] args) {
+		return sql.replaceFirst(Placeholder.WHERE_REG, getWhereSQL(method, args));
+	}
 	
 	/**
 	 * 过滤java语法中的注释
@@ -651,6 +620,26 @@ public class TypeUtil implements Opcodes{
 		return obj !=null ? (int)obj : -1;
 	}
 	
+	/**
+	 * 去除 str 的首尾空格, 如果还存在空格, 就把第1个空格前面的部分删除掉(同时也删除第一个空格). 返回删除之后所留下的字符串, 注意返回之前都会trim<br>
+	 * 例如: str = "a b c" 则返回 "b c" <br>
+	 * 如果传递null, 则返回null, 如果没有什么可删除的,则原样返回.
+	 * @param str
+	 * @return
+	 */
+	public static String removePart(String str){
+		if(str==null) {
+			return null;
+		}
+		
+		StringBuilder sb = new StringBuilder(str.trim());
+		int i = sb.indexOf(" ");
+		if(i != -1){ // 如果还存在空格, 就把第1个空格前面的部分删除掉
+			sb.delete(0, i+1);
+		} 
+		
+		return sb.toString().trim();
+	}
 	
 }
 

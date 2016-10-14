@@ -64,7 +64,7 @@ public class QueryHandler {
 	}
 
 	// 对于查操作可根据其返回值分类如下(也就是说只允许这这些类型,在生成类之前已经做预处理,越界类型是进来不了的)
-	// 1). long 用于统计总行数
+	// 1). long/int 用于统计总行数
 	// 2). boolean 判断是否存在
 	// 3). Map<String,Object>
 	// 4). List<Map<String,Object>>
@@ -101,6 +101,12 @@ public class QueryHandler {
 		}
 		
 		return Long.parseLong(iterator.next().getValue().toString());
+	}
+	
+	public int intType(Method method, List<Map<String, Object>> keyvals) {
+		// 求和的返回值如果是int类型,那么需要把long强制转换成int,可能会越界!
+		// 建议:求和返回值用long
+		return (int)longType(method, keyvals);
 	}
 
 	public boolean booleanType(List<Map<String, Object>> keyvals) {
@@ -236,7 +242,8 @@ public class QueryHandler {
 			return null;
 		}
 		if (keyvals.size() != 1) {
-			throw new RepositoryException(method + "不能把一个集合转换成" + returnType);
+			// method + "不能把一个集合转换成" + returnType
+			throw new RepositoryException(String.format("%s 不能把一个集合转换成 %s %n根据输入的SQL所查询的结果是一个集合.", method,returnType));
 		}
 
 		if (TypeUtil.hasDefaultConstructor(returnType)) {

@@ -211,14 +211,13 @@ List<Map<String, Object>> find(String sex);
 ```java
 @Query("select no, name, sex from Student #{#where} order by age desc")
 // 增加若干个条件
-@Condition(l="no",o=Operator.LIKE,r="?1")                   // ?1的值,如果是null, 该行条件将不参与运算
-@Condition(c=COperator.AND,l="name",o=Operator.LIKE,r="?2") // 参数 ?2,如果接收到的值为null,该条件不参与运算
+@Condition("no like ?1")                            // ?1的值,如果是null, 该行条件将不参与运算
+@Condition("and name like ?2")                      // 参数 ?2,如果接收到的值为null,该条件不参与运算
 // 通过 ignoreNull=false 开启条件值即使是null也参与运算
-// 下行?3接收到的值若为null,该条件也参与运算.
-@Condition(c=COperator.AND,l="age",o=Operator.GT,r="?3",ignoreNull=false)
-@Condition(c=COperator.OR,l="dept",o=Operator.IN,r="(?4,?5,?6)")           // dept in(?4,?5,?6)
-@Condition(c=COperator.AND,l="name",o={Operator.NOT,Operator.LIKE},r="?7") // 等效于 name not like ?7
-@Condition(c=COperator.OR,l="age",o=Operator.BETWEEN,r="?8 and ?9")        // 等效于 age between ?8 and ?9
+@Condition(value = "and age > ?3",ignoreNull=false) // 下行?3接收到的值若为null,该条件也参与运算.
+@Condition("or dept in(?4,?5,?6)")                  // 第4个或第5个或第6个参数,传递null值,该行条件将不参与运算     
+@Condition("and name not like ?7") 
+@Condition("or age between ?8 and ?9")
 Student[] findAllStudent(... args ...);
 ```
 
@@ -469,15 +468,15 @@ public interface UserInfoDBService extends QueryRepository {
 	
 	// 如果没有指定求和语句,那么由fastquery分析出最优的求和语句
 	@Query("select id,name,age from `userinfo` #{#where}")
-	@Condition(l="age",o=Operator.GT,r="?1")                // age > ?1 若age的值传递null,该条件将不参与运算
-	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2 若id的值传递null,该条件将不参与运算
+	@Condition("age > ?1")     // 若age的值传递null,该条件将不参与运算
+	@Condition("and id < ?2")  // 若id的值传递null,该条件将不参与运算
 	Page<UserInfo> find(Integer age,Integer id,Pageable pageable);
 	
 	// countQuery : 指定自定义求和语句
 	@Query(value = "select id,name,age from `userinfo` #{#where}", 
 	       countQuery = "select count(id) from `userinfo` #{#where}")
-	@Condition(l = "age", o = Operator.GT, r = "?1")        // age > ?1 若age的值传递null,该条件将不参与运算
-	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2 若id的值传递null,该条件将不参与运算
+	@Condition("age > ?1")        // 若age的值传递null,该条件将不参与运算
+	@Condition("and id < ?2")     // 若id的值传递null,该条件将不参与运算
 	Page<UserInfo> findSome(Integer age,Integer id,Pageable pageable);
 }
 ```

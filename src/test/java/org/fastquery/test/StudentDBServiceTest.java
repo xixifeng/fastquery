@@ -141,6 +141,13 @@ public class StudentDBServiceTest {
 	}
 	
 	@Test
+	public void count2(){
+		int i = studentDBService.count2();
+		System.out.println("i=" + i);
+		assertThat(i, greaterThan(1));
+	}
+	
+	@Test
 	public void testRows(){
 		JSONObject jsonObject = studentDBService.rows();
 		LOG.debug(jsonObject);
@@ -297,5 +304,35 @@ public class StudentDBServiceTest {
 		studentDBService.findAllStudent(null, "张", 16, null, "数学系", "无派系", null, null, null);
 		studentDBService.findAllStudent(null, null, 16, "化学系", null, "无派系", null, null, null);
 		studentDBService.findAllStudent(null, null, null, "化学系", "数学系", null, null, null, null);
+	}
+	
+	@Test
+	public void findAllStudent3(){
+		String name = "小";
+		Integer age = 18;
+		List<Student> students = studentDBService.findAllStudent("%"+name+"%", age);
+		for (Student student : students) {
+			assertThat(student.getName(), containsString(name));
+			assertThat(student.getAge(),greaterThan(age));
+		}
+		
+		name = "家";
+		age = null;
+		students = studentDBService.findAllStudent("%"+name+"%", age);
+		for (Student student : students) {
+			assertThat(student.getName(), containsString(name));
+		}
+		
+		age = 30;
+		students = studentDBService.findAllStudent(null, age);
+		for (Student student : students) {
+			assertThat(student.getAge(),greaterThan(age));
+		}
+		
+		students = studentDBService.findAllStudent(null, null);
+		assertThat(students, notNullValue());
+		assertThat(students, not(empty()));
+		assertThat(students.size(), greaterThan(1));
+	
 	}
 }

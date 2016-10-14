@@ -38,9 +38,7 @@ import org.fastquery.filter.MyAfterFilter1;
 import org.fastquery.filter.MyBeforeFilter1;
 import org.fastquery.filter.MyBeforeFilter2;
 import org.fastquery.filter.SkipFilter;
-import org.fastquery.where.COperator;
 import org.fastquery.where.Condition;
-import org.fastquery.where.Operator;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -94,6 +92,10 @@ public interface StudentDBService extends QueryRepository {
 	
 	@Query("select count(no) from student")
 	long count();
+	
+	// 求和返回int 类型
+	@Query("select count(no) from student")
+	int count2();
 	
 	@Query("select count(no) as count from student")
 	JSONObject rows(); // --> {"count":8}
@@ -179,17 +181,27 @@ public interface StudentDBService extends QueryRepository {
 	
 	
 	
+	
 	@SkipFilter
 	@Query("select * from Student #{#where} order by age desc")
 	// 增加一些条件
-	@Condition(l="no",o=Operator.LIKE,r="?1") // ?1的值,如果是null, 该行条件将不参与运算
-	@Condition(c=COperator.AND,l="name",o=Operator.LIKE,r="?2") // 参数 ?2,如果接收到的值为null,该条件不参与运算
+	@Condition("no like ?1") // ?1的值,如果是null, 该行条件将不参与运算
+	@Condition("and name like ?2") // 参数 ?2,如果接收到的值为null,该条件不参与运算
 	//通过 ignoreNull=false 开启条件值即使是null也参与运算
-	@Condition(c=COperator.AND,l="age",o=Operator.GT,r="?3",ignoreNull=false) // ?3接收到的值若为null,该条件也参与运算.
-	@Condition(c=COperator.OR,l="dept",o=Operator.IN,r="(?4,?5,?6)")// dept in(?4,?5,?6)
-	@Condition(c=COperator.AND,l="name",o={Operator.NOT,Operator.LIKE},r="?7") // 等效于 name not like ?7
-	@Condition(c=COperator.OR,l="age",o=Operator.BETWEEN,r="?8 and ?9") // 等效于 age between ?8 and ?9
+	@Condition(value = "and age > ?3",ignoreNull=false) // ?3接收到的值若为null,该条件也参与运算.
+	@Condition("or dept in(?4,?5,?6)")
+	@Condition("and name not like ?7")
+	@Condition("or age between ?8 and ?9")
 	Student[] findAllStudent(String no,String name,Integer age,String dept1,String dept2,String dept3,String name2,Integer age2,Integer age3);
+
+
+	
+	@Query("select * from Student #{#where} order by age desc")
+	@Condition("name like ?1")    // 第1个参数(?1)如果传递null, 该行条件将会被忽略
+	@Condition("and age > ?2")    // ?2 如果是null,这行条件将会被忽略
+	List<Student> findAllStudent(String name, Integer age);
+
+
 }
 
 

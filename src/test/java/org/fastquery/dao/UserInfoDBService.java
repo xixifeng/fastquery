@@ -38,9 +38,7 @@ import org.fastquery.page.Page;
 import org.fastquery.page.PageIndex;
 import org.fastquery.page.PageSize;
 import org.fastquery.page.Pageable;
-import org.fastquery.where.COperator;
 import org.fastquery.where.Condition;
-import org.fastquery.where.Operator;
 
 import com.alibaba.fastjson.JSONArray;
 
@@ -49,6 +47,9 @@ import com.alibaba.fastjson.JSONArray;
  * @author xixifeng (fastquery@126.com)
  */
 public interface UserInfoDBService extends QueryRepository {
+	
+	@Query("select id,name,age from UserInfo where id = :id")
+	UserInfo findById(@Param("id") Integer id);
 	
 	@Query("select name,age from UserInfo u where u.name=:name or u.age=:age")
 	UserInfo[] findUserInfoByNameOrAge(@Param("name") String name, @Param("age")Integer age);
@@ -112,20 +113,20 @@ public interface UserInfoDBService extends QueryRepository {
 	
 	// 如果没有指定求和语句,那么`fastquery`自动为分析出最优的求和语句.
 	@Query("select id,name,age from `userinfo` #{#where}")
-	@Condition(l="age",o=Operator.GT,r="?1")                // age > ?1
-	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2
+	@Condition("age > ?1")
+	@Condition("and id < ?2")
 	Page<UserInfo> find(Integer age,Integer id,Pageable pageable);
 	
 	// countQuery : 指定自定义求和语句
 	@Query(value = "select id,name,age from `userinfo` #{#where}", countQuery = "select count(name) from `userinfo` #{#where}")
-	@Condition(l = "age", o = Operator.GT, r = "?1")        // age > ?1
-	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2
+	@Condition("age > ?1")
+	@Condition("and id < ?2")
 	Page<UserInfo> findSome1(Integer age,Integer id,Pageable pageable);
 	
 	@NotCount // 标识分页不统计总行数. 从上百万的数据里求和很消耗性能.
 	@Query(value = "select id,name,age from `userinfo` #{#where}")
-	@Condition(l = "age", o = Operator.GT, r = "?1")        // age > ?1
-	@Condition(c=COperator.AND,l="id",o=Operator.LT,r="?2") // id < ?2
+	@Condition("age > ?1")
+	@Condition("and id < ?2")
 	Page<Map<String,Object>> findSome2(Integer age, Integer id,@PageIndex int pageIndex, @PageSize int pageSize);
 	
 	@Query("select count(id) from `userinfo` where age > ?1 AND id < ?2")

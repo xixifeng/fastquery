@@ -39,9 +39,6 @@ import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Repository;
 import org.fastquery.filter.BeforeFilter;
 import org.fastquery.util.TypeUtil;
-import org.fastquery.where.COperator;
-import org.fastquery.where.Condition;
-import org.fastquery.where.Operator;
 import org.junit.Test;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -187,24 +184,6 @@ public class TypeUtilTest implements Opcodes {
 
 	// 别删除用做测试用
 	@Query("select * from Student #{#where} order by desc")
-	// 增加一些条件
-	@Condition(l = "field1", o = Operator.EQ, r = "?1") // ?1的值,如果是null,
-														// 该行条件将不参与运算
-	@Condition(c = COperator.AND, l = "field2", o = Operator.EQ, r = "?2")
-	@Condition(c = COperator.AND, l = "field3", o = Operator.EQ, r = "?3", ignoreNull = false) // ?3的值是null,该条件也参与运算.
-	@Condition(c = COperator.OR, l = "age", o = Operator.IN, r = "(?3,?7,?8)") // age
-																				// in(?3,?7?8)
-	@Condition(c = COperator.AND, l = "name", o = { Operator.NOT, Operator.LIKE }, r = "?7") // 等效于
-																								// name
-																								// not
-																								// like
-																								// ?7
-	@Condition(c = COperator.OR, l = "info", o = Operator.BETWEEN, r = "?8 and ?9") // 等效于
-																					// info
-																					// between
-																					// ?8
-																					// and
-																					// ?9
 	public void method01() {
 	}
 
@@ -421,6 +400,24 @@ public class TypeUtilTest implements Opcodes {
 		assertThat(strs.get(2), equalTo("C"));
 		assertThat(strs.get(3), equalTo("D"));
 		assertThat(strs.get(4), equalTo("f"));
+	}
+	
+	@Test
+	public void removePart(){
+		String sub = TypeUtil.removePart("a ");
+		assertThat(sub, equalTo("a"));
+		
+		sub = TypeUtil.removePart("    a ");
+		assertThat(sub, equalTo("a"));
+		
+		sub = TypeUtil.removePart("    a                 ");
+		assertThat(sub, equalTo("a"));
+		
+		sub = TypeUtil.removePart(" a b");
+		assertThat(sub, equalTo("b"));
+		
+		sub = TypeUtil.removePart(" a     b");
+		assertThat(sub, equalTo("b"));
 	}
 	
 	

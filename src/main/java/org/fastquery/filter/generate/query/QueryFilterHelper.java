@@ -31,10 +31,9 @@ import org.fastquery.core.Query;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.util.TypeUtil;
 import org.fastquery.where.Condition;
-import org.fastquery.where.Operator;
 
 /**
- * 该的作用范围仅仅是当前包
+ * 该类的作用范围仅仅是当前包
  * @author xixifeng (fastquery@126.com)
  */
 class QueryFilterHelper {
@@ -59,16 +58,7 @@ class QueryFilterHelper {
 			Condition[] conditions = method.getAnnotationsByType(Condition.class);
 			for (int i = 0; i < conditions.length; i++) {
 				sb.append(' ');
-				sb.append(conditions[i].c().getVal());
-				sb.append(' ');	
-				sb.append(conditions[i].l());
-				sb.append(' ');
-				Operator[] operators = conditions[i].o();
-				for (Operator operator : operators) {
-					sb.append(operator.getVal());
-					sb.append(' ');
-				}
-				sb.append(conditions[i].r());
+				sb.append(conditions[i].value());
 			}
 			// 追加条件 End
 			

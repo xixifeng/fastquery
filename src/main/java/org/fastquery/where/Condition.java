@@ -36,27 +36,19 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD,ElementType.ANNOTATION_TYPE })
 public @interface Condition {
-	/**
-	 * 上一个条件跟这个条件的关系逻辑运算符. 例如: where name=? and age >10, 那么 "and" 称为是条件"name=?"与条件"age >10"的关系逻辑运算符
-	 */
-	COperator c() default COperator.NONE;
-	/**
-	 * 左边
-	 */
-	String l();
+	
+	String value();
 	
 	/**
-	 * 表达式
-	 */
-	Operator[] o() default Operator.EQ;
-	
-	/**
-	 * 右边
-	 */
-	String r();
-	
-	/**
-	 * ignoreNull 为true: 表示该条件的{@link #r()}值如果接受到了null值,那么该条件就不参与运算,反之,参与运算.
+	 * ignoreNull 为true: 表示该条件中的参数变量如果接受到的值是null,那么该行条件将不参与运算,反之,参与运算.
 	 */
 	boolean ignoreNull() default true;
+	
+	/**
+	 * 指定哪些参数将参与决定是否忽略当前条件 <br>
+	 * 
+	 * 如: judge = {"?1","?2"},那么当 ?1(第一个参数) 或 ?2(第二个参数) 传递null时,当前条件将会被忽略.
+	 * 
+	 */
+	String[] judges() default {};
 }

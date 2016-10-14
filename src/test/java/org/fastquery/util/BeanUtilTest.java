@@ -20,47 +20,26 @@
  * 
  */
 
-package org.fastquery.bean;
+package org.fastquery.util;
+import java.beans.IntrospectionException;
+import java.lang.reflect.InvocationTargetException;
+
+import org.fastquery.bean.UserInfo;
+import org.junit.Test;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class UserInfo {
-	
-	private Integer id;
-	private String name;
-	private Integer age;
-	
-	public UserInfo() {
+public class BeanUtilTest {
+
+	@Test
+	public void testToInsertSQL() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IntrospectionException {
+		UserInfo userInfo1 = new UserInfo(33,"想向公主",18);
+		UserInfo userInfo2 = new UserInfo(34,"程家洛",20);
+		UserInfo userInfo3 = new UserInfo(35,"于与同",null);
+		String sql = BeanUtil.toInsertSQL(userInfo1,userInfo2,userInfo3);
+		System.out.println(sql);
 	}
 
-	public UserInfo(Integer id, String name, Integer age) {
-		this.id = id;
-		this.name = name;
-		this.age = age;
-	}
-	
-	public Integer getId() {
-		return id;
-	}
-	public String getName() {
-		return name;
-	}
-	public Integer getAge() {
-		return age;
-	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public void setAge(Integer age) {
-		this.age = age;
-	}
-	@Override
-	public String toString() {
-		return "UserInfo [id=" + id + ", name=" + name + ", age=" + age + "]";
-	}
 }

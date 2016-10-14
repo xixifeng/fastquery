@@ -47,7 +47,8 @@
 
 		<!-- 定义零件集,他们可以被value,countQuery节点引用,以达到复用的效果 -->
 		<parts>
-			<part name="condition">
+			<part name="condition"> <!-- 内容可能包含小于号或者大于号,用CDATA就不用转义了 -->
+			  <![CDATA[
 				#if($no)
 				or no like :no
 				#end
@@ -59,15 +60,15 @@
 				#if($age)
 				or age > :age
 				#end
+			 ]]>
 			</part>
 
 			<part name="order">
 				order by age desc
 			</part>
 		</parts>
-
+		
 	</query>
-
 </queries>
 
 

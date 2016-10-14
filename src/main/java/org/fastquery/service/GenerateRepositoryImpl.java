@@ -57,11 +57,14 @@ class GenerateRepositoryImpl implements GenerateRepository {
 		Set<FastQueryJson> fqPropertie = LoadPrperties.load(resource);
 		
 		// 2). 初始化velocity
-		File velocity = new File(FastQueryJSONObject.getVelocity());
-		if( velocity.exists() && velocity.isFile()) {
-			Velocity.init(FastQueryJSONObject.getVelocity());	
-		} else {
-			LOG.info("fastquery.json中的velocity属性指定的文件地址不存在.那行配置不是必须的,请注意:不要重复配置!");
+		String fdir = FastQueryJSONObject.getVelocity();
+		if(fdir!=null) {
+			File velocity = new File(fdir);
+			if( velocity.exists() && velocity.isFile()) {
+				Velocity.init(FastQueryJSONObject.getVelocity());	
+			} else {
+				LOG.info("fastquery.json中的velocity属性指定的文件地址不存在.那行配置不是必须的,请注意:不要重复配置!");
+			}	
 		}
 		
 		// 3). 批量生成 Repository 的实现类
