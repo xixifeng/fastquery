@@ -358,6 +358,14 @@ UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
 // 则: 最终的SQL为: "select * from `userinfo` where 1 order by age desc"
 ```
 
+**SQL IN**  
+IN的值是变量时:
+
+```java
+@Query("select id,name,age from UserInfo where id in (${ids})")
+UserInfo[] findByIds(@Param("ids") int[] ids);
+```
+
 ### 采用${name}时请注意: 
 - 传递null值,模板变量默认取""
 - 参数模板仅仅用来辅助开发者构建SQL语句

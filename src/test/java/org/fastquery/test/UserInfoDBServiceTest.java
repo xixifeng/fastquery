@@ -259,6 +259,14 @@ public class UserInfoDBServiceTest {
 		}
 	}
 	
+	@Test
+	public void findByIds(){
+		int[] ids = new int[]{1,2,3};
+		UserInfo[] userInfos = userInfoDBService.findByIds(ids);
+		assertThat(userInfos[0].getId(), equalTo(1));
+		assertThat(userInfos[1].getId(), equalTo(2));
+		assertThat(userInfos[2].getId(), equalTo(3));
+	}
 	/*
 	@Test
 	public void initv(){
