@@ -23,6 +23,11 @@
 package org.fastquery.util;
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 
 import org.fastquery.bean.UserInfo;
 import org.junit.Test;
@@ -40,6 +45,67 @@ public class BeanUtilTest {
 		UserInfo userInfo3 = new UserInfo(35,"于与同",null);
 		String sql = BeanUtil.toInsertSQL(userInfo1,userInfo2,userInfo3);
 		System.out.println(sql);
+		
+		sql = BeanUtil.toInsertSQL(userInfo1);
+		assertThat(sql, equalTo("insert into UserInfo(id,name,age) values('33','想向公主','18')"));
+	}
+	
+	
+	@Test
+	public void toSelectSQL(){
+		UserInfo userInfo1 = new UserInfo(33,"想向公主",18);
+		//UserInfo userInfo2 = new UserInfo(34,"程家洛",20);
+
+		String str = BeanUtil.toSelectSQL(userInfo1, 36, "xk");
+		System.out.println(str);
 	}
 
+	@Test
+	public void testParseList(){
+		String[] strs = {"AA","BB","CC"};
+		Object vs = BeanUtil.parseList(strs);
+		assertThat(vs.toString(), equalTo("\"AA\",\"BB\",\"CC\""));
+		
+		List<String> strings = new ArrayList<>();
+		strings.add("aa");
+		strings.add("bb");
+		strings.add("cc");
+		vs = BeanUtil.parseList(strings);
+		assertThat(vs.toString(), equalTo("\"aa\",\"bb\",\"cc\""));
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testToUpdateSQL(){
+		UserInfo userInfo1 = new UserInfo(33,"想向公主",18);
+		Object[] updateInfo = BeanUtil.toUpdateSQL(userInfo1,"xk");
+		assertThat(updateInfo[0].toString(), equalTo("update `xk`.`UserInfo` set `name`=?, `age`=? where `id`=?"));
+		List<Object> args = (List<Object>) updateInfo[1];
+		assertThat(args.get(0).toString(), equalTo("想向公主"));
+		assertThat(args.get(1).toString(), equalTo("18"));
+		assertThat(args.get(2).toString(), equalTo("33"));
+		assertThat(updateInfo[2].toString(), equalTo("select * from `xk`.`UserInfo` where `id` = 33"));
+		
+		userInfo1 = new UserInfo(38,"向公主",23);
+		updateInfo = BeanUtil.toUpdateSQL(userInfo1,null);
+		assertThat(updateInfo[0].toString(), equalTo("update `UserInfo` set `name`=?, `age`=? where `id`=?"));
+		args = (List<Object>) updateInfo[1];
+		assertThat(args.get(0).toString(), equalTo("向公主"));
+		assertThat(args.get(1).toString(), equalTo("23"));
+		assertThat(args.get(2).toString(), equalTo("38"));
+		assertThat(updateInfo[2].toString(), equalTo("select * from `UserInfo` where `id` = 38"));
+	}
+	
+	@Test
+	public void testReset(){
+		UserInfo u2 = BeanUtil.newNullInstance(UserInfo.class); 
+		assertThat(u2.getId(),nullValue());
+		assertThat(u2.getName(),nullValue());
+		assertThat(u2.getAge(),nullValue());
+	}
 }
+
+
+
+

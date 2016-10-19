@@ -41,6 +41,7 @@ import org.apache.velocity.app.Velocity;
 import org.fastquery.core.Param;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.Resource;
+import org.fastquery.util.TypeUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -108,6 +109,11 @@ public class QueryPool {
 					String id = element.getAttribute("id");
 					String template = fuseValTpl(element, "value",true);
 					String countQuery = fuseValTpl(element, "countQuery",false);
+					
+					//  在存储template, 和 countQuery 之前 需要做数据库过滤
+					//  待续...
+					//  在存储template, 和 countQuery 之前 需要做数据库过滤 end
+					
 					// countQuery 单独存储起来 (className + "." + id)可以确保唯一值,
 					putCountQuery(className + "." + id,countQuery); // 该方法接受到null值后,会视而不见
 					LOG.debug(String.format("id=%s , template=%s", id,template));
@@ -262,7 +268,9 @@ public class QueryPool {
 	    // 转换输出
 		Velocity.evaluate(context, writer, className+'.'+id, tpl);
 		
-		return writer.toString().replaceAll("\\s+", " ").trim();
+		String str = writer.toString().replaceAll("\\s+", " ").trim();
+		
+		return TypeUtil.parWhere(str);
 	}
 
 	/**

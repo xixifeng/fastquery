@@ -22,12 +22,15 @@
 
 package org.fastquery.bean;
 
+import org.fastquery.core.Id;
+
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
 public class UserInfo {
 	
+	@Id
 	private Integer id;
 	private String name;
 	private Integer age;
@@ -40,6 +43,12 @@ public class UserInfo {
 		this.name = name;
 		this.age = age;
 	}
+	
+	public UserInfo(String name, Integer age) {
+		this.name = name;
+		this.age = age;
+	}
+		
 	
 	public Integer getId() {
 		return id;

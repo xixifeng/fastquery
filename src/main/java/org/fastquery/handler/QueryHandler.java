@@ -178,6 +178,9 @@ public class QueryHandler {
 		}
 
 		Object val = iterator.next().getValue();
+		if(val==null){
+			return null;
+		}
 		// Integer,Double,Long,Short,Byte,Character,Float,String
 		if (returnType == Integer.class) {
 			val = Integer.valueOf(val.toString());

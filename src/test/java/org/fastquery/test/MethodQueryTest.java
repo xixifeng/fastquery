@@ -61,18 +61,56 @@ public class MethodQueryTest {
 		
 		u.setId(id);
 		UserInfo u2 = studentDBService.save(u);
-		assertThat(u2, equalTo(u));
 		assertThat(u2.getId(), equalTo(u.getId()));
 		assertThat(u2.getName(), equalTo(u.getName()));
 		assertThat(u2.getAge(), equalTo(u.getAge()));
-		
-		
+	}
+	
+	@Test
+	public void testSave2(){
+		Integer id = null;
+		String name = "凤侯";
+		Integer age = 32;
+		UserInfo u = new UserInfo(id,name, age);
+		UserInfo u2 = studentDBService.save("xk-c3p0", "xk", u);
+		System.out.println("id:" + u2.getId());
+		assertThat(u2.getId(), notNullValue());
+		assertThat(u2.getName(), equalTo(u.getName()));
+		assertThat(u2.getAge(), equalTo(u.getAge()));
 	}
 	
 	@Test
 	public void executeBatch() {
 		// 参考: http://mxm910821.iteye.com/blog/1701822
 		studentDBService.executeBatch("update.sql", "sqlout.log");
+	}
+	
+	@Test
+	public void update3(){
+		String dataSourceName = "xk-c3p0"; 
+		String dbName = "xk";
+		UserInfo entity = new UserInfo(1,"好哇瓦",3);
+		UserInfo u = studentDBService.update(dataSourceName, dbName, entity);
+		assertThat(u.getId(), equalTo(1));
+		assertThat(u.getName(), equalTo("好哇瓦"));
+		assertThat(u.getAge(), equalTo(3));
+	}
+	
+	@Test
+	public void saveOrUpdate() {
+		UserInfo userInfo = new UserInfo(100,"小蜜蜂", 5);
+		UserInfo u1 = studentDBService.saveOrUpdate(userInfo);
+		Integer id1 = u1.getId();
+		assertThat(id1, notNullValue());
+		assertThat(u1.getName(), equalTo("小蜜蜂"));
+		assertThat(u1.getAge(), equalTo(5));
+		
+		UserInfo u2 = studentDBService.saveOrUpdate(u1);
+		Integer id2 = u2.getId();
+		assertThat(id2, equalTo(id1));
+		assertThat(u2.getName(), equalTo("小蜜蜂"));
+		assertThat(u2.getAge(), equalTo(5));
+		
 	}
 	
 }

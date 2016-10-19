@@ -29,12 +29,12 @@ package org.fastquery.core;
 public interface QueryRepository extends Repository {
 	
 	/**
-	 * 保存一个实体
+	 * 保存一个实体,这个实体必须有一个自增长的主键
 	 * @param entity
 	 * @return
 	 */
 	@Id(MethodId.QUERY0)
-	<S> S  save(S entity);
+	<E> E  save(E entity);
 	
 	/**
 	 * 往指定的数据源里保存一个实体
@@ -43,7 +43,7 @@ public interface QueryRepository extends Repository {
 	 * @return
 	 */
 	@Id(MethodId.QUERY0)
-	<S> S  save(S entity,@Source String dataSourceName);
+	<E> E  save(E entity,@Source String dataSourceName);
 	
 	/**
 	 * 往指定的数据源里保存一个实体,并且指定数据库名称
@@ -52,15 +52,39 @@ public interface QueryRepository extends Repository {
 	 * @param entity
 	 * @return
 	 */
+	@Id(MethodId.QUERY0)
+	<E> E  save(@Source String dataSourceName,String dbName,E entity);
+	
+	/**
+	 * 更新实体,实体需要包含主键值
+	 * @param entity
+	 * @return
+	 */
 	@Id(MethodId.QUERY1)
-	<S> S  save(@Source String dataSourceName,String dbName,S entity);
+	<E> E update(E entity);
+	@Id(MethodId.QUERY1)
+	<E> E update(@Source String dataSourceName,E entity);
+	@Id(MethodId.QUERY1)
+	<E> E update(@Source String dataSourceName,String dbName,E entity);
+	
+	/**
+	 * 保存或者更新实体,实体需要包含主键值否则报错 (如果不存在就存储,存在就更新)
+	 * @param entity
+	 * @return
+	 */
+	@Id(MethodId.QUERY2)
+	<E> E saveOrUpdate(E entity);
+	@Id(MethodId.QUERY2)
+	<E> E saveOrUpdate(@Source String dataSourceName,E entity);
+	@Id(MethodId.QUERY2)
+	<E> E saveOrUpdate(@Source String dataSourceName,String dbName,E entity);
 	
 	/**
 	 * 执行SQL文件
 	 * @param sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置
 	 * @param output 指定执行SQL后的输出将放在哪个文件里. 注意: 会在基准目录里寻找output
 	 */
-	@Id(MethodId.QUERY3)
+	@Id(MethodId.QUERY6)
 	void executeBatch(String sqlName,String output);
 	
 	/**
@@ -70,7 +94,7 @@ public interface QueryRepository extends Repository {
 	 * @param dataSourceName 数据源的名称
 	 * @return 执行所影响的行数
 	 */
-	@Id(MethodId.QUERY3)
+	@Id(MethodId.QUERY6)
 	void executeBatch(String sqlName,String output,@Source String dataSourceName);
 	
 }

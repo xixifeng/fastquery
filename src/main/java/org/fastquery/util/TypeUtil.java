@@ -343,9 +343,12 @@ public class TypeUtil implements Opcodes{
 				if(ann.annotationType() == Param.class) {
 					Param param = (Param) ann;
 					Object objx = args[i];
+					objx = BeanUtil.parseList(objx);
 					// '{' 是正则语法的关键字,必须转义
 					s = s.replaceAll("\\$\\{"+param.value()+"\\}", objx!=null?objx.toString():param.defaultVal());
-					s = s.replaceAll("\\:"+param.value(), "?"+(i+1));
+					// 将 ":xx" 格式的 替换成 "?num"
+					// 替换时必须加单词分界符(\\b),举例说明: sql中同时存在":ABCD",":A", 不加单词分界符,":A"替换成"?num"后,会使":ABCD"变成":?numBCD"
+					s = s.replaceAll("\\:"+param.value()+"\\b", "?"+(i+1)); 
 				}
 			}
 		}
@@ -640,6 +643,31 @@ public class TypeUtil implements Opcodes{
 		
 		return sb.toString().trim();
 	}
+	
+	/**
+	 * 如果在str中,"where"的下一个单词如果是"or"或者"and",那么就删除(忽略大小写)
+	 * @param str
+	 * @return
+	 */
+	public static String parWhere(String str) { // 不可能传递null进来
+		// 把where元素拿出来处理
+		List<String> list = matches(str,"(?i)(?<=<where>)(.|\\n)*(?=</where>)"); 
+		if(!list.isEmpty()){
+			String where = list.get(0);
+			where = where.trim().replaceFirst("(?i)^where\\b","");
+			// 如果第一个单词是"or"或者and,则去掉
+			where = where.trim().replaceFirst("(?i)^or\\b", "");
+			where = where.trim().replaceFirst("(?i)^and\\b", "");
+			where = where.trim();
+			if("".equals(where)){
+				return str.replaceAll("(?i)<where>(.|\\n)*</where>","");
+			} else {
+				return str.replaceAll("(?i)<where>(.|\\n)*</where>","where " + where);
+			}
+		}
+		return str;
+	}
+	
 	
 }
 

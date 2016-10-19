@@ -57,6 +57,7 @@ import org.fastquery.util.BeanUtil;
 import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
@@ -614,25 +615,68 @@ public class QueryProcess {
 		byte methodId = id.value();
 		
 		String sourceName;
+		Object bean;
+		DataSource dataSource;
+		String sql;
+		String dbName = null;
 		switch (methodId) {
 		case MethodId.QUERY0:
-			Object bean = iargs[0];
 			// 获取数据源
 			sourceName = TypeUtil.findSource(method.getParameters(), iargs);
-			DataSource dataSource = DataSourceManage.getDataSource(sourceName,packageName);
-			try(Connection conn = dataSource.getConnection();Statement stat = conn.createStatement()) {
-				conn.setAutoCommit(false);
-				stat.executeUpdate(BeanUtil.toInsertSQL(bean));
-				conn.commit();
-			} catch (Exception e) {
-				throw new RepositoryException(e);
+			dataSource = DataSourceManage.getDataSource(sourceName,packageName);
+			if(iargs.length == 3) {
+				bean = iargs[2];
+				sql = BeanUtil.toInsertSQL(iargs[1].toString(),bean);
+				String key = insert(dataSource, sql).toString();
+				sql = BeanUtil.toSelectSQL(bean, key, iargs[1].toString());
+				return select(dataSource, sql, bean);
+			} else {
+				bean = iargs[0];
+				sql = BeanUtil.toInsertSQL(bean);
+				String k = insert(dataSource,sql).toString();
+				sql = BeanUtil.toSelectSQL(bean, k, null);
+				return select(dataSource, sql, bean);
 			}
-			return bean;
+		
 		case MethodId.QUERY1:
-			return iargs[2];
+			sourceName = TypeUtil.findSource(method.getParameters(), iargs);
+			if (iargs.length == 1) {
+				bean = iargs[0];
+			} else if (iargs.length == 2) {
+				bean = iargs[1];
+			} else {
+				dbName = iargs[1].toString();
+				bean = iargs[2];
+			}
+			dataSource = DataSourceManage.getDataSource(sourceName, packageName);
+			sql = update(dataSource, bean, dbName);
+			return select(dataSource, sql, bean);
+			
 		case MethodId.QUERY2:
-			break;
+			sourceName = TypeUtil.findSource(method.getParameters(), iargs);
+			if (iargs.length == 1) {
+				bean = iargs[0];
+			} else if(iargs.length == 2) {
+				bean = iargs[1];
+			} else {
+				dbName = iargs[1].toString();
+				bean = iargs[2];
+			}
+			dataSource = DataSourceManage.getDataSource(sourceName, packageName);
+			sql = BeanUtil.toSelectSQL(bean, null, dbName);
+			if(exists(dataSource, sql, bean)) {
+				// 更新
+				update(dataSource, bean, dbName);
+			} else {
+				// 保存
+				insert(dataSource,(iargs.length==3) ? BeanUtil.toInsertSQL(iargs[1].toString(),bean) : BeanUtil.toInsertSQL(bean));
+			}
+			return select(dataSource, sql, bean);			
 		case MethodId.QUERY3:
+			
+			break;
+			
+		case MethodId.QUERY6:
 			// 获取数据源
 			sourceName = TypeUtil.findSource(method.getParameters(), iargs);
 			com.mchange.v2.c3p0.ComboPooledDataSource ds = (ComboPooledDataSource) DataSourceManage.getDataSource(sourceName,packageName);
@@ -796,5 +840,104 @@ public class QueryProcess {
 		sb.append(',');
 		sb.append(maxResults);
 		return sb.toString();
+	}
+	
+	// 插入数据返回主键值
+	private Object insert(DataSource dataSource,String sql){
+		Connection conn = null;
+		PreparedStatement stat = null;
+		ResultSet rs = null;
+		String key = null;
+		try {
+			conn = dataSource.getConnection();
+			conn.setAutoCommit(false);
+			stat = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			stat.executeUpdate();
+			rs = stat.getGeneratedKeys();
+			// 获取主键
+			if (rs.next()) {
+				key = rs.getString(1);
+			} else {
+				throw new RepositoryException("保存时没有找到主键");
+			}	
+			conn.commit();	
+		} catch (SQLException e) {
+			if(conn !=null ) {
+				try {
+					conn.rollback();
+				} catch (SQLException e1) {
+					throw new RepositoryException(e1);
+				}
+			}
+			throw new RepositoryException(e);
+		} finally {
+			close(rs, stat, conn);
+		}
+		return key;
+	}
+	
+	// 查询一条数据然后转换成一个实体
+	private Object select(DataSource dataSource,String sql,Object bean) {
+		Connection conn = null;
+		Statement stat = null;
+		ResultSet rs = null;
+		try {
+			conn = dataSource.getConnection();	
+			stat = conn.createStatement();
+			rs = stat.executeQuery(sql);
+			return JSON.toJavaObject(new JSONObject(rs2Map(rs).get(0)),bean.getClass());
+		} catch (SQLException e) {
+			throw new RepositoryException(e);
+		}finally {
+			close(rs, stat, conn);
+		}
+	}
+	private boolean exists(DataSource dataSource,String sql,Object bean) {
+		Connection conn = null;
+		Statement stat = null;
+		ResultSet rs = null;
+		try {
+			conn = dataSource.getConnection();	
+			stat = conn.createStatement();
+			rs = stat.executeQuery(sql);
+			return rs.next();
+		} catch (SQLException e) {
+			throw new RepositoryException(e);
+		}finally {
+			close(rs, stat, conn);
+		}
+	}
+	
+	// 更新一条数据,然后返回更新后的数据,返回根据主键查询的sql语句
+	private String update(DataSource dataSource,Object bean,String dbName) {
+		Connection conn = null;
+		PreparedStatement stat = null;
+		Object[] updateInfo = BeanUtil.toUpdateSQL(bean, dbName);
+		String sql = updateInfo[0].toString();
+		@SuppressWarnings("unchecked")
+		List<Object> args = (List<Object>) updateInfo[1];
+		int count = args.size();
+		try {
+			conn = dataSource.getConnection();
+			conn.setAutoCommit(false);
+			stat = conn.prepareStatement(sql);
+			for (int i = 1; i <= count; i++) {
+				stat.setObject(i, args.get(i-1));
+			}
+			stat.executeUpdate();
+			conn.commit();	
+		} catch (SQLException e) {
+			if(conn !=null ) {
+				try {
+					conn.rollback();
+				} catch (SQLException e1) {
+					throw new RepositoryException(e1);
+				}
+			}
+			throw new RepositoryException(e);
+		} finally {
+			close(null, stat, conn);
+		}
+		return updateInfo[2].toString();
 	}
 }

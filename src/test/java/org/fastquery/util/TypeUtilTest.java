@@ -420,7 +420,28 @@ public class TypeUtilTest implements Opcodes {
 		assertThat(sub, equalTo("b"));
 	}
 	
+	@Test
+	public void parWhere(){
+		String sql = "select * from Student <where>where and id = :id</where>";
+		String nq = TypeUtil.parWhere(sql);
+		assertThat(nq, equalTo("select * from Student where id = :id"));
+		
+		sql = "select * from Student <where>and id = :id</where>";
+		nq = TypeUtil.parWhere(sql);
+		assertThat(nq, equalTo("select * from Student where id = :id"));
+		
+		sql = "select * from Student <where>  	\n</where>";
+		nq = TypeUtil.parWhere(sql);
+		assertThat(nq, equalTo("select * from Student "));
+		
+		
+	}
 	
+	@Test
+	public void test2(){
+		String str = "\t\nabc\n\t";
+		assertThat(str.trim(), equalTo("abc"));
+	}
 }
 
 

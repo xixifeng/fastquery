@@ -37,18 +37,19 @@
 		<!-- 查询主体语句 -->
 		<!-- #{#limit} 内置零件,表示分页区间,#{#limit}可以放在SQL语句中的任何地方,前提是:必须符合SQL语法. #{#limit}默认在尾部. -->
 		<value>
-			select no, name, sex from Student where 1 #{#condition} #{#order}
+			select no, name, sex from Student #{#condition} #{#order}
 		</value>
 
 		<!-- 求和语句 -->
 		<countQuery>
-			select count(no) from Student where 1 #{#condition}
+			select count(no) from Student #{#condition}
 		</countQuery>
 
 		<!-- 定义零件集,他们可以被value,countQuery节点引用,以达到复用的效果 -->
 		<parts>
 			<part name="condition"> <!-- 内容可能包含小于号或者大于号,用CDATA就不用转义了 -->
 			  <![CDATA[
+			  <where>
 				#if($no)
 				or no like :no
 				#end
@@ -60,6 +61,7 @@
 				#if($age)
 				or age > :age
 				#end
+			</where>
 			 ]]>
 			</part>
 

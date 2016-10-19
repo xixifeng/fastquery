@@ -274,6 +274,46 @@ Primarykey saveUserInfo(String name,Integer age);
 
 ```
 
+## QueryRepository的内置方法
+凡是继承`QueryRepository`的接口,都可以使用它的方法,并且不用写实现类.   
+- `&lt;E&gt; E save(E entity);` 保存一个实体,返回保存成功之后的实体(返回的实体包含有主键)
+- `&lt;E&lt; E update(E entity);` 更新一个实体,返回更新成功之后的实体.注意:实体的成员变量如果是null,将不会参与改运算
+- `&lt;E&lt; E saveOrUpdate(E entity);` 不存在就保存,反之更新(前提条件:这个实体必须包含有主键值).
+
+举例说明:  
+先准备一个实体  
+
+```java
+public class UserInfo {
+	@Id
+	private Integer id;
+	private String name;
+	private Integer age;
+    // getter /setter 省略...	
+}
+```
+
+保存实体,更新实体,保存或更新实体示例如下:  
+``` java
+	UserInfo u1 = new UserInfo(36,"Jsxxv", 23);
+	
+	// save entity
+	studentDBService.save(u1)
+	
+	Integer id = 36;
+	String name = "Jsxxv";
+	Integer age = null;
+	UserInfo u2 = new UserInfo(id,name,age);
+	// age是null值, age就不会参与修改运算了.
+	studentDBService.update(u2); // 更新语句为: update UserInfo set name = ? where id = ?
+	
+	// save or update entity
+	studentDBService.saveOrUpdate(u1);
+```
+
+更多内置方法,请参阅fastquery javadoc.  
+
+
 ## @Transactional
 
 ```java
@@ -721,7 +761,6 @@ UserInformation findUserInfoById(Integer id);
 
 - https://git.oschina.net/xixifeng.com/fastquery
 - https://github.com/xixifeng/fastquery
-- https://code.aliyun.com/xixifeng/fastquery
 
 ## 开发环境
 仅仅是建议,并不局限于此         
