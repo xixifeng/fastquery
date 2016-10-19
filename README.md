@@ -276,9 +276,9 @@ Primarykey saveUserInfo(String name,Integer age);
 
 ## QueryRepository的内置方法
 凡是继承`QueryRepository`的接口,都可以使用它的方法,并且不用写实现类.   
-- `&lt;E&gt; E save(E entity);` 保存一个实体,返回保存成功之后的实体(返回的实体包含有主键)
-- `&lt;E&lt; E update(E entity);` 更新一个实体,返回更新成功之后的实体.注意:实体的成员变量如果是null,将不会参与改运算
-- `&lt;E&lt; E saveOrUpdate(E entity);` 不存在就保存,反之更新(前提条件:这个实体必须包含有主键值).
+- `<E> E save(E entity);` 保存一个实体,返回保存成功之后的实体(返回的实体包含有主键)
+- `<E> E update(E entity);` 更新一个实体,返回更新成功之后的实体.注意:实体的成员变量如果是null,将不会参与改运算
+- `<E> E saveOrUpdate(E entity);` 不存在就保存,反之更新(前提条件:这个实体必须包含有主键值).
 
 举例说明:  
 先准备一个实体  
