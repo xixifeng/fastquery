@@ -109,8 +109,7 @@ jdk1.8+
   "basedir" : "/root/git/fastquery/fastquery/tmp/"
 }
 ```
-**注意**: 在fastquery.json中配置作用域,其中"dataSourceName"不是必须的,"dataSourceName"要么不指定,要指定的话那么必须正确.      
-如果没有指定"dataSourceName",那么在调用接口的时候必须指定数据源的名称.下面的适配数据源章节会讲到.
+**注意**: 在fastquery.json中配置作用域,其中"dataSourceName"不是必须的,"dataSourceName"要么不指定,要指定的话那么必须正确.如果没有指定"dataSourceName",那么在调用接口的时候必须指定数据源的名称.下面的适配数据源章节会讲到.
 
 ## 一个完整的入门例子
 - 准备一个实体
@@ -211,10 +210,10 @@ Student[] findAllStudent(... args ...);
 
 **注意**:  
 - 如果参数是`String`类型,值若为`null`或""(空字符串),在默认情况下,都会使条件移除
-- ignoreNull=false : 参数值即便为null,条件也参与
-- ignoreEmpty=false : 参数值即使为"",条件也保留
+- `ignoreNull=false` : 参数值即便为null,条件也参与
+- `ignoreEmpty=false` : 参数值即使为"",条件也保留
 
-当然,实现动态`SQL`,`FastQuery`还提供了另一种方案:采用`@QueryByNamed`(命名式查询),将SQL写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活.下面章节有详细描述.
+当然,实现动态`SQL`,`FastQuery`还提供了另一种方案:采用`@QueryByNamed`(命名式查询),将`SQL`写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活.下面章节有详细描述.
 
 ## count
 
@@ -377,7 +376,7 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 ```
 
 ## @QueryByNamed命名式查询
-就是把SQL语句写在配置文件里(在配置文件中可以进行逻辑判断),然后用@QueryByNamed绑定配置文件中的id值,以便引用到解析后的SQL.       
+就是把`SQL`语句写在配置文件里(在配置文件中可以进行逻辑判断),然后用`@QueryByNamed`绑定配置文件中的id值,以便引用到解析后的`SQL`.       
 配置文件的命名格式: `类的长名称(包含包地址).queries.xml`,每个类文件对应一个配置文件,请放到`classpath`目录下.  
 配置文件里的SQL代码段,会被**Velocity**的模板引擎所渲染,因此,很方便写出复杂的动态SQL语句.    
 例如: `org.fastquery.dao.QueryByNamedDBExample.queries.xml`  
@@ -421,6 +420,7 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 
 假如您在 XML 文档中放置了类似 "<" 或 "&" 字符,那么这个文档会产生一个错误,这是因为 XML 解析器会把它解释为新元素的开始.为了避免此类错误.可以将SQL代码片段定义为CDATA.CDATA中的所有内容都会被 XML 解析器忽略.CDATA 部分由 "<![CDATA[" 开始,由 "]]>" 结束.   
 若不用CDATA,那么有些字符必须采用**命名实体**的方式引入. 在 XML 中有 5 个预定义的实体引用:
+
 | 字符 | 命名实体 | 说明 |
 | -----|:----:| ----:|
 |  <   | &lt;  | 小于 |
@@ -496,7 +496,7 @@ try {
 			or age > :age
 			#end
 	        </where>
-	         ]]>
+	        ]]>
 		</part>
 
 		<part name="order">
