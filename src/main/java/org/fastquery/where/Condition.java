@@ -40,15 +40,24 @@ public @interface Condition {
 	String value();
 	
 	/**
-	 * ignoreNull 为true: 表示该条件中的参数变量如果接受到的值是null,那么该行条件将不参与运算,反之,参与运算.
+	 * 默认:允许传递所有的值,都不会使当前条件忽略. <br>
+	 * 当前条件所包含的变量值跟allow所指定的正则表达式逐个进行匹配,如果其中一个能匹配上就追加这个条件. <br>
+	 * 注意: 先 allow(允许) 后 ignore(忽略)
+	 */
+	String[] allow() default {};
+	
+	/**
+	 * 当前条件所包含的变量值跟ignore所指定的正则表达式逐个进行匹配,如果其中一个能匹配上就忽略该条件
+	 */
+	String[] ignore() default {};
+	
+	/**
+	 * ignoreNull 为true: 表示该条件中的参数变量如果接受到的值是null,那么该行条件将不参与运算,反之,参与运算(默认:true).
 	 */
 	boolean ignoreNull() default true;
 	
 	/**
-	 * 指定哪些参数将参与决定是否忽略当前条件 <br>
-	 * 
-	 * 如: judge = {"?1","?2"},那么当 ?1(第一个参数) 或 ?2(第二个参数) 传递null时,当前条件将会被忽略.
-	 * 
+	 * ignoreEmpty 为true: 表示该条件中的参数变量如果接受到的值是""(空字符串),那么该行条件将不参与运算,反之,参与运算(默认:true).
 	 */
-	String[] judges() default {};
+	boolean ignoreEmpty() default true;
 }

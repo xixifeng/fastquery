@@ -188,7 +188,7 @@ public interface StudentDBService extends QueryRepository {
 	@Condition("no like ?1") // ?1的值,如果是null, 该行条件将不参与运算
 	@Condition("and name like ?2") // 参数 ?2,如果接收到的值为null,该条件不参与运算
 	//通过 ignoreNull=false 开启条件值即使是null也参与运算
-	@Condition(value = "and age > ?3",ignoreNull=false) // ?3接收到的值若为null,该条件也参与运算.
+	@Condition(value = "and age > ?3") // ?3接收到的值若为null,该条件也参与运算.
 	@Condition("or dept in(?4,?5,?6)")
 	@Condition("and name not like ?7")
 	@Condition("or age between ?8 and ?9")

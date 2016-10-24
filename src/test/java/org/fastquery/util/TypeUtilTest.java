@@ -418,6 +418,13 @@ public class TypeUtilTest implements Opcodes {
 		
 		sub = TypeUtil.removePart(" a     b");
 		assertThat(sub, equalTo("b"));
+		
+		// 注意: 如下a与b之间的空白是键入Tab键产生的
+		sub = TypeUtil.removePart(" a		b");
+		assertThat(sub, equalTo("b"));
+		
+		sub = TypeUtil.removePart(" a\t\b\nb");
+		assertThat(sub, equalTo("b"));
 	}
 	
 	@Test
@@ -434,6 +441,20 @@ public class TypeUtilTest implements Opcodes {
 		nq = TypeUtil.parWhere(sql);
 		assertThat(nq, equalTo("select * from Student "));
 		
+		
+	}
+	
+	@Test
+	public void getFirstWord(){
+		
+		assertThat(TypeUtil.getFirstWord(null), nullValue());
+		assertThat(TypeUtil.getFirstWord(""), is(""));
+		
+		String str = "3/3 source files have been analyzed";
+		assertThat(TypeUtil.getFirstWord(str), is("3/3"));
+		
+		str = "   			files have been analyzed";
+		assertThat(TypeUtil.getFirstWord(str), is("files"));
 		
 	}
 	

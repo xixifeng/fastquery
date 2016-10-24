@@ -28,6 +28,7 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.fastquery.core.Param;
 import org.junit.Test;
@@ -69,5 +70,10 @@ public class SyntaxTest {
 	
 	
 	public void todo(@Param("abc") String sx,@Param("efg") String efg,int s){
+	}
+	
+	@Test
+	public void testReg(){
+		System.out.println(Pattern.matches("", ""));
 	}
 }

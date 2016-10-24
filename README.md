@@ -45,25 +45,11 @@ jdk1.8+
 ```
 
 ### c3p0-config.xml
-支持c3p0配置,详情配置请参照c3p0官网的说明.
+完全支持c3p0官方配置,详情配置请参照c3p0官网的说明.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <c3p0-config>  
-    <!--
-    <default-config>  
-        <property name="driverClass">com.mysql.jdbc.Driver</property>  
-        <property name="jdbcUrl">jdbc:mysql://...</property>
-        <property name="user">root</property>  
-        <property name="password">123***</property>  
-        <property name="initialPoolSize">10</property>  
-        <property name="maxIdleTime">30</property>  
-        <property name="maxPoolSize">20</property>  
-        <property name="minPoolSize">5</property>  
-        <property name="maxStatements">200</property>  
-    </default-config> 
-    -->  
-     
     <named-config name="xk-c3p0">  
         <property name="driverClass">com.mysql.jdbc.Driver</property>  
         <property name="jdbcUrl">jdbc:mysql://192.168.1.1:3306/xk</property>  
@@ -119,6 +105,7 @@ jdk1.8+
 		     }
 		  ],
   // 基准目录,注意: 后面记得加上 "/"
+  // 该目录用来放SQL文件,需要执行SQL文件时,指定其名称就够了
   "basedir" : "/root/git/fastquery/fastquery/tmp/"
 }
 ```
@@ -207,19 +194,27 @@ List<Map<String, Object>> find(String sex);
 
 ## 动态条件查询
 
-### 采用`Annotation`实现简单动态条件
+### 采用`Annotation`实现简单动态条件  
+看到这里,可别认为`SQL`只能写在类上.所有的`SQL`还可以写入到配置文件里.  
+
 ```java
 @Query("select no, name, sex from Student #{#where} order by age desc")
 // 增加若干个条件
 @Condition("no like ?1")                            // ?1的值,如果是null, 该行条件将不参与运算
 @Condition("and name like ?2")                      // 参数 ?2,如果接收到的值为null,该条件不参与运算
 // 通过 ignoreNull=false 开启条件值即使是null也参与运算
-@Condition(value = "and age > ?3",ignoreNull=false) // 下行?3接收到的值若为null,该条件也参与运算.
-@Condition("or dept in(?4,?5,?6)")                  // 第4个或第5个或第6个参数,传递null值,该行条件将不参与运算     
-@Condition("and name not like ?7") 
-@Condition("or age between ?8 and ?9")
+@Condition(value = "and age > ?3",ignoreNull=false) // ?3接收到的值若为null,该条件将保留
+@Condition("and name not like ?4") 
+@Condition("or age between ?5 and ?6")
 Student[] findAllStudent(... args ...);
 ```
+
+**注意**:  
+- 如果参数是`String`类型,值若为`null`或""(空字符串),在默认情况下,都会使条件移除
+- ignoreNull=false : 参数值即便为null,条件也参与
+- ignoreEmpty=false : 参数值即使为"",条件也保留
+
+当然,实现动态`SQL`,`FastQuery`还提供了另一种方案:采用`@QueryByNamed`(命名式查询),将SQL写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活.下面章节有详细描述.
 
 ## count
 
@@ -382,8 +377,8 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 ```
 
 ## @QueryByNamed命名式查询
-就是把SQL语句写在配置文件里,然后用`@QueryByNamed`绑定配置文件中的id值,以便引用到SQL.    
-配置文件的命名格式: `类的长名称(包含包地址).queries.xml`,每个类文件对应一个配置文件.  
+就是把SQL语句写在配置文件里(在配置文件中可以进行逻辑判断),然后用@QueryByNamed绑定配置文件中的id值,以便引用到解析后的SQL.       
+配置文件的命名格式: `类的长名称(包含包地址).queries.xml`,每个类文件对应一个配置文件,请放到`classpath`目录下.  
 配置文件里的SQL代码段,会被**Velocity**的模板引擎所渲染,因此,很方便写出复杂的动态SQL语句.    
 例如: `org.fastquery.dao.QueryByNamedDBExample.queries.xml`  
 
@@ -409,6 +404,7 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 
 		<parts>
 			<part name="condition">
+			   <![CDATA[
 				#if(${name})
 				and name = :name
 				#end
@@ -416,13 +412,24 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 				#if(${age})
 				and age = :age
 				#end
+			    ]]>
 			</part>
 		</parts>
 	</query>
 </queries>
 ```
 
-如果想把一些公用的SQL代码片段提取出来,以便重复使用,通过定义`<parts>`元素(零件集)可以达到效果. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件. 
+假如您在 XML 文档中放置了类似 "<" 或 "&" 字符,那么这个文档会产生一个错误,这是因为 XML 解析器会把它解释为新元素的开始.为了避免此类错误.可以将SQL代码片段定义为CDATA.CDATA中的所有内容都会被 XML 解析器忽略.CDATA 部分由 "<![CDATA[" 开始,由 "]]>" 结束.   
+若不用CDATA,那么有些字符必须采用**命名实体**的方式引入. 在 XML 中有 5 个预定义的实体引用:
+| 字符 | 命名实体 | 说明 |
+| -----|:----:| ----:|
+|  <   | &lt;  | 小于 |
+|  >   | &gt;  | 大于 |
+|  &   | &amp; | 和号 |
+|  '   | &apos;| 省略号|
+|  "   | &quot;| 引号 |
+
+如果想把一些公用的SQL代码片段提取出来,以便重用,通过定义`<parts>`元素(零件集)就可以做到. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件. 
 
 ```java
 public interface QueryByNamedDBExample extends QueryRepository {
@@ -464,19 +471,21 @@ try {
 <query id="findPage">
 	<!-- 查询主体语句 -->
 	<value>
-		select no, name, sex from Student where 1 #{#condition} #{#order}
+		select no, name, sex from Student #{#condition} #{#order}
 	</value>
 
 	<!-- 求和语句 -->
 	<countQuery>
-		select count(no) from Student where 1 #{#condition}
+		select count(no) from Student #{#condition}
 	</countQuery>
 
 	<!-- 定义零件集,他们可以被value,countQuery节点引用,以达到复用的效果 -->
 	<parts>
 		<part name="condition">
+	       <![CDATA[
+		    <where>
 			#if($no)
-			or no like :no
+			no like :no
 			#end
 
 			#if($name)
@@ -486,6 +495,8 @@ try {
 			#if($age)
 			or age > :age
 			#end
+	        </where>
+	         ]]>
 		</part>
 
 		<part name="order">
@@ -495,7 +506,11 @@ try {
 </query>
 ```
 
-**注意:** `#{#limit}`是分页模板的内置零件,表示分页区间,`#{#limit}`可以放在SQL语句中的任何地方,不过,前提是:必须符合SQL语法. `#{#limit}`可以不用指定,默认在尾部.  
+### 注意: 
+- `{#limit}`是分页模板的内置零件,表示分页区间. `#{#limit}`默认是放在尾部,在符合`SQL`语法的前提下也可以把它放在`SQL`语句中的其他地方
+- 动态条件部分若用`<where>`元素进行包裹,会自动处理好条件连接符问题(避免出现where紧接`or`或`and`)
+- `<value>`和`<countQuery>`节点引用的零件中已经包含有`<where>`元素,那么该节点中禁止出现where字符串
+
 DB接口:
 
 ```java
@@ -536,7 +551,7 @@ public interface UserInfoDBService extends QueryRepository {
 例如:
 
 ```java
-@NotCount // 分页不统计总行数. 上百万的数据里求和会让人感觉慢
+@NotCount // 分页不统计总行数
 @Query(value = "select id,name,age from `userinfo`")
 Page<Map<String,Object>> findSome(Integer age, Integer id,@PageIndex int pageIndex, @PageSize int pageSize);
 ```
@@ -604,7 +619,7 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 ### 注意:
 - 如果在分页函数上标识`@NotCount`,表示在分页中不统计总行数.那么分页对象中的`totalElements`的值为-1L,`totalPages`为-1.其他属性都有效并且真实.    
 - 如果明确指定不统计行数,那么设置`countField`和`countQuery`就会变得无意义.    
-- 通常分页的 **区间控制** 默认是放在`SQL`语句的末尾. 在符合`SQL`语法的前提下,通过`#{#limit}`可以把分页区间放在`SQL`里的任何地方.
+- `#{#limit}`不仅能使用在 XML 文件里,也可以使用在`@Query`里,无特殊要求,建议不要指定`#{#limit}`.
 
 ## 执行SQL文件
 ```java
@@ -637,7 +652,7 @@ FQuery.createDataSource(dataSourceName, properties);
 
 ### 适配数据源
 使用`@Source`动态适配当前`Repository`的方法应该采用哪个数据源. 显然这个功能很有用.      
-在多租户系统中,数据库彼此隔离,数据库结构一样.那么使用这个特性是非常方便的.    
+在多租户系统中,数据库彼此隔离,表结构一样.那么使用这个特性是非常方便的.    
 **注意:** `@Source`如果标识在参数前面,那么该参数只能是字符串类型.
 
 ```java
@@ -646,9 +661,10 @@ Map<String, Object> findOne(Integer age,@Source String dataSourceName);
 ```
 
 ### 适配数据源的优先级
-如果在fastquery.json中明确指定了数据源的作用域,同时接口函数也存在`@Source`,那么`@Source`指定的优先,其次是配置文件.
+如果在fastquery.json文件里明确指定了数据源的作用域,同时接口函数也存在`@Source`,那么以`@Source`指定的数据源优先,其次是配置文件.
 
 ## @Before拦截器
+在执行方法之前拦截  
 - 准备一个BeforeFilter
 
 ```java
@@ -665,7 +681,7 @@ Map<String, Object> findOne(Integer age,@Source String dataSourceName);
  		// args: 当前传递进来的参数值,args[N]表示第N个参数,从第0开始计数.
  		
  		// this.abortWith(returnVal); // 中断拦截器,并指定返回值
- 		// 中断后立马返回,当前方法后面的所有Filter将不会执行
+ 		// 中断后立马返回,针对当前方法后面的所有Filter将不会执行
 		
  	}
  }
@@ -684,6 +700,7 @@ public interface StudentDBService extends QueryRepository {
 ```
 
 ## @After拦截器
+在执行方法之后,即将返回执行结果之前拦截  
 ```java
 /**
  * @author xixifeng (fastquery@126.com)
@@ -732,7 +749,7 @@ public class MyBeforeFilter3 extends BeforeFilter<DataAcquireDbService> {
 举例:
 
 ```java
-@SkipFilter
+@SkipFilter // 标识该方法将不受“自定义Filter”的约束
 @Query("select no from `course` limit 1")
 String findOneCourse();
 ```
@@ -777,7 +794,7 @@ build: maven
 
 ## 反馈问题
 https://git.oschina.net/xixifeng.com/fastquery/issues  
-地球人都知道，开源中国秉承自由、开放、分享的精神，本项目每次升级之后，代码和文档手册都会在第一时间完全开源，以供大家查阅、批评、指正。笔者技术水平有限，bug或不周之处在所难免，所以，遇到有问题或更好的建议时，还请大家通过码云[issue](https://git.oschina.net/xixifeng.com/fastquery/issues)来向我们反馈。  
+地球人都知道,开源中国秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过码云[issue](https://git.oschina.net/xixifeng.com/fastquery/issues)来向我们反馈.  
 
 ## 联系作者
 @习习风 fastquery#126.com  
