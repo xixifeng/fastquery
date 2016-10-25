@@ -233,22 +233,20 @@ boolean exists(String no);
 
 ## 改操作
 ```java
+// 返回修改之后所影响的行数
 @Query("update student s set s.age=?3,s.name=?2 where  s.no=?1")
 @Modifying
-int update(String no,String name,int age); // 返回修改之后所影响的行数
+int update(String no,String name,int age); 
 
+// 改成功了返回true,反之,false
 @Modifying
-@Query("DELETE FROM `userinfo` WHERE id=?1")
+@Query("delete from `userinfo` where id=?1")
 boolean deleteUserinfoById(int id);
-	
-@Query("update student s set s.age=?2 where  s.no=?1")
-@Modifying
-int update(String no,int age);
 
 // 以实体bean格式,返回当前保存的数据
 @Query("insert into student (no, name, sex, age, dept) values (?1, ?2, ?3, ?4, ?5)")
 @Modifying(table="student",id="no")
-// 注意: student的主键是字符串不会自增长,在此处需要用@Id标识
+// 注意: // 注意: student的主键是字符串,因此不会自增长,在此处需要用@Id标识哪个就是主键字段
 Student addStudent(@Id String no,String name,String sex,int age,String dept);
 	
 // 以Map格式,返回当前保存的数据
@@ -261,7 +259,7 @@ Map<String, Object> addUserInfo(String name,Integer age);
 @Query("insert into #{#table} (name,age) values (?1, ?2)")
 JSONObject saveUserInfo2(String name,Integer age);
 
-// 返回当前保存的数据的主键信息.
+// 返回当前保存的数据的主键信息
 @Modifying(id="id",table="userinfo")
 @Query("insert into #{#table} (name,age) values (?1, ?2)")
 Primarykey saveUserInfo(String name,Integer age);
@@ -291,7 +289,7 @@ public class UserInfo {
 ``` java
 	UserInfo u1 = new UserInfo(36,"Jsxxv", 23);
 	
-	// save entity
+	// 保存实体
 	studentDBService.save(u1)
 	
 	Integer id = 36;
@@ -301,7 +299,7 @@ public class UserInfo {
 	// age是null值, age就不会参与修改运算了.
 	studentDBService.update(u2); // 更新语句为: update UserInfo set name = ? where id = ?
 	
-	// save or update entity
+	// 保存或更新实体
 	studentDBService.saveOrUpdate(u1);
 ```
 
@@ -418,16 +416,16 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 </queries>
 ```
 
-假如您在 XML 文档中放置了类似 "<" 或 "&" 字符,那么这个文档会产生一个错误,这是因为 XML 解析器会把它解释为新元素的开始.为了避免此类错误.可以将SQL代码片段定义为CDATA.CDATA中的所有内容都会被 XML 解析器忽略.CDATA 部分由 "<![CDATA[" 开始,由 "]]>" 结束.   
+假如您在 XML 文档中放置了类似 "<" 或 "&" 字符,那么这个文档会产生一个错误,这是因为 XML 解析器会把它解释为新元素的开始.为了避免此类错误.可以将SQL代码片段定义为CDATA.CDATA中的所有内容都会被 XML 解析器忽略.CDATA 部分由`<![CDATA[` 开始,由 `]]>`结束.   
 若不用CDATA,那么有些字符必须采用**命名实体**的方式引入. 在 XML 中有 5 个预定义的实体引用:
 
 | 字符 | 命名实体 | 说明 |
-| -----|:----:| ----:|
-|  <   | &lt;  | 小于 |
-|  >   | &gt;  | 大于 |
-|  &   | &amp; | 和号 |
-|  '   | &apos;| 省略号|
-|  "   | &quot;| 引号 |
+|:-----:|:----:|:----:|
+|  <   | &amp;lt;  | 小于 |
+|  >   | &amp;gt;  | 大于 |
+|  &   | &amp;amp; | 和号 |
+|  '   | &amp;apos;| 省略号|
+|  "   | &amp;quot;| 引号 |
 
 如果想把一些公用的SQL代码片段提取出来,以便重用,通过定义`<parts>`元素(零件集)就可以做到. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件. 
 
@@ -563,8 +561,9 @@ Page<Map<String,Object>> findSome(Integer age, Integer id,@PageIndex int pageInd
 ```java
 int p = 1;    // 指定访问的是第几页
 int size = 3; // 设定每一页最多显示几条记录
+Integer age=10,id = 50;
 Pageable pageable = new PageableImpl(p, size);
-Page<UserInfo> page  = userInfoDBService.findSome(10, 50,pageable);
+Page<UserInfo> page  = userInfoDBService.findSome(age, id,pageable);
 List<UserInfo> userInfos = page.getContent(); // 获取这页的数据
 Slice slice = page.getNextPageable();         // 下一页
 int number = page.getNumber();                // 当前页数(当前是第几页)
@@ -612,7 +611,7 @@ int number = page.getNumber();                // 当前页数(当前是第几页
     },
     "size": 15,              	// 每页行数
     "totalElements": 188,    	// 总行数
-    "totalPages": 13         	// 总页数(指明一共有多少页)
+    "totalPages": 13         	// 总页数
 }
 ```
 

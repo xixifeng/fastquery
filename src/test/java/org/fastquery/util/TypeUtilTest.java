@@ -459,6 +459,15 @@ public class TypeUtilTest implements Opcodes {
 	}
 	
 	@Test
+	public void matches(){
+		String where = "name=:name and age = :age or sex = :sex";
+		List<String> strs = TypeUtil.matches(where, ":\\S+\\b");
+		for (String str : strs) {
+			System.out.println(str);
+		}
+	}
+	
+	@Test
 	public void test2(){
 		String str = "\t\nabc\n\t";
 		assertThat(str.trim(), equalTo("abc"));

@@ -75,5 +75,7 @@ public class SyntaxTest {
 	@Test
 	public void testReg(){
 		System.out.println(Pattern.matches("", ""));
+		// s.replaceAll("\\:"+param.value()+"\\b", "?"+(i+1)); 
+		assertThat("abckdwgew:name&".replaceAll("\\:name\\b", "?"), equalTo("abckdwgew?&"));
 	}
 }

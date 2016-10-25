@@ -63,9 +63,30 @@ public interface QueryRepository extends Repository {
 	@Id(MethodId.QUERY1)
 	<E> E update(E entity);
 	@Id(MethodId.QUERY1)
+	/**
+	 * 根据主键更新实体
+	 * @param dataSourceName
+	 * @param entity
+	 * @return
+	 */
 	<E> E update(@Source String dataSourceName,E entity);
 	@Id(MethodId.QUERY1)
+	/**
+	 * 根据主键更新实体
+	 * @param dataSourceName
+	 * @param dbName
+	 * @param entity
+	 * @return
+	 */
 	<E> E update(@Source String dataSourceName,String dbName,E entity);
+	
+	
+	@Id(MethodId.QUERY3)
+	int update(Object entity,String where);
+	@Id(MethodId.QUERY3)
+	int update(@Source String dataSourceName,Object entity,String where);
+	@Id(MethodId.QUERY3)
+	int update(@Source String dataSourceName,String dbName,Object entity,String where);
 	
 	/**
 	 * 保存或者更新实体,实体需要包含主键值否则报错 (如果不存在就存储,存在就更新)

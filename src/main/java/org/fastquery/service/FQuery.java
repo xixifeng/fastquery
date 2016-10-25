@@ -27,6 +27,7 @@ import java.util.Properties;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dsm.FQueryProperties;
+import org.fastquery.util.BeanUtil;
 
 /**
  * 
@@ -60,5 +61,15 @@ public class FQuery {
 	 */
 	public static void createDataSource(String dataSourceName,Properties properties) {
 		FQueryProperties.createDataSource(dataSourceName, properties);
+	}
+	
+	/**
+	 * 创建一个bean实例,成员变量的值全部都为null <br>
+	 * 注意:这个bean的成员变量必须都是包装类型
+	 * @param beanClass
+	 * @return
+	 */
+	public static <S> S reset(Class<S> beanClass){
+		return BeanUtil.newBeanVarNull(beanClass);
 	}
 }

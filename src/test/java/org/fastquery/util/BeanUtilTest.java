@@ -29,6 +29,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
+import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.junit.Test;
 
@@ -97,9 +98,48 @@ public class BeanUtilTest {
 		assertThat(updateInfo[2].toString(), equalTo("select * from `UserInfo` where `id` = 38"));
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testToUpdateSQL2(){
+		Integer id = 33;
+		String name = "想向公主";
+		Integer age = 18;
+		UserInfo userInfo1 = new UserInfo(id, name, age);
+		Object[] updateInfo  = BeanUtil.toUpdateSQL(userInfo1,"xk", "name = :name");
+		assertThat(updateInfo[0].toString(), equalTo("update `xk`.`UserInfo` set `id`=?, `age`=? where name = ?"));
+		List<Object> args = (List<Object>) updateInfo[1];
+		assertThat(args.size(), is(3));
+		assertThat(args.get(0), equalTo(id));
+		assertThat(args.get(1), equalTo(age));
+		assertThat(args.get(2), equalTo(name));
+		
+		
+		id = 33;
+		name = "想向公主";
+		age = 18;
+		userInfo1 = new UserInfo(id, name, age);
+		updateInfo  = BeanUtil.toUpdateSQL(userInfo1,null, "name = :name");
+		assertThat(updateInfo[0].toString(), equalTo("update `UserInfo` set `id`=?, `age`=? where name = ?"));
+		args = (List<Object>) updateInfo[1];
+		assertThat(args.size(), is(3));
+		assertThat(args.get(0), equalTo(id));
+		assertThat(args.get(1), equalTo(age));
+		assertThat(args.get(2), equalTo(name));
+		
+		
+		// 根据姓名修改姓名
+		Student student = new Student("113", "zhangsan", "男", 18, "计算机");
+		student.setDept(null);
+		updateInfo  = BeanUtil.toUpdateSQL(student,null,"name = '张三'");
+		assertThat(updateInfo[0].toString(), equalTo("update `Student` set `no`=?, `name`=?, `sex`=?, `age`=? where name = '张三'"));
+		
+		
+	}
+	
+	
 	@Test
 	public void testReset(){
-		UserInfo u2 = BeanUtil.newNullInstance(UserInfo.class); 
+		UserInfo u2 = BeanUtil.newBeanVarNull(UserInfo.class); 
 		assertThat(u2.getId(),nullValue());
 		assertThat(u2.getName(),nullValue());
 		assertThat(u2.getAge(),nullValue());

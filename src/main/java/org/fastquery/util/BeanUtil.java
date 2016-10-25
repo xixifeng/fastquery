@@ -244,6 +244,68 @@ public final class BeanUtil {
 		return updateinfo;
 		
 	}
+	
+	/**
+	 * [0]: 更新语句 [1]:参数值集合类型:List<Object> 
+	 * @param bean
+	 * @param dbName
+	 * @return
+	 */
+	public static Object[] toUpdateSQL(Object bean,String dbName,String where) {
+		List<String> wps = TypeUtil.matches(where, ":\\S+\\b");
+		Object[] updateinfo = new Object[2];
+		List<Object> args = new ArrayList<>();
+		Class<?> cls = bean.getClass();
+		// 表名称
+		String tableName = cls.getSimpleName();
+		if(dbName != null) {
+			tableName = new StringBuilder().append('`').append(dbName).append("`.`").append(tableName).append('`').toString();
+		} else {
+			tableName = '`' + tableName + '`';
+		}
+		
+		// update UserInfo set name=?,age=? where id=?4
+		StringBuilder sb = new StringBuilder("update ");
+		sb.append(tableName);
+		sb.append(" set");
+		try {
+			Field[] fields = cls.getDeclaredFields();
+			for (Field field : fields) {
+				Object val = new PropertyDescriptor(field.getName(), cls).getReadMethod().invoke(bean);
+				if(val!=null && !wps.contains(":"+field.getName())) {
+					args.add(val);
+					sb.append(" `");
+					sb.append(field.getName());
+					sb.append('`');
+					sb.append("=?,");
+					
+				}
+			}
+			
+			// where的后面部分 和 追加sql参数
+			String whef = where.replaceAll(":\\S+\\b", "?");
+			for (String wp : wps) {
+				Object val = new PropertyDescriptor(wp.replace(":", ""), cls).getReadMethod().invoke(bean);
+				if(val==null) {
+					throw new RepositoryException("条件的值不能为null");
+				}
+				args.add(val);
+			}
+			// // where的后面部分 和 追加sql参数 End
+			
+			// 去掉sb最后的一个字符
+			sb.deleteCharAt(sb.length() - 1);
+			sb.append(" where ");
+			sb.append(whef);
+			updateinfo[0] = sb.toString();
+			updateinfo[1] = args;
+		} catch (Exception e) {
+			throw new RepositoryException(e);
+		}
+
+		return updateinfo;
+		
+	}
 
 	// 返回sql中in查询需要的值
 	public static Object parseList(Object obj){
@@ -259,12 +321,12 @@ public final class BeanUtil {
 	}
 	
 	/**
-	 * 创建一个bean实例,实例的成员变量值全部重置为null
-	 * 
+	 * 创建一个bean实例,成员变量的值全部都为null <br>
+	 * 注意:这个bean的成员变量必须都是包装类型
 	 * @param beanClass
 	 * @return
 	 */
-	public static <S>  S newNullInstance(Class<S> beanClass) {
+	public static <S>  S newBeanVarNull(Class<S> beanClass) {
 		// new 一个新bean
 		S ns;
 		Field[] fields = beanClass.getDeclaredFields();

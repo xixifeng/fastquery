@@ -673,8 +673,17 @@ public class QueryProcess {
 			}
 			return select(dataSource, sql, bean);			
 		case MethodId.QUERY3:
-			
-			break;
+			sourceName = TypeUtil.findSource(method.getParameters(), iargs);
+			if (iargs.length == 2) {
+				bean = iargs[0];
+			} else if (iargs.length == 3) {
+				bean = iargs[1];
+			} else {
+				dbName = iargs[1].toString();
+				bean = iargs[2];
+			}
+			dataSource = DataSourceManage.getDataSource(sourceName, packageName);
+			return update(dataSource, bean, dbName,iargs[iargs.length-1].toString());
 			
 		case MethodId.QUERY6:
 			// 获取数据源
@@ -939,5 +948,39 @@ public class QueryProcess {
 			close(null, stat, conn);
 		}
 		return updateInfo[2].toString();
+	}
+	
+	private int update(DataSource dataSource,Object bean,String dbName,String where) {
+		int effect = 0;
+		Connection conn = null;
+		PreparedStatement stat = null;
+		Object[] updateInfo = BeanUtil.toUpdateSQL(bean, dbName,where);
+		String sql = updateInfo[0].toString();
+		LOG.info(sql);
+		@SuppressWarnings("unchecked")
+		List<Object> args = (List<Object>) updateInfo[1];
+		int count = args.size();
+		try {
+			conn = dataSource.getConnection();
+			conn.setAutoCommit(false);
+			stat = conn.prepareStatement(sql);
+			for (int i = 1; i <= count; i++) {
+				stat.setObject(i, args.get(i-1));
+			}
+			effect = stat.executeUpdate();
+			conn.commit();	
+		} catch (SQLException e) {
+			if(conn !=null ) {
+				try {
+					conn.rollback();
+				} catch (SQLException e1) {
+					throw new RepositoryException(e1);
+				}
+			}
+			throw new RepositoryException(e);
+		} finally {
+			close(null, stat, conn);
+		}
+		return effect;
 	}
 }
