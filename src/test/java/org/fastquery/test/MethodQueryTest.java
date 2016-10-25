@@ -113,4 +113,22 @@ public class MethodQueryTest {
 		
 	}
 	
+	// 使用update时,同时自定义条件的例子
+	@Test
+	public void update4(){
+		Integer id = 1;
+		String name = "好哇瓦";
+		Integer age = 3;
+		UserInfo entity = new UserInfo(id,name,age);
+		// 会解析成:update `UserInfo` set `id`=?, `age`=? where name = ?
+		int effect = studentDBService.update(entity,"name = :name");
+		// 断言: 影响的行数大于0行
+		assertThat(effect, greaterThan(0));
+		
+		// 不想让id字段参与改运算
+		entity.setId(null);
+		// 会解析成:update `UserInfo` set `age`=? where name = ?
+		effect = studentDBService.update(entity,"name = :name");
+		assertThat(effect, greaterThan(0));
+	}
 }
