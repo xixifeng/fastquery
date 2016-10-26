@@ -64,7 +64,7 @@ public class FQuery {
 	}
 	
 	/**
-	 * 创建一个bean实例,成员变量的值全部都为null <br>
+	 * 创建一个bean实例,成员变量的值全部重至为null <br>
 	 * 注意:这个bean的成员变量必须都是包装类型
 	 * @param beanClass
 	 * @return

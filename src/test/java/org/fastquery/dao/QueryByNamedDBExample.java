@@ -24,6 +24,7 @@ package org.fastquery.dao;
 
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
+import org.fastquery.core.Modifying;
 import org.fastquery.core.Param;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
@@ -51,4 +52,8 @@ public interface QueryByNamedDBExample extends QueryRepository {
 	@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
 	Page<Student> findPage(Pageable pageable, @Param("no") String no, @Param("name") String name,
 			@Param("age") Integer age);
+	
+	@Modifying
+	@QueryByNamed("updateUserInfoById")
+	int updateUserInfoById(@Param("id") int id,@Param("name") String name,@Param("age") int age);
 }

@@ -22,9 +22,11 @@
 
 package org.fastquery.test;
 
+import org.apache.log4j.Logger;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.dao.QueryByNamedDBExample;
+import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.page.Page;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.service.FQuery;
@@ -37,6 +39,7 @@ import com.alibaba.fastjson.JSONArray;
 import static org.junit.Assert.assertThat;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
@@ -47,11 +50,14 @@ import static org.hamcrest.Matchers.*;
  */
 public class QueryByNamedDBExampleTest {
 	
-	QueryByNamedDBExample queryByNamedDBExample;
+	private static  final Logger LOG = Logger.getLogger(QueryByNamedDBExampleTest.class);
 	
+	QueryByNamedDBExample queryByNamedDBExample;
+	UserInfoDBService userInfoDBService;
 	@Before
 	public void before(){
 		queryByNamedDBExample = FQuery.getRepository(QueryByNamedDBExample.class);
+		userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 	}
 	
 	
@@ -143,6 +149,21 @@ public class QueryByNamedDBExampleTest {
 		System.out.println(JSON.toJSONString(JSON.toJSON(pageObj), true));
 	}
 	
+	@Test
+	public void updateUserInfoById(){
+		int id = Math.abs(new Random().nextInt()%3) + 1; //[1,3] 范围的随机数
+		LOG.debug("正在修改主键为"+id+"的UserInfo.");
+		String name = "清风习习"+new Random().nextInt(8);
+		int age = new Random().nextInt(99);
+		int effect = queryByNamedDBExample.updateUserInfoById(id, name,age);
+		assertThat(effect, is(1));
+		
+		// 把改后的数据查询出来进行断言是否改正确
+		UserInfo userInfo = userInfoDBService.findById(id);
+		assertThat(userInfo.getName(), equalTo(name));
+		assertThat(userInfo.getAge().intValue(), is(age));
+		
+	}
 }
 
 

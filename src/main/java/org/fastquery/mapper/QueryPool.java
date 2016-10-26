@@ -268,7 +268,7 @@ public class QueryPool {
 	    // 转换输出
 		Velocity.evaluate(context, writer, className+'.'+id, tpl);
 		
-		String str = writer.toString().replaceAll("\\s+", " ").trim();
+		String str = writer.toString().trim().replaceAll("\\s+", " ");
 		
 		return TypeUtil.parWhere(str);
 	}

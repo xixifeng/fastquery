@@ -59,6 +59,18 @@ public class UserInfoDBServiceTest {
 	}
 	
 	@Test
+	public void findById(){
+		Integer id = 1;
+		String sql = "select id,name,age from UserInfo where id = ?2";
+		UserInfo userInfo = userInfoDBService.findById(sql,id);
+		assertThat(userInfo.getId(), is(id));
+		
+		sql = "select id,name,age from UserInfo where id = :id";
+		userInfo = userInfoDBService.findById(sql,id);
+		assertThat(userInfo.getId(), is(id));
+	}
+	
+	@Test
 	public void findUserInfoByNameOrAge(){
 		UserInfo[] userInfos = userInfoDBService.findUserInfoByNameOrAge("王五", 8);
 		for (UserInfo userInfo : userInfos) {

@@ -304,7 +304,7 @@ public class UserInfo {
 	studentDBService.saveOrUpdate(u1);
 ```
 
-使用update时,同时自定义条件的例子
+使用update时,同时自定义条件的例子:
 
 ```java
 Integer id = 1;
@@ -464,6 +464,25 @@ public interface QueryByNamedDBExample extends QueryRepository {
 }
 ```
 
+当然,采用`@QueryByNamed`同样适合于改操作,例如:
+
+```java
+@Modifying
+@QueryByNamed("updateUserInfoById")
+int updateUserInfoById(@Param("id") int id,@Param("name") String name,@Param("age") int age);
+```
+
+对应的SQL模板配置
+
+```xml
+<query id="updateUserInfoById">
+    // 在这里支持velocity语法
+	update UserInfo set name = :name,age = :age where id = :id
+</query>
+```
+
+**注意**: `$name`和`:name`这两种表达式的主要区别是:`$name`表示引用的是参数源值,用于在模板中做逻辑判断,而`:name`用于标记参数位,解析SQL时会自动替换成`?`号.
+
 ## 处理异常
 
 捕获和处理`Repository`实例在运行期抛出的异常.   
@@ -533,7 +552,7 @@ DB接口:
 
 ```java
 @QueryByNamed("findPage") // 引用id为"findPage"的分页模板
-Page<Student> findPage(Pageable pageable, @Param("no") String no, @Param("name") String name,@Param("age") Integer age);
+Page<Student> findPage(Pageable pageable, @Param("name") String name,@Param("age") Integer age);
 ```
 
 - 通过@Query实现分页

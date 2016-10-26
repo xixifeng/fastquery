@@ -51,6 +51,9 @@ public interface UserInfoDBService extends QueryRepository {
 	@Query("select id,name,age from UserInfo where id = :id")
 	UserInfo findById(@Param("id") Integer id);
 	
+	@Query("${sql}")
+	UserInfo findById(@Param("sql") String sql,@Param("id") Integer id);
+	
 	@Query("select name,age from UserInfo u where u.name=:name or u.age=:age")
 	UserInfo[] findUserInfoByNameOrAge(@Param("name") String name, @Param("age")Integer age);
 	
