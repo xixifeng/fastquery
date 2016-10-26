@@ -150,6 +150,9 @@ jdk1.8+
    Student[] students = studentDBService.find(); 
 ```
 
+## 针对本文Query的由来
+该项目开源后,有很多关注此项目的网友表示,"使用`@Query`语义不强,为何不用@SQL,@Select,@Insert,@Update...?". 采用Query的用意: SQL的全称是 Structured Query Language,本文的 Query 就是来源于此,因此,不要片面的认为Query就是select操作. 笔者认为,针对数据库操作的注解没有必要根据SQL的四种语言(DDL,DML,DCL,TCL)来定义,定义太多,只会增加复杂度,并且毫无必要.如果是改操作加上`@Modifying`注解,反之,都是"查",这样不更简洁实用吗? 
+
 ## 带条件查询
 
 ```java
@@ -476,12 +479,12 @@ int updateUserInfoById(@Param("id") int id,@Param("name") String name,@Param("ag
 
 ```xml
 <query id="updateUserInfoById">
-    // 在这里支持velocity语法
+    ## 在这里支持velocity语法
 	update UserInfo set name = :name,age = :age where id = :id
 </query>
 ```
 
-**注意**: `$name`和`:name`这两种表达式的主要区别是:`$name`表示引用的是参数源值,用于在模板中做逻辑判断,而`:name`用于标记参数位,解析SQL时会自动替换成`?`号.
+**注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,用于在模板中做逻辑判断,而`:name`用于标记参数位,解析SQL时会自动替换成`?`号.
 
 ## 处理异常
 
