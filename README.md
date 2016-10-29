@@ -194,6 +194,13 @@ Map<String,Object> find(Integer id);
 List<Map<String, Object>> find(String sex);
 ```
 
+**注意**: 查询单个字段,支持返回`List<String>`,`List<Byte>`,`List<Short>`,`List<Integer>`,`List<Long>`,`List<Float>`,`List<Double>`,`List<Character>`,`List<Boolean>`如下:
+
+```java
+@Query("select name from Student limit 3")
+List<String> findNames(); 
+```
+
 ## 动态条件查询
 
 ### 采用`Annotation`实现简单动态条件  

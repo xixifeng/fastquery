@@ -335,4 +335,21 @@ public class StudentDBServiceTest {
 		assertThat(students.size(), greaterThan(1));
 	
 	}
+	
+	@Test
+	public void findAges(){
+		List<Integer> ages = studentDBService.findAges();
+		assertThat(ages.size(), greaterThanOrEqualTo(3));
+	}
+	
+	@Test
+	public void findNames(){
+		List<String> names = studentDBService.findNames();
+		assertThat(names.size(), greaterThanOrEqualTo(3));
+		names.forEach(name -> {
+			System.out.println(name);
+		});
+	}
+	
+	
 }

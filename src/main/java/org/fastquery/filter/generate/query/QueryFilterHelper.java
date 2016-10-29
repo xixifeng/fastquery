@@ -64,7 +64,7 @@ class QueryFilterHelper {
 			
 			String where = sb.toString();
 			if(!"".equals(where) && TypeUtil.matches(query.value(),Placeholder.WHERE_REG).size()!=1) {
-				throw new RepositoryException(method + " 如果有条件注解,那么@Query中的value值,必须存在#{#where},有且只能出现一次");
+				throw new RepositoryException(method + " 如果存在@Condition(条件注解),那么@Query中的value值,必须存在#{#where},有且只能出现一次");
 			}
 			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, sb.toString()));
 		}

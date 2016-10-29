@@ -57,6 +57,9 @@ public final class BeanUtil {
 		sqlsb.append("(");
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
+			if(field.getType().isArray()){
+				continue;
+			}
 			sqlsb.append(field.getName());
 			sqlsb.append(',');
 		}
@@ -66,6 +69,9 @@ public final class BeanUtil {
 			for (Object bean : beans) {
 				sqlsb.append('(');
 				for (Field field : fields) {
+					if(field.getType().isArray()){
+						continue;
+					}
 					Object val = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(bean);
 					if (val != null) {
 						sqlsb.append("'" + val + "',");
@@ -95,6 +101,9 @@ public final class BeanUtil {
 		sqlsb.append("(");
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
+			if(field.getType().isArray()){
+				continue;
+			}
 			sqlsb.append(field.getName());
 			sqlsb.append(',');
 		}
@@ -104,6 +113,9 @@ public final class BeanUtil {
 			for (Object bean : beans) {
 				sqlsb.append('(');
 				for (Field field : fields) {
+					if(field.getType().isArray()){
+						continue;
+					}
 					Object val = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(bean);
 					if (val != null) {
 						sqlsb.append("'" + val + "',");
@@ -143,6 +155,9 @@ public final class BeanUtil {
 		// 获取主键的名称
 		Field[] files = cls.getDeclaredFields();
 		for (Field field : files) {
+			if(field.getType().isArray()){
+				continue;
+			}
 			if(field.getAnnotation(Id.class)!=null){
 				keyFeild = field.getName();
 				if(key==null) {
@@ -191,6 +206,9 @@ public final class BeanUtil {
 		Field[] files = cls.getDeclaredFields();
 		
 		for (Field field : files) {
+			if(field.getType().isArray()){
+				continue;
+			}
 			if(field.getAnnotation(Id.class)!=null){
 				keyFeild = field.getName();
 				// 顺便取主键的值
@@ -214,6 +232,9 @@ public final class BeanUtil {
 		try {
 			Field[] fields = cls.getDeclaredFields();
 			for (Field field : fields) {
+				if(field.getType().isArray()){
+					continue;
+				}
 				Object val = new PropertyDescriptor(field.getName(), cls).getReadMethod().invoke(bean);
 				Id id = field.getAnnotation(Id.class);
 				if(val!=null && id == null) {
@@ -271,6 +292,9 @@ public final class BeanUtil {
 		try {
 			Field[] fields = cls.getDeclaredFields();
 			for (Field field : fields) {
+				if(field.getType().isArray()){
+					continue;
+				}
 				Object val = new PropertyDescriptor(field.getName(), cls).getReadMethod().invoke(bean);
 				if(val!=null && !wps.contains(":"+field.getName())) {
 					args.add(val);

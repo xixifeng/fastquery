@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.fastquery.core.BeanType;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.util.TypeUtil;
 
@@ -127,16 +126,32 @@ public class QueryHandler {
 		return keyvals;
 	}
 	
-
+	
 	public Object list(List<Map<String, Object>> keyvals,Method method,Object[] iargs) { // list bean
 		List<Object> list = new ArrayList<>();
 		if(keyvals.isEmpty()) {
 			return list;
 		}
-		Class<?> beanType = (Class<?>) TypeUtil.findAnnotationParameterVal(BeanType.class, method.getParameters(), iargs);
-		if(beanType == null) {
-			beanType = (Class<?>) ((ParameterizedType)(method.getGenericReturnType())).getActualTypeArguments()[0];
-		}
+		
+		// -- start
+		String returnTypeName = method.getGenericReturnType().getTypeName();
+		ParameterizedType pt = (ParameterizedType) method.getGenericReturnType();
+	    java.lang.reflect.Type[] types = pt.getActualTypeArguments();
+	    if( types.length==1) {
+	    	java.lang.reflect.Type ct = types[0];
+	    	if(ct==String.class || ct==Byte.class || ct==Short.class || ct==Integer.class || ct==Long.class || ct == Float.class || ct == Double.class || ct == Character.class || ct == Boolean.class) {
+	    		keyvals.forEach(map ->{
+	    			if(map.values().size()>1){
+	    				throw new RepositoryException("不能把"+keyvals+"转换成" + returnTypeName);
+	    			}
+	    			list.add(map.values().iterator().next());
+	    		});
+	    		return list;
+	    	}
+	    }
+		// end
+		
+			Class<?> beanType = (Class<?>) pt.getActualTypeArguments()[0];
 		
 		for (Map<String, Object> map : keyvals) {
 			list.add(JSON.toJavaObject(new JSONObject(map), beanType));

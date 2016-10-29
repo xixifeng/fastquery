@@ -201,7 +201,11 @@ public interface StudentDBService extends QueryRepository {
 	@Condition("and age > ?2")    // ?2 如果是null,这行条件将会被忽略
 	List<Student> findAllStudent(String name, Integer age);
 
-
+	@Query("select age from Student limit 3")
+	List<Integer> findAges();
+	
+	@Query("select name from Student limit 3")
+	List<String> findNames();
 }
 
 

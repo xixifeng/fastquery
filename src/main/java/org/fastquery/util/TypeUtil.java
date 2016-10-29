@@ -533,7 +533,9 @@ public class TypeUtil implements Opcodes{
 	}
 
 	public static String getCountQuerySQL(Method method, String sql, Object[] args) {
-		return sql.replaceFirst(Placeholder.WHERE_REG, getWhereSQL(method, args));
+		String csql = sql.replaceFirst(Placeholder.WHERE_REG, getWhereSQL(method, args));
+		LOG.info("求和:" + csql);
+		return csql;
 	}
 	
 	/**

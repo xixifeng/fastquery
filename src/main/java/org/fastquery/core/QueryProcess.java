@@ -536,7 +536,7 @@ public class QueryProcess {
 			if(method.getAnnotation(NotCount.class)==null) { // 需要求和
 				 sql = TypeUtil.paramNameFilter(method, args,countQuery);
 				 sql = sql.replaceAll(Placeholder.SP1_REG, "?");
-				 LOG.debug("求和语句: " + sql);
+				 LOG.info("求和语句: " + sql);
 				try {
 					close(rs, stat, null); // 在新创建rs,stat 先把之前的关闭掉
 					stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
