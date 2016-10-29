@@ -203,8 +203,8 @@ List<Map<String, Object>> find(String sex);
 - `List<Float>`
 - `List<Double>`
 - `List<Character>`
-- `List<Boolean>`
-如: 
+- `List<Boolean>`  
+例如: 
 
 ```java
 @Query("select name from Student limit 3")
@@ -373,7 +373,8 @@ int updateBatch(String name,Integer age,Integer id);
 UserInfo[] findUserInfoByNameOrAge(@Param("name") String name, @Param("age")Integer age);
 ```
 
-其中`:name`对应`@Param("name")`所指定的方法变量值;`:age`对应`@Param("age")`所指定的方法变量值.当然SQL中的变量也可以用`?N`(N={正整数})的形式来表达,且不用标识`@Param`.如:`select name,age from UserInfo u where u.name = :name or u.age = :age`最终会编译成`select name,age from UserInfo u where u.name=? or u.age=?`因此很好地解决了SQL注入问题.  
+其中`:name`对应`@Param("name")`所指定的方法变量值;`:age`对应`@Param("age")`所指定的方法变量值.当然SQL中的变量也可以用`?N`(N={正整数})的形式来表达,且不用标识`@Param`.  
+如:`select name,age from UserInfo u where u.name = :name or u.age = :age`以防SQL注入问题,在执行语句之前,最终会编译成`select name,age from UserInfo u where u.name=? or u.age=?`
 
 
 **SQL中的变量采用${name}表达式**  
