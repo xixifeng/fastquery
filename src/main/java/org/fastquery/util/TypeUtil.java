@@ -374,7 +374,8 @@ public class TypeUtil implements Opcodes{
 			for (Annotation ann : anns) {
 				if(ann.annotationType() == Param.class) {
 					Param param = (Param) ann;
-					s = s.replaceAll(Pattern.quote(":"+param.value()), "?"+(i+1));
+					// Pattern.quote(":"+param.value())
+					s = s.replaceAll("\\:"+param.value()+"\\b", "?"+(i+1));
 				}
 			}
 		}

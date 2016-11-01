@@ -77,5 +77,11 @@ public class SyntaxTest {
 		System.out.println(Pattern.matches("", ""));
 		// s.replaceAll("\\:"+param.value()+"\\b", "?"+(i+1)); 
 		assertThat("abckdwgew:name&".replaceAll("\\:name\\b", "?"), equalTo("abckdwgew?&"));
+		assertThat("abckdwgew:name &".replaceAll("\\:name\\b", "?"), equalTo("abckdwgew? &"));
+		System.out.println("-->: "+ ("abckdwgew:name222 &".replaceAll("\\:name\\b", "?")) );
+		assertThat(":name22".replaceAll("\\:name\\b", "?"), equalTo(":name22"));
+		assertThat(":name22 ".replaceAll("\\:name\\b", "?"), equalTo(":name22 "));
+		assertThat(":name".replaceAll("\\:name\\b", "?"), equalTo("?"));
+		
 	}
 }

@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.fastquery.core.Id;
+import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
@@ -465,6 +466,33 @@ public class TypeUtilTest implements Opcodes {
 		for (String str : strs) {
 			System.out.println(str);
 		}
+	}
+	
+	public void m1(@Param("i") int i,@Param("i1")int i1,@Param("i2")int i2){		
+	}
+	
+	public void m2(@Param("$^i") int i,@Param("$i1$")int i1,@Param("^i2")int i2){		
+	}
+	
+	@Test
+	public void paramFilter() throws NoSuchMethodException, SecurityException{
+		Method m1 = TypeUtilTest.class.getMethod("m1", int.class,int.class,int.class);
+		Object[] agrs = new Object[]{11,22,33};
+		String sql = "abc :i and :i1 where :i2";
+		String str = TypeUtil.paramFilter(m1, agrs, sql);
+		assertThat(str, equalTo("abc ?1 and ?2 where ?3"));
+		sql = "abc :i1 and :i2 where :i";
+		str = TypeUtil.paramFilter(m1, agrs, sql);
+		assertThat(str, equalTo("abc ?2 and ?3 where ?1"));
+	}
+	
+	@Test
+	public void paramNameFilter() throws NoSuchMethodException, SecurityException{
+		Method m1 = TypeUtilTest.class.getMethod("m1", int.class,int.class,int.class);
+		Object[] agrs = new Object[]{11,22,33};
+		String sql = "abc :i and :i1 where :i2";
+		String str = TypeUtil.paramNameFilter(m1, agrs, sql);
+		assertThat(str, equalTo("abc ?1 and ?2 where ?3"));
 	}
 	
 	@Test

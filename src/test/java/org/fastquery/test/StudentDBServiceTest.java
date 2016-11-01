@@ -117,7 +117,10 @@ public class StudentDBServiceTest {
 	@Test
 	public void exists(){
 		boolean exists = studentDBService.exists("9921103");
-		assertThat(exists, isA(boolean.class));
+		assertThat(exists, is(true));
+		
+		exists = studentDBService.exists("9921103xxyy");
+		assertThat(exists, is(false));
 	}
 	
 	@Test
@@ -334,6 +337,12 @@ public class StudentDBServiceTest {
 		assertThat(students, not(empty()));
 		assertThat(students.size(), greaterThan(1));
 	
+	}
+	
+	@Test
+	public void findAllStudent4(){
+		List<Student> students = studentDBService.findAllStudent(null, null);
+		assertThat(students, not(empty()));
 	}
 	
 	@Test

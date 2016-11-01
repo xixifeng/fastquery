@@ -544,8 +544,12 @@ public class QueryProcess {
 						stat.setObject(i, args[ints[i-1]-1]);
 					}
 					rs = stat.executeQuery();
-					rs.next();
-					totalElements = rs.getLong(1);
+					// 如果在求和时画蛇添足在末尾增加了排序,在没有数据的情况下,返回的是:Empty set (0.00 sec) 而不是0,已经验证.
+					if(rs.next()) {
+						totalElements = rs.getLong(1);	
+					} else {
+						totalElements = 0;
+					}
 				} catch (SQLException e) {
 					throw new RepositoryException(e);
 				} finally {
@@ -627,12 +631,14 @@ public class QueryProcess {
 			if(iargs.length == 3) {
 				bean = iargs[2];
 				sql = BeanUtil.toInsertSQL(iargs[1].toString(),bean);
+				LOG.info(sql);
 				String key = insert(dataSource, sql).toString();
 				sql = BeanUtil.toSelectSQL(bean, key, iargs[1].toString());
 				return select(dataSource, sql, bean);
 			} else {
 				bean = iargs[0];
 				sql = BeanUtil.toInsertSQL(bean);
+				LOG.info(sql);
 				String k = insert(dataSource,sql).toString();
 				sql = BeanUtil.toSelectSQL(bean, k, null);
 				return select(dataSource, sql, bean);
