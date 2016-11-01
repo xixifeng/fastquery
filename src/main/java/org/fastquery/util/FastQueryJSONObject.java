@@ -30,10 +30,10 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class FastQueryJSONObject {
 	private static JSONObject jsonObject;
+	
+	private static boolean debug = false;
+	
 	private FastQueryJSONObject(){}
-	public static JSONObject getJSONObject() {
-		return jsonObject;
-	}
 	static void  setJsonObject(JSONObject o){// 只允许对jsonObject赋值一次
 		if(jsonObject==null) {
 			jsonObject = o;	
@@ -54,5 +54,9 @@ public class FastQueryJSONObject {
 	 */
 	public static String getVelocity(){
 		return jsonObject.getString("velocity");
+	}
+	
+	public static boolean getDebug(){
+		return (boolean)jsonObject.getOrDefault("debug", debug);
 	}
 }

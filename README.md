@@ -106,7 +106,10 @@ jdk1.8+
 		  ],
   // 基准目录,注意: 后面记得加上 "/"
   // 该目录用来放SQL文件,需要执行SQL文件时,指定其名称就够了
-  "basedir" : "/root/git/fastquery/fastquery/tmp/"
+  "basedir" : "/root/git/fastquery/fastquery/tmp/",
+  
+  // 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目,默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式
+  "debug" : false
 }
 ```
 **注意**: 在fastquery.json中配置作用域,其中"dataSourceName"不是必须的,"dataSourceName"要么不指定,要指定的话那么必须正确.如果没有指定"dataSourceName",那么在调用接口的时候必须指定数据源的名称.下面的适配数据源章节会讲到.

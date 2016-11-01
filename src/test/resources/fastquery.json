@@ -58,6 +58,9 @@
   // 基准目录,注意: 后面记得加上 "/"
  "basedir" : "/root/git/fastquery/fastquery/tmp/",
  
+  // 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目,默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式
+  "debug" : false,
+ 
   // velocity.properties 的位置
   // 该行配置不是必须的, 请注意不要重复配置,如果在其他地方已配置velocity,请删除该行配置
   "velocity" : "/root/git/fastquery/fastquery/src/test/resources/velocity.properties"

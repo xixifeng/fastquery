@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import org.fastquery.filter.FilterChainHandler;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.Page;
+import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
 
 /**
@@ -57,6 +58,11 @@ public class Prepared {
 		final Method method = TypeUtil.getMethod(iclazz, methodName,methodDescriptor);
 		// return businessProcess(iclazz,method, args)
 		
+        // 如果是调试模式
+        if(FastQueryJSONObject.getDebug()){
+        	QueryPool.reset(iclazz.getName());
+        }
+        
 		// 在businessProcess的先后加拦截器 ==================
 		// 注入BeforeFilter
         Object object = FilterChainHandler.bindBeforeFilterChain(iclazz,target,method,args);
