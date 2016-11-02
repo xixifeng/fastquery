@@ -28,6 +28,7 @@ import java.lang.reflect.Parameter;
 import org.fastquery.core.GenerateRepository;
 import org.fastquery.core.Prepared;
 import org.fastquery.core.Repository;
+import org.fastquery.mapper.QueryValidator;
 import org.fastquery.util.TypeUtil;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -219,6 +220,13 @@ public class AsmRepository implements Opcodes {
 			mv.visitInsn(AASTORE);
 		}
 		return mv;
+	}
+
+	/**
+	 * 所有的代码生成之后
+	 */
+	public static void after() {
+		QueryValidator.check();
 	}
 
 }

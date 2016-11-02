@@ -139,7 +139,7 @@ public class QueryHandler {
 	    java.lang.reflect.Type[] types = pt.getActualTypeArguments();
 	    if( types.length==1) {
 	    	java.lang.reflect.Type ct = types[0];
-	    	if(ct==String.class || ct==Byte.class || ct==Short.class || ct==Integer.class || ct==Long.class || ct == Float.class || ct == Double.class || ct == Character.class || ct == Boolean.class) {
+	    	if(TypeUtil.isWarrp(ct)) {
 	    		keyvals.forEach(map ->{
 	    			if(map.values().size()>1){
 	    				throw new RepositoryException("不能把"+keyvals+"转换成" + returnTypeName);

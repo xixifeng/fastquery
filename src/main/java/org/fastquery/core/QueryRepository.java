@@ -29,7 +29,8 @@ package org.fastquery.core;
 public interface QueryRepository extends Repository {
 	
 	/**
-	 * 保存一个实体,这个实体必须有一个自增长的主键
+	 * 保存一个实体,这个实体必须有一个自增长的主键 <br>
+	 * 注意: 如果该实体没有主键,则返回null
 	 * @param entity
 	 * @return
 	 */
@@ -37,7 +38,8 @@ public interface QueryRepository extends Repository {
 	<E> E  save(E entity);
 	
 	/**
-	 * 往指定的数据源里保存一个实体
+	 * 往指定的数据源里保存一个实体<br>
+	 * 注意: 如果该实体没有主键,则返回null
 	 * @param entity
 	 * @param dataSourceName
 	 * @return
@@ -46,7 +48,8 @@ public interface QueryRepository extends Repository {
 	<E> E  save(E entity,@Source String dataSourceName);
 	
 	/**
-	 * 往指定的数据源里保存一个实体,并且指定数据库名称
+	 * 往指定的数据源里保存一个实体,并且指定数据库名称<br>
+	 * 注意: 如果该实体没有主键,则返回null
 	 * @param dataSourceName
 	 * @param dbName
 	 * @param entity
@@ -56,28 +59,33 @@ public interface QueryRepository extends Repository {
 	<E> E  save(@Source String dataSourceName,String dbName,E entity);
 	
 	/**
-	 * 更新实体,实体需要包含主键值
+	 * 更新实体,实体需要包含主键值 <br>
+	 * 注意: 修改失败,或违规操作则返回null
 	 * @param entity
 	 * @return
 	 */
 	@Id(MethodId.QUERY1)
 	<E> E update(E entity);
-	@Id(MethodId.QUERY1)
+	
 	/**
-	 * 根据主键更新实体
+	 * 根据主键更新实体 <br>
+	 * 注意: 修改失败,或违规操作则返回null
 	 * @param dataSourceName
 	 * @param entity
 	 * @return
 	 */
-	<E> E update(@Source String dataSourceName,E entity);
 	@Id(MethodId.QUERY1)
+	<E> E update(@Source String dataSourceName,E entity);
+
 	/**
-	 * 根据主键更新实体
+	 * 根据主键更新实体 <br>
+	 * 注意: 修改失败,或违规操作则返回null
 	 * @param dataSourceName
 	 * @param dbName
 	 * @param entity
 	 * @return
 	 */
+	@Id(MethodId.QUERY1)
 	<E> E update(@Source String dataSourceName,String dbName,E entity);
 	
 	

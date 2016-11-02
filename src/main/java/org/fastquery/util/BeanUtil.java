@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.fastquery.core.Id;
 import org.fastquery.core.RepositoryException;
 
@@ -37,6 +38,8 @@ import com.alibaba.fastjson.JSONArray;
  * @author xixifeng (fastquery@126.com)
  */
 public final class BeanUtil {
+	
+	private static final Logger LOG = Logger.getLogger(BeanUtil.class);
 
 	private BeanUtil() {
 	}
@@ -57,7 +60,7 @@ public final class BeanUtil {
 		sqlsb.append("(");
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
-			if(field.getType().isArray()){
+			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
 				continue;
 			}
 			sqlsb.append(field.getName());
@@ -69,7 +72,7 @@ public final class BeanUtil {
 			for (Object bean : beans) {
 				sqlsb.append('(');
 				for (Field field : fields) {
-					if(field.getType().isArray()){
+					if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
 						continue;
 					}
 					Object val = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(bean);
@@ -101,7 +104,7 @@ public final class BeanUtil {
 		sqlsb.append("(");
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
-			if(field.getType().isArray()){
+			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
 				continue;
 			}
 			sqlsb.append(field.getName());
@@ -113,7 +116,7 @@ public final class BeanUtil {
 			for (Object bean : beans) {
 				sqlsb.append('(');
 				for (Field field : fields) {
-					if(field.getType().isArray()){
+					if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
 						continue;
 					}
 					Object val = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(bean);
@@ -155,7 +158,7 @@ public final class BeanUtil {
 		// 获取主键的名称
 		Field[] files = cls.getDeclaredFields();
 		for (Field field : files) {
-			if(field.getType().isArray()){
+			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
 				continue;
 			}
 			if(field.getAnnotation(Id.class)!=null){
@@ -206,7 +209,7 @@ public final class BeanUtil {
 		Field[] files = cls.getDeclaredFields();
 		
 		for (Field field : files) {
-			if(field.getType().isArray()){
+			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
 				continue;
 			}
 			if(field.getAnnotation(Id.class)!=null){
@@ -229,10 +232,11 @@ public final class BeanUtil {
 		StringBuilder sb = new StringBuilder("update ");
 		sb.append(tableName);
 		sb.append(" set");
+		int len = sb.length();
 		try {
 			Field[] fields = cls.getDeclaredFields();
 			for (Field field : fields) {
-				if(field.getType().isArray()){
+				if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
 					continue;
 				}
 				Object val = new PropertyDescriptor(field.getName(), cls).getReadMethod().invoke(bean);
@@ -246,6 +250,10 @@ public final class BeanUtil {
 					sb.append("=?,");
 					
 				}
+			}
+			if(sb.length()==len) {
+				LOG.warn("传递的实体,没有什么可以修改," + bean);
+				return null;
 			}
 			// 去掉sb最后的一个字符
 			sb.deleteCharAt(sb.length() - 1);
@@ -289,10 +297,11 @@ public final class BeanUtil {
 		StringBuilder sb = new StringBuilder("update ");
 		sb.append(tableName);
 		sb.append(" set");
+		int len = sb.length();
 		try {
 			Field[] fields = cls.getDeclaredFields();
 			for (Field field : fields) {
-				if(field.getType().isArray()){
+				if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
 					continue;
 				}
 				Object val = new PropertyDescriptor(field.getName(), cls).getReadMethod().invoke(bean);
@@ -305,7 +314,10 @@ public final class BeanUtil {
 					
 				}
 			}
-			
+			if(sb.length()==len) {
+				LOG.warn("传递的实体,没有什么可以修改," + bean);
+				return null;
+			}
 			// where的后面部分 和 追加sql参数
 			String whef = where.replaceAll(":\\S+\\b", "?");
 			for (String wp : wps) {
@@ -337,7 +349,7 @@ public final class BeanUtil {
 			return null;
 		}
 		Class<?> cls = obj.getClass();
-		if(cls.isArray() || obj instanceof Iterable){
+		if(cls.isArray() || !TypeUtil.isWarrp(cls) || obj instanceof Iterable){
 			String strs = JSONArray.toJSONString(obj);
 			return strs.substring(1, strs.length()-1);
 		}

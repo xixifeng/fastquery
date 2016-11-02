@@ -269,9 +269,9 @@ public class QueryProcess {
 			return qh.jsonObjeType(method,keyvals);
 		}else if(returnType == JSONArray.class){
 			return qh.jsonArrayType(keyvals);
-		}else if(isWarrp(returnType)){
+		}else if(TypeUtil.isWarrp(returnType)){
 			return qh.wrapperType(method,returnType,keyvals);
-		}else if(isWarrp(returnType.getComponentType()) || TypeUtil.hasDefaultConstructor(returnType.getComponentType())){
+		}else if(TypeUtil.isWarrp(returnType.getComponentType()) || TypeUtil.hasDefaultConstructor(returnType.getComponentType())){
 			// 基本类型数组, bean数组
 			return qh.wrapperAarryType(method,returnType,keyvals);
 		}else {
@@ -544,7 +544,7 @@ public class QueryProcess {
 						stat.setObject(i, args[ints[i-1]-1]);
 					}
 					rs = stat.executeQuery();
-					// 如果在求和时画蛇添足在末尾增加了排序,在没有数据的情况下,返回的是:Empty set (0.00 sec) 而不是0,已经验证.
+					// 如果在求和时画蛇添足在末尾增加了分组(group by),在没有数据的情况下,返回的是:Empty set (0.00 sec) 而不是0,已经验证.
 					if(rs.next()) {
 						totalElements = rs.getLong(1);	
 					} else {
@@ -632,16 +632,24 @@ public class QueryProcess {
 				bean = iargs[2];
 				sql = BeanUtil.toInsertSQL(iargs[1].toString(),bean);
 				LOG.info(sql);
-				String key = insert(dataSource, sql).toString();
-				sql = BeanUtil.toSelectSQL(bean, key, iargs[1].toString());
-				return select(dataSource, sql, bean);
+				Object keyObj = insert(dataSource, sql);
+				if(keyObj==null){
+					return null;
+				} else {
+					sql = BeanUtil.toSelectSQL(bean, keyObj.toString(), iargs[1].toString());
+					return select(dataSource, sql, bean);
+				}
 			} else {
 				bean = iargs[0];
 				sql = BeanUtil.toInsertSQL(bean);
 				LOG.info(sql);
-				String k = insert(dataSource,sql).toString();
-				sql = BeanUtil.toSelectSQL(bean, k, null);
-				return select(dataSource, sql, bean);
+				Object keyObj = insert(dataSource,sql);
+				if(keyObj==null){
+					return null;
+				} else {
+					sql = BeanUtil.toSelectSQL(bean, keyObj.toString(), null);
+					return select(dataSource, sql, bean);	
+				}
 			}
 		
 		case MethodId.QUERY1:
@@ -656,6 +664,9 @@ public class QueryProcess {
 			}
 			dataSource = DataSourceManage.getDataSource(sourceName, packageName);
 			sql = update(dataSource, bean, dbName);
+			if(sql==null){
+				return null;
+			}
 			return select(dataSource, sql, bean);
 			
 		case MethodId.QUERY2:
@@ -802,16 +813,7 @@ public class QueryProcess {
 		}
 		LOG.debug(sb.toString());
 	}
-	
-	// 判断 returnType 是否是包装类型
-	private boolean isWarrp(Class<?> returnType){
-		if(returnType==null) {
-			return false;
-		}
-		return (returnType == Integer.class) || (returnType == Double.class) || (returnType == Long.class) || (returnType == Short.class) || (returnType == Byte.class) || (returnType == Character.class) || (returnType == Float.class) || (returnType == String.class);
-	}
-	
-	
+		
 	/**
 	 * 根据regex在target中首次匹配到的开始索引, 没有匹配到返回-1
 	 * @param regex 正则表达式
@@ -857,7 +859,13 @@ public class QueryProcess {
 		return sb.toString();
 	}
 	
-	// 插入数据返回主键值
+	// 
+	/**
+	 * 插入数据返回主键值,如果没有主键,返回null
+	 * @param dataSource
+	 * @param sql
+	 * @return
+	 */
 	private Object insert(DataSource dataSource,String sql){
 		Connection conn = null;
 		PreparedStatement stat = null;
@@ -872,9 +880,7 @@ public class QueryProcess {
 			// 获取主键
 			if (rs.next()) {
 				key = rs.getString(1);
-			} else {
-				throw new RepositoryException("保存时没有找到主键");
-			}	
+			}
 			conn.commit();	
 		} catch (SQLException e) {
 			if(conn !=null ) {
@@ -928,6 +934,9 @@ public class QueryProcess {
 		Connection conn = null;
 		PreparedStatement stat = null;
 		Object[] updateInfo = BeanUtil.toUpdateSQL(bean, dbName);
+		if(updateInfo==null){
+			return null;
+		}
 		String sql = updateInfo[0].toString();
 		@SuppressWarnings("unchecked")
 		List<Object> args = (List<Object>) updateInfo[1];
@@ -961,6 +970,9 @@ public class QueryProcess {
 		Connection conn = null;
 		PreparedStatement stat = null;
 		Object[] updateInfo = BeanUtil.toUpdateSQL(bean, dbName,where);
+		if(updateInfo==null){
+			return effect;
+		}
 		String sql = updateInfo[0].toString();
 		LOG.info(sql);
 		@SuppressWarnings("unchecked")

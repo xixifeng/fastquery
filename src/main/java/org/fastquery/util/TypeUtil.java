@@ -477,9 +477,10 @@ public class TypeUtil implements Opcodes{
 		// 追加条件
 		Condition[] conditions = method.getAnnotationsByType(Condition.class);
 		o: for (int i = 0; i < conditions.length; i++) {
-
+			String value = conditions[i].value();
+			value = paramFilter(method, args, value);
 			// value 属性中包含的参数,必须去重
-			Set<String> pars = TypeUtil.matchesNotrepeat(conditions[i].value(), "\\?\\d+");
+			Set<String> pars = TypeUtil.matchesNotrepeat(value, "\\?\\d+");
 			for (String par : pars) {
 				int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
 				if (ignoreCondition(conditions[i], args[index - 1])) {
@@ -490,10 +491,10 @@ public class TypeUtil implements Opcodes{
 			sb.append(' ');
 			if (sb.length() == 1 && i != 0) { // 条件成立,表示这个SQL条件的前面还不存在条件,// 那么第一个条件的链接符,必须去掉. (where后面不能直接跟运算符号)
 				sb.append(' ');
-				sb.append(removePart(conditions[i].value()));
+				sb.append(removePart(value));
 			} else {
 				sb.append(' ');
-				sb.append(conditions[i].value());
+				sb.append(value);
 			}
 
 		}
@@ -767,6 +768,18 @@ public class TypeUtil implements Opcodes{
 		return word.substring(0, index);
 	}
 	
+	/**
+	 * 判断传入的ct是否是String,Byte,Short,Integer,Long,Float,Double,Character,Boolean其中的一个.如果是,返回true
+	 * @param ct
+	 * @return
+	 */
+	public static boolean isWarrp(java.lang.reflect.Type ct) {
+		if(ct == null){
+			return false;
+		}
+		return ct == String.class || ct == Byte.class || ct == Short.class || ct == Integer.class || ct == Long.class || ct == Float.class
+				|| ct == Double.class || ct == Character.class || ct == Boolean.class;
+	}
 }
 
 

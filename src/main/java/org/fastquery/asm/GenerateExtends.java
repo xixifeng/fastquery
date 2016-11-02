@@ -44,6 +44,7 @@ import org.fastquery.filter.generate.query.ParameterFilter;
 import org.fastquery.filter.generate.query.QueryReturnTypeFilter;
 import org.fastquery.filter.generate.query.SQLFilter;
 import org.fastquery.filter.generate.querya.ConditionParameterFilter;
+import org.fastquery.filter.generate.querya.MarkFilter;
 import org.fastquery.filter.generate.querya.MethodAnnotationFilter;
 import org.fastquery.filter.generate.querya.ModifyingDependencyFilter;
 import org.fastquery.filter.generate.querya.OutFilter;
@@ -129,6 +130,7 @@ class GenerateExtends {
 				queryFilterChain.addFilter(new ConditionParameterFilter());
 				queryFilterChain.addFilter(new SourceFilter());
 				queryFilterChain.addFilter(new OutFilter());
+				queryFilterChain.addFilter(new MarkFilter());
 				
 				
 				// filter/modifying

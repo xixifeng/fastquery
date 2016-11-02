@@ -130,5 +130,10 @@ public class MethodQueryTest {
 		// 会解析成:update `UserInfo` set `age`=? where name = ?
 		effect = studentDBService.update(entity,"name = :name");
 		assertThat(effect, greaterThan(0));
+		
+		// 不想让age字段参与改运算
+		entity.setAge(null);
+		effect = studentDBService.update(entity,"name = :name");
+		assertThat(effect, is(0));
 	}
 }

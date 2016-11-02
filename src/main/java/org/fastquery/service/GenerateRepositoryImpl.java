@@ -80,6 +80,10 @@ class GenerateRepositoryImpl implements GenerateRepository {
 				}
 			}
 		}
+		
+		// 3). 生成 Repository之后的检测
+		AsmRepository.after();
+		
 	}
 
 	static GenerateRepositoryImpl getInstance() {

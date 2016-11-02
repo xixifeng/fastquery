@@ -75,7 +75,7 @@ public class QueryPool {
 	 * @param key
 	 * @return
 	 */
-	public static String getCountQuery(String key){
+	static String getCountQuery(String key){
 		return countQueryMap.get(key);
 	}
 
@@ -86,7 +86,7 @@ public class QueryPool {
 	 * @param resource
 	 * @return
 	 */
-	public static Set<QueryMapper> xml2QueryMapper(String className,Resource resource){
+	static Set<QueryMapper> xml2QueryMapper(String className,Resource resource){
 		String xmlName = className + ".queries.xml";
 		Set<QueryMapper> queryMappers = new HashSet<>();
 		// 判断xmlName有没有存在
@@ -202,6 +202,7 @@ public class QueryPool {
 	 */
 	public static void reset(String className){
 		mapQueryMapper.clear();
+		countQueryMap.clear();
 		Set<QueryMapper> queryMappers = xml2QueryMapper(className, resource);
 		queryMappers.forEach(queryMapper -> addTemplate(className, queryMapper));
 	}
@@ -213,7 +214,7 @@ public class QueryPool {
 	 * @param map
 	 * @return
 	 */
-	public static String render(String className,String id,Map<String, Object> map){
+	static String render(String className,String id,Map<String, Object> map){
 		String tpl = getTemplate(className, id);
 		if(tpl==null || "".equals(tpl)){
 			return null;
@@ -347,5 +348,13 @@ public class QueryPool {
 			mapQueryMapper.put(className, queryMappers);
 		}
 		return queryMappers;
+	}
+
+	static Map<String, Set<QueryMapper>> getMapQueryMapper() {
+		return mapQueryMapper;
+	}
+
+	static Map<String, String> getCountQueryMap() {
+		return countQueryMap;
 	}
 }

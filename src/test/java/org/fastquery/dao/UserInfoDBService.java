@@ -122,9 +122,9 @@ public interface UserInfoDBService extends QueryRepository {
 	
 	// countQuery : 指定自定义求和语句
 	@Query(value = "select id,name,age from `userinfo` #{#where}", countQuery = "select count(name) from `userinfo` #{#where}")
-	@Condition("age > ?1")
-	@Condition("and id < ?2")
-	Page<UserInfo> findSome1(Integer age,Integer id,Pageable pageable);
+	@Condition("age > :age")
+	@Condition("and id < :id")
+	Page<UserInfo> findSome1(@Param("age")Integer age,@Param("id")Integer id,Pageable pageable);
 	
 	@NotCount // 标识分页不统计总行数. 从上百万的数据里求和很消耗性能.
 	@Query(value = "select id,name,age from `userinfo` #{#where}")

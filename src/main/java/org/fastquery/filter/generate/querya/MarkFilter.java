@@ -1,0 +1,80 @@
+/*
+ * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ * For more information, please see http://www.fastquery.org/.
+ * 
+ */
+
+package org.fastquery.filter.generate.querya;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.fastquery.core.Param;
+import org.fastquery.core.Query;
+import org.fastquery.filter.generate.common.MethodFilter;
+import org.fastquery.util.TypeUtil;
+import org.fastquery.where.Condition;
+
+/**
+ * 如果Query,Condition中出现有":name" 表达式, 那么当前方法必须存在Parm注解并且保持一致.
+ * 
+ * @author xixifeng (fastquery@126.com)
+ */
+public class MarkFilter implements MethodFilter {
+
+	@Override
+	public Method doFilter(Method method) {
+		
+		Set<String> params = new HashSet<>();
+		Parameter[] parameters = method.getParameters();
+		for (Parameter parameter : parameters) {
+			Param param = parameter.getAnnotation(Param.class);
+			if(param != null) {
+				params.add(":"+param.value());
+			}
+		}
+		
+		String reg = ":\\S+\\b";
+		
+		Set<String> ps = new HashSet<>();
+		Query[] queries = method.getAnnotationsByType(Query.class);
+		for (Query query : queries) {
+			ps.addAll( TypeUtil.matchesNotrepeat(query.value(), reg) );
+			ps.addAll( TypeUtil.matchesNotrepeat(query.countField(), reg) );
+			ps.addAll( TypeUtil.matchesNotrepeat(query.countQuery(), reg) );
+		}
+		
+		Condition[] conditions = method.getAnnotationsByType(Condition.class);
+		for (Condition condition : conditions) {
+			ps.addAll(TypeUtil.matchesNotrepeat(condition.value(), reg));
+		}
+		
+		for (String p : ps) {
+			// params的每个成员前面都已加上:
+			if(!params.contains(p)) {
+				this.abortWith(method, String.format("发现存在%s,而从参数中没有找到@Param(\"%s\"),这种语法是不允许的.", p,p.replaceFirst(":","")));
+			}
+		}
+		
+		return null;
+	}
+
+}
