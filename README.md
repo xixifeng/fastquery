@@ -470,7 +470,8 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 |  '   | &amp;apos;| 省略号|
 |  "   | &amp;quot;| 引号 |
 
-如果想把一些公用的SQL代码片段提取出来,以便重用,通过定义`<parts>`元素(零件集)就可以做到. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件. 
+如果想把一些公用的SQL代码片段提取出来,以便重用,通过定义`<parts>`元素(零件集)就可以做到. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件.  
+若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`query`都能引用它.一个非分页的函数,如果绑定的是分页模板,那么这个函数只识别查询语句,不理会求和语句.
 
 ```java
 public interface QueryByNamedDBExample extends QueryRepository {
@@ -487,7 +488,7 @@ public interface QueryByNamedDBExample extends QueryRepository {
 }
 ```
 
-当然,采用`@QueryByNamed`同样适合于改操作,例如:
+允许多个方法绑定同一个模板id.当然,采用`@QueryByNamed`同样适应于改操作,例如:
 
 ```java
 @Modifying
@@ -605,8 +606,8 @@ public interface UserInfoDBService extends QueryRepository {
 ```
 
 ### @PageIndex和@PageSize
-`@PageIndex` 用来指定当前页索引   
-`@PageSize`  用来指定当前页应该显示多少条数据   
+`@PageIndex` 用来指定当前页索引,如果传递的值小于1,依然视为1   
+`@PageSize`  用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1   
 **注意**: 该注解组合不能和`Pageable`一起使用  
 例如:
 

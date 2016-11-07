@@ -23,6 +23,7 @@
 package org.fastquery.service;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -67,12 +68,15 @@ class GenerateRepositoryImpl implements GenerateRepository {
 			}	
 		}
 		
+		List<Class<Repository>> clses = new ArrayList<>();
+		
 		// 3). 批量生成 Repository 的实现类
 		Set<String> basePackages = null;
 		for (FastQueryJson fQueryPropertie : fqPropertie) {
 			basePackages = fQueryPropertie.getBasePackages();
 			for (String basePackage : basePackages) {
 				List<Class<Repository>> classes = ClassUtil.getClasses(basePackage);
+				clses.addAll(classes);
 				// classes.forEach(this::generate)
 				for (Class<Repository> rcls : classes) {
 					generate(rcls); // 生成
@@ -82,7 +86,7 @@ class GenerateRepositoryImpl implements GenerateRepository {
 		}
 		
 		// 3). 生成 Repository之后的检测
-		AsmRepository.after();
+		AsmRepository.after(clses);
 		
 	}
 

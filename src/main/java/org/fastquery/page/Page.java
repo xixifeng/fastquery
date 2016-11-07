@@ -45,9 +45,9 @@ public interface Page<E> {
 	public int getNumberOfElements();
 
 	/**
-	 * 当前页码,从0开始
+	 * 当前页码,从1开始
 	 * 
-	 * @return 当前页码,从0开始
+	 * @return 当前页码,从1开始
 	 */
 	public int getNumber();
 

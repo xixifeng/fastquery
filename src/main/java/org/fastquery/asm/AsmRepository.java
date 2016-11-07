@@ -24,6 +24,7 @@ package org.fastquery.asm;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.List;
 
 import org.fastquery.core.GenerateRepository;
 import org.fastquery.core.Prepared;
@@ -225,8 +226,9 @@ public class AsmRepository implements Opcodes {
 	/**
 	 * 所有的代码生成之后
 	 */
-	public static void after() {
-		QueryValidator.check();
+	public static void after(List<Class<Repository>> classes) {
+		QueryValidator.check(classes);
+		classes.clear();
 	}
 
 }

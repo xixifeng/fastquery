@@ -279,6 +279,23 @@ public class UserInfoDBServiceTest {
 		assertThat(userInfos[1].getId(), equalTo(2));
 		assertThat(userInfos[2].getId(), equalTo(3));
 	}
+	
+	@Test
+	public void insert(){
+		Integer id = 1950;
+		String name = "香月儿";
+		Integer age = 23;
+		
+		while (userInfoDBService.findById(id)!=null) {  // 该主键已经存在,直到该主键不存在时,才会结束循环
+			id += 1;
+		}
+		UserInfo u = userInfoDBService.insert(id, name, age);
+		assertThat(u.getId(), equalTo(id));
+		assertThat(u.getName(), equalTo(name));
+		assertThat(u.getAge(), equalTo(age));
+		
+	}
+	
 	/*
 	@Test
 	public void initv(){

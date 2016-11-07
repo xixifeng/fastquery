@@ -28,13 +28,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.fastquery.core.Param;
+import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
 import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.util.TypeUtil;
 import org.fastquery.where.Condition;
 
 /**
- * 如果Query,Condition中出现有":name" 表达式, 那么当前方法必须存在Parm注解并且保持一致.
+ * 如果Query,Condition中出现有":name" 表达式, 那么当前方法必须存在Parm注解并且保持一致. <br>
+ * Parm("") 命名时禁止用""字符串
  * 
  * @author xixifeng (fastquery@126.com)
  */
@@ -49,17 +51,21 @@ public class MarkFilter implements MethodFilter {
 			Param param = parameter.getAnnotation(Param.class);
 			if(param != null) {
 				params.add(":"+param.value());
+				if("".equals(param.value().trim())){
+					this.abortWith(method, "@Param(\""+param.value()+"\")这个小括号里面的值不能为空字符串");
+				}
 			}
 		}
 		
-		String reg = ":\\S+\\b";
+		String reg = Placeholder.SL_REG;
 		
 		Set<String> ps = new HashSet<>();
 		Query[] queries = method.getAnnotationsByType(Query.class);
 		for (Query query : queries) {
-			ps.addAll( TypeUtil.matchesNotrepeat(query.value(), reg) );
-			ps.addAll( TypeUtil.matchesNotrepeat(query.countField(), reg) );
-			ps.addAll( TypeUtil.matchesNotrepeat(query.countQuery(), reg) );
+			// 为什么要把","替换成" ,",请看SL_REG的注释
+			ps.addAll( TypeUtil.matchesNotrepeat(query.value().replace(",", " ,"), reg) );
+			ps.addAll( TypeUtil.matchesNotrepeat(query.countField().replace(",", " ,"), reg) );
+			ps.addAll( TypeUtil.matchesNotrepeat(query.countQuery().replace(",", " ,"), reg) );
 		}
 		
 		Condition[] conditions = method.getAnnotationsByType(Condition.class);
@@ -74,7 +80,7 @@ public class MarkFilter implements MethodFilter {
 			}
 		}
 		
-		return null;
+		return method;
 	}
 
 }

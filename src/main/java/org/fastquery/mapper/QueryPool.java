@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 
@@ -88,6 +89,8 @@ public class QueryPool {
 	 */
 	static Set<QueryMapper> xml2QueryMapper(String className,Resource resource){
 		String xmlName = className + ".queries.xml";
+		// 用来存储全局parts
+		Map<String, String> gparts = new HashMap<>();
 		Set<QueryMapper> queryMappers = new HashSet<>();
 		// 判断xmlName有没有存在
 		if(!resource.exist(xmlName)){
@@ -104,11 +107,24 @@ public class QueryPool {
 			int len = nodeList.getLength();
 			for (int i = 0; i < len; i++) {
 				Node node = nodeList.item(i);
+				
+				// 全局 parts
+				if(node.getNodeType() == Document.ELEMENT_NODE && "parts".equals(node.getNodeName())) {
+					NodeList partNodes = node.getChildNodes();
+					for(int j = 0; j< partNodes.getLength(); j++){
+						Node partNode = partNodes.item(j);
+						if(partNode.getNodeType() == Document.ELEMENT_NODE && "part".equals(partNode.getNodeName())) {
+							gparts.put(((Element)partNode).getAttribute("name"), partNode.getTextContent());
+						}
+					}
+				}
+				// 全局 parts End
+				
 				if(node.getNodeType() == Document.ELEMENT_NODE && "query".equals(node.getNodeName())) {
 					element = (Element) node;
 					String id = element.getAttribute("id");
-					String template = fuseValTpl(element, "value",true);
-					String countQuery = fuseValTpl(element, "countQuery",false);
+					String template = fuseValTpl(gparts,element, "value",true);
+					String countQuery = fuseValTpl(gparts,element, "countQuery",false);
 					
 					//  在存储template, 和 countQuery 之前 需要做数据库过滤
 					//  待续...
@@ -136,12 +152,12 @@ public class QueryPool {
 	 * @param defaultText 如果没有找到<XXX>节点元素是否直接取<query>下的textContent, true表示是.
 	 * @return 注意: 如果既没有<XXX>又不允许defaultText为true, 那么就返回null.
 	 */
-	private static String fuseValTpl(Element element, String xxx,boolean defaultText) {
+	private static String fuseValTpl(Map<String, String> gparts,Element element, String xxx,boolean defaultText) {
 		// 判断这个节点是否有子节点 value 
 		Element ele = getChildElement(element, xxx);
 		String template = null;
 		if(ele !=null) {
-			template = ele.getTextContent();
+			template = ele.getTextContent();			
 			// 看<value> 节点是否有兄弟节点<parts>
 			Element parts = getChildElement(element, "parts");
 			if(parts == null){ // 若没有parts节点
@@ -161,6 +177,17 @@ public class QueryPool {
 		} else if(defaultText) {
 			template = element.getTextContent();
 		}
+		
+		if(template==null) {
+			return null;
+		}
+		
+		// 融合全局part
+		Set<Entry<String, String>> entries = gparts.entrySet();
+		for (Entry<String, String> entry : entries) {
+			template = template.replaceAll("\\#\\{\\#"+entry.getKey()+"\\}", Matcher.quoteReplacement(entry.getValue()));
+		}
+		// 融合全局part End
 		return template;
 	}
 
@@ -208,7 +235,7 @@ public class QueryPool {
 	}
 
 	/**
-	 * 渲染模板,如果没有找到模板返回null
+	 * 渲染模板,该方法永远不会返回null或空,因为在初始化时就做了检测
 	 * @param className
 	 * @param id
 	 * @param map
@@ -216,10 +243,6 @@ public class QueryPool {
 	 */
 	static String render(String className,String id,Map<String, Object> map){
 		String tpl = getTemplate(className, id);
-		if(tpl==null || "".equals(tpl)){
-			return null;
-		}
-		
 		VelocityContext context = new VelocityContext();
 		if(map != null) {
 			// 往上下文设置值
@@ -235,17 +258,16 @@ public class QueryPool {
 		return writer.toString().replaceAll("\\s+", " ").trim();
 	}
 	
+	// 该方法永远不会返回null或空,因为在初始化时就做了检测
 	public static String render(String className,Method method,boolean isQuery,Object...args){
 		String id = method.getAnnotation(QueryByNamed.class).value();
-		
+		LOG.info("正在渲染模板:" + id);
 		String tpl;
 		if(isQuery){
+			// getTemplate 永远不会为null,在初始化时已经做了检测
 			tpl = getTemplate(className, id);	
 		} else {
 			tpl = getCountQuery(className+'.'+id);
-		}
-		if(tpl==null || "".equals(tpl)){
-			return null;
 		}
 		
 		VelocityContext context = new VelocityContext();
@@ -287,27 +309,20 @@ public class QueryPool {
 	}
 	
 	/**
-	 * 根据类名称(包含包地址)和id查询出模板,没有找到返回null
+	 * 根据类名称(包含包地址)和id查询出模板 该方法永远不会返回null或"",因为在初始化时做了与处理,如果为null或"",初始化都通过不了.
 	 * 
 	 * @param className
 	 * @param id
 	 * @return
 	 */
 	private static String getTemplate(String className,String id) {
-		if(className == null || id == null) {
-			return null;
-		}
+		// 特别注意: 是否有模板,已经在初始化时做了严格校验,在此处就不用判断是否为null了
 		Set<QueryMapper> queryMappers = mapQueryMapper.get(className);
-		if(queryMappers == null){
-			LOG.warn(String.format("从%s.queries.xml中没有id为%s的模板,将返回null", className,id));
-			return null;
-		}
 		for (QueryMapper queryMapper : queryMappers) {
 			if(queryMapper.getId().equals(id)){
 				return queryMapper.getTemplate();
 			}
 		}
-		LOG.warn(String.format("从%s.queries.xml中没有id为%s的模板", className,id));
 		return null;
 	}
 	
@@ -316,8 +331,8 @@ public class QueryPool {
 		String id = queryMapper.getId();
 		String template = queryMapper.getTemplate();
 		
-		notNullAndEmpty(id,xmlName + " 里面的id不能为\"\",且不能为null!");
-		notNullAndEmpty(template,xmlName + " 配置的模板不能为\"\",且不能为null!");
+		notNullAndEmpty(id,xmlName + ",<query>里面的id属性不能为\"\",且不能为null!");
+		notNullAndEmpty(template,xmlName + ", <query id=\""+id+"\"> 里面的配置不能为\"\",且不能为null!");
 		
 		for (QueryMapper qm : queryMappers) {
 			if(qm.getId().equals(id)){

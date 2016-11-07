@@ -81,7 +81,7 @@ public class SyntaxTest {
 		System.out.println("-->: "+ ("abckdwgew:name222 &".replaceAll("\\:name\\b", "?")) );
 		assertThat(":name22".replaceAll("\\:name\\b", "?"), equalTo(":name22"));
 		assertThat(":name22 ".replaceAll("\\:name\\b", "?"), equalTo(":name22 "));
-		assertThat(":name".replaceAll("\\:name\\b", "?"), equalTo("?"));
+		assertThat(":name,".replaceAll("\\:name\\b", "?"), equalTo("?"));
 		
 	}
 }

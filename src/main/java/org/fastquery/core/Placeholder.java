@@ -51,4 +51,7 @@ public interface Placeholder {
 	// 匹配格式 "?2"(允许首尾空格)
 	String SP2_REG = "\\s*\\?\\d+\\s*";
 	
+	// 注意: 该正则它能把":id,:name,:age"作为一个整体匹配下来
+	String SL_REG = ":\\S+\\b";
+	
 }

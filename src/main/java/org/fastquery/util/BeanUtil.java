@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.fastquery.core.Id;
+import org.fastquery.core.Placeholder;
 import org.fastquery.core.RepositoryException;
 
 import com.alibaba.fastjson.JSONArray;
@@ -281,7 +282,7 @@ public final class BeanUtil {
 	 * @return
 	 */
 	public static Object[] toUpdateSQL(Object bean,String dbName,String where) {
-		List<String> wps = TypeUtil.matches(where, ":\\S+\\b");
+		List<String> wps = TypeUtil.matches(where.replace(",", " ,"), Placeholder.SL_REG);
 		Object[] updateinfo = new Object[2];
 		List<Object> args = new ArrayList<>();
 		Class<?> cls = bean.getClass();
@@ -319,7 +320,7 @@ public final class BeanUtil {
 				return null;
 			}
 			// where的后面部分 和 追加sql参数
-			String whef = where.replaceAll(":\\S+\\b", "?");
+			String whef = where.replace(",", " ,").replaceAll(Placeholder.SL_REG, "?");
 			for (String wp : wps) {
 				Object val = new PropertyDescriptor(wp.replace(":", ""), cls).getReadMethod().invoke(bean);
 				if(val==null) {

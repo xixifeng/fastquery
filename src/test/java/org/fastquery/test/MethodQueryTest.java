@@ -136,4 +136,21 @@ public class MethodQueryTest {
 		effect = studentDBService.update(entity,"name = :name");
 		assertThat(effect, is(0));
 	}
+	
+	@Test
+	public void update5(){
+		Integer id = 1;
+		String name = "框架测试!";
+		Integer age = 23;
+		UserInfo ui = FQuery.reset(UserInfo.class);
+		ui.setName(name);
+		ui.setAge(age);
+		ui.setId(id);
+		int i = userInfoDBService.update(ui,"id in (:id,:id)");
+		assertThat(i, equalTo(1));
+		UserInfo userInfo = userInfoDBService.findById(ui.getId());
+		assertThat(userInfo.getId(), equalTo(id));
+		assertThat(userInfo.getName(), equalTo(name));
+		assertThat(userInfo.getAge(), equalTo(age));
+	}
 }

@@ -137,6 +137,10 @@ public interface UserInfoDBService extends QueryRepository {
 	
 	@Query("select id,name,age from UserInfo where id in (${ids})")
 	UserInfo[] findByIds(@Param("ids") int[] ids);
+	
+	@Modifying(table="UserInfo")
+	@Query("insert into UserInfo(id,name,age) values(:id,:name,:age)")
+	UserInfo insert(@Param("id") Integer id,@Param("name") String name, @Param("age")Integer age);
 }
 
 

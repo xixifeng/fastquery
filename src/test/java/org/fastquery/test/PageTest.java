@@ -20,47 +20,44 @@
  * 
  */
 
-package org.fastquery.page;
+package org.fastquery.test;
+
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import org.fastquery.bean.UserInfo;
+import org.fastquery.dao.UserInfoDBService;
+import org.fastquery.page.Page;
+import org.fastquery.page.PageableImpl;
+import org.fastquery.service.FQuery;
+import org.junit.Test;
+
+import static org.hamcrest.Matchers.*;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageableImpl implements Pageable {
+public class PageTest {
 
-	// 这个给默认值是没有意义的, 当前访问的是第几页和每页显示多少条数据,应该让客户端决定.
-	private int page; 
-	private int size;
+	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 	
-	public PageableImpl(int page, int size) {
+	
+	@Test
+	public void findSome1(){
 		
-		this.page = page;
-		this.size = size;
-		
-		if (page < 1) {
-			//throw new IllegalArgumentException("页码索引不能小于1 !")
-			this.page = 1;
-		}
-
-		if (size < 1) {
-			//throw new IllegalArgumentException("Page size 不能小于1 !")
-			this.size = 1;
-		}
+		int pageIndex = 0;
+		int size = 0;
+		Page<UserInfo> page = userInfoDBService.findSome1(1, 100, new PageableImpl(pageIndex, size));
+		assertThat(page, notNullValue());
+		assertThat(page.getNumber(),equalTo(1));
+		assertThat(page.getSize(),equalTo(1));
 	}
-
-	@Override
-	public int getPageNumber() {
-		return page;
-	}
-
-	@Override
-	public int getPageSize() {
-		return size;
-	}
-
-	@Override
-	public int getOffset() {
-		return page * size - size;
-	}
-
 }
+
+
+
+
+
+
+
+

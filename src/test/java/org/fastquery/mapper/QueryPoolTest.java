@@ -62,7 +62,6 @@ public class QueryPoolTest {
 				return true;
 			}
 		};
-		QueryPool.put("org.fastquery.dao.UserInfoDBService", resource);
 	}
 	
 	@Before
@@ -72,7 +71,7 @@ public class QueryPoolTest {
 	
 	@Test
 	public void testXml2QueryMapper() {
-		Set<QueryMapper> queryMappers = QueryPool.xml2QueryMapper("org.fastquery.dao.UserInfoDBService",resource);
+		Set<QueryMapper> queryMappers = QueryPool.xml2QueryMapper("org.fastquery.dao.QueryByNamedDBExample",resource);
 		
 		JSONArray jsonArray = new JSONArray();
 		for (QueryMapper queryMapper : queryMappers) {
