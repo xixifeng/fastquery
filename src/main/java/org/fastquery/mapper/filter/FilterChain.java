@@ -20,45 +20,33 @@
  * 
  */
 
-package org.fastquery.test;
+package org.fastquery.mapper.filter;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import org.fastquery.bean.UserInfo;
-import org.fastquery.dao.UserInfoDBService;
-import org.fastquery.page.Page;
-import org.fastquery.page.PageableImpl;
-import org.fastquery.service.FQuery;
-import org.junit.Test;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+import org.w3c.dom.Element;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageTest {
+public class FilterChain implements Filter {
 
-	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
-	
-	
-	@Test
-	public void findSome1(){
-		
-		int pageIndex = 0;
-		int size = 0;
-		Page<UserInfo> page = userInfoDBService.findSome1(1, 100, new PageableImpl(pageIndex, size));
-		assertThat(page, notNullValue());
-		assertThat(page.getNumber(),equalTo(1));
-		assertThat(page.getSize(),equalTo(1));
-		
+	private List<Filter> filters = new ArrayList<>();
+
+	public FilterChain addFilter(Filter filter) {
+		filters.add(filter);
+		return this;
 	}
+	
+	@Override
+	public Element doFilter(String xmlName, Element element) {
+		Element e = element;
+		for (Filter filter : filters) {
+			e = filter.doFilter(xmlName, element);
+		}
+		return e;
+	}
+
 }
-
-
-
-
-
-
-
-

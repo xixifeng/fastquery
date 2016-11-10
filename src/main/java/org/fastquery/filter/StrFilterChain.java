@@ -20,45 +20,31 @@
  * 
  */
 
-package org.fastquery.test;
+package org.fastquery.filter;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import org.fastquery.bean.UserInfo;
-import org.fastquery.dao.UserInfoDBService;
-import org.fastquery.page.Page;
-import org.fastquery.page.PageableImpl;
-import org.fastquery.service.FQuery;
-import org.junit.Test;
-
-import static org.hamcrest.Matchers.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageTest {
+public class StrFilterChain implements StrFilter {
 
-	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
-	
-	
-	@Test
-	public void findSome1(){
-		
-		int pageIndex = 0;
-		int size = 0;
-		Page<UserInfo> page = userInfoDBService.findSome1(1, 100, new PageableImpl(pageIndex, size));
-		assertThat(page, notNullValue());
-		assertThat(page.getNumber(),equalTo(1));
-		assertThat(page.getSize(),equalTo(1));
-		
+	private List<StrFilter> strFilters = new ArrayList<>();
+
+	public StrFilterChain addFilter(StrFilter strFilter) {
+		strFilters.add(strFilter);
+		return this;
 	}
+
+	@Override
+	public String doFilter(String str) {
+		String s = str;
+		for (StrFilter strFilter : strFilters) {
+			s = strFilter.doFilter(str);
+		}
+		return s;
+	}
+
 }
-
-
-
-
-
-
-
-

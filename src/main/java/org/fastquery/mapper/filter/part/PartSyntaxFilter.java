@@ -20,45 +20,36 @@
  * 
  */
 
-package org.fastquery.test;
+package org.fastquery.mapper.filter.part;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import org.fastquery.bean.UserInfo;
-import org.fastquery.dao.UserInfoDBService;
-import org.fastquery.page.Page;
-import org.fastquery.page.PageableImpl;
-import org.fastquery.service.FQuery;
-import org.junit.Test;
-
-import static org.hamcrest.Matchers.*;
+import org.fastquery.mapper.filter.Filter;
+import org.w3c.dom.Element;
 
 /**
+ * 校验 part 节点的语法
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageTest {
+public class PartSyntaxFilter implements Filter {
 
-	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
-	
-	
-	@Test
-	public void findSome1(){
+	@Override
+	public Element doFilter(String xmlName, Element element) {
+		// 找出part的爷爷
+		Element pe = (Element) element.getParentNode().getParentNode();
+		String ps;
+		if("query".equals(pe.getNodeName())) {
+			ps = "<query id=\""+pe.getAttribute("id")+"\">里面的parts";
+		} else {
+			ps = "<queries>下面的全局parts";
+		}
 		
-		int pageIndex = 0;
-		int size = 0;
-		Page<UserInfo> page = userInfoDBService.findSome1(1, 100, new PageableImpl(pageIndex, size));
-		assertThat(page, notNullValue());
-		assertThat(page.getNumber(),equalTo(1));
-		assertThat(page.getSize(),equalTo(1));
+		// 1). part节点必须有name属性
+		String name = element.getAttribute("name");
+		if("".equals(name)) {
+			this.abortWith("解析"+xmlName + "错误,原因:没有给part节点设置name属性.大概位置:它被"+ps+"包裹着");
+		}
 		
+		return element;
 	}
+
 }
-
-
-
-
-
-
-
-

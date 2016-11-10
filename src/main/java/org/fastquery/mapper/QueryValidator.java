@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.Repository;
 import org.fastquery.page.Page;
+import org.fastquery.util.TypeUtil;
 
 import java.util.Set;
 
@@ -53,26 +54,24 @@ public class QueryValidator {
 		   qms.forEach(q -> queries.add(q.getTemplate()));
 	   }
 	   
-	   // 1). query中不能出现 ";"
 	   for (String query : queries) {
-		   if(query.indexOf(';') != -1) {
-			   throw new ExceptionInInitializerError("禁止出现\";\"号, 错误位置>>>>>>>>>>>>>>: " + query);
+		   // 2). query装载后,就不能再出现 #{#name} 表达式了
+		   List<String> mts = TypeUtil.matches(query, "#\\{#\\S+\\}");
+		   if(  !mts.isEmpty() ) {
+			   error(String.format("没有找到name=\"%s\"的part", mts.get(0).replace("{", "").replace("}", "").replace("#", "")), query);
 		   }
+		   
 	   }
 	   
 
-	   // 2). 检验方法
+
+	   // 10). 检验方法
 	   for (Class<Repository> cls : classes) {
 		   String className = cls.getName();
 		   Method[] methods = cls.getMethods();
 			for (Method method : methods) {
 				QueryByNamed queryByNamed = method.getAnnotation(QueryByNamed.class);
 				if(queryByNamed!=null) {
-					
-					// m1: QueryByNamed的值不能为""
-					if("".equals(queryByNamed.value())){
-						error(method, "@QueryByNamed的值不能为空字符串");
-					}
 					
 					// m2: 标识有@QueryByNamed的方法,必须有对应的模板
 					String tmp = getTemplate(className, queryByNamed.value(), mapQueryMapper.get(className));
@@ -104,6 +103,10 @@ public class QueryValidator {
    
    private static void error(Method method,String msg){
 	   throw new ExceptionInInitializerError(String.format("%s->: %s ", method.toString(),msg));
+   }
+   
+   private static void error(String msg,String query){
+	   throw new ExceptionInInitializerError(msg+ ", 错误位置>>>>>>>>>>>>>>: " + query);
    }
    
 	static String getTemplate(String className,String id,Set<QueryMapper> queryMappers) {

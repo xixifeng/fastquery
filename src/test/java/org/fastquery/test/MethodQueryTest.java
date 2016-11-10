@@ -153,4 +153,12 @@ public class MethodQueryTest {
 		assertThat(userInfo.getName(), equalTo(name));
 		assertThat(userInfo.getAge(), equalTo(age));
 	}
+	
+	@Test
+	public void update6(){
+		UserInfo ui = FQuery.reset(UserInfo.class);
+		ui.setId(1);
+		int i = userInfoDBService.update(ui,"id = :id");
+		assertThat(i, lessThan(1));
+	}
 }

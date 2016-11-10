@@ -136,6 +136,12 @@ public class BeanUtilTest {
 		
 	}
 	
+	@Test
+	public void toUpdate3(){
+		String sql = BeanUtil.toInsertSQL(new UserInfo(null, "zhansan", 30));
+		assertThat(sql, equalTo("insert into UserInfo(id,name,age) values(null,'zhansan','30')"));
+	}
+	
 	
 	@Test
 	public void testReset(){

@@ -41,6 +41,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.fastquery.core.Param;
 import org.fastquery.core.QueryByNamed;
+import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
 import org.fastquery.util.TypeUtil;
 import org.w3c.dom.Document;
@@ -110,6 +111,7 @@ public class QueryPool {
 				
 				// 全局 parts
 				if(node.getNodeType() == Document.ELEMENT_NODE && "parts".equals(node.getNodeName())) {
+					Allocation.center(xmlName, (Element)node);
 					NodeList partNodes = node.getChildNodes();
 					for(int j = 0; j< partNodes.getLength(); j++){
 						Node partNode = partNodes.item(j);
@@ -121,10 +123,12 @@ public class QueryPool {
 				// 全局 parts End
 				
 				if(node.getNodeType() == Document.ELEMENT_NODE && "query".equals(node.getNodeName())) {
+					Allocation.center(xmlName, (Element)node);
 					element = (Element) node;
 					String id = element.getAttribute("id");
-					String template = fuseValTpl(gparts,element, "value",true);
-					String countQuery = fuseValTpl(gparts,element, "countQuery",false);
+					String postion = String.format("错误位置:%s  --> <%s id=\"%s\"", xmlName,element.getNodeName(),id);
+					String template = fuseValTpl(postion,gparts,element, "value",true);
+					String countQuery = fuseValTpl(postion,gparts,element, "countQuery",false);
 					
 					//  在存储template, 和 countQuery 之前 需要做数据库过滤
 					//  待续...
@@ -135,24 +139,27 @@ public class QueryPool {
 					LOG.debug(String.format("id=%s , template=%s", id,template));
 					QueryMapper queryMapper = new QueryMapper(id, template);
 					// 边解析,边做合法校验
-					legalCheck(queryMappers, queryMapper,xmlName);
+					legalCheck(queryMappers, queryMapper,postion);
+					legalCheck(countQuery,postion);
 					queryMappers.add(queryMapper);
 				}
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(),e);
+			throw new RepositoryException(e.getMessage(),e);
 		}
 		return queryMappers;
 	}
 
 	/**
-	 * 融合模板 融合 <query>节点下的<XXX>和<parts> 然后返回字符串
-	 * @param element <query>节点元素
-	 * @param ele <XXX>节点元素
+	 *  融合模板 融合 <query>节点下的<XXX>和<parts> 然后返回字符串
+	 * @param gparts 全局parts
+	 * @param element
+	 * @param xxx
 	 * @param defaultText 如果没有找到<XXX>节点元素是否直接取<query>下的textContent, true表示是.
 	 * @return 注意: 如果既没有<XXX>又不允许defaultText为true, 那么就返回null.
 	 */
-	private static String fuseValTpl(Map<String, String> gparts,Element element, String xxx,boolean defaultText) {
+	private static String fuseValTpl(String postion,Map<String, String> gparts,Element element, String xxx,boolean defaultText) {
 		// 判断这个节点是否有子节点 value 
 		Element ele = getChildElement(element, xxx);
 		String template = null;
@@ -160,20 +167,20 @@ public class QueryPool {
 			template = ele.getTextContent();			
 			// 看<value> 节点是否有兄弟节点<parts>
 			Element parts = getChildElement(element, "parts");
-			if(parts == null){ // 若没有parts节点
-				return template;
-			}
-			
-			NodeList ps = parts.getChildNodes();
-			for (int j = 0; j < ps.getLength(); j++) {
-				if(ps.item(j).getNodeType() == Element.ELEMENT_NODE) {
-					Element p = (Element) ps.item(j);
-					String name = p.getAttribute("name");
-					// p.getTextContent() 里面很可能包含有$ 或 \ 如果不用Matcher.quoteReplacement进行处理,那么$表示反向引用,就会报错的
-					template = template.replaceAll("\\#\\{\\#"+name+"\\}",Matcher.quoteReplacement(p.getTextContent()));
+			if(parts != null){ // 存在parts节点
+				NodeList ps = parts.getChildNodes();
+				for (int j = 0; j < ps.getLength(); j++) {
+					if(ps.item(j).getNodeType() == Element.ELEMENT_NODE) {
+						Element p = (Element) ps.item(j);
+						String name = p.getAttribute("name");
+						if("".equals(name)){
+							throw new ExceptionInInitializerError(String.format("%s> 下面的 part 节点没有设置name属性", postion));
+						}
+						// p.getTextContent() 里面很可能包含有$ 或 \ 如果不用Matcher.quoteReplacement进行处理,那么$表示反向引用,就会报错的
+						template = template.replaceAll("\\#\\{\\#"+name+"\\}",Matcher.quoteReplacement(p.getTextContent()));
+					}
 				}
 			}
-			
 		} else if(defaultText) {
 			template = element.getTextContent();
 		}
@@ -241,21 +248,19 @@ public class QueryPool {
 	 * @param map
 	 * @return
 	 */
-	static String render(String className,String id,Map<String, Object> map){
-		String tpl = getTemplate(className, id);
+	static String render(String tpl,String logTag,Map<String, Object> map){
+		// 不用判断map是否为空,这个方法没有公开,在作用域
 		VelocityContext context = new VelocityContext();
-		if(map != null) {
-			// 往上下文设置值
-			map.forEach((k,v)->context.put(k, v));	
-		}		
+		// 往上下文设置值
+		map.forEach((k,v)->context.put(k, v));	
 		
 		// 输出流
 		StringWriter writer = new StringWriter();
 		
 	    // 转换输出
-		Velocity.evaluate(context, writer, className+'.'+id, tpl);
+		Velocity.evaluate(context, writer, logTag, tpl);
 		
-		return writer.toString().replaceAll("\\s+", " ").trim();
+		return writer.toString();
 	}
 	
 	// 该方法永远不会返回null或空,因为在初始化时就做了检测
@@ -270,8 +275,8 @@ public class QueryPool {
 			tpl = getCountQuery(className+'.'+id);
 		}
 		
-		VelocityContext context = new VelocityContext();
-		// 替换@Param
+		// 处理@Param
+		Map<String, Object> map = new HashMap<>();
 		Annotation[][] annotations = method.getParameterAnnotations();
 		int len = annotations.length;
 		for (int i = 0; i < len; i++) {
@@ -279,19 +284,15 @@ public class QueryPool {
 			for (Annotation ann : anns) {
 				if(ann.annotationType() == Param.class) {
 					Param param = (Param) ann;
-					context.put(param.value(), args[i]);
+					map.put(param.value(), args[i]);
 				}
 			}
 		}
-		// 替换@Param End
+		// 处理@Param End
 		
-		// 输出流
-		StringWriter writer = new StringWriter();
+		String logTag = new StringBuilder(className).append('.').append(id).toString();
 		
-	    // 转换输出
-		Velocity.evaluate(context, writer, className+'.'+id, tpl);
-		
-		String str = writer.toString().trim().replaceAll("\\s+", " ");
+		String str = render(tpl, logTag, map).trim().replaceAll("\\s+", " ");
 		
 		return TypeUtil.parWhere(str);
 	}
@@ -315,7 +316,7 @@ public class QueryPool {
 	 * @param id
 	 * @return
 	 */
-	private static String getTemplate(String className,String id) {
+	static String getTemplate(String className,String id) {
 		// 特别注意: 是否有模板,已经在初始化时做了严格校验,在此处就不用判断是否为null了
 		Set<QueryMapper> queryMappers = mapQueryMapper.get(className);
 		for (QueryMapper queryMapper : queryMappers) {
@@ -327,26 +328,34 @@ public class QueryPool {
 	}
 	
 	// 在解析xml时,合法性检查
-	private static void legalCheck(Set<QueryMapper> queryMappers, QueryMapper queryMapper,String xmlName) {
+	private static void legalCheck(Set<QueryMapper> queryMappers, QueryMapper queryMapper,String postion) {
 		String id = queryMapper.getId();
 		String template = queryMapper.getTemplate();
 		
-		notNullAndEmpty(id,xmlName + ",<query>里面的id属性不能为\"\",且不能为null!");
-		notNullAndEmpty(template,xmlName + ", <query id=\""+id+"\"> 里面的配置不能为\"\",且不能为null!");
+		notNullAndEmpty(id,postion + ">,这个query里面的id属性值不能为\"\".");
+		notNullAndEmpty(template,postion + ">, 这个query所包裹的模板内容不能为空白.");
 		
 		for (QueryMapper qm : queryMappers) {
 			if(qm.getId().equals(id)){
-				throw new ExceptionInInitializerError(xmlName + " 里面的id不能重复!");
-			}
-			if(qm.getTemplate().equals(template)){
-				throw new ExceptionInInitializerError(xmlName + " 配置的模板不能重复!");
+				throw new ExceptionInInitializerError(postion + "> 这个query的id值已经存在了,请不要重复.");
 			}
 		}
-		
+		notSemicolons(template, postion + "> 这个query所包裹的模板内容不能出现\";\"号,并不是说不能往里面传递值包含有\";\"的参数");
+	}
+	
+	private static void legalCheck(String countQuery,String postion) {
+		notSemicolons(countQuery, postion + "> 下面的<countQuery>所包裹的模板内容不能出现\";\"号,并不是说不能往里面传递值包含有\";\"的参数");
+	}
+	
+	// 禁止";"号
+	private static void notSemicolons(String query,String postion){
+		if(query!=null && query.indexOf(';') != -1) {
+			throw new ExceptionInInitializerError(postion);
+		 }
 	}
 	
 	private static void notNullAndEmpty(String str,String msg){
-		if(str == null || "".equals(str.trim())) {
+		if("".equals(str.trim())) {
 			throw new ExceptionInInitializerError(msg);
 		}	
 	}

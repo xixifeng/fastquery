@@ -33,6 +33,7 @@ import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.filter.generate.common.MethodFilterChain;
 import org.fastquery.filter.generate.global.InterceptorFilter;
+import org.fastquery.filter.generate.global.PageableFilter;
 import org.fastquery.filter.generate.global.ReturnTypeFilter;
 import org.fastquery.filter.generate.modifying.AnnotationSynxFilter;
 import org.fastquery.filter.generate.modifying.ArgsFilter;
@@ -116,6 +117,7 @@ class GenerateExtends {
 			globalFilterChain = new MethodFilterChain();		
 			globalFilterChain.addFilter(new ReturnTypeFilter());
 			globalFilterChain.addFilter(new InterceptorFilter()); // @Before,@After拦截器安全校验
+			globalFilterChain.addFilter(new PageableFilter());
 			
 			
 			queryFilterChain = new MethodFilterChain();

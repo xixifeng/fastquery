@@ -36,6 +36,7 @@ import org.junit.Test;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import static org.junit.Assert.assertThat;
 
@@ -294,6 +295,35 @@ public class UserInfoDBServiceTest {
 		assertThat(u.getName(), equalTo(name));
 		assertThat(u.getAge(), equalTo(age));
 		
+	}
+	
+	@Test
+	public void updateNameById(){
+		int id = 2;
+		int i = userInfoDBService.updateNameById("'戚继光'", 2);
+		assertThat(i, is(1));
+		UserInfo u = userInfoDBService.findById(id);
+		assertThat(u.getId(), equalTo(id));
+		assertThat(u.getName(), equalTo("戚继光"));
+	}
+	
+	@Test
+	public void updateAgeById(){
+		UserInfo userInfo = userInfoDBService.updateAgeById(null, 3);
+		assertThat(userInfo.getId(), is(3));
+		assertThat(userInfo.getAge(), nullValue());
+		userInfo = userInfoDBService.updateAgeById(21, 3);
+		assertThat(userInfo.getId(), is(3));
+		assertThat(userInfo.getAge(), is(21));	
+	}
+	
+	
+	@Test
+	public void updateAge(){
+		JSONObject userInfo = userInfoDBService.updateAge(null, 3);
+		assertThat(userInfo.getIntValue("id"), is(3));
+		// 断言:包含有age属性 (age即使是null)
+		assertThat(JSON.toJSONString(userInfo, SerializerFeature.WriteMapNullValue).indexOf("\"age\"") != -1, is(true));
 	}
 	
 	/*

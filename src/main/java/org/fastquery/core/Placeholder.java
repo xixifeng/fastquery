@@ -54,4 +54,5 @@ public interface Placeholder {
 	// 注意: 该正则它能把":id,:name,:age"作为一个整体匹配下来
 	String SL_REG = ":\\S+\\b";
 	
+	String P_REG = "\\$\\{\\S+\\}";
 }

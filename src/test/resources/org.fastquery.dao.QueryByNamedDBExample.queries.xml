@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <queries>
 
+	<!-- 定义全局 parts -->
+	<parts>
+		<part name="feids">id,name,age</part>
+	</parts>
+	
 	<query id="findUserInfoAll">
 		select id,name,age from UserInfo
 	</query>
@@ -75,6 +80,19 @@
 	<query id="updateUserInfoById">
 	    ## 在这里支持velocity语法
 		update UserInfo set name = :name,age = :age where id= :id
+	</query>
+	
+	<!-- 局部part优先渲染 -->
+	<!-- 举例说明:  编译#{#feids}的过程:先从`<query>`范围里寻找name为feids的part,若没有找到,就去全局`<parts>`里寻找name为feids的part. -->	
+	<query id="findUAll">
+		<value>select #{#feids} from UserInfo</value>
+	</query>
+	
+	<query id="findUserAll">
+		<value>select #{#feids} from UserInfo</value>
+		<parts>
+			<part name="feids">name</part>
+		</parts>
 	</query>
 </queries>
 

@@ -20,45 +20,31 @@
  * 
  */
 
-package org.fastquery.test;
+package org.fastquery.mapper.filter;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import org.fastquery.bean.UserInfo;
-import org.fastquery.dao.UserInfoDBService;
-import org.fastquery.page.Page;
-import org.fastquery.page.PageableImpl;
-import org.fastquery.service.FQuery;
-import org.junit.Test;
-
-import static org.hamcrest.Matchers.*;
+import org.fastquery.core.RepositoryException;
+import org.w3c.dom.Element;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageTest {
-
-	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
+@FunctionalInterface
+public interface Filter {
 	
+	/**
+	 * 过滤
+	 * @param element 待检测的Element
+	 * @return
+	 */
+	Element doFilter(String xmlName,Element element);
 	
-	@Test
-	public void findSome1(){
-		
-		int pageIndex = 0;
-		int size = 0;
-		Page<UserInfo> page = userInfoDBService.findSome1(1, 100, new PageableImpl(pageIndex, size));
-		assertThat(page, notNullValue());
-		assertThat(page.getNumber(),equalTo(1));
-		assertThat(page.getSize(),equalTo(1));
-		
+	/**
+	 * 终止(扯断链条)
+	 * @param errmsg 终止理由
+	 */
+	default void abortWith(String errmsg){
+		throw new RepositoryException(errmsg);
 	}
+	
 }
-
-
-
-
-
-
-
-

@@ -198,15 +198,16 @@ List<Map<String, Object>> find(String sex);
 ```
 
 **注意**: 查询单个字段,支持返回如下格式:
-- `List<String>`
-- `List<Byte>`
-- `List<Short>`
-- `List<Integer>`
-- `List<Long>`
-- `List<Float>`
-- `List<Double>`
-- `List<Character>`
-- `List<Boolean>`  
+- `List<String>` 或 `String`
+- `List<Byte>` 或 `Byte`
+- `List<Short>` 或 `Short`
+- `List<Integer>` 或 `Integer`
+- `List<Long>` 或 `Long`
+- `List<Float>` 或 `Float`
+- `List<Double>` 或 `Double`
+- `List<Character>` 或 `Character`
+- `List<Boolean>` 或 `Boolean`  
+除了改操作或求和外,查单个字段不能返回基本类型,因为:基本类型不能接受`null`值,而SQL表字段可以为`null`.
 例如: 
 
 ```java
@@ -471,7 +472,7 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 |  "   | &amp;quot;| 引号 |
 
 如果想把一些公用的SQL代码片段提取出来,以便重用,通过定义`<parts>`元素(零件集)就可以做到. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件.  
-若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`query`都能引用它.一个非分页的函数,如果绑定的是分页模板,那么这个函数只识别查询语句,不理会求和语句.
+若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`<query>`都能引用它.一个非分页的函数,如果绑定的是分页模板,那么这个函数只识别查询语句,不理会求和语句.
 
 ```java
 public interface QueryByNamedDBExample extends QueryRepository {
@@ -856,7 +857,7 @@ build: maven
 
 ## 反馈问题
 https://git.oschina.net/xixifeng.com/fastquery/issues  
-地球人都知道,开源中国秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过码云[issue](https://git.oschina.net/xixifeng.com/fastquery/issues)来向我们反馈.  
+地球人都知道,开源中国秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://git.oschina.net/xixifeng.com/fastquery/issues)来向我们反馈.  
 
 ## 联系作者
 @习习风 fastquery#126.com  

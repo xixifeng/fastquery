@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
@@ -50,33 +51,45 @@ public class MarkFilter implements MethodFilter {
 		for (Parameter parameter : parameters) {
 			Param param = parameter.getAnnotation(Param.class);
 			if(param != null) {
-				params.add(":"+param.value());
+				params.add(param.value());
 				if("".equals(param.value().trim())){
 					this.abortWith(method, "@Param(\""+param.value()+"\")这个小括号里面的值不能为空字符串");
 				}
 			}
 		}
 		
-		String reg = Placeholder.SL_REG;
+		String slreg = Placeholder.SL_REG;
+		String preg = Placeholder.P_REG;
 		
+		// 把能与SL_REG和preg匹配的表达式收集起来
 		Set<String> ps = new HashSet<>();
 		Query[] queries = method.getAnnotationsByType(Query.class);
 		for (Query query : queries) {
 			// 为什么要把","替换成" ,",请看SL_REG的注释
-			ps.addAll( TypeUtil.matchesNotrepeat(query.value().replace(",", " ,"), reg) );
-			ps.addAll( TypeUtil.matchesNotrepeat(query.countField().replace(",", " ,"), reg) );
-			ps.addAll( TypeUtil.matchesNotrepeat(query.countQuery().replace(",", " ,"), reg) );
+			ps.addAll( TypeUtil.matchesNotrepeat(query.value().replace(",", " ,"), slreg) );
+			ps.addAll( TypeUtil.matchesNotrepeat(query.countField().replace(",", " ,"), slreg) );
+			ps.addAll( TypeUtil.matchesNotrepeat(query.countQuery().replace(",", " ,"), slreg) );
+			
+			ps.addAll( TypeUtil.matchesNotrepeat(query.value(), preg) );
+			ps.addAll( TypeUtil.matchesNotrepeat(query.countField(), preg) );
+			ps.addAll( TypeUtil.matchesNotrepeat(query.countQuery(), preg) );
+				
 		}
 		
 		Condition[] conditions = method.getAnnotationsByType(Condition.class);
 		for (Condition condition : conditions) {
-			ps.addAll(TypeUtil.matchesNotrepeat(condition.value(), reg));
+			ps.addAll(TypeUtil.matchesNotrepeat(condition.value(), slreg));
 		}
 		
 		for (String p : ps) {
-			// params的每个成员前面都已加上:
-			if(!params.contains(p)) {
-				this.abortWith(method, String.format("发现存在%s,而从参数中没有找到@Param(\"%s\"),这种语法是不允许的.", p,p.replaceFirst(":","")));
+			String s;
+			if(Pattern.matches(slreg, p)) {
+				s = p.replaceFirst(":","");
+			} else {
+				s = p.replace("${", "").replace("}","");
+			} 
+			if(!params.contains(s)) {
+				this.abortWith(method, String.format("发现存在%s,而从参数中没有找到@Param(\"%s\"),这种语法是不被允许的.", p,s));
 			}
 		}
 		

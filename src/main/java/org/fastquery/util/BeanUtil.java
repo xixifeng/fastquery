@@ -316,7 +316,7 @@ public final class BeanUtil {
 				}
 			}
 			if(sb.length()==len) {
-				LOG.warn("传递的实体,没有什么可以修改," + bean);
+				LOG.warn("传递的实体,没有什么可修改," + bean);
 				return null;
 			}
 			// where的后面部分 和 追加sql参数

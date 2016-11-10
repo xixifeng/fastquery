@@ -28,6 +28,7 @@ import java.util.Map;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInformation;
 import org.fastquery.core.Source;
+import org.fastquery.core.Id;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;
@@ -41,6 +42,7 @@ import org.fastquery.page.Pageable;
 import org.fastquery.where.Condition;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * 
@@ -141,6 +143,19 @@ public interface UserInfoDBService extends QueryRepository {
 	@Modifying(table="UserInfo")
 	@Query("insert into UserInfo(id,name,age) values(:id,:name,:age)")
 	UserInfo insert(@Param("id") Integer id,@Param("name") String name, @Param("age")Integer age);
+	
+	// 这行SQL参数完全可以用?或:name表达式,在此仅用来测试语法特性
+	@Modifying
+	@Query("update UserInfo set name = ${name} where id = ${id}")
+	int updateNameById(@Param("name") String name,@Param("id") int id);
+	
+	@Modifying(table="UserInfo")
+	@Query("update UserInfo set age = ${age} where id = ${id}")
+	UserInfo updateAgeById(@Param(value="age",defaultVal="null") Integer age,@Id @Param("id") int id);
+	
+	@Modifying(table="UserInfo")
+	@Query("update UserInfo set age = ${age} where id = ${id}")
+	JSONObject updateAge(@Param(value="age",defaultVal="null") Integer age,@Id @Param("id") int id);
 }
 
 

@@ -30,8 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Param;
 import org.junit.Test;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializeFilter;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -84,4 +89,16 @@ public class SyntaxTest {
 		assertThat(":name,".replaceAll("\\:name\\b", "?"), equalTo("?"));
 		
 	}
+	
+	@Test
+	public void fastjson(){
+		UserInfo userInfo = new UserInfo(1, null, null);
+		System.out.println(JSON.toJSONString(userInfo,SerializerFeature.WriteMapNullValue));
+		Boolean b = false;
+		System.out.println(JSON.toJSONString(b,SerializerFeature.WriteNullBooleanAsFalse));
+	}
 }
+
+
+
+
