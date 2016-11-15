@@ -24,6 +24,7 @@ package org.fastquery.test;
 
 import org.fastquery.mapper.QueryByNamedDBExampleMapperTest;
 import org.fastquery.util.BeanUtilTest;
+import org.fastquery.util.FastQueryJSONObjectTest;
 import org.fastquery.util.TypeUtilTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,7 +40,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({ StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class,
 		UserInfoDBServiceTest3.class, TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class,
-		BeanUtilTest.class, PageTest.class, QueryByNamedDBExampleMapperTest.class })
+		BeanUtilTest.class, PageTest.class, QueryByNamedDBExampleMapperTest.class,FastQueryJSONObjectTest.class })
 class AllTest {
 
 	@Test

@@ -32,6 +32,7 @@ import org.fastquery.core.Id;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;
+import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Transactional;
 import org.fastquery.page.NotCount;
@@ -156,6 +157,9 @@ public interface UserInfoDBService extends QueryRepository {
 	@Modifying(table="UserInfo")
 	@Query("update UserInfo set age = ${age} where id = ${id}")
 	JSONObject updateAge(@Param(value="age",defaultVal="null") Integer age,@Id @Param("id") int id);
+	
+	@QueryByNamed("findLimit")
+	UserInfo findLimit();
 }
 
 

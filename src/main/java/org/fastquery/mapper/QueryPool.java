@@ -28,6 +28,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -43,6 +44,7 @@ import org.fastquery.core.Param;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
+import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -81,6 +83,22 @@ public class QueryPool {
 		return countQueryMap.get(key);
 	}
 
+	static String findTplXml(String className,Resource resource) {
+		// 搜索顺序,先从classpath的根目录开始搜寻,再从fastquery.json的queries所指定的目录里查找
+		// 一旦找到,就不往下找了,立马返回.
+		
+		List<String> pers = FastQueryJSONObject.getQueries();
+		pers.add("");
+		for (String per : pers) {
+			String perxml = new StringBuilder().append(per).append(className).append(".queries.xml").toString();
+			if(resource.exist(perxml)) {
+				return perxml;
+			}
+		}
+		
+		return null;
+	}
+	
 	/**
 	 * 将*.querys.xml -> QueryMapper 并检测配置文件的正确性
 	 * 
@@ -89,13 +107,12 @@ public class QueryPool {
 	 * @return
 	 */
 	static Set<QueryMapper> xml2QueryMapper(String className,Resource resource){
-		String xmlName = className + ".queries.xml";
 		// 用来存储全局parts
 		Map<String, String> gparts = new HashMap<>();
 		Set<QueryMapper> queryMappers = new HashSet<>();
+		String xmlName = findTplXml(className, resource);
 		// 判断xmlName有没有存在
-		if(!resource.exist(xmlName)){
-			LOG.debug("没有找到文件:" + xmlName);
+		if(xmlName == null){
 			return queryMappers;
 		}
 		

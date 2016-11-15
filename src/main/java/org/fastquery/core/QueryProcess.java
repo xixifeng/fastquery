@@ -535,6 +535,7 @@ public class QueryProcess {
 			
 			if(method.getAnnotation(NotCount.class)==null) { // 需要求和
 				 sql = TypeUtil.paramNameFilter(method, args,countQuery);
+				 ints = TypeUtil.getSQLParameter(sql); // 06-11-11
 				 sql = sql.replaceAll(Placeholder.SP1_REG, "?");
 				 LOG.info("求和语句: " + sql);
 				try {
@@ -565,6 +566,9 @@ public class QueryProcess {
 				isLast = number == totalPages;
 				// 求和 --------------------------------------------------- End
 			} else {
+				// 获取sql
+				sql = TypeUtil.paramNameFilter(method, args, query); // 06-11-11
+				ints = TypeUtil.getSQLParameter(sql); // 06-11-11
 				// 在查一下推算出下一页是否有数据, 要不要把下一页的数据存储起来,有待考虑...
 				int firstResult = pageable.getOffset()+pageable.getPageSize();
 				limit =  getLimit(firstResult, pageable.getPageSize());

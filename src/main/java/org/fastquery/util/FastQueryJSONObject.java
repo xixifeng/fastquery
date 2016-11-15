@@ -22,6 +22,12 @@
 
 package org.fastquery.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.fastquery.core.RepositoryException;
+
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -31,9 +37,8 @@ import com.alibaba.fastjson.JSONObject;
 public class FastQueryJSONObject {
 	private static JSONObject jsonObject;
 	
-	private static boolean debug = false;
-	
 	private FastQueryJSONObject(){}
+	
 	static void  setJsonObject(JSONObject o){// 只允许对jsonObject赋值一次
 		if(jsonObject==null) {
 			jsonObject = o;	
@@ -57,6 +62,32 @@ public class FastQueryJSONObject {
 	}
 	
 	public static boolean getDebug(){
-		return (boolean)jsonObject.getOrDefault("debug", debug);
+		return (boolean)jsonObject.getOrDefault("debug", false);
+	}
+	
+	public static List<String> getQueries(){
+		List<String> strs = new ArrayList<>();
+		JSONArray jsonArray = jsonObject.getJSONArray("queries");
+		if(jsonArray==null){
+			return strs;
+		}
+		jsonArray.forEach(s -> strs.add(s.toString()));
+		return strs;
+	}
+	
+	static void check(){
+		// 1). queries属性要么不配置,要么配置正确
+		List<String> strs = getQueries();
+		for (String str : strs) {
+			if( "".equals(str)) {
+				continue;
+			}
+			if(str.charAt(0)=='/') {
+				throw new RepositoryException(String.format("fastquery.json-> queries配置错误,\"%s\"的开头不应该有\"/\"", str));
+			}	
+			if(str.charAt(str.length()-1)!='/'){
+				throw new RepositoryException(String.format("fastquery.json-> queries配置错误,\"%s\"的末尾必须加\"/\"", str));
+			}
+		}
 	}
 }
