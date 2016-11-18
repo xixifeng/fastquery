@@ -103,13 +103,7 @@ jdk1.8+
 		             "org.fastquery.dao2.UserInfoDBService2"
 		        ]
 		     }
-		  ],
-  // 基准目录,注意: 后面记得加上 "/"
-  // 该目录用来放SQL文件,需要执行SQL文件时,指定其名称就够了
-  "basedir" : "/root/git/fastquery/fastquery/tmp/",
-  
-  // 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目,默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式
-  "debug" : false
+		  ] 
 }
 ```
 **注意**: 在fastquery.json中配置作用域,其中"dataSourceName"不是必须的,"dataSourceName"要么不指定,要指定的话那么必须正确.如果没有指定"dataSourceName",那么在调用接口的时候必须指定数据源的名称.下面的适配数据源章节会讲到.  
@@ -117,7 +111,9 @@ fastquery.json其他可选配置选项:
 
 | 属性名 | 类型 | 默认值 | 作用 | 示例 |
 |:-----:|:-----:|:-----:|:-----|:-----|
-| queries | array | [] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
+| basedir | string | 无 | 基准目录,注意: 后面记得加上 "/" <br> 该目录用来放SQL文件,需要执行SQL文件时,指定其名称就够了 | "/tmp/sql/" |
+| debug | boolean | false | 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目,默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式 | false |
+| queries | array | [ ] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
 | velocity | string | 无 | 指定velocity的配置文件 | "/tmp/velocity.properties" |
 
 
