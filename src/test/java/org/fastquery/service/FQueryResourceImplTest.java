@@ -20,33 +20,41 @@
  * 
  */
 
-package org.fastquery.test;
+package org.fastquery.service;
 
-import org.fastquery.mapper.QueryByNamedDBExampleMapperTest;
-import org.fastquery.service.FQueryResourceImplTest;
-import org.fastquery.util.BeanUtilTest;
-import org.fastquery.util.FastQueryJSONObjectTest;
-import org.fastquery.util.TypeUtilTest;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+
+import org.fastquery.core.Resource;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
 
 /**
- * 运行所有的测试用例
  * 
  * @author xixifeng (fastquery@126.com)
  */
-// 指定运行器
-@RunWith(Suite.class)
-@SuiteClasses({ StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class,
-		UserInfoDBServiceTest3.class, TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class,
-		BeanUtilTest.class, PageTest.class, QueryByNamedDBExampleMapperTest.class, FastQueryJSONObjectTest.class,
-		FQueryResourceImplTest.class, SunnyDBServiceTest.class })
-class AllTest {
+public class FQueryResourceImplTest {
+
+	private Resource resource = new FQueryResourceImpl();
+	
+	@Test
+	public void testGetResourceAsStream() {		
+		try (InputStream inputStream = resource.getResourceAsStream("queries/org.fastquery.dao.UserInfoDBService.queries.xml"); ByteArrayOutputStream bo = new ByteArrayOutputStream()) {
+			int b = 0;
+			while ( (b=inputStream.read()) != -1 ) {
+				bo.write(b);
+			}
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 
 	@Test
-	public void todo() {
+	public void testExist() {
+		assertThat(resource.exist("fastquery.json"), is(true));
 	}
 
 }

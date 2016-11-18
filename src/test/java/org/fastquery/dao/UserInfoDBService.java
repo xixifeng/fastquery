@@ -160,6 +160,10 @@ public interface UserInfoDBService extends QueryRepository {
 	
 	@QueryByNamed("findLimit")
 	UserInfo findLimit();
+	
+	
+	@Query("select age from UserInfo where id = ?1")
+	Integer findAge(Integer id);
 }
 
 

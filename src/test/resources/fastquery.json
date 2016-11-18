@@ -39,6 +39,14 @@
     }
     ,
     {
+        "config": "c3p0",            
+        "dataSourceName": "sunnydb", 
+        "basePackages": [            
+            "org.fastquery.dao.SunnyDBService"
+        ]
+    }
+    ,
+    {
         "config": "c3p0",            // 表示由c3p0负责提供数据源
         "basePackages": [   
              "org.fastquery.dao2.UserInfoDBService2"

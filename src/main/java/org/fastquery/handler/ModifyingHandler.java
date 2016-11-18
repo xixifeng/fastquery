@@ -124,7 +124,7 @@ public final class ModifyingHandler {
 	}
 	
 	public boolean booleanType(long effect){
-		return effect > 0;
+		return effect >= 0;
 	}
 	
 	

@@ -32,14 +32,20 @@ import org.fastquery.core.Resource;
  * @author xixifeng (fastquery@126.com)
  */
 class FQueryResourceImpl implements Resource {
-	
+		
 	@Override
 	public InputStream getResourceAsStream(String name) {
+		if(!exist(name)) {
+			return null;
+		}
 		return FQueryResourceImpl.class.getClassLoader().getResourceAsStream(name);
 	}
 
 	@Override
 	public boolean exist(String name) {
+		if(name==null || name.charAt(0) == '/') {
+			return false;
+		}
 		URL url = FQueryResourceImpl.class.getClassLoader().getResource(name);
 		if (url == null) {
 			return false;

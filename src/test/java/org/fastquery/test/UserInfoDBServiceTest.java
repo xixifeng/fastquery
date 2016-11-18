@@ -72,6 +72,14 @@ public class UserInfoDBServiceTest {
 	}
 	
 	@Test
+	public void findById2(){
+		UserInfo userInfo = userInfoDBService.findById(35); // 没有找到 userInfo 会返回null
+		if(userInfo!=null) {
+			assertThat(userInfo.getAge(), nullValue());	
+		}
+	}
+	
+	@Test
 	public void findUserInfoByNameOrAge(){
 		UserInfo[] userInfos = userInfoDBService.findUserInfoByNameOrAge("王五", 8);
 		for (UserInfo userInfo : userInfos) {
@@ -324,6 +332,12 @@ public class UserInfoDBServiceTest {
 		assertThat(userInfo.getIntValue("id"), is(3));
 		// 断言:包含有age属性 (age即使是null)
 		assertThat(JSON.toJSONString(userInfo, SerializerFeature.WriteMapNullValue).indexOf("\"age\"") != -1, is(true));
+	}
+	
+	@Test
+	public void findAge() {
+		Integer age = userInfoDBService.findAge(35);
+		assertThat(age, nullValue());
 	}
 	
 	/*

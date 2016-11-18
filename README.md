@@ -112,7 +112,14 @@ jdk1.8+
   "debug" : false
 }
 ```
-**注意**: 在fastquery.json中配置作用域,其中"dataSourceName"不是必须的,"dataSourceName"要么不指定,要指定的话那么必须正确.如果没有指定"dataSourceName",那么在调用接口的时候必须指定数据源的名称.下面的适配数据源章节会讲到.
+**注意**: 在fastquery.json中配置作用域,其中"dataSourceName"不是必须的,"dataSourceName"要么不指定,要指定的话那么必须正确.如果没有指定"dataSourceName",那么在调用接口的时候必须指定数据源的名称.下面的适配数据源章节会讲到.  
+fastquery.json其他可选配置选项:
+
+| 属性名 | 类型 | 默认值 | 作用 | 示例 |
+|:-----:|:-----:|:-----:|:-----:|
+| queries | array | [] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
+| velocity | string | 无 | 指定velocity的配置文件 | "/tmp/velocity.properties" |
+
 
 ## 一个完整的入门例子
 - 准备一个实体
@@ -207,7 +214,9 @@ List<Map<String, Object>> find(String sex);
 - `List<Double>` 或 `Double`
 - `List<Character>` 或 `Character`
 - `List<Boolean>` 或 `Boolean`  
+
 除了改操作或求和外,查单个字段不能返回基本类型,因为:基本类型不能接受`null`值,而SQL表字段可以为`null`.
+返回类型若是基本包装类型,若返回null, 表示:没有查到或字段的值本身就是null.
 例如: 
 
 ```java
@@ -287,8 +296,11 @@ JSONObject saveUserInfo2(String name,Integer age);
 @Modifying(id="id",table="userinfo")
 @Query("insert into #{#table} (name,age) values (?1, ?2)")
 Primarykey saveUserInfo(String name,Integer age);
-
 ```
+
+**注意**:
+- 改操作返回int类型:表示影响的行数,没有找到可以修改的,那么影响行数为0,并不能视为改失败了
+- 改操作返回boolean类型:表示是否改正确,没有找到可以修改的,那么返回true,并不能视为改失败了
 
 ## QueryRepository的内置方法
 凡是继承`QueryRepository`的接口,都可以使用它的方法,并且不用写实现类.   

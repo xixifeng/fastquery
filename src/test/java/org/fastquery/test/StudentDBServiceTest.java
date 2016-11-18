@@ -271,7 +271,7 @@ public class StudentDBServiceTest {
 	@Test
 	public void deleteUserinfoById() {
 		boolean b = studentDBService.deleteUserinfoById(0);
-		assertThat(b, is(false));
+		assertThat(b, is(true));
 	}
 	
 	@Test

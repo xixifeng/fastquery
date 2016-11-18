@@ -22,31 +22,46 @@
 
 package org.fastquery.test;
 
-import org.fastquery.mapper.QueryByNamedDBExampleMapperTest;
-import org.fastquery.service.FQueryResourceImplTest;
-import org.fastquery.util.BeanUtilTest;
-import org.fastquery.util.FastQueryJSONObjectTest;
-import org.fastquery.util.TypeUtilTest;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+
+import org.fastquery.bean.sunny.Card;
+import org.fastquery.dao.SunnyDBService;
+import org.fastquery.service.FQuery;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+
 
 /**
- * 运行所有的测试用例
  * 
  * @author xixifeng (fastquery@126.com)
  */
-// 指定运行器
-@RunWith(Suite.class)
-@SuiteClasses({ StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class,
-		UserInfoDBServiceTest3.class, TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class,
-		BeanUtilTest.class, PageTest.class, QueryByNamedDBExampleMapperTest.class, FastQueryJSONObjectTest.class,
-		FQueryResourceImplTest.class, SunnyDBServiceTest.class })
-class AllTest {
+public class SunnyDBServiceTest {
 
+	private SunnyDBService sunnyDBService = FQuery.getRepository(SunnyDBService.class);
+	
 	@Test
-	public void todo() {
+	public void save() {
+		Card card = new Card();
+		card.setNumber("852000XXXXX");
+		Card c = sunnyDBService.save(card);
+		assertThat(c.getNumber(), equalTo(card.getNumber()));
+		Integer id = c.getId();
+		int effect = sunnyDBService.delete(id);
+		assertThat(effect, is(1));
+		assertThat(sunnyDBService.exists(id), is(false));
 	}
 
+	@Test
+	public void delete() {
+		int effect = sunnyDBService.delete(-1);
+		assertThat(effect, is(0));
+		effect = sunnyDBService.delete(0);
+		assertThat(effect, is(0));
+	}
+	
+	@Test
+	public void deleteById(){
+		boolean b = sunnyDBService.deleteById(-1);
+		assertThat(b, is(true));
+	}
 }

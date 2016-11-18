@@ -23,9 +23,12 @@
 package org.fastquery.core;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.TypeVariable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -56,6 +59,7 @@ import org.fastquery.page.Slice;
 import org.fastquery.util.BeanUtil;
 import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
+import org.objectweb.asm.Type;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -620,6 +624,21 @@ public class QueryProcess {
 	
 	Object methodQuery(Method method,String packageName,Object[] iargs) {		
 		Id id = method.getAnnotation(Id.class);
+		if(id != null) {
+			// 检验实体
+			Parameter[] parameters = method.getParameters();
+			for (int i = 0; i < parameters.length; i++) {
+				if( parameters[i].getParameterizedType() instanceof TypeVariable ) { // 这个类型是变量类型吗?
+					Field[] fields = iargs[i].getClass().getDeclaredFields();
+					for (Field field : fields) {
+						if( Type.getType(field.getType()).getSort() != Type.OBJECT ) {
+							throw new RepositoryException(String.format("%s这个实体的成员变量%s %s %s不允许是基本类型", iargs[i].getClass().getName(),Modifier.toString(field.getModifiers()),field.getType().getName(),field.getName()));
+						}
+					}
+				}	
+			}
+			// 检验实体 end
+		}
 		byte methodId = id.value();
 		
 		String sourceName;

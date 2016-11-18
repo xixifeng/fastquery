@@ -126,6 +126,21 @@ public interface QueryRepository extends Repository {
 	@Id(MethodId.QUERY6)
 	void executeBatch(String sqlName,String output,@Source String dataSourceName);
 	
+	/**
+	 * 根据id 删除表记录, 返回影响行数(每什么可删除的返回0),反之将抛出异常
+	 * @param tableName
+	 * @param id
+	 * @return
+	 */
+	int delete(String tableName,int id);
+	
+	/**
+	 * 根据id 删除表记录, 返回影响行数(每什么可删除的返回0),反之将抛出异常
+	 * @param tableName
+	 * @param id
+	 * @return
+	 */
+	int delete(String tableName,int id,@Source String dataSourceName);
 }
 
 

@@ -31,14 +31,16 @@ import java.io.InputStream;
 public interface Resource {
 
 	/**
-	 * 获取name资源
+	 * 获取name资源 <br>
+	 * 注意: 没有找到返回null
 	 * @param name
 	 * @return
 	 */
 	InputStream getResourceAsStream(String name);
 	
 	/**
-	 * 当前是否存在 name 资源
+	 * 当前是否存在 name 资源 <br>
+	 * 注意: 传递的name第一个字符不能是"/",不然找不到(已经验证)
 	 * @param name
 	 * @return
 	 */

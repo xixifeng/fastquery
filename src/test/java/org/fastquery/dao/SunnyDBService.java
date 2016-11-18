@@ -20,33 +20,26 @@
  * 
  */
 
-package org.fastquery.test;
+package org.fastquery.dao;
 
-import org.fastquery.mapper.QueryByNamedDBExampleMapperTest;
-import org.fastquery.service.FQueryResourceImplTest;
-import org.fastquery.util.BeanUtilTest;
-import org.fastquery.util.FastQueryJSONObjectTest;
-import org.fastquery.util.TypeUtilTest;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.fastquery.core.Modifying;
+import org.fastquery.core.Query;
+import org.fastquery.core.QueryRepository;
 
 /**
- * 运行所有的测试用例
  * 
  * @author xixifeng (fastquery@126.com)
  */
-// 指定运行器
-@RunWith(Suite.class)
-@SuiteClasses({ StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class,
-		UserInfoDBServiceTest3.class, TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class,
-		BeanUtilTest.class, PageTest.class, QueryByNamedDBExampleMapperTest.class, FastQueryJSONObjectTest.class,
-		FQueryResourceImplTest.class, SunnyDBServiceTest.class })
-class AllTest {
-
-	@Test
-	public void todo() {
-	}
-
+public interface SunnyDBService extends QueryRepository {
+	
+	@Modifying
+	@Query("delete from Card where id = ?1")
+	int delete(int id);
+	
+	@Modifying
+	@Query("delete from Card where id = ?1")
+	boolean deleteById(int id);
+	
+	@Query("select id from Card where id = ?1")
+	boolean exists(int id);
 }
