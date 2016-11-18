@@ -116,7 +116,7 @@ jdk1.8+
 fastquery.json其他可选配置选项:
 
 | 属性名 | 类型 | 默认值 | 作用 | 示例 |
-|:-----:|:-----:|:-----:|:-----:|
+|:-----:|:-----:|:-----:|:-----|:-----|
 | queries | array | [] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
 | velocity | string | 无 | 指定velocity的配置文件 | "/tmp/velocity.properties" |
 
