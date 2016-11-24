@@ -21,8 +21,6 @@
  */
 
 package org.fastquery.util;
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +36,18 @@ import org.junit.Test;
  * @author xixifeng (fastquery@126.com)
  */
 public class BeanUtilTest {
-
+	
+	final class T {
+		private Integer key;
+		public Integer getKey() {
+			return key;
+		}
+		public void setKey(Integer key) {
+			this.key = key;
+		} 
+	}
+	
+	/*
 	@Test
 	public void testToInsertSQL() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IntrospectionException {
 		UserInfo userInfo1 = new UserInfo(33,"想向公主",18);
@@ -50,15 +59,63 @@ public class BeanUtilTest {
 		sql = BeanUtil.toInsertSQL(userInfo1);
 		assertThat(sql, equalTo("insert into UserInfo(id,name,age) values('33','想向公主','18')"));
 	}
+	*/
 	
+	@Test
+	public void testToInsertSQL(){
+		UserInfo userInfo = new UserInfo(33,"想向公主",18);
+		String sql  = BeanUtil.toInsertSQL(userInfo,false);
+		assertThat(sql, equalTo("insert into `UserInfo`(`id`,`name`,`age`) values('33','想向公主','18')"));
+		
+		// 主键设置为null
+		userInfo.setId(null);
+		sql  = BeanUtil.toInsertSQL(userInfo,false);
+		assertThat(sql, equalTo("insert into `UserInfo`(`name`,`age`) values('想向公主','18')"));
+		
+		userInfo.setName(null);
+		sql  = BeanUtil.toInsertSQL(userInfo,false);
+		assertThat(sql, equalTo("insert into `UserInfo`(`name`,`age`) values(null,'18')"));
+		
+		userInfo.setAge(null);
+		sql  = BeanUtil.toInsertSQL(userInfo,false);
+		assertThat(sql, equalTo("insert into `UserInfo`(`name`,`age`) values(null,null)"));
+		
+		T t = new T();
+		sql  = BeanUtil.toInsertSQL(t,false);
+		assertThat(sql, equalTo("insert into `T`(`key`) values(null)"));
+	}
+	
+	@Test
+	public void testToInsertSQL2() {
+		UserInfo userInfo = new UserInfo(33,"想向公主",18);
+		String sql  = BeanUtil.toInsertSQL(userInfo,true);
+		assertThat(sql, equalTo("insert into `${dbpre}`.`UserInfo`(`id`,`name`,`age`) values('33','想向公主','18')"));
+		
+		// 主键设置为null
+		userInfo.setId(null);
+		sql  = BeanUtil.toInsertSQL(userInfo,true);
+		assertThat(sql, equalTo("insert into `${dbpre}`.`UserInfo`(`name`,`age`) values('想向公主','18')"));
+		
+		userInfo.setName(null);
+		sql  = BeanUtil.toInsertSQL(userInfo,true);
+		assertThat(sql, equalTo("insert into `${dbpre}`.`UserInfo`(`name`,`age`) values(null,'18')"));
+		
+		userInfo.setAge(null);
+		sql  = BeanUtil.toInsertSQL(userInfo,true);
+		assertThat(sql, equalTo("insert into `${dbpre}`.`UserInfo`(`name`,`age`) values(null,null)"));
+		
+		T t = new T();
+		sql  = BeanUtil.toInsertSQL(t,true);
+		assertThat(sql, equalTo("insert into `${dbpre}`.`T`(`key`) values(null)"));
+	}
 	
 	@Test
 	public void toSelectSQL(){
-		UserInfo userInfo1 = new UserInfo(33,"想向公主",18);
-		//UserInfo userInfo2 = new UserInfo(34,"程家洛",20);
+		UserInfo userInfo = new UserInfo(33,"想向公主",18);
 
-		String str = BeanUtil.toSelectSQL(userInfo1, 36, "xk");
-		System.out.println(str);
+		String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk");
+		
+		assertThat(sql, equalTo("select * from `xk`.`UserInfo` where `id` = 36"));
 	}
 
 	@Test
@@ -138,8 +195,8 @@ public class BeanUtilTest {
 	
 	@Test
 	public void toUpdate3(){
-		String sql = BeanUtil.toInsertSQL(new UserInfo(null, "zhansan", 30));
-		assertThat(sql, equalTo("insert into UserInfo(id,name,age) values(null,'zhansan','30')"));
+		String sql = BeanUtil.toInsertSQL(new UserInfo(null, "zhansan", 30),false);
+		assertThat(sql, equalTo("insert into `UserInfo`(`name`,`age`) values('zhansan','30')"));
 	}
 	
 	

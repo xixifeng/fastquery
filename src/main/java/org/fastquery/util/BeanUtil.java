@@ -46,11 +46,88 @@ public final class BeanUtil {
 	}
 
 	/**
+	 * 将1个bean 转换成 insert sql语句, 注意: 主键值为null,将不参与运算.
+	 * 
+	 * @param beans
+	 * @return
+	 */
+	public static String toInsertSQL(Object bean,boolean dbNamePrefix) {
+
+		int idOfSet = -1; // 用于记录主键名应该在sql中的什么位置
+		
+		Class<?> clazz = bean.getClass();
+		String tableName = clazz.getSimpleName();
+
+		StringBuilder sqlsb = new StringBuilder("insert into ");
+		if(dbNamePrefix) {
+		  sqlsb.append("`${dbpre}`.");
+		}
+		sqlsb.append("`");
+		sqlsb.append(tableName);
+		sqlsb.append("`");
+		sqlsb.append("(");
+		Field[] fields = clazz.getDeclaredFields();
+		for (Field field : fields) {
+			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
+				continue;
+			}
+			// 如果是主键,记录一下应该插入的位置
+			if(field.getAnnotation(Id.class) !=null ) {
+				idOfSet = sqlsb.length();	
+			} else {
+				sqlsb.append("`");
+				sqlsb.append(field.getName());
+				sqlsb.append("`");
+			}
+			sqlsb.append(',');
+		}
+		sqlsb.deleteCharAt(sqlsb.length() - 1);
+		sqlsb.append(") values");
+		try {
+				sqlsb.append('(');
+				for (Field field : fields) {
+					if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
+						continue;
+					}
+					Object val = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(bean);
+					if(field.getAnnotation(Id.class)!=null) {
+						if (val != null) {
+							sqlsb.insert(idOfSet, new StringBuilder().append("`").append(field.getName()).append("`"));
+							sqlsb.append("'" + val + "',");
+						} else {
+							if(sqlsb.charAt(idOfSet) == ',') {
+								sqlsb.deleteCharAt(idOfSet);	
+							}
+						}
+					} else {
+						if (val != null) {
+							sqlsb.append("'" + val + "',");
+						} else {
+							sqlsb.append(val);
+							sqlsb.append(',');
+						}
+					}
+				}
+				sqlsb.deleteCharAt(sqlsb.length() - 1);
+				sqlsb.append("),");
+		} catch (Exception e) {
+			throw new RepositoryException(e);
+		}
+		sqlsb.deleteCharAt(sqlsb.length() - 1);
+		return sqlsb.toString();
+	}
+	
+	public static String toInsertSQL(String dbName, Object bean) {
+		return toInsertSQL(bean, true).replace("${dbpre}", dbName);
+	}
+	
+	/**
 	 * 将多个bean 转换成 insert sql语句, 注意:多个bean,其类型必须相等
 	 * 
 	 * @param beans
 	 * @return
 	 */
+	/*
 	public static String toInsertSQL(Object... beans) {
 
 		Class<?> clazz = beans[0].getClass();
@@ -137,7 +214,7 @@ public final class BeanUtil {
 		sqlsb.deleteCharAt(sqlsb.length() - 1);
 		return sqlsb.toString();
 	}
-
+	*/
 	/**
 	 * 
 	 * @param bean

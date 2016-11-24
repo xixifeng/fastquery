@@ -97,6 +97,10 @@ public class SyntaxTest {
 		Boolean b = false;
 		System.out.println(JSON.toJSONString(b,SerializerFeature.WriteNullBooleanAsFalse));
 		System.out.println("基本类型:"+boolean.class.isPrimitive());
+		
+		StringBuilder sb = new StringBuilder("abc");
+		sb.insert(3, "d");
+		System.out.println(sb.toString());
 	}
 }
 
