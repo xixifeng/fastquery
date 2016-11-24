@@ -629,7 +629,7 @@ public interface UserInfoDBService extends QueryRepository {
 ```java
 @NotCount // 分页不统计总行数
 @Query(value = "select id,name,age from `userinfo`")
-Page<Map<String,Object>> findSome(Integer age, Integer id,@PageIndex int pageIndex, @PageSize int pageSize);
+Page<Map<String,Object>> findSome(Integer age,Integer id,@PageIndex int pageIndex,@PageSize int pageSize);
 ```
 
 
