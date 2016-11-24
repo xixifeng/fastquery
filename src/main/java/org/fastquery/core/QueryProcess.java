@@ -29,6 +29,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -647,6 +648,32 @@ public class QueryProcess {
 		String sql;
 		String dbName = null;
 		switch (methodId) {
+		case MethodId.QUERY:
+			// 获取数据源
+			sourceName = TypeUtil.findSource(method.getParameters(), iargs);
+			dataSource = DataSourceManage.getDataSource(sourceName,packageName);
+			if(iargs.length == 3) {
+				bean = iargs[2];
+				sql = BeanUtil.toInsertSQL(iargs[1].toString(),bean);
+				LOG.info(sql);
+				Object keyObj = insert(dataSource, sql);
+				if(keyObj==null){
+					return new BigInteger("-1");
+				} else {
+					return new BigInteger(keyObj.toString());
+				}
+			} else {
+				bean = iargs[0];
+				sql = BeanUtil.toInsertSQL(bean);
+				LOG.info(sql);
+				Object keyObj = insert(dataSource,sql);
+				if(keyObj==null){
+					return new BigInteger("-1");
+				} else {
+					return new BigInteger(keyObj.toString());
+				}
+			}
+			
 		case MethodId.QUERY0:
 			// 获取数据源
 			sourceName = TypeUtil.findSource(method.getParameters(), iargs);
@@ -893,18 +920,18 @@ public class QueryProcess {
 		Connection conn = null;
 		PreparedStatement stat = null;
 		ResultSet rs = null;
-		String key = null;
+		Object key = null;
 		try {
 			conn = dataSource.getConnection();
-			conn.setAutoCommit(false);
+			//conn.setAutoCommit(false);
 			stat = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			stat.executeUpdate();
 			rs = stat.getGeneratedKeys();
 			// 获取主键
 			if (rs.next()) {
-				key = rs.getString(1);
+				key = rs.getObject(1);
 			}
-			conn.commit();	
+			//conn.commit();	
 		} catch (SQLException e) {
 			if(conn !=null ) {
 				try {
@@ -928,8 +955,13 @@ public class QueryProcess {
 		try {
 			conn = dataSource.getConnection();	
 			stat = conn.createStatement();
+			LOG.info(sql);
 			rs = stat.executeQuery(sql);
-			return JSON.toJavaObject(new JSONObject(rs2Map(rs).get(0)),bean.getClass());
+			List<Map<String, Object>> maps = rs2Map(rs);
+			if(maps.isEmpty()) {
+				return null;
+			}
+			return JSON.toJavaObject(new JSONObject(maps.get(0)),bean.getClass());
 		} catch (SQLException e) {
 			throw new RepositoryException(e);
 		}finally {
@@ -966,13 +998,13 @@ public class QueryProcess {
 		int count = args.size();
 		try {
 			conn = dataSource.getConnection();
-			conn.setAutoCommit(false);
+			//conn.setAutoCommit(false);
 			stat = conn.prepareStatement(sql);
 			for (int i = 1; i <= count; i++) {
 				stat.setObject(i, args.get(i-1));
 			}
 			stat.executeUpdate();
-			conn.commit();	
+			//conn.commit();	
 		} catch (SQLException e) {
 			if(conn !=null ) {
 				try {
@@ -1003,13 +1035,13 @@ public class QueryProcess {
 		int count = args.size();
 		try {
 			conn = dataSource.getConnection();
-			conn.setAutoCommit(false);
+			//conn.setAutoCommit(false);
 			stat = conn.prepareStatement(sql);
 			for (int i = 1; i <= count; i++) {
 				stat.setObject(i, args.get(i-1));
 			}
 			effect = stat.executeUpdate();
-			conn.commit();	
+			//conn.commit();	
 		} catch (SQLException e) {
 			if(conn !=null ) {
 				try {

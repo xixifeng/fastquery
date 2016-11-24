@@ -28,6 +28,8 @@ package org.fastquery.core;
  */
 public class MethodId {
 	
+	public static final byte QUERY =  -1;
+	
 	public static final byte QUERY0 = 0X00;
 	
 	public static final byte QUERY1 = 0X01;

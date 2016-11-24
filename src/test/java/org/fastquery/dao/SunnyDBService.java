@@ -41,5 +41,8 @@ public interface SunnyDBService extends QueryRepository {
 	boolean deleteById(int id);
 	
 	@Query("select id from Card where id = ?1")
-	boolean exists(int id);
+	boolean exists(long id);
+
+	@Query("select id from Tenant where id = ?1")
+	boolean existsTenant(Long id);
 }

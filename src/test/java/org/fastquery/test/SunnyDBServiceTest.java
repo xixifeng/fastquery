@@ -23,9 +23,13 @@
 package org.fastquery.test;
 
 import static org.junit.Assert.assertThat;
+
+import java.math.BigInteger;
+
 import static org.hamcrest.Matchers.*;
 
 import org.fastquery.bean.sunny.Card;
+import org.fastquery.bean.sunny.Tenant;
 import org.fastquery.dao.SunnyDBService;
 import org.fastquery.service.FQuery;
 import org.junit.Test;
@@ -49,6 +53,36 @@ public class SunnyDBServiceTest {
 		int effect = sunnyDBService.delete(id);
 		assertThat(effect, is(1));
 		assertThat(sunnyDBService.exists(id), is(false));
+	}
+	
+	@Test
+	public void save2() {
+		Card card = new Card(-1,"32ccczuidazhi");
+		Card c = sunnyDBService.save(card);
+		assertThat(c,nullValue());
+		int effect = sunnyDBService.delete(-1);
+		assertThat(effect, is(1));
+		assertThat(sunnyDBService.exists(-1), is(false));
+	}
+	
+	@Test
+	public void save3() {
+		Card card = new Card("32ccczuidazhi");
+		BigInteger bigInteger = sunnyDBService.saveToId(card);
+		int effect = sunnyDBService.delete(bigInteger.intValue());
+		assertThat(effect, is(1));
+	}
+	
+	@Test
+	public void saveTenant() {
+		System.out.println(Integer.MAX_VALUE);
+		long id = new Long(Integer.MAX_VALUE) + 10;
+		while(sunnyDBService.existsTenant(id)){
+			id = id + 1;
+		}
+		Tenant tenant = new Tenant(id, "测试用户"+id);
+		BigInteger bigInteger = sunnyDBService.saveToId(tenant);
+		assertThat(bigInteger.longValue(), is(id));
 	}
 
 	@Test

@@ -22,11 +22,39 @@
 
 package org.fastquery.core;
 
+import java.math.BigInteger;
+
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
 public interface QueryRepository extends Repository {
+	/**
+	 * 保存一个实体,然后将主键值返回(不适用于联合主键).注意:永不返回null,没有找到主键返回-1
+	 * @param entity 实体bean
+	 * @return
+	 */
+	@Id(MethodId.QUERY)
+	BigInteger saveToId(Object entity);
+	
+	/**
+	 * 保存一个实体,然后将主键值返回(不适用于联合主键).注意:永不返回null,没有找到主键返回-1
+	 * @param entity 实体bean
+	 * @param dataSourceName 数据源名称
+	 * @return
+	 */
+	@Id(MethodId.QUERY)
+	BigInteger saveToId(Object entity,@Source String dataSourceName);
+	
+	/**
+	 * 保存一个实体,然后将主键值返回(不适用于联合主键).注意:永不返回null,没有找到主键返回-1
+	 * @param dataSourceName 数据源名称
+	 * @param dbName 数据库名称
+	 * @param entity 实体bean
+	 * @return
+	 */
+	@Id(MethodId.QUERY)
+	BigInteger saveToId(@Source String dataSourceName,String dbName,Object entity);
 	
 	/**
 	 * 保存一个实体,这个实体必须有一个自增长的主键 <br>
@@ -57,7 +85,7 @@ public interface QueryRepository extends Repository {
 	 */
 	@Id(MethodId.QUERY0)
 	<E> E  save(@Source String dataSourceName,String dbName,E entity);
-	
+		
 	/**
 	 * 更新实体,实体需要包含主键值 <br>
 	 * 注意: 修改失败,或违规操作则返回null

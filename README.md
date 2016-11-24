@@ -112,7 +112,7 @@ fastquery.json其他可选配置选项:
 | 属性名 | 类型 | 默认值 | 作用 | 示例 |
 |:-----:|:-----:|:-----:|:-----|:-----|
 | basedir | string | 无 | 基准目录,注意: 后面记得加上 "/" <br> 该目录用来放SQL文件,需要执行SQL文件时,指定其名称就够了 | "/tmp/sql/" |
-| debug | boolean | false | 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目,默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式 | false |
+| debug | boolean | false | 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目<br>默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式 | false |
 | queries | array | [ ] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
 | velocity | string | 无 | 指定velocity的配置文件 | "/tmp/velocity.properties" |
 
@@ -299,11 +299,17 @@ Primarykey saveUserInfo(String name,Integer age);
 - 改操作返回boolean类型:表示是否改正确,没有找到可以修改的,那么返回true,并不能视为改失败了
 
 ## QueryRepository的内置方法
-凡是继承`QueryRepository`的接口,都可以使用它的方法,并且不用写实现类.   
-- `<E> E save(E entity);` 保存一个实体,返回保存成功之后的实体(返回的实体包含有主键)
-- `<E> E update(E entity);` 更新一个实体,返回更新成功之后的实体.注意:实体的成员变量如果是null,将不会参与改运算
-- `<E> E saveOrUpdate(E entity);` 不存在就保存,反之更新(前提条件:这个实体必须包含有主键值).
-- `int update(Object entity,String where);` 更新实体时,自定义条件(有时候不一定是根据主键来修改),返回影响行数
+凡是继承`QueryRepository`的接口,都可以使用它的方法,并且不用写实现类.
+
+| 方法 | 描述 |
+|:---|:---|
+| `<E> E save(E entity)` | 保存一个实体,返回保存成功之后的实体(返回的实体包含有主键) |
+| `BigInteger saveToId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
+| `<E> E update(E entity)` | 更新一个实体,返回更新成功之后的实体.**注意**:实体的成员变量如果是null,将不会参与改运算 |
+| `<E> E saveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含有主键值) |
+| `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),返回影响行数 |
+
+
 
 举例说明:  
 先准备一个实体  
