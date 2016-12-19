@@ -32,6 +32,7 @@ import org.apache.velocity.app.Velocity;
 import org.fastquery.core.Resource;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.alibaba.fastjson.JSON;
@@ -69,6 +70,7 @@ public class QueryPoolTest {
 
 	}
 	
+	@Ignore
 	@Test
 	public void testXml2QueryMapper() {
 		Set<QueryMapper> queryMappers = QueryPool.xml2QueryMapper("org.fastquery.dao.QueryByNamedDBExample",resource);
@@ -95,12 +97,14 @@ public class QueryPoolTest {
 		System.out.println(writer.toString());
 	}
 	
+	@Ignore
 	@Test
 	public void put(){
 		String str = QueryPool.render("org.fastquery.dao.UserInfoDBService", "findUserInfoAll",null);
 		System.out.println("str:" + str);
 	}
 
+	@Ignore
 	@Test
 	public void reset(){
 		QueryPool.reset("org.fastquery.dao.UserInfoDBService");

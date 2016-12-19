@@ -303,7 +303,7 @@ Primarykey saveUserInfo(String name,Integer age);
 
 | 方法 | 描述 |
 |:---|:---|
-| `<E> E save(E entity)` | 保存一个实体,返回保存成功之后的实体(返回的实体包含有主键) |
+| `<E> E save(E entity)` | 保存一个实体(主键字段的值若为null,那么该字段将不参与运算),返回保存成功之后的实体(返回的实体包含有主键) |
 | `BigInteger saveToId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
 | `<E> E update(E entity)` | 更新一个实体,返回更新成功之后的实体.**注意**:实体的成员变量如果是null,将不会参与改运算 |
 | `<E> E saveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含有主键值) |
@@ -519,6 +519,15 @@ int updateUserInfoById(@Param("id") int id,@Param("name") String name,@Param("ag
 	update UserInfo set name = :name,age = :age where id = :id
 </query>
 ```
+
+`@QueryByNamed` 中的value值如果没有指定,默认是当前方法名.
+
+```java
+@QueryByNamed
+public List<Student> findSomeStudent();
+```
+
+等效于 `@QueryByNamed("findSomeStudent")`  
 
 **注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,用于在模板中做逻辑判断,而`:name`用于标记参数位,解析SQL时会自动替换成`?`号.
 

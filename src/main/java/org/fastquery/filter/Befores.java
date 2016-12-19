@@ -33,6 +33,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE })
-@interface Befores {
+public @interface Befores {
 	Before[] value() default {};
 }

@@ -36,7 +36,7 @@ import org.fastquery.util.TypeUtil;
 import java.util.Set;
 
 /**
- * 
+ * 所有的代码生成之后,检测query, 尾部集中检测
  * @author xixifeng (fastquery@126.com)
  */
 public class QueryValidator {
@@ -72,25 +72,28 @@ public class QueryValidator {
 			for (Method method : methods) {
 				QueryByNamed queryByNamed = method.getAnnotation(QueryByNamed.class);
 				if(queryByNamed!=null) {
-					
+					String id = queryByNamed.value();
+					if("".equals(id)) {
+						id = method.getName();
+					}
 					// m2: 标识有@QueryByNamed的方法,必须有对应的模板
-					String tmp = getTemplate(className, queryByNamed.value(), mapQueryMapper.get(className));
+					String tmp = getTemplate(className, id, mapQueryMapper.get(className));
 					if(tmp==null) {
-						error(method, String.format("从%s.queries.xml里没有找到id为%s的模板", className,queryByNamed.value()));
+						error(method, String.format("从%s.queries.xml里没有找到id为%s的模板", className,id));
 					}
 					if("".equals(tmp.trim())) {
-						error(method, String.format("在%s.queries.xml里,id为%s的模板不能为空字符串", className,queryByNamed.value()));
+						error(method, String.format("在%s.queries.xml里,id为%s的模板不能为空字符串", className,id));
 					}
 					
-					String key = className + "." + queryByNamed.value();
+					String key = className + "." + id;
 					
 					// m3: 如果是分页,必须有求和语句
 					Class<?> returnType = method.getReturnType();
 					if(returnType == Page.class && QueryPool.getCountQuery(key)==null) {
-						error(method, String.format("该方法指明需要分页. 而在%s.queries.xml里,<query id=\"%s\">下面没有发现求和语句", className,queryByNamed.value()));
+						error(method, String.format("该方法指明需要分页. 而在%s.queries.xml里,<query id=\"%s\">下面没有发现求和语句", className,id));
 					}
 					if(returnType == Page.class && "".equals(QueryPool.getCountQuery(key).trim())) {
-						error(method, String.format("该方法指明需要分页. 而在%s.queries.xml里,<query id=\"%s\">下面的求和语句是空字符串", className,queryByNamed.value()));
+						error(method, String.format("该方法指明需要分页. 而在%s.queries.xml里,<query id=\"%s\">下面的求和语句是空字符串", className,id));
 					}
 				}
 			}

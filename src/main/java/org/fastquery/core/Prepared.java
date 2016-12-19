@@ -24,6 +24,7 @@ package org.fastquery.core;
 
 import java.lang.reflect.Method;
 
+import org.apache.log4j.Logger;
 import org.fastquery.filter.FilterChainHandler;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.Page;
@@ -35,6 +36,8 @@ import org.fastquery.util.TypeUtil;
  * @author xixifeng (fastquery@126.com)
  */
 public class Prepared {
+	
+	private static final Logger LOG = Logger.getLogger(Prepared.class);
 	
 	private static ThreadLocal<ClassLoader> clsloadThread = new ThreadLocal<ClassLoader>(){
 		@Override
@@ -54,30 +57,35 @@ public class Prepared {
 	 * @return
 	 */
 	public static Object excute(String interfaceClazz, String methodName,String methodDescriptor,Object[] args,Repository target) {
-		final Class<? extends Repository> iclazz = getInterfaceClass(interfaceClazz);
-		final Method method = TypeUtil.getMethod(iclazz, methodName,methodDescriptor);
-		// return businessProcess(iclazz,method, args)
-		
-        // 如果是调试模式
-        if(FastQueryJSONObject.getDebug()){
-        	QueryPool.reset(iclazz.getName());
-        }
-        
-		// 在businessProcess的先后加拦截器 ==================
-		// 注入BeforeFilter
-        Object object = FilterChainHandler.bindBeforeFilterChain(iclazz,target,method,args);
-        if(object!=void.class){
-                return object;
-        }
+		try {
+			final Class<? extends Repository> iclazz = getInterfaceClass(interfaceClazz);
+			final Method method = TypeUtil.getMethod(iclazz, methodName,methodDescriptor);
+			// return businessProcess(iclazz,method, args)
+			
+	        // 如果是调试模式
+	        if(FastQueryJSONObject.getDebug()){
+	        	QueryPool.reset(iclazz.getName());
+	        }
+	        
+			// 在businessProcess的先后加拦截器 ==================
+			// 注入BeforeFilter
+	        Object object = FilterChainHandler.bindBeforeFilterChain(iclazz,target,method,args);
+	        if(object!=void.class){
+	                return object;
+	        }
 
-        // 取出当前线程中method和args(BeforeFilter 有可能中途修换其他method, 因为过滤器有个功能this.change(..,...) )
-        object = businessProcess(iclazz,method, args);
+	        // 取出当前线程中method和args(BeforeFilter 有可能中途修换其他method, 因为过滤器有个功能this.change(..,...) )
+	        object = businessProcess(iclazz,method, args);
 
-        // 注入AfterFilter
-        object = FilterChainHandler.bindAfterFilterChain(iclazz,target,method,args,object); // 注意,这个方法的method,必须是原始的!!!
-        // 在businessProcess的先后加拦截器 ================== End
-        
-        return object;
+	        // 注入AfterFilter
+	        object = FilterChainHandler.bindAfterFilterChain(iclazz,target,method,args,object); // 注意,这个方法的method,必须是原始的!!!
+	        // 在businessProcess的先后加拦截器 ================== End
+	        
+	        return object;	
+		} catch (Exception e) {
+			LOG.error(e.getMessage(),e);
+			throw new RepositoryException(e);
+		}
 	}
 	
 	private static Object businessProcess(Class<? extends Repository> iclazz,Method method,Object...args) {

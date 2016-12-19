@@ -283,6 +283,9 @@ public class QueryPool {
 	// 该方法永远不会返回null或空,因为在初始化时就做了检测
 	public static String render(String className,Method method,boolean isQuery,Object...args){
 		String id = method.getAnnotation(QueryByNamed.class).value();
+		if("".equals(id)) {
+			id = method.getName();
+		}
 		LOG.info("正在渲染模板:" + id);
 		String tpl;
 		if(isQuery){

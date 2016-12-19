@@ -30,6 +30,7 @@ import org.fastquery.core.Id;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Primarykey;
 import org.fastquery.core.Query;
+import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.filter.After;
 import org.fastquery.filter.Before;
@@ -206,6 +207,9 @@ public interface StudentDBService extends QueryRepository {
 	
 	@Query("select name from Student limit 3")
 	List<String> findNames();
+	
+	@QueryByNamed
+	public List<Student> findSomeStudent();
 }
 
 

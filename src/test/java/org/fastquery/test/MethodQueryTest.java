@@ -23,6 +23,7 @@
 package org.fastquery.test;
 
 import org.fastquery.bean.UserInfo;
+import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
@@ -79,7 +80,7 @@ public class MethodQueryTest {
 		assertThat(u2.getAge(), equalTo(u.getAge()));
 	}
 	
-	@Test
+	@Test(expected = RepositoryException.class)
 	public void executeBatch() {
 		// 参考: http://mxm910821.iteye.com/blog/1701822
 		studentDBService.executeBatch("update.sql", "sqlout.log");

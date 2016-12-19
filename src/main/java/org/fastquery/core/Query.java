@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * 查询语句
  * @author xixifeng (fastquery@126.com)
  */
-@Repeatable(Querys.class)
+@Repeatable(Queries.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
 public @interface Query {

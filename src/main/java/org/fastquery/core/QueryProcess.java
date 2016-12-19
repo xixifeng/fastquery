@@ -782,7 +782,7 @@ public class QueryProcess {
 			try {
 				sqlExec.execute();
 			} catch (Exception e) {
-				LOG.error(String.format("执行%s发生致命错误", iargs[0]),e);
+				throw new RepositoryException(String.format("执行%s发生致命错误", iargs[0]), e);
 			}
 			
 			break;
@@ -933,13 +933,13 @@ public class QueryProcess {
 			}
 			//conn.commit();	
 		} catch (SQLException e) {
-			if(conn !=null ) {
+			/*if(conn !=null ) {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
 					throw new RepositoryException(e1);
 				}
-			}
+			}*/
 			throw new RepositoryException(e);
 		} finally {
 			close(rs, stat, conn);
@@ -1006,13 +1006,13 @@ public class QueryProcess {
 			stat.executeUpdate();
 			//conn.commit();	
 		} catch (SQLException e) {
-			if(conn !=null ) {
+			/*if(conn !=null ) {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
 					throw new RepositoryException(e1);
 				}
-			}
+			}*/
 			throw new RepositoryException(e);
 		} finally {
 			close(null, stat, conn);
@@ -1043,13 +1043,13 @@ public class QueryProcess {
 			effect = stat.executeUpdate();
 			//conn.commit();	
 		} catch (SQLException e) {
-			if(conn !=null ) {
+			/*if(conn !=null ) {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
 					throw new RepositoryException(e1);
 				}
-			}
+			}*/
 			throw new RepositoryException(e);
 		} finally {
 			close(null, stat, conn);

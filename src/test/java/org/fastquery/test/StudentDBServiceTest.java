@@ -116,7 +116,7 @@ public class StudentDBServiceTest {
 	
 	@Test
 	public void exists(){
-		boolean exists = studentDBService.exists("9921103");
+		boolean exists = studentDBService.exists("9512101");
 		assertThat(exists, is(true));
 		
 		exists = studentDBService.exists("9921103xxyy");
@@ -358,6 +358,12 @@ public class StudentDBServiceTest {
 		names.forEach(name -> {
 			System.out.println(name);
 		});
+	}
+	
+	@Test
+	public void findSomeStudent(){
+		List<Student> students = studentDBService.findSomeStudent();
+		assertThat(students.size(), is(3));
 	}
 	
 	
