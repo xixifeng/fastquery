@@ -21,6 +21,7 @@
  */
 
 package org.fastquery.util;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,20 +47,6 @@ public class BeanUtilTest {
 			this.key = key;
 		} 
 	}
-	
-	/*
-	@Test
-	public void testToInsertSQL() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IntrospectionException {
-		UserInfo userInfo1 = new UserInfo(33,"想向公主",18);
-		UserInfo userInfo2 = new UserInfo(34,"程家洛",20);
-		UserInfo userInfo3 = new UserInfo(35,"于与同",null);
-		String sql = BeanUtil.toInsertSQL(userInfo1,userInfo2,userInfo3);
-		System.out.println(sql);
-		
-		sql = BeanUtil.toInsertSQL(userInfo1);
-		assertThat(sql, equalTo("insert into UserInfo(id,name,age) values('33','想向公主','18')"));
-	}
-	*/
 	
 	@Test
 	public void testToInsertSQL(){
@@ -110,6 +97,56 @@ public class BeanUtilTest {
 	}
 	
 	@Test
+	public void beansToInsertSQL1() {
+		List<UserInfo> userInfos = new ArrayList<>();
+		String str = BeanUtil.toInsertSQL(userInfos,null,false);
+		assertThat(str, nullValue());
+		str = BeanUtil.toInsertSQL(null,null,false);
+		assertThat(str, nullValue());
+	}
+	
+	@Test
+	public void beansToInsertSQL2() {
+		List<UserInfo> userInfos = new ArrayList<>();
+		userInfos.add(new UserInfo("牵牛花", 3));
+		String str = BeanUtil.toInsertSQL(userInfos,null,false);
+		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('牵牛花','3')"));
+		userInfos.clear();
+		
+		userInfos.add(new UserInfo("牵牛花", null));
+		str = BeanUtil.toInsertSQL(userInfos,null,false);
+		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('牵牛花',null)"));
+		userInfos.clear();
+		
+		userInfos.add(new UserInfo(null,3));
+		str = BeanUtil.toInsertSQL(userInfos,null,false);
+		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values(null,'3')"));
+		userInfos.clear();
+		
+		userInfos.add(new UserInfo(null,null));
+		str = BeanUtil.toInsertSQL(userInfos,null,false);
+		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values(null,null)"));
+		userInfos.clear();
+		
+		userInfos.add(new UserInfo(null,"abc",null));
+		str = BeanUtil.toInsertSQL(userInfos,null,false);
+		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('abc',null)"));
+		userInfos.clear();
+		
+		userInfos.add(new UserInfo(null,"叶'兰",null));
+		str = BeanUtil.toInsertSQL(userInfos,null,false);
+		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('叶''兰',null)"));
+	}
+	
+	@Test
+	public void beansToInsertSQL3() {
+		List<UserInfo> userInfos = new ArrayList<>();
+		userInfos.add(new UserInfo("牵牛花", 3));
+		userInfos.add(new UserInfo(10,"松'鼠",5));
+		String str = BeanUtil.toInsertSQL(userInfos,null,false);
+		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('牵牛花','3'),('10','松''鼠','5')"));
+	}
+	@Test
 	public void toSelectSQL(){
 		UserInfo userInfo = new UserInfo(33,"想向公主",18);
 
@@ -132,6 +169,35 @@ public class BeanUtilTest {
 		assertThat(vs.toString(), equalTo("\"aa\",\"bb\",\"cc\""));
 	}
 	
+	@Test
+	public void toFields(){
+		Class<UserInfo> clazz = UserInfo.class;
+		Field[] fields = clazz.getDeclaredFields();
+		UserInfo bean = new UserInfo(null,"叶'兰",null);
+		String str = BeanUtil.toFields(clazz, fields, bean);
+		assertThat(str, equalTo("(`name`,`age`)"));
+		
+		bean = new UserInfo(1,"叶'兰",null);
+		str = BeanUtil.toFields(clazz, fields, bean);
+		assertThat(str, equalTo("(`id`,`name`,`age`)"));
+	}
+	
+	@Test
+	public void toValue(){
+		UserInfo u = new UserInfo();
+		Class<UserInfo> clazz = UserInfo.class;
+		Field[] fields = clazz.getDeclaredFields();
+		String str = BeanUtil.toValue(clazz,fields,u);
+		assertThat(str, equalTo("(null,null)"));
+		
+		u = new UserInfo(null,"叶'兰",null);
+		str = BeanUtil.toValue(clazz,fields,u);
+		assertThat(str, equalTo("('叶''兰',null)"));
+		
+		u = new UserInfo(1,"叶'兰",2);
+		str = BeanUtil.toValue(clazz,fields,u);
+		assertThat(str, equalTo("('1','叶''兰','2')"));
+	}
 	
 	@SuppressWarnings("unchecked")
 	@Test

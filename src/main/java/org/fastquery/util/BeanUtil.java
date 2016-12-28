@@ -22,11 +22,16 @@
 
 package org.fastquery.util;
 
+import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.fastquery.core.Id;
 import org.fastquery.core.Placeholder;
@@ -93,7 +98,7 @@ public final class BeanUtil {
 					if(field.getAnnotation(Id.class)!=null) {
 						if (val != null) {
 							sqlsb.insert(idOfSet, new StringBuilder().append("`").append(field.getName()).append("`"));
-							sqlsb.append("'" + val + "',");
+							sqlsb.append("'" + StringEscapeUtils.escapeSql(val.toString()) + "',");
 						} else {
 							if(sqlsb.charAt(idOfSet) == ',') {
 								sqlsb.deleteCharAt(idOfSet);	
@@ -101,7 +106,7 @@ public final class BeanUtil {
 						}
 					} else {
 						if (val != null) {
-							sqlsb.append("'" + val + "',");
+							sqlsb.append("'" + StringEscapeUtils.escapeSql(val.toString()) + "',");
 						} else {
 							sqlsb.append(val);
 							sqlsb.append(',');
@@ -121,100 +126,144 @@ public final class BeanUtil {
 		return toInsertSQL(bean, true).replace("${dbpre}", dbName);
 	}
 	
+	
+	public static <B> String toFields(Class<B> clazz,Field[] fields,B bean) {
+		StringBuilder sb = new StringBuilder();
+		sb.append('(');
+		for (Field field : fields) {
+			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
+				continue;
+			}
+			try {
+				if(field.getAnnotation(Id.class) == null || new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(bean) != null) {
+					sb.append("`");
+					sb.append(field.getName());
+					sb.append("`,");
+				}
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+					| IntrospectionException e) {
+				throw new RepositoryException(e);
+			}
+		}
+		sb.deleteCharAt(sb.length() - 1);
+		sb.append(')');
+		return sb.toString();
+	}
+	
 	/**
-	 * 将多个bean 转换成 insert sql语句, 注意:多个bean,其类型必须相等
-	 * 
+	 * 将bean 转换成这样的格式: ('12','sunny','20')
+	 * @param clazz
+	 * @param fields
+	 * @param bean
+	 * @return
+	 */
+	public static <B> String toValue(Class<B> clazz,Field[] fields,B bean) {
+		StringBuilder sb = new StringBuilder();
+		sb.append('(');
+		for (Field field : fields) {
+			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
+				continue;
+			}
+			Object val = null;
+			try {
+				val = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(bean);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+					| IntrospectionException e) {
+				throw new RepositoryException(e);
+			}
+			if( val!= null ) {
+				sb.append("'");
+				sb.append(StringEscapeUtils.escapeSql(val.toString()));
+				sb.append("',");
+			} else if(field.getAnnotation(Id.class) == null) {
+				sb.append("null,");
+			}
+		}
+		sb.deleteCharAt(sb.length() - 1);
+		sb.append(')');
+		return sb.toString();
+	}
+	
+	/**
+	 * 把实体集合转换成sql中的values部分
 	 * @param beans
 	 * @return
 	 */
-	/*
-	public static String toInsertSQL(Object... beans) {
-
-		Class<?> clazz = beans[0].getClass();
-		String tableName = clazz.getSimpleName();
-
-		StringBuilder sqlsb = new StringBuilder("insert into ");
-		sqlsb.append(tableName);
-		sqlsb.append("(");
-		Field[] fields = clazz.getDeclaredFields();
-		for (Field field : fields) {
-			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
-				continue;
-			}
-			sqlsb.append(field.getName());
-			sqlsb.append(',');
+	private static <B> String toValues(Class<B> clazz,Field[] fields,Iterable<B> beans) {
+		StringBuilder sbValues = new StringBuilder();
+		sbValues.append("values");
+		for (B b : beans) {
+			sbValues.append(toValue(clazz,fields,b));
+			sbValues.append(',');
 		}
-		sqlsb.deleteCharAt(sqlsb.length() - 1);
-		sqlsb.append(") values");
-		try {
-			for (Object bean : beans) {
-				sqlsb.append('(');
-				for (Field field : fields) {
-					if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
-						continue;
-					}
-					Object val = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(bean);
-					if (val != null) {
-						sqlsb.append("'" + val + "',");
-					} else {
-						sqlsb.append(val);
-						sqlsb.append(',');
-					}
-				}
-				sqlsb.deleteCharAt(sqlsb.length() - 1);
-				sqlsb.append("),");
-			}
-		} catch (Exception e) {
-			throw new RepositoryException(e);
-		}
-		sqlsb.deleteCharAt(sqlsb.length() - 1);
-		return sqlsb.toString();
+		sbValues.deleteCharAt(sbValues.length() - 1);
+		return sbValues.toString();
 	}
-
-	// 该方法有待重构
-	public static String toInsertSQL(String dbName, Object... beans) {
-
-		Class<?> clazz = beans[0].getClass();
-		String tableName = clazz.getSimpleName();
-
-		StringBuilder sqlsb = new StringBuilder("insert into ");
-		sqlsb.append(dbName + "." + tableName);
-		sqlsb.append("(");
+	
+	/**
+	 * 
+	 * @param beans 如果结合为空,则返回null
+	 * @param dbName 如果为null,表名称之前不会有前缀
+	 * @return
+	 */
+	public static <B> String toInsertSQL(Iterable<B> beans,String dbName,boolean ignoreRepeat) {
+		if(beans==null) 
+		   return null;
+		
+		Iterator<B> iterator = beans.iterator();
+		if(!iterator.hasNext()) {
+			return null;
+		}
+		// 集合中的第一个bean
+		B bean = iterator.next();
+		@SuppressWarnings("unchecked")
+		Class<B> clazz = (Class<B>) bean.getClass();
+		// 确立表名称
+		StringBuilder sb = new StringBuilder();
+		if(dbName!=null) {
+			sb.append('`');
+			sb.append(dbName);
+			sb.append("`.`");
+			sb.append(clazz.getSimpleName());
+			sb.append('`');
+		} else {
+			sb.append('`');
+			sb.append(clazz.getSimpleName());
+			sb.append('`');
+		}
 		Field[] fields = clazz.getDeclaredFields();
-		for (Field field : fields) {
-			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
-				continue;
-			}
-			sqlsb.append(field.getName());
-			sqlsb.append(',');
+		
+		// 表名称
+		String tableName = sb.toString();
+		
+		// 表字段
+		String fs = toFields(clazz, fields, bean);
+		
+		// values 部分
+		String values = toValues(clazz, fields, beans);
+		
+		// insert into 语句
+		String insertStr;
+		if(ignoreRepeat) {
+			insertStr = "insert ignore into";
+		} else {
+			insertStr = "insert into";
 		}
-		sqlsb.deleteCharAt(sqlsb.length() - 1);
-		sqlsb.append(") values");
-		try {
-			for (Object bean : beans) {
-				sqlsb.append('(');
-				for (Field field : fields) {
-					if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
-						continue;
-					}
-					Object val = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(bean);
-					if (val != null) {
-						sqlsb.append("'" + val + "',");
-					} else {
-						sqlsb.append(val);
-						sqlsb.append(',');
-					}
-				}
-				sqlsb.deleteCharAt(sqlsb.length() - 1);
-				sqlsb.append("),");
-			}
-		} catch (Exception e) {
-			throw new RepositoryException(e);
-		}
-		sqlsb.deleteCharAt(sqlsb.length() - 1);
-		return sqlsb.toString();
+		StringBuilder insertsql = new StringBuilder();
+		insertsql.append(insertStr);
+		insertsql.append(" ");
+		insertsql.append(tableName);
+		insertsql.append(fs);
+		insertsql.append(" ");
+		insertsql.append(values);
+		return insertsql.toString();
 	}
-	*/
+	
+	public static String arr2InsertSQL(Object[] beans,String dbName,boolean ignoreRepeat) {
+		Iterable<Object> list = Arrays.asList(beans);  
+		return toInsertSQL(list, dbName, ignoreRepeat);
+	}
+	
 	/**
 	 * 
 	 * @param bean

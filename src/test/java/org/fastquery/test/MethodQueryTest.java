@@ -28,10 +28,18 @@ import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 
@@ -39,6 +47,9 @@ import static org.junit.Assert.assertThat;
  */
 public class MethodQueryTest {
 
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+	
 	private StudentDBService studentDBService;
 	private UserInfoDBService userInfoDBService;
 	
@@ -78,6 +89,50 @@ public class MethodQueryTest {
 		assertThat(u2.getId(), notNullValue());
 		assertThat(u2.getName(), equalTo(u.getName()));
 		assertThat(u2.getAge(), equalTo(u.getAge()));
+	}
+	
+	@Test
+	public void save3(){
+		UserInfo u1 = new UserInfo(1, "equinox", 10);
+		UserInfo u2 = new UserInfo(2, "Eclipse", 3);
+		UserInfo u3 = new UserInfo(3, "ement", 2);
+		int effect = studentDBService.saveArray(true, u1,u2,u3);
+		assertThat(effect, is(0));
+	}
+	
+	@Test
+	public void save4(){
+		UserInfo u1 = new UserInfo(1, "equ", 10);
+		UserInfo u2 = new UserInfo(2, "Ecl", 3);
+		UserInfo u3 = new UserInfo(3, "ement", 2);
+		// 断言: 在执行studentDBService.save(false, u1,u2,u3)之后,将会抛出 RepositoryException 异常!
+		thrown.expect(RepositoryException.class);
+		// 断言: 在执行studentDBService.save(false, u1,u2,u3)之后,抛出的异常信息中包含有"Duplicate entry '1' for key 'PRIMARY'"字符串
+		thrown.expectMessage(containsString("Duplicate entry '1' for key 'PRIMARY'"));
+		int effect = studentDBService.saveArray(false, u1,u2,u3);
+		assertThat(effect, is(0));
+	}
+	
+	@Test
+	public void save5(){
+		UserInfo u1 = new UserInfo("equ", 10);
+		UserInfo u2 = new UserInfo("Ecl", 3);
+		UserInfo u3 = new UserInfo("ement", 2);
+		int effect = studentDBService.saveArray(false, u1,u2,u3);
+		assertThat(effect, is(3));
+	}
+	
+	@Test
+	public void save6(){
+		UserInfo u1 = new UserInfo("安小惠", 10);
+		UserInfo u2 = new UserInfo("袁承志", 3);
+		UserInfo u3 = new UserInfo("袁崇焕", 2);
+		Collection<UserInfo> userInfos = new ArrayList<>();
+		userInfos.add(u1);
+		userInfos.add(u2);
+		userInfos.add(u3);
+		int effect = studentDBService.save(false,userInfos);
+		assertThat(effect, is(3));
 	}
 	
 	@Test(expected = RepositoryException.class)

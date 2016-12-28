@@ -623,6 +623,7 @@ public class QueryProcess {
 			
 		}
 	
+	@SuppressWarnings("unchecked")
 	Object methodQuery(Method method,String packageName,Object[] iargs) {		
 		Id id = method.getAnnotation(Id.class);
 		if(id != null) {
@@ -647,6 +648,7 @@ public class QueryProcess {
 		DataSource dataSource;
 		String sql;
 		String dbName = null;
+		boolean ignoreRepeat;
 		switch (methodId) {
 		case MethodId.QUERY:
 			// 获取数据源
@@ -751,6 +753,22 @@ public class QueryProcess {
 			}
 			dataSource = DataSourceManage.getDataSource(sourceName, packageName);
 			return update(dataSource, bean, dbName,iargs[iargs.length-1].toString());
+		case MethodId.QUERY4:
+			// 获取数据源
+			sourceName = TypeUtil.findSource(method.getParameters(), iargs);
+			dataSource = DataSourceManage.getDataSource(sourceName,packageName);
+			ignoreRepeat = (boolean) iargs[0];
+			Object entitiesObj = iargs[iargs.length-1];
+			if(iargs.length == 4) {
+				dbName = iargs[2].toString();
+			}
+			if(entitiesObj.getClass().isArray()) {
+				sql = BeanUtil.arr2InsertSQL((Object[])entitiesObj, dbName, ignoreRepeat);
+			} else {
+				sql = BeanUtil.toInsertSQL((Iterable<Object>)entitiesObj, dbName, ignoreRepeat);
+			}
+			LOG.info(sql);
+			return insert(sql,dataSource);
 			
 		case MethodId.QUERY6:
 			// 获取数据源
@@ -945,6 +963,21 @@ public class QueryProcess {
 			close(rs, stat, conn);
 		}
 		return key;
+	}
+	
+	private int insert(String sql,DataSource dataSource){
+		Connection conn = null;
+		Statement stat = null;
+		ResultSet rs = null;
+		try {
+			conn = dataSource.getConnection();
+			stat = conn.createStatement();
+			return stat.executeUpdate(sql);
+		} catch (SQLException e) {
+			throw new RepositoryException(e);
+		} finally {
+			close(rs, stat, conn);
+		}
 	}
 	
 	// 查询一条数据然后转换成一个实体

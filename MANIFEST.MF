@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-SymbolicName: fquery.source
+Bundle-Version: 1.0.0.qualifier
+Bundle-Name: %bundleName
+Bundle-ManifestVersion: 2
+Bundle-Vendor: %bundleVendor
+Built-By: xixifeng.com
+Eclipse-SourceBundle: fquery;version="1.0.0.qualifier";roots:="."
+Created-By: Apache Maven

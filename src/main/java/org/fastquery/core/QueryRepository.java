@@ -23,6 +23,7 @@
 package org.fastquery.core;
 
 import java.math.BigInteger;
+import java.util.Collection;
 
 /**
  * 
@@ -55,6 +56,61 @@ public interface QueryRepository extends Repository {
 	 */
 	@Id(MethodId.QUERY)
 	BigInteger saveToId(@Source String dataSourceName,String dbName,Object entity);
+	
+	/**
+	 * 保存实体集合
+	 * @param ignoreRepeat 忽略重复主键
+	 * @param entities 实体集合
+	 * @return 影响行数
+	 */
+	@Id(MethodId.QUERY4)
+	<B> int save(boolean ignoreRepeat,Collection<B> entities);
+	/**
+	 * 保存实体集合
+	 * @param ignoreRepeat 忽略重复主键
+	 * @param entities 实体集合
+	 * @return 影响行数
+	 */
+	@Id(MethodId.QUERY4)
+	int saveArray(boolean ignoreRepeat,Object...entities);
+	/**
+	 * 保存实体集合
+	 * @param ignoreRepeat 忽略重复主键
+	 * @param dataSourceName 数据源名称
+	 * @param entities 实体集合
+	 * @return 影响行数
+	 */
+	@Id(MethodId.QUERY4)
+	<B> int save(boolean ignoreRepeat,@Source String dataSourceName,Collection<B> entities);
+	/**
+	 * 保存实体集合
+	 * @param ignoreRepeat 忽略重复主键
+	 * @param dataSourceName 数据源名称
+	 * @param entities 实体集合
+	 * @return 影响行数
+	 */
+	@Id(MethodId.QUERY4)
+	int saveArray(boolean ignoreRepeat,@Source String dataSourceName,Object...entities);
+	/**
+	 * 保存实体集合
+	 * @param dataSourceName 数据源名称
+	 * @param dbName 数据库名称
+	 * @param entities 实体集合
+	 * @param ignoreRepeat 忽略重复主键
+	 * @return 影响行数
+	 */
+	@Id(MethodId.QUERY4)
+	<B> int save(boolean ignoreRepeat,@Source String dataSourceName,String dbName,Collection<B> entities);
+	/**
+	 * 保存实体集合
+	 * @param ignoreRepeat 忽略重复主键
+	 * @param dataSourceName 数据源名称
+	 * @param dbName 数据库名称
+	 * @param entities 实体集合
+	 * @return 影响行数
+	 */
+	@Id(MethodId.QUERY4)
+	int saveArray(boolean ignoreRepeat,@Source String dataSourceName,String dbName,Object...entities);
 	
 	/**
 	 * 保存一个实体,这个实体必须有一个自增长的主键 <br>

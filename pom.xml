@@ -4,9 +4,9 @@
 
 	<groupId>org.fastquery</groupId>
 	<artifactId>fastquery</artifactId>
-	<version>1.0.15</version>
+	<version>1.0.18</version>
 	<packaging>jar</packaging>
-	
+
 
 	<name>fastquery</name>
 	<url>http://maven.apache.org</url>
@@ -46,20 +46,34 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.29</version>
 		</dependency>
-		
+
 		<dependency>
-           <groupId>org.apache.velocity</groupId>
-           <artifactId>velocity</artifactId>
-           <version>1.7</version>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.7</version>
 		</dependency>
-		
-        <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.9.6</version>
-        </dependency>
-        
-        <dependency>
+
+		<dependency>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>1.9.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse</groupId>
+			<artifactId>org.eclipse.osgi</artifactId>
+			<version>3.8.0.v20120529-1548</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-core</artifactId>
+			<version>3.1.7</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
@@ -84,11 +98,29 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<archive>
+						<manifestFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+					<classesDirectory>
+					</classesDirectory>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<version>3.0.1</version>
+				<configuration>
+				<archive>
+					<manifestFile>${project.basedir}/MANIFEST.MF</manifestFile>
+				</archive>
+				</configuration>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -98,21 +130,12 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--  
-			<plugin>
-			   <groupId>org.apache.maven.plugins</groupId>
-			   <artifactId>maven-surefire-plugin</artifactId>
-			   <version>2.19.1</version>
-			   <configuration>
-			       <includes>
-			       <include>AllTest.java</include>
-			       </includes>
-			   </configuration>
-			</plugin>
-			-->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-surefire-plugin</artifactId> 
+				<version>2.19.1</version> <configuration> <includes> <include>AllTest.java</include> 
+				</includes> </configuration> </plugin> -->
 		</plugins>
 	</build>
-	
+
 	<distributionManagement>
 		<repository>
 			<id>fastquery-releases</id>

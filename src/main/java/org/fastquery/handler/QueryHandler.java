@@ -144,7 +144,14 @@ public class QueryHandler {
 	    			if(map.values().size()>1){
 	    				throw new RepositoryException("不能把"+keyvals+"转换成" + returnTypeName);
 	    			}
-	    			list.add(map.values().iterator().next());
+	    			Object obj = map.values().iterator().next();
+	    			Class<?> clazz = (Class<?>) ct; 
+	    			// 如果obj就是clazz对应实例的子类
+	    			if(clazz.isAssignableFrom(obj.getClass())) {
+		    			list.add(obj);
+	    			} else {
+	    				throw new RepositoryException("从数据库查出的类型是:" + obj.getClass() + "不能充当List<"+ct+">的元素");
+	    			}
 	    		});
 	    		return list;
 	    	}
