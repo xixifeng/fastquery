@@ -128,7 +128,8 @@ fastquery.json其他可选配置选项:
       private String sex;
       private Integer age;
       private String dept;
-      // getter /setter 省略...
+      // getter / setter 省略... 
+      // 实际应用中不能省略(getter/setter占篇幅较多,为了文档经凑,因此没列举)
  } 
 ```
 
@@ -304,13 +305,12 @@ Primarykey saveUserInfo(String name,Integer age);
 | 方法 | 描述 |
 |:---|:---|
 | `<E> E save(E entity)` | 保存一个实体(主键字段的值若为null,那么该字段将不参与运算),返回保存成功之后的实体(返回的实体包含有主键) |
+| `<B> int save(boolean ignoreRepeat,Collection<B> entities)` | 保存一个集合实体,是否忽略重复主键记录 |
+| `int saveArray(boolean ignoreRepeat,Object...entities)` | 保存一个可变数组实体,是否忽略重复主键记录 |
 | `BigInteger saveToId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
 | `<E> E update(E entity)` | 更新一个实体,返回更新成功之后的实体.**注意**:实体的成员变量如果是null,将不会参与改运算 |
 | `<E> E saveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含有主键值) |
 | `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),返回影响行数 |
-| `<B> int save(boolean ignoreRepeat,Collection<B> entities)` | 保存一个集合实体,是否忽略重复主键记录 |
-| `int saveArray(boolean ignoreRepeat,Object...entities)` | 保存一个可变数组实体,是否忽略重复主键记录 |
-
 
 
 举例说明:  
