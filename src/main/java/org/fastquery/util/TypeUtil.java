@@ -27,8 +27,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -184,7 +187,7 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 获取sql中包含的参数与方法参数的对应关系. <br> 
-	 * sql参数也称之为是sql占位符叫法不一,不要扣字眼. <br>
+	 * sql参数也称之为是sql占位符叫法不一,请不要扣字眼. <br>
 	 * 例如: int[4]={2,2,3,1,4} <br>
 	 * 表示: sql中的第1个参数 对应方法的第2个参数 <br>
 	 * sql中的第2个参数 对应方法的第2个参数 <br>
@@ -202,6 +205,105 @@ public class TypeUtil implements Opcodes{
 			ints[i] = Integer.parseInt(subs.get(i).replace("?",""));
 		}
 		return ints;
+	}
+	
+	/**
+	 * 
+	 * 返回sql参数的值. <br>
+	 * 
+	 * 例如,若返回List->{1,3.3,"aa"} <br>
+	 * 表示: sql中的第1个参数的值对应1 <br>
+     * 表示: sql中的第2个参数的值对应3.3 <br>
+     * 表示: sql中的第3个参数的值对应"aa" <br>
+	 * 
+	 * @param indexMap 标记着,sql中的参数,对应着哪个方法参数 <br>
+	 * 例如: int[4]={2,2,3,1,4} <br>
+	 * 表示: sql中的第1个参数 对应方法的第2个参数 <br>
+	 * sql中的第2个参数 对应方法的第2个参数 <br>
+	 * sql中的第3个参数 对应方法的第3个参数 <br>
+	 * sql中的第4个参数 对应方法的第1个参数 <br>
+	 * sql中的第5个参数 对应方法的第4个参数 <br>
+	 * 
+	 * 请特别注意: sql参数与方法参数的对应,并不代表就是值的对应. <br>
+	 * 
+	 * @param args 方法参数的具体值,如: args[0] 表示第一个方法参数的值
+	 * 
+	 * @return
+	 */
+	public static Object[] getParamMap(int[] indexMap,Object[] args) {
+		Object[] os = new Object[2];
+		Map<Integer, Integer> rps = new HashMap<>();
+		List<Object> objs = new ArrayList<>();
+		int increment = 0;
+		for (int i = 0; i < indexMap.length; i++) {
+			// 取出sql参数所对应的方法参数
+			Object mp = args[indexMap[i]-1];
+			Class<?> mpClazz = mp.getClass();
+			int count;
+			if(mp instanceof Iterable) {
+				@SuppressWarnings("unchecked")
+				Iterable<Object> iterable =  (Iterable<Object>) mp;
+				Iterator<Object> iterator =  iterable.iterator();
+				count = 0;
+				while (iterator.hasNext()) {
+					++count;
+					objs.add(iterator.next());
+				}
+				if(count!=0) {
+					rps.put(i + increment, count); // 第i个"?"需要替换成count个"?"
+					increment += count-1;	// 增量个数(除开本身一个)
+				}
+			} else if(mpClazz.isArray()) {
+				// asList 是一个可变变量
+				List<Object> arrs = Arrays.asList((Object[]) mp); // 请特别注意: 如果此处写成 Arrays.asList(mp); 即使mp里面有多个成员, arrs的长度是1
+				arrs.forEach(objs::add);
+				count = arrs.size();
+				if(count!=0) {
+					rps.put(i + increment, count);
+					increment += count-1;	
+				}
+			} else {
+				objs.add(mp);
+			}
+		}
+		
+		os[0] = rps;
+		os[1] = objs;
+		return os;
+		
+	}
+	
+	public static String overChar(int overlap) {
+		if(overlap<1) {
+			return "";
+		}
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < overlap; i++) {
+			sb.append("?,");
+		}
+		sb.deleteCharAt(sb.length() - 1);
+		return sb.toString();
+	}
+	/**
+	 * 将第index个'?'换成overlap个'?','?'号之间用逗号(,)隔开
+	 * @param str
+	 * @param index 
+	 * @param overlap
+	 * @return
+	 */
+	public static String replace(String str,int index,int overlap) {
+		if(str == null || index < 0 || overlap < 1) 
+		   return "";
+		StringBuilder sb = new StringBuilder(str);
+		int arisen = 0; // 记录"?"是第几次出现
+		int len = sb.length();
+		for (int i = 0; i < len; i++) { // 在这里用len 而不是 sb.length(),那是因为sb一但被改变了,这个for循环就会结束,因此用len是没问题的
+			if(sb.charAt(i) == '?' && index == arisen++) {
+				sb.replace(i, i + 1, overChar(overlap));
+				break;
+			}
+		}
+		return sb.toString();
 	}
 	
 	/**
@@ -244,7 +346,7 @@ public class TypeUtil implements Opcodes{
 	        try {
 				clazz.getConstructor();
 			}catch (Exception e) {
-				LOG.info(clazz + ": 该类没有一个默认的构造方法.");
+				LOG.debug(clazz + ": 该类没有一个默认的构造方法.");
 				return false;
 			}
 	    return true;

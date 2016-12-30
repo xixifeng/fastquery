@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -230,11 +232,11 @@ public class QueryProcess {
 	}
 	
 	// 查操作
+	@SuppressWarnings("unchecked")
 	Object query(Method method,Class<?> returnType, String sql,String sourceName, String packageName,Object[] iargs,Object...args) {
 		int[] ints = TypeUtil.getSQLParameter(sql);
 		showArgs(ints,args);
 		sql = sql.replaceAll(Placeholder.SP1_REG, "?");
-		LOG.info(sql);
 		DataSource dataSource = DataSourceManage.getDataSource(sourceName,packageName);
 		List<Map<String, Object>> keyvals = null;
 		Connection conn = null;
@@ -243,9 +245,30 @@ public class QueryProcess {
 		try {
 			// 获取链接
 			conn = dataSource.getConnection();
+			// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
+			Object[] os = TypeUtil.getParamMap(ints, args);
+			Map<Integer, Integer> rpates = (Map<Integer, Integer>) os[0];
+			List<Object> objs = (List<Object>) os[1];
+			
+			Set<Entry<Integer, Integer>> entities = rpates.entrySet();
+			for (Entry<Integer, Integer> entry : entities) {
+				sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
+			}
+			LOG.info(sql);
+
 			stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+			/*
 			for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 				stat.setObject(i, args[ints[i-1]-1]);
+			}
+			List<Object> sqlParValues = TypeUtil.getParamMap(ints, args);
+			for (int i = 0; i < sqlParValues.size(); i++) {
+				// 给sql设置参数值是从1开始的
+				stat.setObject(i+1, sqlParValues.get(i));
+			}*/
+			int lenTmp = objs.size();
+			for (int i = 0; i < lenTmp; i++) {
+				stat.setObject(i+1, objs.get(i));
 			}
 			rs = stat.executeQuery();
 			keyvals = rs2Map(rs);

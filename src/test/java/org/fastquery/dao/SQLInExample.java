@@ -20,34 +20,30 @@
  * 
  */
 
-package org.fastquery.test;
+package org.fastquery.dao;
 
-import org.fastquery.mapper.QueryByNamedDBExampleMapperTest;
-import org.fastquery.service.FQueryResourceImplTest;
-import org.fastquery.service.FQueryTest;
-import org.fastquery.util.BeanUtilTest;
-import org.fastquery.util.FastQueryJSONObjectTest;
-import org.fastquery.util.TypeUtilTest;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import java.util.List;
+import java.util.Set;
+
+import org.fastquery.bean.Student;
+import org.fastquery.bean.UserInfo;
+import org.fastquery.core.Param;
+import org.fastquery.core.Query;
+import org.fastquery.core.QueryRepository;
 
 /**
- * 运行所有的测试用例
  * 
  * @author xixifeng (fastquery@126.com)
  */
-// 指定运行器
-@RunWith(Suite.class)
-@SuiteClasses({ FQueryTest.class,StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class,
-		UserInfoDBServiceTest3.class, TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class,
-		BeanUtilTest.class, PageTest.class, QueryByNamedDBExampleMapperTest.class, FastQueryJSONObjectTest.class,
-		FQueryResourceImplTest.class, SunnyDBServiceTest.class })
-class AllTest {
+public interface SQLInExample extends QueryRepository {
 
-	@Test
-	public void todo() {
-	}
+	@Query("select * from UserInfo where name in (?1)")
+	List<UserInfo> findByNameIn(String...names);
 
+	@Query("select * from UserInfo where name in (?1) and id > ?2")
+	List<UserInfo> findByNameListIn(List<String> names,Integer id);
+	
+	@Query("select * from student where sex = :sex and age > :age and name in(:names)")
+	List<Student> findByIn(@Param("sex")String sex,@Param("age")Integer age,@Param("names")Set<String> names);
+	
 }

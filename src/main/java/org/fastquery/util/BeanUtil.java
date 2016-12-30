@@ -496,6 +496,7 @@ public final class BeanUtil {
 		try {
 			ns = (S) beanClass.newInstance();
 			for (Field field : fields) {
+				// 这里虽然只是调用getWriteMethod, 但是如果get方法写错了,也会导致getWriteMethod不能用
 				new PropertyDescriptor(field.getName(), beanClass).getWriteMethod().invoke(ns, new Object[]{null});
 			}
 		} catch (Exception e) {

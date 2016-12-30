@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.fastquery.core.Id;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
@@ -499,6 +500,85 @@ public class TypeUtilTest implements Opcodes {
 	public void test2(){
 		String str = "\t\nabc\n\t";
 		assertThat(str.trim(), equalTo("abc"));
+	}
+	
+	@Test
+	public void overChar(){
+		String str = TypeUtil.overChar(-1);
+		assertThat(str, equalTo(""));
+		
+		str = TypeUtil.overChar(0);
+		assertThat(str, equalTo(""));
+		
+		str = TypeUtil.overChar(1);
+		assertThat(str, equalTo("?"));
+		
+		str = TypeUtil.overChar(2);
+		assertThat(str, equalTo("?,?"));
+		
+		str = TypeUtil.overChar(3);
+		assertThat(str, equalTo("?,?,?"));
+		
+		str = TypeUtil.overChar(8);
+		assertThat(str, equalTo("?,?,?,?,?,?,?,?"));
+	}
+
+	@Test
+	public void replace1(){ 
+		String str = TypeUtil.replace(null,0,1);
+		assertThat(str, is(""));
+		
+		str = TypeUtil.replace("",0,1);
+		assertThat(str, is(""));
+		
+		str = TypeUtil.replace(null,-1,0);
+		assertThat(str, is(""));
+	}
+	
+	@Test
+	public void replace2(){
+		String src = "kljgwkg?gwgw47478978?jioj2?87983lkjksj";
+		int count = StringUtils.countMatches(src, "?");
+		int repat = 3;
+		String str = TypeUtil.replace(src,0,repat);
+		assertThat(StringUtils.countMatches(str, "?"), is(count + repat - 1));
+		
+		for (int i = 0; i < 10; i++) {
+			count = StringUtils.countMatches(src, "?");
+			repat = i + 1;
+			str = TypeUtil.replace(src,0,repat);
+			assertThat(StringUtils.countMatches(str, "?"), is(count + repat - 1));
+		}
+		
+		str = TypeUtil.replace(src,0,3);
+		assertThat(str, equalTo("kljgwkg?,?,?gwgw47478978?jioj2?87983lkjksj"));
+		
+		
+		str = TypeUtil.replace(src,1,2);
+		assertThat(str, equalTo("kljgwkg?gwgw47478978?,?jioj2?87983lkjksj"));
+		
+		str = TypeUtil.replace(src,2,5);
+		assertThat(str, equalTo("kljgwkg?gwgw47478978?jioj2?,?,?,?,?87983lkjksj"));
+		
+	}
+	
+	
+	@Test
+	public void replace3(){
+		String src = "??????????kjlwkgj5?32415456?45lkjkljgw";
+		String str = TypeUtil.replace(src,1,5);
+		assertThat(str, equalTo("??,?,?,?,?????????kjlwkgj5?32415456?45lkjkljgw"));
+		str = TypeUtil.replace(src,20,5);
+		assertThat(str, equalTo("??????????kjlwkgj5?32415456?45lkjkljgw"));
+	}
+	
+	@Test
+	public void replace4(){
+		String src = "";
+		String str = TypeUtil.replace(src,1,5);
+		assertThat(str, equalTo(""));
+		str = TypeUtil.replace(src,20,5);
+		assertThat(str, equalTo(""));
 	}
 }
 

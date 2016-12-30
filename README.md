@@ -410,14 +410,6 @@ UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
 // 则: 最终的SQL为: "select * from `userinfo` where 1 order by age desc"
 ```
 
-**SQL IN**  
-IN的值是变量时:
-
-```java
-@Query("select id,name,age from UserInfo where id in (${ids})")
-UserInfo[] findByIds(@Param("ids") int[] ids);
-```
-
 ### 采用${name}时请注意: 
 - 传递null值,模板变量默认取""
 - 参数模板仅仅用来辅助开发者构建SQL语句
@@ -432,6 +424,31 @@ UserInfo[] findByIds(@Param("ids") int[] ids);
 // orderby 若为null, 那么 ${orderby}的值,就取defaultVal的值
 JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") String orderby);
 ```
+
+##  SQL IN
+
+### "?"索引方式
+```java
+@Query("select * from UserInfo where name in (?1)")
+List<UserInfo> findByNameIn(String...names);
+
+@Query("select * from UserInfo where name in (?1) and id > ?2")
+List<UserInfo> findByNameListIn(List<String> names,Integer id);
+```
+
+### 冒号(:)命名式参数
+```java
+@Query("select * from student where sex = :sex and age > :age and name in(:names)")
+List<Student> findByIn(@Param("sex")String sex,@Param("age")Integer age,@Param("names")Set<String> names);
+```
+
+### 当然,也可以采用${name}表达式
+**注意:** 这种方式请堤防SQL注入
+```java
+@Query("select id,name,age from UserInfo where id in (${ids})")
+UserInfo[] findByIds(@Param("ids") int[] ids);
+```
+
 
 ## @QueryByNamed命名式查询
 就是把`SQL`语句写在配置文件里(在配置文件中可以进行逻辑判断),然后用`@QueryByNamed`绑定配置文件中的id值,以便引用到解析后的`SQL`.       
