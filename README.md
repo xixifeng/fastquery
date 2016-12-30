@@ -413,7 +413,7 @@ UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
 ### 采用${name}时请注意: 
 - 传递null值,模板变量默认取""
 - 参数模板仅仅用来辅助开发者构建SQL语句
-- 请堤防使用不当,引发SQL注入问题
+- 请提防使用不当,引发SQL注入问题
 - 请避免模板参数的值完全来源于用户层的输入
 - 请确保参数值可控.  
 
@@ -443,7 +443,7 @@ List<Student> findByIn(@Param("sex")String sex,@Param("age")Integer age,@Param("
 ```
 
 ### 当然,也可以采用${name}表达式
-**注意:** 这种方式请堤防SQL注入
+**注意:** 这种方式请提防SQL注入
 ```java
 @Query("select id,name,age from UserInfo where id in (${ids})")
 UserInfo[] findByIds(@Param("ids") int[] ids);

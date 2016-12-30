@@ -36,5 +36,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Param {
 	String value();
+	/**
+	 * "" 表示没有设置默认值
+	 */
 	String defaultVal() default "";
+	/**
+	 * "" 表示无格式
+	 * @return
+	 */
+	String format() default "";
 }

@@ -95,6 +95,7 @@ public class QueryProcess {
 	}
 	
 	// 改操作
+	@SuppressWarnings("unchecked")
 	Object modifying(Method method,Class<?> returnType,List<String> queries,String packageName,Object...args) {
 		// 获取数据源
 		String sourceName = TypeUtil.findSource(method.getParameters(), args);
@@ -129,17 +130,35 @@ public class QueryProcess {
 				sql = sql.replaceAll(Placeholder.TABLE_REG, table);
 				sql = sql.replaceAll(Placeholder.ID_REG, id);
 				showArgs(ints,args);
-				LOG.info(sql);
 				
 				try {
+					// sql 中的"?"号调整
+					// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
+					Object[] os = TypeUtil.getParamMap(ints, args);
+					Map<Integer, Integer> rpates = (Map<Integer, Integer>) os[0];
+					List<Object> objs = (List<Object>) os[1];
+					
+					Set<Entry<Integer, Integer>> entities = rpates.entrySet();
+					for (Entry<Integer, Integer> entry : entities) {
+						sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
+					}
+					// sql 中的"?"号调整 End
 					// Statement.RETURN_GENERATED_KEYS
+					LOG.info(sql);
 					stat = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS); // stat 会在下面的finally里关闭.
 					// 注意: preparedStatement的参数索引是从1开始的!
+					/*
 					for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 						// ints[i-1] 表示当前SQL参数对应方法的第几个参数. 从1开始计数
 						// 从args中取出值,数组的值是从0开始的,因此必须减去1
 						stat.setObject(i, args[ints[i-1]-1]);
+					}*/
+					// 设置sql参数值
+					int lenTmp = objs.size();
+					for (int i = 0; i < lenTmp; i++) {
+						stat.setObject(i+1, objs.get(i));
 					}
+					// 设置sql参数值 End
 					effect = stat.executeUpdate();
 					
 					// XXXXXXXXXXXX
@@ -245,6 +264,8 @@ public class QueryProcess {
 		try {
 			// 获取链接
 			conn = dataSource.getConnection();
+			
+			// sql 中的"?"号调整
 			// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
 			Object[] os = TypeUtil.getParamMap(ints, args);
 			Map<Integer, Integer> rpates = (Map<Integer, Integer>) os[0];
@@ -254,22 +275,21 @@ public class QueryProcess {
 			for (Entry<Integer, Integer> entry : entities) {
 				sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
 			}
+			// sql 中的"?"号调整 End
 			LOG.info(sql);
 
 			stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
 			/*
 			for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 				stat.setObject(i, args[ints[i-1]-1]);
-			}
-			List<Object> sqlParValues = TypeUtil.getParamMap(ints, args);
-			for (int i = 0; i < sqlParValues.size(); i++) {
-				// 给sql设置参数值是从1开始的
-				stat.setObject(i+1, sqlParValues.get(i));
 			}*/
+			
+			// 设置sql参数值
 			int lenTmp = objs.size();
 			for (int i = 0; i < lenTmp; i++) {
 				stat.setObject(i+1, objs.get(i));
 			}
+			// 设置sql参数值 End
 			rs = stat.executeQuery();
 			keyvals = rs2Map(rs);
 		} catch (SQLException e) {
@@ -351,7 +371,6 @@ public class QueryProcess {
 		
 		showArgs(ints,args);
 		sql = sql.replaceAll(Placeholder.SP1_REG, "?");
-		LOG.info(sql);
 		// 获取数据源
 		String sourceName = TypeUtil.findSource(parameters, args);
 		DataSource dataSource = DataSourceManage.getDataSource(sourceName,packageName);
@@ -362,10 +381,30 @@ public class QueryProcess {
 		try {
 			// 获取链接
 			conn = dataSource.getConnection();
+			            // sql 中的"?"号调整
+						// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
+						Object[] os = TypeUtil.getParamMap(ints, args);
+						Map<Integer, Integer> rpates = (Map<Integer, Integer>) os[0];
+						List<Object> objs = (List<Object>) os[1];
+						
+						Set<Entry<Integer, Integer>> entities = rpates.entrySet();
+						for (Entry<Integer, Integer> entry : entities) {
+							sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
+						}
+						// sql 中的"?"号调整 End
+						LOG.info(sql);
 			stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+			/*
 			for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 				stat.setObject(i, args[ints[i-1]-1]);
+			}*/
+			// 设置sql参数值
+			int lenTmp = objs.size();
+			for (int i = 0; i < lenTmp; i++) {
+				stat.setObject(i+1, objs.get(i));
 			}
+			// 设置sql参数值 End
+			
 			rs = stat.executeQuery();
 			keyvals = rs2Map(rs);
 		} catch (SQLException e) {
@@ -420,13 +459,31 @@ public class QueryProcess {
 			 // 过滤limit后面的字符串(包含自身)
 			 sql = sql.replaceFirst("(?i)(limit )(.|\n)+", "");
 			 
-			LOG.debug("求和语句: " + sql);
 			try {
 				close(rs, stat, null); // 在新创建rs,stat 先把之前的关闭掉
+				// sql 中的"?"号调整
+				// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
+				Object[] os = TypeUtil.getParamMap(ints, args);
+				Map<Integer, Integer> rpates = (Map<Integer, Integer>) os[0];
+				List<Object> objs = (List<Object>) os[1];
+				
+				Set<Entry<Integer, Integer>> entities = rpates.entrySet();
+				for (Entry<Integer, Integer> entry : entities) {
+					sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
+				}
+				// sql 中的"?"号调整 End
+				LOG.debug("求和语句: " + sql);
 				stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+				/*
 				for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 					stat.setObject(i, args[ints[i-1]-1]);
+				}*/
+				// 设置sql参数值
+				int lenTmp = objs.size();
+				for (int i = 0; i < lenTmp; i++) {
+					stat.setObject(i+1, objs.get(i));
 				}
+				// 设置sql参数值 End
 				rs = stat.executeQuery();
 				rs.next();
 				totalElements = rs.getLong(1);
@@ -454,13 +511,31 @@ public class QueryProcess {
 			limit = sb.toString();
 			sql = ssql.replaceFirst(Placeholder.LIMIT_RGE, limit);
 			sql = sql.replaceAll(Placeholder.SP1_REG, "?");
-			LOG.debug("下一页的SQL:" + sql);
 			try {
 				close(rs, stat, null); // 在新创建rs,stat 先把之前的关闭掉
+				// sql 中的"?"号调整
+				// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
+				Object[] os = TypeUtil.getParamMap(ints, args);
+				Map<Integer, Integer> rpates = (Map<Integer, Integer>) os[0];
+				List<Object> objs = (List<Object>) os[1];
+				
+				Set<Entry<Integer, Integer>> entities = rpates.entrySet();
+				for (Entry<Integer, Integer> entry : entities) {
+					sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
+				}
+				// sql 中的"?"号调整 End
+				LOG.debug("下一页的SQL:" + sql);
 				stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+				/*
 				for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 					stat.setObject(i, args[ints[i-1]-1]);
+				}*/
+				// 设置sql参数值
+				int lenTmp = objs.size();
+				for (int i = 0; i < lenTmp; i++) {
+					stat.setObject(i+1, objs.get(i));
 				}
+				// 设置sql参数值 End
 				rs = stat.executeQuery();
 				boolean next = rs.next();
 				hasNext = next; // 下一页有数据
@@ -526,7 +601,7 @@ public class QueryProcess {
 			} else {
 				sql += limit;
 			}
-			LOG.info(sql);
+
 			
 			// 获取数据源
 			String sourceName = TypeUtil.findSource(parameters, args);
@@ -538,10 +613,29 @@ public class QueryProcess {
 			try {
 				// 获取链接
 				conn = dataSource.getConnection();
+				// sql 中的"?"号调整
+				// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
+				Object[] os = TypeUtil.getParamMap(ints, args);
+				Map<Integer, Integer> rpates = (Map<Integer, Integer>) os[0];
+				List<Object> objs = (List<Object>) os[1];
+				
+				Set<Entry<Integer, Integer>> entities = rpates.entrySet();
+				for (Entry<Integer, Integer> entry : entities) {
+					sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
+				}
+				// sql 中的"?"号调整 End
+				LOG.info(sql);
 				stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+				/*
 				for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 					stat.setObject(i, args[ints[i-1]-1]);
+				}*/
+				// 设置sql参数值
+				int lenTmp = objs.size();
+				for (int i = 0; i < lenTmp; i++) {
+					stat.setObject(i+1, objs.get(i));
 				}
+				// 设置sql参数值 End
 				rs = stat.executeQuery();
 				keyvals = rs2Map(rs);
 			} catch (SQLException e) {
@@ -565,13 +659,31 @@ public class QueryProcess {
 				 sql = TypeUtil.paramNameFilter(method, args,countQuery);
 				 ints = TypeUtil.getSQLParameter(sql); // 06-11-11
 				 sql = sql.replaceAll(Placeholder.SP1_REG, "?");
-				 LOG.info("求和语句: " + sql);
 				try {
 					close(rs, stat, null); // 在新创建rs,stat 先把之前的关闭掉
+					// sql 中的"?"号调整
+					// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
+					Object[] os = TypeUtil.getParamMap(ints, args);
+					Map<Integer, Integer> rpates = (Map<Integer, Integer>) os[0];
+					List<Object> objs = (List<Object>) os[1];
+					
+					Set<Entry<Integer, Integer>> entities = rpates.entrySet();
+					for (Entry<Integer, Integer> entry : entities) {
+						sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
+					}
+					// sql 中的"?"号调整 End
+					LOG.info("求和语句: " + sql);
 					stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+					/*
 					for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 						stat.setObject(i, args[ints[i-1]-1]);
+					}*/
+					// 设置sql参数值
+					int lenTmp = objs.size();
+					for (int i = 0; i < lenTmp; i++) {
+						stat.setObject(i+1, objs.get(i));
 					}
+					// 设置sql参数值 End
 					rs = stat.executeQuery();
 					// 如果在求和时画蛇添足在末尾增加了分组(group by),在没有数据的情况下,返回的是:Empty set (0.00 sec) 而不是0,已经验证.
 					if(rs.next()) {
@@ -606,13 +718,31 @@ public class QueryProcess {
 					sql += limit;
 				}
 				sql = sql.replaceAll(Placeholder.SP1_REG, "?");
-				LOG.debug("下一页的SQL:" + sql);
 				try {
 					close(rs, stat, null); // 在新创建rs,stat 先把之前的关闭掉
+					// sql 中的"?"号调整
+					// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
+					Object[] os = TypeUtil.getParamMap(ints, args);
+					Map<Integer, Integer> rpates = (Map<Integer, Integer>) os[0];
+					List<Object> objs = (List<Object>) os[1];
+					
+					Set<Entry<Integer, Integer>> entities = rpates.entrySet();
+					for (Entry<Integer, Integer> entry : entities) {
+						sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
+					}
+					// sql 中的"?"号调整 End
+					LOG.debug("下一页的SQL:" + sql);
 					stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
+					/*
 					for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
 						stat.setObject(i, args[ints[i-1]-1]);
+					}*/
+					// 设置sql参数值
+					int lenTmp = objs.size();
+					for (int i = 0; i < lenTmp; i++) {
+						stat.setObject(i+1, objs.get(i));
 					}
+					// 设置sql参数值 End
 					rs = stat.executeQuery();
 					boolean next = rs.next();
 					hasNext = next; // 下一页有数据
