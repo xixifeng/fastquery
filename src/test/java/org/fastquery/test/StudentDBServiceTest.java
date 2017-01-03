@@ -115,6 +115,12 @@ public class StudentDBServiceTest {
 	}
 	
 	@Test
+	public void findStudent2() {
+		Student student = studentDBService.findStudent(null);
+		assertThat(student,nullValue());
+	}
+	
+	@Test
 	public void exists(){
 		boolean exists = studentDBService.exists("9512101");
 		assertThat(exists, is(true));

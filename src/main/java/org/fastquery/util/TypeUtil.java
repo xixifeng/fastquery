@@ -241,7 +241,11 @@ public class TypeUtil implements Opcodes{
 		int increment = 0;
 		for (int i = 0; i < indexMap.length; i++) {
 			// 取出sql参数所对应的方法参数
-			Object mp = args[indexMap[i]-1];
+			Object mp = args[indexMap[i]-1]; // 这个值有可能是null
+			if(mp==null) {
+				objs.add(mp);
+				continue;
+			}
 			Class<?> mpClazz = mp.getClass();
 			int count;
 			if(mp instanceof Iterable) {
