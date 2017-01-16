@@ -47,14 +47,15 @@ public class Prepared {
     }; 
     
 	private Prepared(){}
-    
+  
 	/**
-	 * 
+	 * 执行方法
 	 * @param interfaceClazz 接口clazz
-	 * @param methodName  方法名称
+	 * @param methodName 方法名称
 	 * @param methodDescriptor 方法完整描述(asm)
 	 * @param args 方法参数 注意: 此处参数列表的成员,永远都是包装类型(已经验证)
-	 * @return
+	 * @param target 目标 Repository
+	 * @return 执行之后的值
 	 */
 	public static Object excute(String interfaceClazz, String methodName,String methodDescriptor,Object[] args,Repository target) {
 		try {

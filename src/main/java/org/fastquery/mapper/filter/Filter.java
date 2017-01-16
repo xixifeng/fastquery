@@ -31,11 +31,12 @@ import org.w3c.dom.Element;
  */
 @FunctionalInterface
 public interface Filter {
-	
+
 	/**
 	 * 过滤
-	 * @param element 待检测的Element
-	 * @return
+	 * @param xmlName xml名称
+	 * @param element  element 待检测的Element
+	 * @return 元素
 	 */
 	Element doFilter(String xmlName,Element element);
 	

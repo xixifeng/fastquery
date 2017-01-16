@@ -47,8 +47,8 @@ public class AsmRepository implements Opcodes {
 	
 	/**
 	 * 自动生成Repository接口的实现类并以字节的形式返回, 该方法是线程安全的.
-	 * @param repositoryClazz
-	 * @return
+	 * @param repositoryClazz repository class
+	 * @return 生成的类字节码
 	 */
 	public static synchronized byte[] generateBytes(Class<? extends Repository> repositoryClazz) {
 		// 安全检测
@@ -225,6 +225,8 @@ public class AsmRepository implements Opcodes {
 
 	/**
 	 * 所有的代码生成之后
+	 * 
+	 * @param classes Repository class 集合
 	 */
 	public static void after(List<Class<Repository>> classes) {
 		QueryValidator.check(classes);

@@ -17,22 +17,25 @@ public @interface Query {
 	
 	/**
 	 * sql语句
+	 * @return String
 	 */
 	String value() default "";
 
 	/**
 	 * 求和语句
+	 * @return String
 	 */
 	String countQuery() default "";
 	
 	/**
 	 * 求和字段
-	 * @return
+	 * @return String
 	 */
 	String countField() default "id";
 	
 	/**
 	 * 是否采用本地查询
+	 * @return 布尔 boolean
 	 */
 	boolean nativeQuery() default true;
 }

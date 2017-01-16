@@ -47,15 +47,14 @@ public class FastQueryJSONObject {
 	
 	/**
 	 * 获取基准路径
-	 * @return
+	 * @return basedir
 	 */
 	public static String getBasedir(){
 		return jsonObject.getString("basedir");
 	}
 	
 	/**
-	 * 获取velocity配置文件的路径 
-	 * @return
+	 * @return velocity配置文件的路径 
 	 */
 	public static String getVelocity(){
 		return jsonObject.getString("velocity");

@@ -83,6 +83,10 @@ public class QueryProcess {
 		
 	}
 	
+	/**
+	 * 获取QueryProcess实例
+	 * @return QueryProcess
+	 */
 	public static QueryProcess getInstance(){
 		if(queryProcess == null) {
 			synchronized (QueryProcess.class) {
@@ -963,12 +967,11 @@ public class QueryProcess {
 		return null;
 	}
 	
-	
 	/**
-	 * 将 rs 的结果集 转换成 List<Map>, rs没有结果则返回空对象(该方法永不返回null).
-	 * @param rs
-	 * @return
-	 * @throws SQLException
+	 * 将 rs 的结果集 转换成 List&lt;Map&gt;,rs没有结果则返回空对象(该方法永不返回null).
+	 * @param rs 结果集
+	 * @return List map结果集
+	 * @throws SQLException SQL异常
 	 */
 	public List<Map<String, Object>> rs2Map(ResultSet rs) throws SQLException {
 
@@ -996,9 +999,9 @@ public class QueryProcess {
 		
 	/**
 	 * 释放资源
-	 * @param rs
-	 * @param stat
-	 * @param conn
+	 * @param rs ResultSet实例
+	 * @param stat Statement实例
+	 * @param conn Connection实例
 	 */
 	public void close(ResultSet rs, Statement stat, Connection conn) {
 		try {

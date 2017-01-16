@@ -23,7 +23,7 @@
 package org.fastquery.core;
 
 /**
- * 
+ * 任务调度
  * @author xixifeng (fastquery@126.com)
  */
 public interface QuartzRepository extends Repository{
@@ -36,18 +36,17 @@ public interface QuartzRepository extends Repository{
 	 */
 	 String addJobDetai(QuartzStatus status,QuartzJob...quartzJob);
 	 
-	 
 	 /**
 	  * 动态增加一个作业
-	  * @param status
-	  * @param quartzJob quartzJob 字符串格式的作业源代码,在服务端会自动编译装载进去.
+	  * @param status 状态
+	  * @param quartzJob 字符串格式的作业源代码,在服务端会自动编译装载进去.
 	  */
 	 void addJobDetai(QuartzStatus status,String...quartzJob);
 	 
 	 /**
 	  * 更改指定作业的状态
-	  * @param jobKey
-	  * @param status
+	  * @param status 状态
+	  * @param jobKey job key
 	  */
 	 void update(QuartzStatus status,String...jobKey);
 	 

@@ -28,23 +28,53 @@ package org.fastquery.core;
  */
 public class MethodId {
 	
+	/**
+	 * -1
+	 */
 	public static final byte QUERY =  -1;
 	
+	/**
+	 * 0X00
+	 */
 	public static final byte QUERY0 = 0X00;
 	
+	/**
+	 * 0X01
+	 */
 	public static final byte QUERY1 = 0X01;
 	
+	/**
+	 * 0X02
+	 */
 	public static final byte QUERY2 = 0X02;
 	
+	/**
+	 * 0X03
+	 */
 	public static final byte QUERY3 = 0X03;
 	
+	/**
+	 * 0X04
+	 */
 	public static final byte QUERY4 = 0X04;
 	
+	/**
+	 * 0X05
+	 */
 	public static final byte QUERY5 = 0X05;
 	
+	/**
+	 * 0X06
+	 */
 	public static final byte QUERY6 = 0X06;
 	
+	/**
+	 * 0X07
+	 */
 	public static final byte QUERY7 = 0X07;
 	
+	/**
+	 * 默认私有构造方法
+	 */
 	private MethodId(){}
 }

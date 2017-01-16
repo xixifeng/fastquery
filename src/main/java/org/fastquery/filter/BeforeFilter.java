@@ -41,7 +41,7 @@ public abstract class BeforeFilter<R extends Repository> {
 	
 	/**
 	 * 终止链条,直接返回returnVal
-	 * @param returnVal
+	 * @param returnVal 放回的值
 	 */
 	protected void abortWith(Object returnVal){
 		BeforeFilterChain.setThreadLocal(returnVal);

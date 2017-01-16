@@ -44,11 +44,11 @@ public class ClassUtil {
 	
 	private ClassUtil(){}
 	
-	 /**
-	  * 从包package中获取所有的Class
-	  * @param pack
-	  * @return
-	  */
+	/**
+	 * 从包package中获取所有的Class
+	 * @param packageName 包地址
+	 * @return clazz 集
+	 */
 	 @SuppressWarnings("unchecked")
 	public static List<Class<Repository>> getClasses(String packageName){
 	     		 

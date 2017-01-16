@@ -34,7 +34,8 @@
             "org.fastquery.example",              // 包地址
             "org.fastquery.dao.UserInfoDBService",// 完整类名称
             "org.fastquery.dao.QueryByNamedDBExample",
-            "org.fastquery.dao.SQLInExample"
+            "org.fastquery.dao.SQLInExample",
+            "org.fastquery.dao.ProcedureExample"
             // 在这可以配置多个DB接口或包地址,以","号隔开
         ]
     }

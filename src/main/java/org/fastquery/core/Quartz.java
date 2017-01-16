@@ -40,37 +40,37 @@ public @interface Quartz {
 	
 	/**
 	 * 目标作业
-	 * @return
+	 * @return QuartzJob 的子类
 	 */
 	Class<? extends QuartzJob> value() default QuartzJobDefaultImpl.class;
 	
 	/**
 	 *  计划任务, 默认值 0/3 * * * * ? 表示每隔3秒执行一次
-	 * @return
+	 * @return String
 	 */
 	String cronExpression() default "0/3 * * * * ?";
 	
 	/**
 	 * 调度开始时间(用时间戳来表达,精确至毫秒) 默认是-1, 表示按默认的开始时间
-	 * @return
+	 * @return long
 	 */
 	long startAt() default -1;
 	
 	/**
 	 * 循环次数. 默认是-1, 表示重复次数无限制,无限循环下去.
-	 * @return
+	 * @return int
 	 */
 	int withRepeatCount() default -1;
 
 	/**
 	 * 激活状态
-	 * @return
+	 * @return QuartzStatus.Active
 	 */
 	QuartzStatus.Active status() default QuartzStatus.Active.YES;
 	
 	/**
 	 * 作业是否并发进行
-	 * @return
+	 * @return boolean
 	 */
 	boolean concurrent() default false;
 }

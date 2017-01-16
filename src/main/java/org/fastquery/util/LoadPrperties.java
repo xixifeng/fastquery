@@ -43,8 +43,8 @@ public class LoadPrperties {
 	
 	/**
 	 * 装载配置并且初始化数据源,该方法的消耗成本较大.把它用在频繁调用的地方,显然是不合理的!
-	 * @param fqueryResource
-	 * @return
+	 * @param fqueryResource fquery.json 资源文件
+	 * @return set格式 fquery.json
 	 */
 	public static synchronized Set<FastQueryJson> load(Resource fqueryResource) {
 		Set<FastQueryJson> fqProperties = PropertiesUtil.getFQueryProperties(fqueryResource.getResourceAsStream("fastquery.json"),fqueryResource);

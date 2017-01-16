@@ -34,17 +34,17 @@ public enum Operator {
 	EQ("="),
 	
 	/**
-	 * < LT 是 less than的缩写
+	 * &lt; LT 是 less than的缩写
 	 */
 	LT("<"),
 	
 	/**
-	 * > GT 是 greater than的缩写
+	 * &gt; GT 是 greater than的缩写
 	 */
 	GT(">"),
 	
 	/**
-	 * <> 不等与 NE 是 not equal的缩写 
+	 * &lt;&gt; 不等与 NE 是 not equal的缩写 
 	 */
 	NE("<>"),
 	
@@ -54,22 +54,22 @@ public enum Operator {
 	NEQ("!="),
 	
 	/**
-	 * !>（不大于）not greater than
+	 * !&gt;（不大于）not greater than
 	 */
 	NGT("!>"),
 	
 	/**
-	 * !<（不小于） not less than
+	 * !&lt;（不小于） not less than
 	 */
 	NLT("!<"),
 	
 	/**
-	 * >=（大于等于） greater or equal
+	 * &gt;=（大于等于） greater or equal
 	 */
 	GE(">="),
 	
 	/**
-	 * <=（小于等于） less or equal
+	 * &lt;=（小于等于） less or equal
 	 */
 	LE("<="),
 	

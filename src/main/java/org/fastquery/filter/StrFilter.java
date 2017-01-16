@@ -34,7 +34,7 @@ public interface StrFilter {
 	/**
 	 * 过滤
 	 * @param str 待检测的string
-	 * @return
+	 * @return 过滤之后的字符串
 	 */
 	String doFilter(String str);
 	

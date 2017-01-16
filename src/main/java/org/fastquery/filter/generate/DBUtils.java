@@ -62,7 +62,7 @@ public class DBUtils {
 	 * @param packageName 基本包地址,根据它获取数据源.
 	 * @param table 表名称
 	 * @param field 字段名称
-	 * @return
+	 * @return y:true/n:false
 	 */
 	public boolean findColumnKey(String packageName,String table,String field){
 		

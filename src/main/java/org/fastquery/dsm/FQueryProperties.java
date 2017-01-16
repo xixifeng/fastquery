@@ -62,8 +62,8 @@ public class FQueryProperties {
 	/**
 	 * 根据basePackage 查找出 数据源的名字的名字
 	 * 
-	 * @param packageName
-	 * @return
+	 * @param packageName 包名称
+	 * @return 数据源名称
 	 */
 	public static String findDataSourceName(String packageName) {
 		String dataSourceName = dataSourceIndexs.get(packageName);
@@ -85,8 +85,8 @@ public class FQueryProperties {
 	/**
 	 * 根据数据源的名字查寻出数据库对象
 	 * 
-	 * @param sourceName
-	 * @return
+	 * @param dataSourceName 数据源名称
+	 * @return 数据源
 	 */
 	public static DataSource findDataSource(String dataSourceName) {
 		return dataSources.get(dataSourceName);

@@ -7,9 +7,15 @@
 	<version>1.0.20</version>
 	<packaging>jar</packaging>
 
-
 	<name>fastquery</name>
-	<url>http://maven.apache.org</url>
+	<description>Method of fast database query in complicated environment.</description>
+	<url>https://github.com/xixifeng/fastquery</url>
+
+	<scm>
+		<connection>scm:git:https://github.com/xixifeng/fastquery.git</connection>
+		<developerConnection>scm:git:https://github.com/xixifeng/fastquery.git</developerConnection>
+		<url>https://github.com/xixifeng/fastquery</url>
+	</scm>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -117,9 +123,9 @@
 				<artifactId>maven-source-plugin</artifactId>
 				<version>3.0.1</version>
 				<configuration>
-				<archive>
-					<manifestFile>${project.basedir}/MANIFEST.MF</manifestFile>
-				</archive>
+					<archive>
+						<manifestFile>${project.basedir}/MANIFEST.MF</manifestFile>
+					</archive>
 				</configuration>
 				<executions>
 					<execution>
@@ -130,22 +136,91 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-surefire-plugin</artifactId> 
-				<version>2.19.1</version> <configuration> <includes> <include>AllTest.java</include> 
-				</includes> </configuration> </plugin> -->
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- 
+			<plugin> 
+			   <groupId>org.apache.maven.plugins</groupId> 
+			   <artifactId>maven-surefire-plugin</artifactId> 
+			   <version>2.19.1</version>
+			   <configuration>
+			      <includes>
+			         <include>AllTest.java</include> 
+			      </includes>
+			   </configuration>
+			</plugin>
+			-->
+			
 		</plugins>
 	</build>
 
+	<!-- 
 	<distributionManagement>
-		<repository>
-			<id>fastquery-releases</id>
-			<name>FastQuery releases repository</name>
-			<url>http://192.168.8.10/nexus/content/repositories/fastquery-releases/</url>
-		</repository>
+	        <repository>
+	           <id>fastquery-releases</id>
+	           <name>FastQuery releases repository</name>
+	           <url>http://192.168.8.10/nexus/content/repositories/fastquery-releases/</url> 
+		    </repository>
+		    <snapshotRepository>
+		       <id>fastquery-snapshots</id>
+		       <name>FastQuery snapshots repository</name>
+		       <url>http://192.168.8.10/nexus/content/repositories/fastquery-snapshots/</url> 
+		    </snapshotRepository>
+		 </distributionManagement> 
+   -->
+
+	<distributionManagement>
 		<snapshotRepository>
-			<id>fastquery-snapshots</id>
-			<name>FastQuery snapshots repository</name>
-			<url>http://192.168.8.10/nexus/content/repositories/fastquery-snapshots/</url>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
 	</distributionManagement>
+
+	<developers>
+		<developer>
+			<name>xixifeng</name>
+			<email>fastquery@126.com</email>
+			<organization>fastquery.org</organization>
+			<organizationUrl>http://fastquery.org/</organizationUrl>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
 </project>

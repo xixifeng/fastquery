@@ -27,6 +27,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.fastquery.core.Modifying;
 import org.fastquery.core.Primarykey;
 import org.fastquery.core.Query;
 import org.fastquery.filter.generate.common.MethodFilter;

@@ -20,36 +20,25 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.dao;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.fastquery.core.Modifying;
+import org.fastquery.core.Param;
+import org.fastquery.core.Query;
+import org.fastquery.core.QueryRepository;
+
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
+public interface ProcedureExample  extends QueryRepository {
 
-@Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Param {
-	/**
-	 * value值
-	 * @return String
-	 */
-	String value();
+	/*
+	@Modifying
+	@Query("call addStudent(:no,:name,:sex,:age,:dept,@a,@b)")
+	JSONObject addStudent(@Param("no")String no,@Param("name")String name, @Param("sex")String sex,@Param("age")Integer age,@Param("dept") String dept);
+	*/
 	
-	/**
-	 * "" 表示没有设置默认值
-	 * @return String
-	 */
-	String defaultVal() default "";
-	
-	/**
-	 * "" 表示无格式
-	 * @return String
-	 */
-	String format() default "";
 }

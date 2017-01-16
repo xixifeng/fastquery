@@ -40,9 +40,9 @@ public class FQuery {
 
 	/**
 	 * 获取 Repository
-	 * 
-	 * @param clazz
-	 * @return
+	 * @param <T> 接口
+	 * @param clazz 接口class
+	 * @return 接口的实例
 	 */
 	public static <T extends Repository> T getRepository(Class<T> clazz) {
 		T t = GenerateRepositoryImpl.getInstance().getProxyRepository(clazz);
@@ -66,8 +66,10 @@ public class FQuery {
 	/**
 	 * 创建一个bean实例,成员变量的值全部重至为null <br>
 	 * 注意:这个bean的成员变量必须都是包装类型
-	 * @param beanClass
-	 * @return
+	 * 
+	 * @param <S> 实体
+	 * @param beanClass 实体
+	 * @return 成员变量重至为null后的实体
 	 */
 	public static <S> S reset(Class<S> beanClass){
 		return BeanUtil.newBeanVarNull(beanClass);

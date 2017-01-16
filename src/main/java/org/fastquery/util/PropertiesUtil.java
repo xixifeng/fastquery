@@ -60,9 +60,11 @@ public class PropertiesUtil {
 	private PropertiesUtil(){}
 	
 	/**
-	 * 解析 c3p0-config.xml
+	 * 解析 c3p0-config.xml <br>
 	 * 返回null 表示解析失败了或是待解析的文件不存在.
-	 * @return
+	 * 
+	 * @param inputStream 配置文件输入流
+	 * @return c3p0 config for json
 	 */
 	public static JSONObject getC3p0Configs(InputStream inputStream){
 
@@ -126,9 +128,10 @@ public class PropertiesUtil {
 	}
 	
 	/**
-	 * 解析 jdbc-config.xml
-	 * 返回null 表示解析失败了或是待解析的文件不存在.
-	 * @return
+	 * 解析 jdbc-config.xml,返回null 表示解析失败了或是待解析的文件不存在.
+	 * 
+	 * @param inputStream 配置文件输入流
+	 * @return jdbc conf map
 	 */
 	public static Map<String,JdbcConfig> getJdbcConfigs(InputStream inputStream) {
 
@@ -205,14 +208,11 @@ public class PropertiesUtil {
 		return jdbcConfigs;
 	}
 	
-	
-	
 	/**
-	 * 
-	 * @param fqueryjson
-	 * @param jdbcConfig
-	 * @param fqueryResource
-	 * @return
+	 * 配置转换
+	 * @param fqueryjson fquery.json 输入流
+	 * @param fqueryResource fquery资源
+	 * @return fastquery.json set结构
 	 */
 	public static Set<FastQueryJson> getFQueryProperties(InputStream fqueryjson,Resource fqueryResource){
 				

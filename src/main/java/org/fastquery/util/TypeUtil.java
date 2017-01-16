@@ -141,8 +141,8 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 从 clazz类中搜索具备有methodDescriptor属性,并且name为methodName的Method
-	 * @param clazz 
-	 * @param methodName 
+	 * @param clazz 类
+	 * @param methodName 方法名称
 	 * @param methodDescriptor asm方法描述
 	 * @return 匹配的方法, 如果没有匹配到抛出异常 {@link RuntimeException}
 	 */
@@ -194,8 +194,8 @@ public class TypeUtil implements Opcodes{
 	 * sql中的第3个参数 对应方法的第3个参数 <br>
 	 * sql中的第4个参数 对应方法的第1个参数 <br>
 	 * sql中的第5个参数 对应方法的第4个参数 <br>
-	 * @param sql
-	 * @return
+	 * @param sql sql语句
+	 * @return sql
 	 */
 	public static int[] getSQLParameter(String sql) {
 		List<String> subs = matches(sql, "\\?\\d+");
@@ -210,12 +210,12 @@ public class TypeUtil implements Opcodes{
 	/**
 	 * 为描述方便: 若返回的值时 arrs
 	 * 
-	 * arrs[0]: 返回sql中的"?"需要变化的地方.例如:若返回Map<Integer, Integer> -> {1=3,5=2} <br>
+	 * arrs[0]: 返回sql中的"?"需要变化的地方.例如:若返回Map&lt;Integer, Integer&gt; -&gt; {1=3,5=2} <br>
      * 表示sql中的第1个(从0开始计数)"?"号,应该调整3个"?"号,问号彼此用","号隔开 <br>
      * 完成上次替换之后的新sql中的第5个(从0开始计数)"?"号,应该调整2个"?"号,问号彼此用","号隔开 <br>
      * 强调: 完成上次替换之后的新sql,这句话要理解! <br>
      * 
-	 * arrs[1]: 返回sql参数的值.例如: 若返回List->{1,3.3,"aa"} <br>
+	 * arrs[1]: 返回sql参数的值.例如: 若返回List-&gt;{1,3.3,"aa"} <br>
 	 * 表示: sql中的第1个参数的值对应1 <br>
      * 表示: sql中的第2个参数的值对应3.3 <br>
      * 表示: sql中的第3个参数的值对应"aa" <br>
@@ -232,7 +232,7 @@ public class TypeUtil implements Opcodes{
 	 * 
 	 * @param args 方法参数的具体值,如: args[0] 表示第一个方法参数的值
 	 * 
-	 * @return
+	 * @return sql处理信号集
 	 */
 	public static Object[] getParamMap(int[] indexMap,Object[] args) {
 		Object[] os = new Object[2];
@@ -294,10 +294,10 @@ public class TypeUtil implements Opcodes{
 	}
 	/**
 	 * 将第index个'?'换成overlap个'?','?'号之间用逗号(,)隔开
-	 * @param str
-	 * @param index 
-	 * @param overlap
-	 * @return
+	 * @param str 被处理的字符串
+	 * @param index 索引
+	 * @param overlap 个数
+	 * @return 处理后的字符串
 	 */
 	public static String replace(String str,int index,int overlap) {
 		if(str == null || index < 0 || overlap < 1) 
@@ -316,9 +316,9 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 判断在str字符串中,在不区分大小写的前提下是否包含有给定的word
-	 * @param str 
-	 * @param word 单词
-	 * @return
+	 * @param str 目标字符串
+	 * @param word 待差找的单词
+	 * @return 存在:true,反之,false
 	 */
 	public static boolean containsIgnoreCase(String str,String word) {
 	
@@ -343,9 +343,9 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 检查对象是否存在默认构造函数
-	 * @param clazz
-	 * @return
-	 * @throws SecurityException
+	 * @param clazz 待检查的class
+	 * @return 有:true, 无:false
+	 * @throws SecurityException 安全异常
 	 */
 	public static boolean hasDefaultConstructor(Class<?> clazz) {
 		if(clazz == null) {
@@ -362,9 +362,9 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 从给定的参数列表中,搜寻出是第几个参数带有指定的注解.注意:从0开始计数
-	 * @param annotation 需要查询的注解
+	 * @param clazz 需要查询的注解
 	 * @param parameters 被查的参数列表
-	 * @return
+	 * @return 第几个
 	 */
 	public static int findAnnotationIndex(Class<? extends Annotation> clazz,Parameter[] parameters){
 		for (int i = 0; i < parameters.length; i++) {
@@ -377,9 +377,9 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 查询标识有指定注解的参数
-	 * @param clazz
-	 * @param parameters
-	 * @return
+	 * @param clazz 待差找的类型
+	 * @param parameters 参数类型集
+	 * @return 参数类型
 	 */
 	public static Parameter findParameter(Class<? extends Annotation> clazz,Parameter[] parameters){
 		for (Parameter parameter : parameters) {
@@ -392,9 +392,9 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * parameters 中是否存在 clazz,存在就返回true,反之返回false
-	 * @param clazz
-	 * @param parameters
-	 * @return
+	 * @param clazz 待差找的类型
+	 * @param parameters 参数类型
+	 * @return 有返回true,无:false
 	 */
 	public static boolean hasType(Class<?> clazz,Parameter[] parameters){
 		for (Parameter parameter : parameters) {
@@ -407,9 +407,9 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 统计一个注解在参数列表中出现的次数
-	 * @param clazz
-	 * @param parameters
-	 * @return
+	 * @param clazz 注解的class
+	 * @param parameters 参数类型
+	 * @return 出现次数
 	 */
 	public static int countRepeated(Class<? extends Annotation> clazz,Parameter[] parameters) {
 		int count = 0;
@@ -423,7 +423,7 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 从给定的参数列表中,搜寻出是第几个参数带有@Id注解.注意:从0开始计数
-	 * @param parameters
+	 * @param parameters 参数类型
 	 * @return 若返回 -1 表示没有找到
 	 */
 	public static int findId(Parameter[] parameters) {
@@ -437,10 +437,10 @@ public class TypeUtil implements Opcodes{
 	/**
 	 * 处理 @Param 模板参数
 	 * 
-	 * @param method
-	 * @param args
-	 * @param sql
-	 * @return
+	 * @param method 方法
+	 * @param args 给这个方法传递的参数值
+	 * @param sql sql语句
+	 * @return sql
 	 */
 	public static String paramFilter(Method method, Object[] args, String sql) {
 		String s = sql;
@@ -468,11 +468,10 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 处理 @Param 模板参数 仅仅只处理把 ":name" 替换成 "?数字" 
-	 * 
-	 * @param method
-	 * @param args
-	 * @param sql
-	 * @return
+	 * @param method 方法
+	 * @param args 参数值
+	 * @param sql sql语句
+	 * @return sql
 	 */
 	public static String paramNameFilter(Method method, Object[] args, String sql) {
 		String s = sql;
@@ -495,8 +494,8 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 裁决是否忽略指定的条件,返回true表示要把这个条件忽略掉
-	 * @param condition
-	 * @return
+	 * @param condition 条件
+	 * @return y:true/n:false
 	 */
 	private static boolean ignoreCondition(Condition condition,Object arg) {
 		/*
@@ -578,9 +577,9 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 考虑条件是否参与运算问题.
-	 * @param method
-	 * @param args
-	 * @return
+	 * @param method 方法
+	 * @param args 参数集
+	 * @return where部分sql
 	 */
 	public static String getWhereSQL(Method method, Object[] args) {
 		StringBuilder sb = new StringBuilder();
@@ -618,10 +617,10 @@ public class TypeUtil implements Opcodes{
 
 	/**
 	 * 获取完整的SQL语句
-	 * @param method
-	 * @param query
-	 * @param args
-	 * @return
+	 * @param method 方法
+	 * @param queries 注解集
+	 * @param args 参数集
+	 * @return sql集
 	 */
 	public static List<String> getQuerySQL(Method method,Query[] queries,Object[] args) {
 		List<String> sqls = new ArrayList<>();
@@ -653,7 +652,7 @@ public class TypeUtil implements Opcodes{
 	/**
 	 * 过滤java语法中的注释
 	 * @param str 等待过滤的字符串
-	 * @return
+	 * @return 处理之后的字符串
 	 */
 	public static String filterComments(String str){
 		// 过滤 // 
@@ -667,7 +666,7 @@ public class TypeUtil implements Opcodes{
 	/**
 	 * 过滤SQL语法中的注释
 	 * @param str 等待过滤的字符串
-	 * @return
+	 * @return 处理之后的字符串
 	 */
 	public static String filterSQLComments(String str){
 		// 过滤 // 
@@ -679,9 +678,9 @@ public class TypeUtil implements Opcodes{
 	}
 	
 	/**
-	 * 判断类型是否是Map<String,Object>
-	 * @param type
-	 * @return
+	 * 判断类型是否是Map&lt;String,Object&gt;
+	 * @param type 类型
+	 * @return y:true/n:false
 	 */
 	public static boolean isMapSO(java.lang.reflect.Type type){
 		if(type==null){
@@ -690,9 +689,9 @@ public class TypeUtil implements Opcodes{
 		return "java.util.Map<java.lang.String, java.lang.Object>".equals(type.toString());
 	}
 	/**
-	 * 判断是否是List<Map<String,Object>>
-	 * @param type
-	 * @return
+	 * 判断是否是List&lt;Map&lt;String,Object&gt;&gt;
+	 * @param type 类型
+	 * @return y:true/n:false
 	 */
 	public static boolean isListMapSO(java.lang.reflect.Type type) {
 		if(type==null){
@@ -770,9 +769,10 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 查找出标识有注解的参数的具体值,没有找到返回null
+	 * @param clazz 注解class
 	 * @param parameters 方法的参数类型列表
 	 * @param args 该方的具体参数
-	 * @return
+	 * @return 值
 	 */
 	public static Object findAnnotationParameterVal(Class<? extends Annotation> clazz,Parameter[] parameters,Object...args){
 		for (int i = 0; i < parameters.length; i++) {
@@ -787,7 +787,7 @@ public class TypeUtil implements Opcodes{
 	 * 标识有Source注解的参数的具体的实参.
 	 * @param parameters 类型集合
 	 * @param args 实参
-	 * @return
+	 * @return 值
 	 */
 	public static String findSource(Parameter[] parameters,Object...args){
 		Object obj = findAnnotationParameterVal(Source.class, parameters, args);
@@ -798,18 +798,18 @@ public class TypeUtil implements Opcodes{
 	 * 标识有PageIndex注解的参数的具体的实参.
 	 * @param parameters 类型集合
 	 * @param args 实参
-	 * @return
+	 * @return 位置索引
 	 */
 	public static int findPageIndex(Parameter[] parameters,Object...args){
 		Object obj = findAnnotationParameterVal(PageIndex.class, parameters, args);
 		return obj !=null ? (int)obj : -1;
 	}
-	
+
 	/**
 	 * 标识有PageSize注解的参数的具体的实参.
-	 * @param parameters 类型集合
-	 * @param args 实参
-	 * @return
+	 * @param parameters 参数类型
+	 * @param args 参数值
+	 * @return 位置索引
 	 */
 	public static int findPageSize(Parameter[] parameters,Object...args){
 		Object obj = findAnnotationParameterVal(PageSize.class, parameters, args);
@@ -821,8 +821,8 @@ public class TypeUtil implements Opcodes{
 	 * 特别注意: 空白: 包行tab或空格... <br>
 	 * 例如: str = "a b c" 则返回 "b c" <br>
 	 * 如果传递null, 则返回null, 如果没有什么可删除的,则原样返回.
-	 * @param str
-	 * @return
+	 * @param str 待处理字符串
+	 * @return 处理之后的字符串
 	 */
 	public static String removePart(String str){
 		if(str==null) {
@@ -840,8 +840,8 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 如果在str中,"where"的下一个单词如果是"or"或者"and",那么就删除(忽略大小写)
-	 * @param str
-	 * @return
+	 * @param str 待处理的字符串
+	 * @return 处理之后的字符串
 	 */
 	public static String parWhere(String str) { // 不可能传递null进来
 		// 把where元素拿出来处理
@@ -861,10 +861,11 @@ public class TypeUtil implements Opcodes{
 		}
 		return str;
 	}
-	
+
 	/**
 	 * 先去除首尾空被,获取第一个空白前面的字符串
-	 * @param str
+	 * @param str 待处理的字符串
+	 * @return 处理之后的字符串
 	 */
 	public static String getFirstWord(String str){
 		if(str==null) {
@@ -880,8 +881,8 @@ public class TypeUtil implements Opcodes{
 	
 	/**
 	 * 判断传入的ct是否是String,Byte,Short,Integer,Long,Float,Double,Character,Boolean其中的一个.如果是,返回true
-	 * @param ct
-	 * @return
+	 * @param ct 类型
+	 * @return 是:true,否:false
 	 */
 	public static boolean isWarrp(java.lang.reflect.Type ct) {
 		if(ct == null){

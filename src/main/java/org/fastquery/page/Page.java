@@ -109,16 +109,16 @@ public interface Page<E> {
 	public boolean isLast();
 
 	/**
-	 * 下一页的 {@link TenetPageable}
+	 * 下一页的 {@link Slice}
 	 * 
-	 * @return 下一页的 {@link TenetPageable}
+	 * @return 下一页的 {@link Slice}
 	 */
 	public Slice getNextPageable();
 
 	/**
-	 * 上一页的 {@link TenetPageable}
+	 * 上一页的 {@link Slice}
 	 * 
-	 * @return 上一页的 {@link TenetPageable}
+	 * @return 上一页的 {@link Slice}
 	 */
 	public Slice getPreviousPageable();
 }

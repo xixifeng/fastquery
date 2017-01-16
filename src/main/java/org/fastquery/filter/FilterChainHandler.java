@@ -35,12 +35,15 @@ import org.fastquery.core.RepositoryException;
  * @author xixifeng (fastquery@126.com)
  */
 public class FilterChainHandler {
-	
+
 	/**
-	 * 
-	 * @param method
-	 * @param args
-	 * @return
+	 * 绑定before filter
+	 * @param <R> repository
+	 * @param iclazz 类class
+	 * @param repository repository
+	 * @param method 方法
+	 * @param args 参数值
+	 * @return 执行结果
 	 */
 	public static <R extends Repository> Object bindBeforeFilterChain(Class<?> iclazz, R repository,Method method, Object[] args) {
 		SkipFilter skipFilter = method.getAnnotation(SkipFilter.class);

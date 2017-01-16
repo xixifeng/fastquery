@@ -32,8 +32,8 @@ import javax.sql.DataSource;
 public interface FQueryFactory {
 	/**
 	 * 根据包地址获取对应的数据源
-	 * @param packageName
-	 * @return
+	 * @param packageName 包地址
+	 * @return 数据源
 	 */
 	DataSource getDataSource(String packageName);
 	

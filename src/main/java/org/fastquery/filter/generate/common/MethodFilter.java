@@ -43,7 +43,7 @@ public interface MethodFilter {
 	/**
 	 * 终止(扯断链条)
 	 * @param method 当前方法
-	 * @param errorMsg 终止理由
+	 * @param msg 终止理由
 	 */
 	default void abortWith(Method method,String msg){
 		throw new RepositoryException(String.format("%s->: %s ", method.toString(),msg));

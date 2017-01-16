@@ -44,7 +44,7 @@ public class Primarykey {
 	
 	/**
 	 * 获取主键
-	 * @return
+	 * @return 主键
 	 */
 	public long getPrimarykey() {
 		return autoIncKey;
@@ -52,7 +52,7 @@ public class Primarykey {
 	
 	/**
 	 * 获取主键
-	 * @return
+	 * @return 字符串类型的主键
 	 */
 	public String getSpecifyPrimarykey() {
 		return pkey;

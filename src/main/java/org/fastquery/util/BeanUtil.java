@@ -53,8 +53,9 @@ public final class BeanUtil {
 	/**
 	 * 将1个bean 转换成 insert sql语句, 注意: 主键值为null,将不参与运算.
 	 * 
-	 * @param beans
-	 * @return
+	 * @param bean 实体
+	 * @param dbNamePrefix 数据库名称前缀
+	 * @return insert 语句
 	 */
 	public static String toInsertSQL(Object bean,boolean dbNamePrefix) {
 
@@ -152,10 +153,11 @@ public final class BeanUtil {
 	
 	/**
 	 * 将bean 转换成这样的格式: ('12','sunny','20')
-	 * @param clazz
-	 * @param fields
-	 * @param bean
-	 * @return
+	 * @param <B> 实体
+	 * @param clazz 实体class
+	 * @param fields 实体字段集
+	 * @param bean 实体
+	 * @return sql value部分
 	 */
 	public static <B> String toValue(Class<B> clazz,Field[] fields,B bean) {
 		StringBuilder sb = new StringBuilder();
@@ -186,8 +188,10 @@ public final class BeanUtil {
 	
 	/**
 	 * 把实体集合转换成sql中的values部分
-	 * @param beans
-	 * @return
+	 * @param clazz 实体class
+	 * @param fields 实体的字段
+	 * @param beans 实体集
+	 * @return sql 中的 values 部分
 	 */
 	private static <B> String toValues(Class<B> clazz,Field[] fields,Iterable<B> beans) {
 		StringBuilder sbValues = new StringBuilder();
@@ -201,10 +205,12 @@ public final class BeanUtil {
 	}
 	
 	/**
-	 * 
+	 * 转换insert 语句
+	 * @param <B> 实体
 	 * @param beans 如果结合为空,则返回null
 	 * @param dbName 如果为null,表名称之前不会有前缀
-	 * @return
+	 * @param ignoreRepeat 忽略重复
+	 * @return 插入语句
 	 */
 	public static <B> String toInsertSQL(Iterable<B> beans,String dbName,boolean ignoreRepeat) {
 		if(beans==null) 
@@ -265,11 +271,11 @@ public final class BeanUtil {
 	}
 	
 	/**
-	 * 
-	 * @param bean
+	 * 转换查询语句
+	 * @param bean 实体
 	 * @param key 主键值, 如果传递null,那么自动获取,获取到的为null那么报错. 指定的值优先
-	 * @param dbName
-	 * @return
+	 * @param dbName 数据库名称
+	 * @return sql语句
 	 */
 	public static String toSelectSQL(Object bean,Object key,String dbName) {
 		Class<?> cls = bean.getClass();
@@ -311,12 +317,12 @@ public final class BeanUtil {
 	}
 	
 	/**
-	 * 如果这个bean已经包含主键的值,就已bean的主键值为准
-	 * [0]: 更新语句, [1]:参数值集合类型:List<Object> [2]: 根据主键查的sql语句
+	 * 如果这个bean已经包含主键的值,就已bean的主键值为准 <br>
+	 * [0]: 更新语句, [1]:参数值集合类型:List&lt;Object&gt; [2]: 根据主键查的sql语句
+	 * 
 	 * @param bean 待更新的实体
-	 * @param key 主键的值
 	 * @param dbName 数据库名称,可以为null
-	 * @return
+	 * @return 更新语句信息
 	 */
 	public static Object[] toUpdateSQL(Object bean,String dbName) {
 		Object key = null;
@@ -402,10 +408,12 @@ public final class BeanUtil {
 	}
 	
 	/**
-	 * [0]: 更新语句 [1]:参数值集合类型:List<Object> 
-	 * @param bean
-	 * @param dbName
-	 * @return
+	 * [0]: 更新语句 [1]:参数值集合类型:List&lt;Object&gt; 
+	 * 
+	 * @param bean 实体
+	 * @param dbName 数据库名称
+	 * @param where 条件
+	 * @return 更新语句信息
 	 */
 	public static Object[] toUpdateSQL(Object bean,String dbName,String where) {
 		List<String> wps = TypeUtil.matches(where.replace(",", " ,"), Placeholder.SL_REG);
@@ -485,9 +493,10 @@ public final class BeanUtil {
 	
 	/**
 	 * 创建一个bean实例,成员变量的值全部都为null <br>
-	 * 注意:这个bean的成员变量必须都是包装类型
-	 * @param beanClass
-	 * @return
+	 * 注意:这个bean的成员变量必须都是包装类型 
+	 * @param <S> 实体
+	 * @param beanClass 实体class
+	 * @return 实体
 	 */
 	public static <S>  S newBeanVarNull(Class<S> beanClass) {
 		// new 一个新bean

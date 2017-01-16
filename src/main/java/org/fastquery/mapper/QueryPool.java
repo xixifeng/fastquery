@@ -233,11 +233,11 @@ public class QueryPool {
 	}
 	
 	/**
-	 * 根据 className -> query配置文件 -> 获取模板,然后存储到QueryPool里.<br>
+	 * 根据 className -&gt; query配置文件 -&gt; 获取模板,然后存储到QueryPool里.<br>
 	 * 注意: 这个方法开销较大,生产环境中最好做到项目初始时执行一次,不要执行多遍.
 	 * 
-	 * @param className
-	 * @param resource
+	 * @param className class名称
+	 * @param resource 资源
 	 */
 	public static void put(String className,Resource resource){
 		QueryPool.resource = resource;
@@ -247,9 +247,7 @@ public class QueryPool {
 	
 	/**
 	 * 重新读取模板放入池中,显然在调试模式下很有用
-	 * 
-	 * @param className
-	 * @param resource
+	 * @param className class名称
 	 */
 	public static void reset(String className){
 		mapQueryMapper.clear();
@@ -260,10 +258,10 @@ public class QueryPool {
 
 	/**
 	 * 渲染模板,该方法永远不会返回null或空,因为在初始化时就做了检测
-	 * @param className
-	 * @param id
-	 * @param map
-	 * @return
+	 * @param tpl 模板
+	 * @param logTag 日志标识
+	 * @param map 键值
+	 * @return 渲染之后的字符串
 	 */
 	static String render(String tpl,String logTag,Map<String, Object> map){
 		// 不用判断map是否为空,这个方法没有公开,在作用域

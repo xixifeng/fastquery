@@ -40,20 +40,20 @@ public @interface Modifying {
 
 	/**
 	 * 主键字段的名称,默认值"id"
-	 * @return
+	 * @return String
 	 */
 	String id() default "id";
 	
 	/**
 	 * 指定当前正在修改的表
-	 * @return
+	 * @return String
 	 */
 	String table() default "";
 	
 	/**
 	 * Defines whether we should clear the underlying persistence context after executing the modifying query.
 	 * 定义在执行修改后的查询之后，我们是否应该清除底层持久上下文。
-	 * @return
+	 * @return boolean
 	 */
 	//boolean clearAutomatically() default false
 }

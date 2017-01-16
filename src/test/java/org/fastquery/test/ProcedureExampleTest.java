@@ -20,36 +20,37 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.test;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import static org.junit.Assert.*;
+
+import org.fastquery.dao.ProcedureExample;
+import org.fastquery.service.FQuery;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
+@Ignore
+public class ProcedureExampleTest {
 
-@Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Param {
-	/**
-	 * value值
-	 * @return String
-	 */
-	String value();
+	/*
+	private ProcedureExample pe = FQuery.getRepository(ProcedureExample.class);
 	
-	/**
-	 * "" 表示没有设置默认值
-	 * @return String
-	 */
-	String defaultVal() default "";
-	
-	/**
-	 * "" 表示无格式
-	 * @return String
-	 */
-	String format() default "";
+	@Test
+	public void testAddStudent() {
+		String no = "00035667";
+		String name = "百灵鸟";
+		String sex = "男";
+		Integer age = 18;
+		String dept = "鸟科";
+		JSONObject json = pe.addStudent(no, name, sex, age, dept);
+		System.out.println(json);
+	}
+	*/
+
 }

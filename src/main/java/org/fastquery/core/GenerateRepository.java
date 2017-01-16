@@ -36,12 +36,15 @@ public interface GenerateRepository {
 	
 	/**
 	 * 生成 Repository 接口的实现
-	 * @param queryRepository
+	 * @param <T> T 是 Repository 的子类
+	 * @param repositoryClazz 待生成实现类的 repository
+	 * @return 实现类
 	 */
 	<T extends Repository> T generate(Class<T> repositoryClazz);
 	
 	/**
 	 * 获取代理Repository(也就是 Repository的实现)
+	 * @param <T> T 是 Repository 的子类
 	 * @param clazz Repository的子接口
 	 * @return Repository的具体实现
 	 */

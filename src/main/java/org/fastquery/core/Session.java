@@ -40,9 +40,10 @@ public class Session {
     
     /**
      * 根据 packageName 或 dataSourceName 或类的完整名称获取当前连接
-     * @param packageName
-     * @param dataSourceName
-     * @return
+     * @param dataSourceName 数据源名称
+     * @param packageName 包名称
+     * @param className Repository class
+     * @return 数据库连接
      */
     public static Connection getConnection(String dataSourceName,String packageName,String className)  
     {  
