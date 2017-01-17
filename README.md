@@ -1,3 +1,17 @@
+### Apache Maven
+```xml
+<dependency>
+    <groupId>org.fastquery</groupId>
+    <artifactId>fastquery</artifactId>
+    <version>1.0.20</version>
+</dependency>
+```
+
+### Gradle/Grails
+```xml
+compile 'org.fastquery:fastquery:1.0.20'
+```
+
 # FastQuery 数据持久层框架
 FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 做为一个开发者, **仅仅只需要设计DAO接口即可**,其内部采用ASM动态生成实现类,执行快. 因此,代码简洁而优雅.从而,大幅度提升开发效率.<br />
@@ -18,21 +32,6 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 
 ## 运行环境要求
 jdk1.8+
-
-## 构建
-### Apache Maven
-```xml
-<dependency>
-    <groupId>org.fastquery</groupId>
-    <artifactId>fastquery</artifactId>
-    <version>1.0.20</version>
-</dependency>
-```
-
-### Gradle/Grails
-```java
-compile 'org.fastquery:fastquery:1.0.20'
-```
 
 ## 配置文件
 ### jdbc-config.xml
