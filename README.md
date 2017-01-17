@@ -19,6 +19,21 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 ## 运行环境要求
 jdk1.8+
 
+## 构建
+### Apache Maven
+```xml
+<dependency>
+    <groupId>org.fastquery</groupId>
+    <artifactId>fastquery</artifactId>
+    <version>1.0.20</version>
+</dependency>
+```
+
+### Gradle/Grails
+```java
+compile 'org.fastquery:fastquery:1.0.20'
+```
+
 ## 配置文件
 ### jdbc-config.xml
 用来配置支持jdbc. **注意**:如果采用连接池,该配置文件可以不要.
