@@ -12,7 +12,10 @@
 compile 'org.fastquery:fastquery:1.0.20'
 ```
 
-### Dowload
+### FastQuery Archive
+https://repo1.maven.org/maven2/org/fastquery/fastquery/
+
+### Current Source
 https://github.com/xixifeng/fastquery/archive/master.zip
 
 # FastQuery 数据持久层框架
