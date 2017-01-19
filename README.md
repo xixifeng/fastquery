@@ -18,6 +18,10 @@ https://repo1.maven.org/maven2/org/fastquery/fastquery/
 ### Current Source
 https://github.com/xixifeng/fastquery/archive/master.zip
 
+### Javadoc Api
+CN: http://xixifeng.com.oschina.io/fastquery/docs/api/
+EN: http://xixifeng.github.io/fastquery/docs/api/
+
 # FastQuery 数据持久层框架
 FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 做为一个开发者, **仅仅只需要设计DAO接口即可**,其内部采用ASM动态生成实现类,执行快. 因此,代码简洁而优雅.从而,大幅度提升开发效率.<br />
