@@ -913,7 +913,7 @@ UserInformation findUserInfoById(Integer id);
 
 ## 源码
 
-- https://git.oschina.net/xixifeng.com/fastquery
+- https://gitee.com/xixifeng.com/fastquery
 - https://github.com/xixifeng/fastquery
 
 ## 开发环境
@@ -922,12 +922,12 @@ UserInformation findUserInfoById(Integer id);
 build: maven 
 
 ## 交流
-![快来加入群【FastQuery 交流群】(群号621656696)，发现精彩内容](https://git.oschina.net/uploads/images/2017/0705/115519_b9f971c8_788636.png "快来加入群【FastQuery 交流群】(群号621656696)，发现精彩内容")    
+![快来加入群【FastQuery 交流群】(群号621656696)，发现精彩内容](https://gitee.com/uploads/images/2017/0705/115519_b9f971c8_788636.png "快来加入群【FastQuery 交流群】(群号621656696)，发现精彩内容")    
 【FastQuery 交流群】(621656696)由支持者贡献,非常感谢!
 
 ## 反馈问题
-https://git.oschina.net/xixifeng.com/fastquery/issues  
-地球人都知道,开源中国秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://git.oschina.net/xixifeng.com/fastquery/issues)来向我们反馈.  
+https://gitee.com/xixifeng.com/fastquery/issues  
+地球人都知道,开源中国秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://gitee.com/xixifeng.com/fastquery/issues)来向我们反馈.  
 
 ## 联系作者
 @习习风 fastquery#126.com  
