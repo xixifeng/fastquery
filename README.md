@@ -12,7 +12,7 @@
 compile 'org.fastquery:fastquery:1.0.20'
 ```
 
-### FastQuery Archive
+### Apache Archive
 https://repo1.maven.org/maven2/org/fastquery/fastquery/
 
 ### Current Source
@@ -920,6 +920,10 @@ UserInformation findUserInfoById(Integer id);
 仅仅是建议,并不局限于此         
   IDE: eclipse          
 build: maven 
+
+## 交流
+![快来加入群【FastQuery 交流群】(群号621656696)，发现精彩内容](https://git.oschina.net/uploads/images/2017/0705/115519_b9f971c8_788636.png "快来加入群【FastQuery 交流群】(群号621656696)，发现精彩内容")    
+QQ群(621656696)由支持者贡献,非常感谢!
 
 ## 反馈问题
 https://git.oschina.net/xixifeng.com/fastquery/issues  
