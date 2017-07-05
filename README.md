@@ -103,7 +103,7 @@ jdk1.8+
 		        "dataSourceName": "xk-c3p0", // 数据源的名称
 		        "basePackages": [            // 该数据源的作用范围
 		            "org.fastquery.example",              // 包地址
-		            "org.fastquery.dao.UserInfoDBService" // 完整类名称. 
+		            "org.fastquery.dao.UserInfoDBService" // 完整类名称 
 		            // 在这可以配置多个DB接口或包地址,以","号隔开
 		            // 提醒:在json结构中,数组的最后一个元素的后面不能加","
 		        ]
@@ -236,11 +236,12 @@ List<Map<String, Object>> find(String sex);
 - `List<Character>` 或 `Character`
 - `List<Boolean>` 或 `Boolean`  
 
-除了改操作或求和外,查单个字段不能返回基本类型,因为:基本类型不能接受`null`值,而SQL表字段可以为`null`.
-返回类型若是基本包装类型,若返回null, 表示:没有查到或字段的值本身就是null.
+除了改操作或count外,查单个字段不能返回基本类型,因为:基本类型不能接受`null`值,而SQL表字段可以为`null`.
+返回类型若是基本类型的包装类型,若返回null, 表示:没有查到或字段的值本身就是null.
 例如: 
 
 ```java
+// 查询单个字段
 @Query("select name from Student limit 3")
 List<String> findNames(); 
 ```
@@ -380,7 +381,7 @@ int effect = studentDBService.update(entity,"name = :name");
 // 断言: 影响的行数大于0行
 assertThat(effect, greaterThan(0));
 
-// 不想让id字段参与改运算
+// 不想让id字段参与改运算,那么就把它的值设置为null
 entity.setId(null);
 // 会解析成:update `UserInfo` set `age`=? where name = ?
 effect = studentDBService.update(entity,"name = :name");
@@ -418,7 +419,7 @@ UserInfo[] findUserInfoByNameOrAge(@Param("name") String name, @Param("age")Inte
 ```
 
 其中`:name`对应`@Param("name")`所指定的方法变量值;`:age`对应`@Param("age")`所指定的方法变量值.当然SQL中的变量也可以用`?N`(N={正整数})的形式来表达,且不用标识`@Param`.  
-如:`select name,age from UserInfo u where u.name = :name or u.age = :age`以防SQL注入问题,在执行语句之前,最终会编译成`select name,age from UserInfo u where u.name=? or u.age=?`
+如:`select name,age from UserInfo u where u.name = :name or u.age = :age`以防SQL注入问题,在执行语句之前,最终会被编译成`select name,age from UserInfo u where u.name=? or u.age=?`
 
 
 **SQL中的变量采用${name}表达式**  
@@ -529,7 +530,7 @@ UserInfo[] findByIds(@Param("ids") int[] ids);
 |  "   | &amp;quot;| 引号 |
 
 如果想把一些公用的SQL代码片段提取出来,以便重用,通过定义`<parts>`元素(零件集)就可以做到. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件.  
-若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`<query>`都能引用它.一个非分页的函数,如果绑定的是分页模板,那么这个函数只识别查询语句,不理会求和语句.
+若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`<query>`都能引用它.一个非分页的函数,如果绑定的是分页模板,那么这个函数只识别查询语句,不理会count语句.
 
 ```java
 public interface QueryByNamedDBExample extends QueryRepository {
@@ -602,7 +603,7 @@ try {
 		select no, name, sex from Student #{#condition} #{#order}
 	</value>
 
-	<!-- 求和语句 -->
+	<!-- count语句 -->
 	<countQuery>
 		select count(no) from Student #{#condition}
 	</countQuery>
@@ -657,13 +658,13 @@ public interface UserInfoDBService extends QueryRepository {
 	@Query(value="select id,name,age from `userinfo` where 1",countField="id")
 	Page<Map<String, Object>> findAll(Pageable pageable);
 	
-	// 如果没有指定求和语句,那么由fastquery分析出最优的求和语句
+	// 如果没有指定count语句,那么由fastquery分析出最优的count语句
 	@Query("select id,name,age from `userinfo` #{#where}")
 	@Condition("age > ?1")     // 若age的值传递null,该条件将不参与运算
 	@Condition("and id < ?2")  // 若id的值传递null,该条件将不参与运算
 	Page<UserInfo> find(Integer age,Integer id,Pageable pageable);
 	
-	// countQuery : 指定自定义求和语句
+	// countQuery : 指定自定义count语句
 	@Query(value = "select id,name,age from `userinfo` #{#where}", 
 	       countQuery = "select count(id) from `userinfo` #{#where}")
 	@Condition("age > ?1")        // 若age的值传递null,该条件将不参与运算
