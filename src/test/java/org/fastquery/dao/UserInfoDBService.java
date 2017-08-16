@@ -138,6 +138,9 @@ public interface UserInfoDBService extends QueryRepository {
 	@Query("select count(id) from `userinfo` where age > ?1 AND id < ?2")
 	long count(Integer age, Integer id);
 	
+	@Query("select sum(id) from `userinfo` where age > ?1 AND id < ?2")
+	Double countDouble(Integer age, Integer id);
+	
 	@Query("select id,name,age from UserInfo where id in (${ids})")
 	UserInfo[] findByIds(@Param("ids") int[] ids);
 	

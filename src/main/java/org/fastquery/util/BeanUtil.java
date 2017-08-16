@@ -309,7 +309,7 @@ public final class BeanUtil {
 		}
 		
 		if(keyFeild==null || key == null){
-			throw new RepositoryException(cls + " 需要主键标识并且主键的值不能为null");
+			throw new RepositoryException(cls + " 需要用@Id在实体上标识主键并且主键的值不能为null");
 		}
 		
 		return String.format("select * from %s where `%s` = %s",tableName,keyFeild,key.toString());

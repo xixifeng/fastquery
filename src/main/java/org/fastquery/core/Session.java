@@ -33,11 +33,25 @@ import org.fastquery.dsm.FQueryProperties;
  */
 public class Session {
 	
+	private static ThreadLocal<String> lang = new ThreadLocal<>();
+	
+	public static String getLang(){
+		String l = lang.get();
+		if(l==null) {
+			return "zh_CN";
+		}
+		return l;
+	}
+	
+	public static void setLang(String lang) {
+		Session.lang.set(lang);
+	}
+	/*
     private static ThreadLocal<Connection> connection = new ThreadLocal<>();  
 
     private Session(){
     }
-    
+    */
     /**
      * 根据 packageName 或 dataSourceName 或类的完整名称获取当前连接
      * @param dataSourceName 数据源名称
@@ -45,6 +59,7 @@ public class Session {
      * @param className Repository class
      * @return 数据库连接
      */
+	/*
     public static Connection getConnection(String dataSourceName,String packageName,String className)  
     {  
     	// 数据源的名称
@@ -163,4 +178,5 @@ public class Session {
             }     
         }  
     } 
+    */
 }

@@ -98,7 +98,7 @@ public final class ModifyingHandler {
 			conn = dataSource.getConnection();
 			stat = conn.prepareStatement(sql); // stat会在下面的finally中关闭
 			rs = stat.executeQuery();
-			keyvals = qp.rs2Map(rs); // rs2Map 远不会返回null
+			keyvals = qp.rs2Map(rs,null); // rs2Map 远不会返回null
 			if(!keyvals.isEmpty()) {
 				keyval = keyvals.get(0);
 			}

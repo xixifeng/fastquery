@@ -37,6 +37,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,7 @@ import org.fastquery.page.Slice;
 import org.fastquery.util.BeanUtil;
 import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
+import org.fastquery.where.I18n;
 import org.objectweb.asm.Type;
 
 import com.alibaba.fastjson.JSON;
@@ -295,7 +297,7 @@ public class QueryProcess {
 			}
 			// 设置sql参数值 End
 			rs = stat.executeQuery();
-			keyvals = rs2Map(rs);
+			keyvals = rs2Map(rs,method);
 		} catch (SQLException e) {
 			throw new RepositoryException(e.getMessage(),e);
 		} finally {
@@ -410,7 +412,7 @@ public class QueryProcess {
 			// 设置sql参数值 End
 			
 			rs = stat.executeQuery();
-			keyvals = rs2Map(rs);
+			keyvals = rs2Map(rs,method);
 		} catch (SQLException e) {
 			throw new RepositoryException(e.getMessage(),e);
 		} finally {
@@ -641,7 +643,7 @@ public class QueryProcess {
 				}
 				// 设置sql参数值 End
 				rs = stat.executeQuery();
-				keyvals = rs2Map(rs);
+				keyvals = rs2Map(rs,method);
 			} catch (SQLException e) {
 				throw new RepositoryException(e.getMessage(),e);
 			} finally {
@@ -970,11 +972,20 @@ public class QueryProcess {
 	/**
 	 * 将 rs 的结果集 转换成 List&lt;Map&gt;,rs没有结果则返回空对象(该方法永不返回null).
 	 * @param rs 结果集
+	 * @param method 当前方法
 	 * @return List map结果集
 	 * @throws SQLException SQL异常
 	 */
-	public List<Map<String, Object>> rs2Map(ResultSet rs) throws SQLException {
+	public List<Map<String, Object>> rs2Map(ResultSet rs,Method method) throws SQLException {
 
+		List<String> feildNames = null;
+		if(method!=null) {
+			I18n i18n = method.getAnnotation(I18n.class);
+			if(i18n!=null) {
+				feildNames = Arrays.asList(i18n.value());	
+			}
+		}
+		
 		List<Map<String, Object>> keyvals = new ArrayList<>();
 		Map<String, Object> keyval;
 		// 获取列信息
@@ -983,6 +994,7 @@ public class QueryProcess {
 		int columnCount;
 
 		String key;
+		Object obj;
 		while (rs.next()) {
 			resultSetMetaData = rs.getMetaData();
 			columnCount = resultSetMetaData.getColumnCount();
@@ -990,7 +1002,11 @@ public class QueryProcess {
 			for (int i = 1; i <= columnCount; i++) {
 				//key = resultSetMetaData.getColumnName(i); // 获取列名称
 				key = resultSetMetaData.getColumnLabel(i); // 获取列别名,若没有别名那么就获取本身名称(getColumnName)
-				keyval.put(key, rs.getObject(i));
+				obj = rs.getObject(i);
+				if(feildNames!=null && feildNames.contains(key)) {
+					obj = TypeUtil.i18n(obj);
+				} 
+				keyval.put(key, obj);
 			}
 			keyvals.add(keyval);
 		}
@@ -1146,12 +1162,12 @@ public class QueryProcess {
 			stat = conn.createStatement();
 			LOG.info(sql);
 			rs = stat.executeQuery(sql);
-			List<Map<String, Object>> maps = rs2Map(rs);
+			List<Map<String, Object>> maps = rs2Map(rs,null);
 			if(maps.isEmpty()) {
 				return null;
 			}
 			return JSON.toJavaObject(new JSONObject(maps.get(0)),bean.getClass());
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			throw new RepositoryException(e);
 		}finally {
 			close(rs, stat, conn);

@@ -47,6 +47,7 @@ import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
+import org.fastquery.core.Session;
 import org.fastquery.core.Source;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.PageIndex;
@@ -890,6 +891,19 @@ public class TypeUtil implements Opcodes{
 		}
 		return ct == String.class || ct == Byte.class || ct == Short.class || ct == Integer.class || ct == Long.class || ct == Float.class
 				|| ct == Double.class || ct == Character.class || ct == Boolean.class;
+	}
+	
+	public static Object i18n(Object obj) {
+		try {
+			JSONObject json = (JSONObject) JSON.parse(obj.toString());
+			String lang = Session.getLang();
+			if(json.containsKey(lang)){
+				return json.get(Session.getLang());	
+			}
+			return "i18n error";
+		} catch (Exception e) {
+			return obj;
+		}
 	}
 }
 

@@ -272,12 +272,13 @@ public class PropertiesUtil {
 			if("".equals(dataSourceName)){
 				throw new RepositoryException("fastquery.json 中的dataSourceName配置错误,提示,不能是空字符且不能为null");
 			}
-			if(basePackages==null || basePackages.isEmpty()) {
+			/*if(basePackages==null || basePackages.isEmpty()) {
 				throw new RepositoryException("fastquery.json 中的basePackage配置错误,提示basePackages不能配置成空");
-			}
+			}*/
 			for (String basePackage : basePackages) {
 				if(basePackage==null || "".equals(basePackage)){
-					throw new RepositoryException("fastquery.json 中的basePackage配置错误,提示,不能是空字符且不能为null");
+					//throw new RepositoryException("fastquery.json 中的basePackage配置错误,提示,不能是空字符且不能为null")
+					continue;
 				}
 				bpNames.add(basePackage); // 把所有的basePackage收集在一个集合里,方便校验是否有重复
 			}

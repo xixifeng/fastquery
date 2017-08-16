@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.fastquery.bean.Student;
 import org.fastquery.core.Primarykey;
 import org.fastquery.core.QueryRepository;
+import org.fastquery.core.Session;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
 
@@ -106,7 +107,29 @@ public class StudentDBServiceTest {
 		assertThat(student.getString("no"), is("9521103"));
 		assertThat(student.getString("dept"), is("化学系"));
 	}
+	
+	@Test
+	public void findOne2() {
+		Session.setLang("en");
+		JSONObject student = studentDBService.findOne("9921103");
+		assertThat(student.get("name"), equalTo("Lily"));
+		assertThat(student.get("dept"), equalTo("Chinese"));
+		
+		Session.setLang("zh");
+		student = studentDBService.findOne("9921103");
+		assertThat(student.get("name"), equalTo("丽丽"));
+		assertThat(student.get("dept"), equalTo("语文"));
+	}
 
+	@Test
+	public void updateNameAndDept(){
+		String name = "{\"zh\":\"丽丽\",\"en\":\"Lily\"}";
+		String dept = "{\"zh\":\"语文\",\"en\":\"Chinese\"}";
+		String no = "9921103";
+		int i = studentDBService.updateNameAndDept(name, dept, no);
+		assertThat(i, is(i));
+	}
+	
 	@Test
 	public void findStudent() {
 		Student student = studentDBService.findStudent("9521103");
@@ -131,13 +154,13 @@ public class StudentDBServiceTest {
 	
 	@Test
 	public void findByNo(){
-		boolean exists = studentDBService.exists("9921103");
+		boolean exists = studentDBService.exists("1121103");
 		if(!exists) {
-			studentDBService.add("9921103", "9921103", "女", 82, "无派系");
+			studentDBService.add("1121103", "1121103", "女", 82, "无派系");
 		}
-		Student student = studentDBService.findByNo("9921103");
-		assertThat(student.getNo(), is("9921103"));
-		assertThat(student.getName(), is("9921103"));
+		Student student = studentDBService.findByNo("1121103");
+		assertThat(student.getNo(), is("1121103"));
+		assertThat(student.getName(), is("1121103"));
 		assertThat(student.getSex(), is("女"));
 		assertThat(student.getAge(), is(82));
 		assertThat(student.getDept(), is("无派系"));

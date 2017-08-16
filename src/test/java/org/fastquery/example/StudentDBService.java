@@ -28,6 +28,7 @@ import java.util.Map;
 import org.fastquery.bean.Student;
 import org.fastquery.core.Id;
 import org.fastquery.core.Modifying;
+import org.fastquery.core.Param;
 import org.fastquery.core.Primarykey;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
@@ -40,6 +41,7 @@ import org.fastquery.filter.MyBeforeFilter1;
 import org.fastquery.filter.MyBeforeFilter2;
 import org.fastquery.filter.SkipFilter;
 import org.fastquery.where.Condition;
+import org.fastquery.where.I18n;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -78,8 +80,14 @@ public interface StudentDBService extends QueryRepository {
 	@Query("select * from student")
 	Student[] find();
 	
+	@I18n({"name","dept"})
 	@Query("select * from student s where s.no=?1")
 	JSONObject findOne(String no);
+	
+	@Modifying
+	@I18n({"name","dept"})
+	@Query("update Student set name = :name, dept = :dept where no = :no")
+	int updateNameAndDept(@Param("name") String name,@Param("dept") String dept,@Param("no") String no);
 	
 	@Query("select * from student s where s.no=?1")
 	Student findStudent(String no);

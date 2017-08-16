@@ -281,6 +281,12 @@ public class UserInfoDBServiceTest {
 	}
 	
 	@Test
+	public void countDouble(){
+		Double d = userInfoDBService.countDouble(2100, 2308);
+		System.out.println(d);
+	}
+	
+	@Test
 	public void findByIds(){
 		int[] ids = new int[]{1,2,3};
 		UserInfo[] userInfos = userInfoDBService.findByIds(ids);

@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -101,6 +102,13 @@ public class SyntaxTest {
 		StringBuilder sb = new StringBuilder("abc");
 		sb.insert(3, "d");
 		System.out.println(sb.toString());
+	}
+	
+	@Test
+	public void local(){
+	    Locale locale = Locale.getDefault();  
+	    System.out.println("Language:" + locale.getLanguage());  
+	    System.out.println("Country:" + locale.getCountry());  
 	}
 }
 
