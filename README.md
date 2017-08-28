@@ -24,7 +24,7 @@ EN: http://xixifeng.github.io/fastquery/docs/api/
 
 # FastQuery 数据持久层框架
 FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
-做为一个开发者, **仅仅只需要设计DAO接口即可**,其内部采用ASM动态生成实现类,执行快. 因此,代码简洁而优雅.从而,大幅度提升开发效率.<br />
+做为一个开发者, **仅仅只需要设计DAO接口即可**,在项目初始化阶段采用ASM生成好实现类.因此,开发代码不得不简洁而优雅.从而,大幅度提升开发效率.<br />
 遵循非侵入式原则设计,松耦合,很容易与其它容器或框架集成.<br />
 提供了一组简单的`Annotation`.消费者只用关心注解的含义.这就使得框架的核心便于重构,便于持续良性发展.<br />
 
@@ -208,7 +208,8 @@ List<Map<String, Object>> findBy(String sex,Integer age);
 List<UserInfo> findSome(Integer id);
 ```
 
-**注意**: 在没有查询到数据的情况下,如果返回值是集合类型或`JSON`类型或者是数组类型.具体的值不会是`null`,而是一个空集合或空`JSON`或者是长度为0的数组.   
+**注意**: 在没有查询到数据的情况下,如果返回值是集合类型或`JSON`类型或者是数组类型,返回具体的值不会是`null`,而是一个空对象(empty object)集合或空对象`JSON`或者是长度为0的数组.   
+使用空对象来代替返回`null`,它与有意义的对象一样,并且能避免`NullPointerException`,可以减少运行期错误.反对者一般都从性能的角度来考虑,认为`new`一个空对象替代`null`,会增加系统的开销.可是,&lt;&lt;Effective Java&gt;&gt;的作者`Josh Bloch`说,在这个级别上担心性能问题是不明智的,除非有分析表明,返回空对象来替代返回null正是造成性能问题的源头.      
 举例说明: 
 
 ```java
@@ -249,7 +250,7 @@ List<String> findNames();
 ## 动态条件查询
 
 ### 采用`Annotation`实现简单动态条件  
-看到这里,可别认为`SQL`只能写在类上.所有的`SQL`还可以写入到配置文件里.  
+看到这里,可别认为`SQL`只能写在Annotation(注解)里.所有的`SQL`还允许写入到配置文件里.  
 
 ```java
 @Query("select no, name, sex from Student #{#where} order by age desc")
