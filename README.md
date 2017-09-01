@@ -562,8 +562,8 @@ int updateUserInfoById(@Param("id") int id,@Param("name") String name,@Param("ag
 
 ```xml
 <query id="updateUserInfoById">
-    ## 在这里支持velocity语法
-	update UserInfo set name = :name,age = :age where id = :id
+      ## 在这里支持velocity语法
+      update UserInfo set name = :name,age = :age where id = :id
 </query>
 ```
 
