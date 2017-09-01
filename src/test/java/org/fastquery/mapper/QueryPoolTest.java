@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -44,16 +44,17 @@ import com.alibaba.fastjson.JSONObject;
  * @author xixifeng (fastquery@126.com)
  */
 public class QueryPoolTest {
-	
+
 	static Resource resource;
-	
+
 	@BeforeClass
-	public static void beforeClass(){
+	public static void beforeClass() {
 		resource = new Resource() {
 			@Override
 			public InputStream getResourceAsStream(String name) {
 				return QueryPoolTest.class.getClassLoader().getResourceAsStream(name);
 			}
+
 			@Override
 			public boolean exist(String name) {
 				URL url = QueryPoolTest.class.getClassLoader().getResource(name);
@@ -64,51 +65,53 @@ public class QueryPoolTest {
 			}
 		};
 	}
-	
+
 	@Before
-	public void before(){
+	public void before() {
 
 	}
-	
+
 	@Ignore
 	@Test
 	public void testXml2QueryMapper() {
-		Set<QueryMapper> queryMappers = QueryPool.xml2QueryMapper("org.fastquery.dao.QueryByNamedDBExample",resource);
-		
+		Set<QueryMapper> queryMappers = QueryPool.xml2QueryMapper("org.fastquery.dao.QueryByNamedDBExample", resource);
+
 		JSONArray jsonArray = new JSONArray();
 		for (QueryMapper queryMapper : queryMappers) {
-			//System.out.println(String.format("{\n\t\"id\" : \"%s\",\n\t\"template\" : \"%s\"\n}", queryMapper.getId(),queryMapper.getTemplate()));
+			// System.out.println(String.format("{\n\t\"id\" :
+			// \"%s\",\n\t\"template\" : \"%s\"\n}",
+			// queryMapper.getId(),queryMapper.getTemplate()));
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("id", queryMapper.getId());
 			jsonObject.put("template", queryMapper.getTemplate());
 			jsonArray.add(jsonObject);
 		}
-		
+
 		System.out.println(JSON.toJSONString(jsonArray, true));
-		
+
 		VelocityContext context = new VelocityContext();
 		// 把数据填入上下文
-		context.put("name","张三");
+		context.put("name", "张三");
 		context.put("age", 23);
-		  // 输出流
+		// 输出流
 		StringWriter writer = new StringWriter();
-		 // 转换输出
+		// 转换输出
 		Velocity.evaluate(context, writer, "", jsonArray.getJSONObject(2).getString("template")); // 关键方法
 		System.out.println(writer.toString());
 	}
-	
+
 	@Ignore
 	@Test
-	public void put(){
-		String str = QueryPool.render("org.fastquery.dao.UserInfoDBService", "findUserInfoAll",null);
+	public void put() {
+		String str = QueryPool.render("org.fastquery.dao.UserInfoDBService", "findUserInfoAll", null);
 		System.out.println("str:" + str);
 	}
 
 	@Ignore
 	@Test
-	public void reset(){
+	public void reset() {
 		QueryPool.reset("org.fastquery.dao.UserInfoDBService");
-		String str = QueryPool.render("org.fastquery.dao.UserInfoDBService", "findUserInfoAll",null);
+		String str = QueryPool.render("org.fastquery.dao.UserInfoDBService", "findUserInfoAll", null);
 		System.out.println("str:" + str);
 	}
 }

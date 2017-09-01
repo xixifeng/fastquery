@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -40,25 +40,16 @@ import static org.hamcrest.Matchers.*;
 public class PageTest {
 
 	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
-	
-	
+
 	@Test
-	public void findSome1(){
-		
+	public void findSome1() {
+
 		int pageIndex = 0;
 		int size = 0;
 		Page<UserInfo> page = userInfoDBService.findSome1(1, 100, new PageableImpl(pageIndex, size));
 		assertThat(page, notNullValue());
-		assertThat(page.getNumber(),equalTo(1));
-		assertThat(page.getSize(),equalTo(1));
-		
+		assertThat(page.getNumber(), equalTo(1));
+		assertThat(page.getSize(), equalTo(1));
+
 	}
 }
-
-
-
-
-
-
-
-

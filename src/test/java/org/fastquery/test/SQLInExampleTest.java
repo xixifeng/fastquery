@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -45,31 +45,32 @@ import static org.junit.Assert.assertThat;
 public class SQLInExampleTest {
 
 	private SQLInExample sqlInExample = FQuery.getRepository(SQLInExample.class);
+
 	@Test
 	public void testFindByNameIn1() {
 		String name = "袁承志";
 		List<UserInfo> userinfos = sqlInExample.findByNameIn(name);
-		if(userinfos.isEmpty()) 
+		if (userinfos.isEmpty())
 			return;
 		for (UserInfo u : userinfos) {
 			assertThat(u.getName(), equalTo(name));
 		}
 	}
-	
+
 	@Test
 	public void testFindByNameIn2() {
 		String name1 = "袁承志";
 		String name2 = "安小惠";
-		List<UserInfo> userinfos = sqlInExample.findByNameIn(name1,name2);
-		if(userinfos.isEmpty()) 
+		List<UserInfo> userinfos = sqlInExample.findByNameIn(name1, name2);
+		if (userinfos.isEmpty())
 			return;
 		for (UserInfo u : userinfos) {
 			assertThat(u.getName().equals(name1) || u.getName().equals(name2), is(true));
 		}
 	}
-	
+
 	@Test
-	public void findByNameListIn(){
+	public void findByNameListIn() {
 		String name1 = "袁承志";
 		String name2 = "安小惠";
 		String name3 = "小青小青86545lk";
@@ -78,16 +79,16 @@ public class SQLInExampleTest {
 		names.add(name1);
 		names.add(name2);
 		names.add(name3);
-		List<UserInfo> userinfos = sqlInExample.findByNameListIn(names,id);
+		List<UserInfo> userinfos = sqlInExample.findByNameListIn(names, id);
 		userinfos.forEach(u -> {
 			assertThat(u.getName().equals(name1) || u.getName().equals(name2), is(true));
-			assertThat(u.getName(),not(is(name3)));
+			assertThat(u.getName(), not(is(name3)));
 			assertThat(u.getId().intValue(), greaterThan(id));
 		});
 	}
-	
+
 	@Test
-	public void findByIn(){
+	public void findByIn() {
 		String sex = "女";
 		Integer age = 10;
 		String name1 = "小蚂蚁";
@@ -97,7 +98,7 @@ public class SQLInExampleTest {
 		names.add(name1);
 		names.add(name2);
 		names.add(name3);
-		
+
 		List<Student> students = sqlInExample.findByIn(sex, age, names);
 		assertThat(students.isEmpty(), is(false));
 		students.forEach(s -> {

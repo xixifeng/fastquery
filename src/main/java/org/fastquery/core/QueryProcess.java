@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -256,6 +256,19 @@ public class QueryProcess {
 		return sum;
 	}
 	
+	// 获取返回值map泛型的value的类型
+	private static Class<?> mapValueTyep(Method method) {
+		ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
+		return (Class<?>) type.getActualTypeArguments()[1];
+	}
+	
+	// 获取返回值listmap泛型的value的类型
+	private static Class<?> listMapValueTyep(Method method) {
+		ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
+		type = (ParameterizedType) type.getActualTypeArguments()[0];
+		return (Class<?>) type.getActualTypeArguments()[1];
+	}
+	
 	// 查操作
 	@SuppressWarnings("unchecked")
 	Object query(Method method,Class<?> returnType, String sql,String sourceName, String packageName,Object[] iargs,Object...args) {
@@ -314,9 +327,9 @@ public class QueryProcess {
 		} else if(returnType == boolean.class) {
 			return qh.booleanType(keyvals);
 		} else if(returnType == Map.class){
-			return qh.mapType(method,keyvals);
+			return qh.mapType(method,keyvals,mapValueTyep(method));
 		} else if(TypeUtil.isListMapSO(method.getGenericReturnType())){
-			return qh.listType(keyvals);
+			return qh.listType(method,keyvals,listMapValueTyep(method));
 		}else if(returnType == List.class){
 			return qh.list(keyvals,method,iargs);
 		}else if(returnType == JSONObject.class){

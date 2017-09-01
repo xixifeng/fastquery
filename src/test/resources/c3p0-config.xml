@@ -4,7 +4,7 @@
 
 	<!-- 
     <default-config>  
-        <property name="driverClass">com.mysql.jdbc.Driver</property>  
+        <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
         <property name="jdbcUrl">jdbc:mysql://...</property>
         <property name="user">root</property>  
         
@@ -18,7 +18,7 @@
     -->
      
     <named-config name="xk-c3p0">  
-        <property name="driverClass">com.mysql.jdbc.Driver</property>  
+        <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
         <!-- 在这里需要把 & 替换成 &amp; 不然会报错: XML configuration disabled! Verify that standard XML libs are available-->
         <!-- 如果前后台数据库编码一致,不必加?useUnicode=true&amp;characterEncoding=UTF-8 -->
         <property name="jdbcUrl">jdbc:mysql://192.168.8.10:3306/xk</property>  
@@ -36,7 +36,7 @@
         </named-config>  
         
         <named-config name="sunnydb">  
-        <property name="driverClass">com.mysql.jdbc.Driver</property>  
+        <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
         <property name="jdbcUrl">jdbc:mysql://192.168.8.10:3306/sunny</property>  
         <property name="user">sunny</property>  
         <property name="password">abc123</property>  

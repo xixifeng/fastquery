@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -679,7 +679,7 @@ public class TypeUtil implements Opcodes{
 	}
 	
 	/**
-	 * 判断类型是否是Map&lt;String,Object&gt;
+	 * 判断类型是否是Map&lt;String,Object&gt;或Map&lt;String,String&gt;
 	 * @param type 类型
 	 * @return y:true/n:false
 	 */
@@ -687,10 +687,10 @@ public class TypeUtil implements Opcodes{
 		if(type==null){
 			return false;
 		}
-		return "java.util.Map<java.lang.String, java.lang.Object>".equals(type.toString());
+		return "java.util.Map<java.lang.String, java.lang.Object>".equals(type.toString()) || "java.util.Map<java.lang.String, java.lang.String>".equals(type.toString());
 	}
 	/**
-	 * 判断是否是List&lt;Map&lt;String,Object&gt;&gt;
+	 * 判断是否是List&lt;Map&lt;String,Object&gt;&gt;或List&lt;Map&lt;String,String&gt;&gt;
 	 * @param type 类型
 	 * @return y:true/n:false
 	 */
@@ -698,7 +698,7 @@ public class TypeUtil implements Opcodes{
 		if(type==null){
 			return false;
 		}
-		return "java.util.List<java.util.Map<java.lang.String, java.lang.Object>>".equals(type.toString());
+		return "java.util.List<java.util.Map<java.lang.String, java.lang.Object>>".equals(type.toString()) || "java.util.List<java.util.Map<java.lang.String, java.lang.String>>".equals(type.toString());
 	}
 	
 	// 假设: 有两个类,其class分别为c1和c2. c1的直接父类的范型为X

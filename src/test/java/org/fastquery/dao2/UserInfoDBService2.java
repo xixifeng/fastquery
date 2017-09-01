@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -39,21 +39,19 @@ import com.alibaba.fastjson.JSONArray;
 public interface UserInfoDBService2 extends QueryRepository {
 
 	@Query("select id,name,age from `userinfo` as u where u.age>?1")
-	JSONArray findUserInfoByAge(Integer age,@Source String source);
-	
+	JSONArray findUserInfoByAge(Integer age, @Source String source);
+
 	@Query("select id,name,age from `userinfo` as u where u.age>?1")
-	Map<String, Object> findOne(Integer age,@Source String dataSource);
-	
-	//@Query("select id,name,age from `userinfo` as u where u.id>?1")
-	//List<UserInfo> findSome(Integer id);
-	
+	Map<String, Object> findOne(Integer age, @Source String dataSource);
+
+	// @Query("select id,name,age from `userinfo` as u where u.id>?1")
+	// List<UserInfo> findSome(Integer id);
+
 	@Transactional
 	@Modifying
 	@Query("update `userinfo` set `name`=?1 where id=?3")
 	@Query("update `userinfo` set `age`=?2 where id=?3")
 	@Query("update `userinfo` set `name`=?1,`age`=?2 where id=?3")
-	int updateBatch(String name,Integer age,Integer id,@Source String dataSource);
-		
+	int updateBatch(String name, Integer age, Integer id, @Source String dataSource);
+
 }
-
-

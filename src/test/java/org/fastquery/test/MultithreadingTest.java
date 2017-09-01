@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -22,7 +22,6 @@
 
 package org.fastquery.test;
 
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,37 +31,37 @@ import org.fastquery.service.FQuery;
 
 /**
  * 多线程测试
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public class MultithreadingTest {
 	static int count = 0;
+
 	public static void main(String[] args) {
 		long s = System.currentTimeMillis();
 		SunnyDBService sunnyDBService = FQuery.getRepository(SunnyDBService.class);
-		 ExecutorService executorService = Executors.newFixedThreadPool(1000);
-		 int sum = 10000000;
-		 for (int i = 0; i < sum; i++) {
-			 executorService.execute(new Runnable() {
+		ExecutorService executorService = Executors.newFixedThreadPool(1000);
+		int sum = 10000000;
+		for (int i = 0; i < sum; i++) {
+			executorService.execute(new Runnable() {
 				@Override
 				public void run() {
 					/*
-					try {
-						Thread.sleep(1);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}*/
+					 * try { Thread.sleep(1); } catch (InterruptedException e) {
+					 * e.printStackTrace(); }
+					 */
 					Card card = new Card();
 					card.setNumber("852000XXXXX");
 					Card c = sunnyDBService.save(card);
-					//Integer id = c.getId();
-					//int effect = sunnyDBService.delete(id);
+					// Integer id = c.getId();
+					// int effect = sunnyDBService.delete(id);
 					count = count + 1;
-					if(count==(sum-1)){
-						System.out.println("用时: " + (System.currentTimeMillis()-s) + "毫秒");
-					} 
+					if (count == (sum - 1)) {
+						System.out.println("用时: " + (System.currentTimeMillis() - s) + "毫秒");
+					}
 				}
 			});
 		}
-		
+
 	}
 }

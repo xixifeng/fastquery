@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -46,14 +46,15 @@ public class QueryReturnTypeFilter implements MethodFilter {
 				"2). boolean 判断是否存在",
 				"3). Map<String,Object>", 
 				"4). List<Map<String,Object>>",
-				"5). List<实体>",
-				"6). Page",
-				"7). JSONObject",
-				"8). JSONArray",
-				"9). Integer,Double,Long,Short,Byte,Character,Float,String 八种基本类型(除了Boolean)",
-				"10). Integer[],Double[],Long[],Short[],Byte[],Character[],Float[]",
-				"11). 自定义实体数组",
-				"12).自定义实体,必须包含有默认的构造函数"
+				"5). List<Map<String,String>>",
+				"6). List<实体>",
+				"7). Page",
+				"8). JSONObject",
+				"9). JSONArray",
+				"10). Integer,Double,Long,Short,Byte,Character,Float,String 八种基本类型(除了Boolean)",
+				"11). Integer[],Double[],Long[],Short[],Byte[],Character[],Float[]",
+				"12). 自定义实体数组",
+				"13).自定义实体,必须包含有默认的构造函数"
 				);
 		
 		Type genericReturnType = method.getGenericReturnType();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -29,23 +29,26 @@ package org.fastquery.bean.sunny;
 public class Tenant {
 	private Long id;
 	private String name;
-	
+
 	public Tenant(Long id, String name) {
 		this.id = id;
 		this.name = name;
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 }

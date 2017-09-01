@@ -4,14 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Teacher {
-	
+
 	private int id;
 	private String tname;
-	
+
 	private Card card;
 	private Set<Student> students = new HashSet<Student>();
 	private Set<ClassRoom> classRooms = new HashSet<ClassRoom>();
-	
+
 	public Teacher() {
 	}
 
@@ -54,14 +54,15 @@ public class Teacher {
 	public Set<ClassRoom> getClassRooms() {
 		return classRooms;
 	}
-	
+
 	// 增加一条与ClassRoom的关系
 	public void addClassRoom(ClassRoom classRoom) {
 		this.classRooms.add(classRoom);
 	}
+
 	// 删除一条与ClassRoom的关联
 	public void removeClassRoom(ClassRoom classRoom) {
-		if( classRooms.contains(classRoom) ) {
+		if (classRooms.contains(classRoom)) {
 			classRooms.remove(classRoom);
 		}
 	}
@@ -74,8 +75,5 @@ public class Teacher {
 	public String toString() {
 		return "Teacher [id=" + id + ", tname=" + tname + "]";
 	}
-	
-	
-	
-	
+
 }

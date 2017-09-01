@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -31,15 +31,15 @@ import org.fastquery.core.QueryRepository;
  * @author xixifeng (fastquery@126.com)
  */
 public interface SunnyDBService extends QueryRepository {
-	
+
 	@Modifying
 	@Query("delete from Card where id = ?1")
 	int delete(int id);
-	
+
 	@Modifying
 	@Query("delete from Card where id = ?1")
 	boolean deleteById(int id);
-	
+
 	@Query("select id from Card where id = ?1")
 	boolean exists(long id);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -39,12 +39,11 @@ import static org.hamcrest.Matchers.*;
  */
 public class FastQueryJSONObjectTest {
 
-	
 	@BeforeClass
-	public static void before(){
+	public static void before() {
 		FQuery.getRepository(UserInfoDBService.class);
 	}
-	
+
 	@Test
 	public void testGetBasedir() {
 		String basedir = FastQueryJSONObject.getBasedir();
@@ -66,9 +65,9 @@ public class FastQueryJSONObjectTest {
 	@Test
 	public void testGetQueries() {
 		List<String> queries = FastQueryJSONObject.getQueries();
-		if(!queries.isEmpty()) {
+		if (!queries.isEmpty()) {
 			assertThat(queries.contains("queries/"), is(true));
-			assertThat(queries.contains("tpl/"), is(true));	
+			assertThat(queries.contains("tpl/"), is(true));
 		}
 	}
 

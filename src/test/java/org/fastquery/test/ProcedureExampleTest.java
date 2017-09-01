@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -39,18 +39,13 @@ import com.alibaba.fastjson.JSONObject;
 public class ProcedureExampleTest {
 
 	/*
-	private ProcedureExample pe = FQuery.getRepository(ProcedureExample.class);
-	
-	@Test
-	public void testAddStudent() {
-		String no = "00035667";
-		String name = "百灵鸟";
-		String sex = "男";
-		Integer age = 18;
-		String dept = "鸟科";
-		JSONObject json = pe.addStudent(no, name, sex, age, dept);
-		System.out.println(json);
-	}
-	*/
+	 * private ProcedureExample pe =
+	 * FQuery.getRepository(ProcedureExample.class);
+	 * 
+	 * @Test public void testAddStudent() { String no = "00035667"; String name
+	 * = "百灵鸟"; String sex = "男"; Integer age = 18; String dept = "鸟科";
+	 * JSONObject json = pe.addStudent(no, name, sex, age, dept);
+	 * System.out.println(json); }
+	 */
 
 }

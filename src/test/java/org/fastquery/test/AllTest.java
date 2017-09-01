@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -40,11 +40,11 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 // 指定运行器
 @RunWith(Suite.class)
-@SuiteClasses({ FQueryTest.class,StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class,
+@SuiteClasses({ FQueryTest.class, StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class,
 		UserInfoDBServiceTest3.class, TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class,
 		BeanUtilTest.class, PageTest.class, QueryByNamedDBExampleMapperTest.class, FastQueryJSONObjectTest.class,
-		FQueryResourceImplTest.class, SunnyDBServiceTest.class })
-class AllTest {
+		FQueryResourceImplTest.class, SunnyDBServiceTest.class, QueryProcessTest.class })
+public class AllTest {
 
 	@Test
 	public void todo() {

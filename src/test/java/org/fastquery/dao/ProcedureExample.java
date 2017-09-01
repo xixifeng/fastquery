@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -33,12 +33,15 @@ import com.alibaba.fastjson.JSONObject;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public interface ProcedureExample  extends QueryRepository {
+public interface ProcedureExample extends QueryRepository {
 
 	/*
-	@Modifying
-	@Query("call addStudent(:no,:name,:sex,:age,:dept,@a,@b)")
-	JSONObject addStudent(@Param("no")String no,@Param("name")String name, @Param("sex")String sex,@Param("age")Integer age,@Param("dept") String dept);
-	*/
-	
+	 * @Modifying
+	 * 
+	 * @Query("call addStudent(:no,:name,:sex,:age,:dept,@a,@b)") JSONObject
+	 * addStudent(@Param("no")String no,@Param("name")String
+	 * name, @Param("sex")String sex,@Param("age")Integer age,@Param("dept")
+	 * String dept);
+	 */
+
 }

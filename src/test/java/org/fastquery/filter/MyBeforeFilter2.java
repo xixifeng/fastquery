@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -32,12 +32,12 @@ import org.fastquery.filter.BeforeFilter;
  * @author xixifeng (fastquery@126.com)
  */
 public class MyBeforeFilter2 extends BeforeFilter<StudentDBService> {
-	
+
 	@Override
-	public void doFilter(StudentDBService repository,Method method, Object[] args) {
+	public void doFilter(StudentDBService repository, Method method, Object[] args) {
 		// repository : 当前拦截到实例对象
-		// method     : 当前拦截到的方法
-		// args       : 当前传递进来的参数列表
+		// method : 当前拦截到的方法
+		// args : 当前传递进来的参数列表
 		System.out.println("MyBeforeFilter2....");
 	}
 }

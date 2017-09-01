@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -77,9 +77,9 @@ public class LoadPrperties {
 
 				// 根据不同的jdbc的驱动,选择不同的数据源实现
 				switch (jdbcConfig.getDriverClass()) {
-				case "com.mysql.jdbc.Driver":
+				case "com.mysql.cj.jdbc.Driver":
 					if(FQueryProperties.findDataSource(namedConfig) == null) { // 如果名称为namedConfig的数据源不存在,才能new!
-						com.mysql.jdbc.jdbc2.optional.MysqlDataSource cpd = new com.mysql.jdbc.jdbc2.optional.MysqlDataSource();
+						com.mysql.cj.jdbc.MysqlDataSource cpd = new com.mysql.cj.jdbc.MysqlDataSource();
 						cpd.setDatabaseName(jdbcConfig.getDatabaseName());
 						cpd.setPassword(jdbcConfig.getPassword());
 						cpd.setPortNumber(jdbcConfig.getPortNumber());

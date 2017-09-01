@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -44,95 +44,97 @@ import static org.hamcrest.Matchers.*;
 public class QueryByNamedDBExampleMapperTest {
 
 	private String className = "org.fastquery.dao.QueryByNamedDBExample";
-	
+
 	private String logTag = "QueryByNamedDBExampleMapperTest";
-	
+
 	@BeforeClass
-	public static void beforeClass(){
+	public static void beforeClass() {
 		FQuery.getRepository(QueryByNamedDBExample.class);
 	}
-	
+
 	@Test
-	public void findUserInfoAll(){
+	public void findUserInfoAll() {
 		String tpl = QueryPool.getTemplate(className, "findUserInfoAll");
 		assertThat(tpl, equalToIgnoringWhiteSpace("select id,name,age from UserInfo"));
 	}
-	
+
 	@Test
-	public void findUserInfoOne(){
+	public void findUserInfoOne() {
 		String tpl = QueryPool.getTemplate(className, "findUserInfoOne");
 		Map<String, Object> map = new HashMap<>();
 		map.put("id", "1");
 		tpl = QueryPool.render(tpl, logTag, map);
 		assertThat(tpl, equalToIgnoringWhiteSpace("select id,name,age from UserInfo where id = :id"));
 	}
-	
+
 	@Test
-	public void findUserInfoByNameAndAge(){
+	public void findUserInfoByNameAndAge() {
 		String tpl = QueryPool.getTemplate(className, "findUserInfoByNameAndAge");
 		Map<String, Object> map = null;
 		String str = null;
-		
+
 		map = new HashMap<>();
 		map.put("name", null);
 		map.put("age", null);
 		str = QueryPool.render(tpl, logTag, map);
 		assertThat(str, equalToIgnoringWhiteSpace("select id,name,age from UserInfo where 1"));
-		
+
 		map = new HashMap<>();
 		map.put("name", "zhangsan");
 		map.put("age", 18);
 		str = QueryPool.render(tpl, logTag, map);
-		assertThat(str, equalToIgnoringWhiteSpace("select id,name,age from UserInfo where 1 and name = :name and age = :age"));
-		
+		assertThat(str,
+				equalToIgnoringWhiteSpace("select id,name,age from UserInfo where 1 and name = :name and age = :age"));
+
 		map = new HashMap<>();
 		map.put("age", 18);
 		str = QueryPool.render(tpl, logTag, map);
 		assertThat(str, equalToIgnoringWhiteSpace("select id,name,age from UserInfo where 1 and age = :age"));
-		
+
 		map = new HashMap<>();
 		map.put("name", "zhangsan");
 		str = QueryPool.render(tpl, logTag, map);
 		assertThat(str, equalToIgnoringWhiteSpace("select id,name,age from UserInfo where 1 and name = :name"));
-		
+
 	}
-	
+
 	@Test
-	public void findPage(){
+	public void findPage() {
 		String tpl = QueryPool.getTemplate(className, "findPage");
 		Map<String, Object> map = null;
 		String str = null;
-		
+
 		map = new HashMap<>();
 		str = QueryPool.render(tpl, logTag, map);
 		str = TypeUtil.parWhere(str);
 		assertThat(str, equalToIgnoringWhiteSpace("select no, name, sex from Student order by age desc"));
-		
+
 		map = new HashMap<>();
 		map.put("name", "zhangsan");
 		str = QueryPool.render(tpl, logTag, map);
 		str = TypeUtil.parWhere(str);
-		assertThat(str, equalToIgnoringWhiteSpace("select no, name, sex from Student where name like :name order by age desc"));
+		assertThat(str,
+				equalToIgnoringWhiteSpace("select no, name, sex from Student where name like :name order by age desc"));
 	}
-	
+
 	@Test
-	public void updateUserInfoById(){
+	public void updateUserInfoById() {
 		String tpl = QueryPool.getTemplate(className, "updateUserInfoById");
 		String str = null;
-		str = QueryPool.render(tpl, logTag,new HashMap<>());
+		str = QueryPool.render(tpl, logTag, new HashMap<>());
 		assertThat(str, equalToIgnoringWhiteSpace("update UserInfo set name = :name,age = :age where id= :id"));
 	}
-	
+
 	@Test
-	public void findUAll(){
+	public void findUAll() {
 		String tpl = QueryPool.getTemplate(className, "findUAll");
 		assertThat(tpl, equalToIgnoringWhiteSpace("select id,name,age from UserInfo"));
 	}
-	
+
 	@Test
-	public void findUserAll(){
+	public void findUserAll() {
 		String tpl = QueryPool.getTemplate(className, "findUserAll");
 		assertThat(tpl, equalToIgnoringWhiteSpace("select name from UserInfo"));
 	}
-	
+
 }

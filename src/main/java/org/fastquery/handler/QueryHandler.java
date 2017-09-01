@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -66,7 +66,7 @@ public class QueryHandler {
 	// 1). long/int 用于统计总行数
 	// 2). boolean 判断是否存在
 	// 3). Map<String,Object>
-	// 4). List<Map<String,Object>>
+	// 4). List<Map<String,Object>> 或 List<Map<String,String>>
 	// 5). JSONObject
 	// 6). JSONArray
 	// 7). Integer,Double,Long,Short,Byte,Character,Float,String
@@ -111,18 +111,38 @@ public class QueryHandler {
 	public boolean booleanType(List<Map<String, Object>> keyvals) {
        return !keyvals.isEmpty();
 	}
-
-	public Map<String, Object> mapType(Method method, List<Map<String, Object>> keyvals) {
+	
+	// convertType 表示map种的value需要转换的目标类型
+	public Map<String, Object> mapType(Method method, List<Map<String, Object>> keyvals,Class<?> convertType) {
 		if( keyvals.isEmpty() ) {
 			return new HashMap<>();
 		}
 		if (keyvals.size() > 1) {
 			throw new RepositoryException(method + "不能把多条记录赋值给Map");
 		}
-		return keyvals.get(0);
+		
+		Map<String, Object> map = keyvals.get(0);
+		if(convertType == String.class) {
+			Map<String, Object> map2 = new HashMap<>();
+			map.forEach((k,v)-> map2.put(k, v.toString()));
+			return map2;
+		}
+		return map;
 	}
 
-	public List<Map<String, Object>> listType(List<Map<String, Object>> keyvals) {
+	// convertType 表示map种的value需要转换的目标类型
+	public List<Map<String, Object>> listType(Method method,List<Map<String, Object>> keyvals,Class<?> convertType) {
+		if(convertType == String.class) {
+			List<Map<String, Object>> kvs = new ArrayList<>();
+			keyvals.forEach(map->{
+				Map<String, Object> m = new HashMap<>();
+				map.forEach((k,v) -> {
+					m.put(k, v);
+					kvs.add(m);
+				});
+			});
+			return kvs;
+		}
 		return keyvals;
 	}
 	
@@ -170,7 +190,7 @@ public class QueryHandler {
 		if (keyvals.size() > 1) {
 			throw new RepositoryException(method + "不能把多条记录赋值给JSONObject");
 		}
-		return new JSONObject(mapType(method, keyvals));
+		return new JSONObject(mapType(method, keyvals,Object.class));
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

@@ -4,7 +4,7 @@
 
 	<groupId>org.fastquery</groupId>
 	<artifactId>fastquery</artifactId>
-	<version>1.0.21.M1</version>
+	<version>1.0.22.M1</version> 
 	<packaging>jar</packaging>
 
 	<name>fastquery</name>
@@ -26,19 +26,19 @@
 		<dependency>
 			<groupId>com.mchange</groupId>
 			<artifactId>c3p0</artifactId>
-			<version>0.9.5.1</version>
+			<version>0.9.5.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.ow2.asm</groupId>
 			<artifactId>asm-all</artifactId>
-			<version>5.0.2</version>
+			<version>5.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
-			<version>1.2.20</version>
+			<version>1.2.37</version>
 		</dependency>
 
 		<dependency>
@@ -50,7 +50,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.29</version>
+			<version>6.0.6</version>
 		</dependency>
 
 		<dependency>
@@ -66,23 +66,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.osgi</artifactId>
-			<version>3.8.0.v20120529-1548</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-core</artifactId>
-			<version>3.1.7</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -122,11 +108,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<version>3.0.1</version>
-				<configuration>
-					<archive>
-						<manifestFile>${project.basedir}/MANIFEST.MF</manifestFile>
-					</archive>
-				</configuration>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -165,38 +146,10 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			<!-- 
-			<plugin> 
-			   <groupId>org.apache.maven.plugins</groupId> 
-			   <artifactId>maven-surefire-plugin</artifactId> 
-			   <version>2.19.1</version>
-			   <configuration>
-			      <includes>
-			         <include>AllTest.java</include> 
-			      </includes>
-			   </configuration>
-			</plugin>
-			-->
-			
+
 		</plugins>
 	</build>
-
-	<!-- 
-	<distributionManagement>
-	        <repository>
-	           <id>fastquery-releases</id>
-	           <name>FastQuery releases repository</name>
-	           <url>http://192.168.8.10/nexus/content/repositories/fastquery-releases/</url> 
-		    </repository>
-		    <snapshotRepository>
-		       <id>fastquery-snapshots</id>
-		       <name>FastQuery snapshots repository</name>
-		       <url>http://192.168.8.10/nexus/content/repositories/fastquery-snapshots/</url> 
-		    </snapshotRepository>
-		 </distributionManagement> 
-   -->
-
+	
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>

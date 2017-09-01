@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -34,7 +34,6 @@ import org.fastquery.dao.SunnyDBService;
 import org.fastquery.service.FQuery;
 import org.junit.Test;
 
-
 /**
  * 
  * @author xixifeng (fastquery@126.com)
@@ -42,7 +41,7 @@ import org.junit.Test;
 public class SunnyDBServiceTest {
 
 	private SunnyDBService sunnyDBService = FQuery.getRepository(SunnyDBService.class);
-	
+
 	@Test
 	public void save() {
 		Card card = new Card();
@@ -54,17 +53,17 @@ public class SunnyDBServiceTest {
 		assertThat(effect, is(1));
 		assertThat(sunnyDBService.exists(id), is(false));
 	}
-	
+
 	@Test
 	public void save2() {
-		Card card = new Card(-1,"32ccczuidazhi");
+		Card card = new Card(-1, "32ccczuidazhi");
 		Card c = sunnyDBService.save(card);
-		assertThat(c,nullValue());
+		assertThat(c, nullValue());
 		int effect = sunnyDBService.delete(-1);
 		assertThat(effect, is(1));
 		assertThat(sunnyDBService.exists(-1), is(false));
 	}
-	
+
 	@Test
 	public void save3() {
 		Card card = new Card("32ccczuidazhi");
@@ -72,15 +71,15 @@ public class SunnyDBServiceTest {
 		int effect = sunnyDBService.delete(bigInteger.intValue());
 		assertThat(effect, is(1));
 	}
-	
+
 	@Test
 	public void saveTenant() {
 		System.out.println(Integer.MAX_VALUE);
 		long id = new Long(Integer.MAX_VALUE) + 10;
-		while(sunnyDBService.existsTenant(id)){
+		while (sunnyDBService.existsTenant(id)) {
 			id = id + 1;
 		}
-		Tenant tenant = new Tenant(id, "测试用户"+id);
+		Tenant tenant = new Tenant(id, "测试用户" + id);
 		BigInteger bigInteger = sunnyDBService.saveToId(tenant);
 		assertThat(bigInteger.longValue(), is(id));
 	}
@@ -92,9 +91,9 @@ public class SunnyDBServiceTest {
 		effect = sunnyDBService.delete(0);
 		assertThat(effect, is(0));
 	}
-	
+
 	@Test
-	public void deleteById(){
+	public void deleteById() {
 		boolean b = sunnyDBService.deleteById(-1);
 		assertThat(b, is(true));
 	}

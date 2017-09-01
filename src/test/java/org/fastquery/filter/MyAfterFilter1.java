@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -37,7 +37,7 @@ public class MyAfterFilter1 extends AfterFilter<StudentDBService> {
 	public Object doFilter(StudentDBService repository, Method method, Object[] args, Object returnVal) {
 		// returnVal : 表示当前方法执行后返回的结果
 		// 在真正交给客户之前,可以在这儿修改它.
-		// .... ... 
+		// .... ...
 		System.out.println("MyAfterFilter1...");
 		return returnVal;
 	}

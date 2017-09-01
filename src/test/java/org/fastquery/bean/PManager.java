@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -38,7 +38,8 @@ public class PManager {
 	private Byte isActive = 0;// 是否激活 0未激活，1激活
 	private Byte isdm = 0; // 是否是设备管理员（0否，1是）可管理门禁，蓝牙设备
 	private Byte isReg = 0; // 是否可进行人员登记(0:否,1:是，默认:0) 可操作people
-	private Byte pmRole = 0; // 物管员角色 (0:其他,1:物业主任,2:保安经理,3:保安队长,4:保安,88:维修人员/技工)
+	private Byte pmRole = 0; // 物管员角色
+								// (0:其他,1:物业主任,2:保安经理,3:保安队长,4:保安,88:维修人员/技工)
 	private String realName; // 真实姓名
 	private Byte gender = 0; // 性别（0:保密,1:男,2:女）
 	private String head; // 头像
@@ -52,8 +53,8 @@ public class PManager {
 	public PManager() {
 	}
 
-	public PManager(Long punitId, String mobile, String password, Byte isdm, Byte isReg,
-			Byte pmRole, String realName, Byte gender) {
+	public PManager(Long punitId, String mobile, String password, Byte isdm, Byte isReg, Byte pmRole, String realName,
+			Byte gender) {
 		this.punitId = punitId;
 		this.mobile = mobile;
 		this.password = password;
@@ -123,7 +124,7 @@ public class PManager {
 	public String getHxRoomId() {
 		return hxRoomId;
 	}
-	
+
 	public Long getCreateUid() {
 		return createUid;
 	}

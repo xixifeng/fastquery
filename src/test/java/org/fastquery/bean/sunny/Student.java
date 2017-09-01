@@ -3,15 +3,14 @@ package org.fastquery.bean.sunny;
 import java.util.HashSet;
 import java.util.Set;
 
-
 public class Student {
 	private int id;
 	private String sname;
-	
+
 	private Card card;
 	private Set<Teacher> teachers = new HashSet<Teacher>();
 	private Set<ClassRoom> classRooms = new HashSet<ClassRoom>();
-	
+
 	public Student() {
 	}
 
@@ -55,35 +54,34 @@ public class Student {
 	public void setTeachers(Set<Teacher> teachers) {
 		this.teachers = teachers;
 	}
-	
-	//增加一条关联记录
+
+	// 增加一条关联记录
 	public void addTeacher(Teacher teacher) {
-	   teachers.add(teacher);
+		teachers.add(teacher);
 	}
-	//删除一条关联记录
+
+	// 删除一条关联记录
 	public void removeTeacher(Teacher teacher) {
-	   if (teachers.contains(teacher)) {
-	    teachers.remove(teacher);
-	   }
+		if (teachers.contains(teacher)) {
+			teachers.remove(teacher);
+		}
 	}
 
 	public Set<ClassRoom> getClassRooms() {
 		return classRooms;
 	}
-	
+
 	// 增加一条与ClassRoom的关联记录
 	public void addClassRoom(ClassRoom classRoom) {
 		this.classRooms.add(classRoom);
 	}
-	
-	
+
 	// 删除一条与ClassRoom的关联记录
 	public void removeClassRoom(ClassRoom classRoom) {
-		if(classRooms.contains(classRoom)) {
+		if (classRooms.contains(classRoom)) {
 			this.classRooms.remove(classRoom);
 		}
 	}
-	
 
 	public void setClassRooms(Set<ClassRoom> classRooms) {
 		this.classRooms = classRooms;
@@ -116,5 +114,4 @@ public class Student {
 		return "Student [id=" + id + ", sname=" + sname + "]";
 	}
 
-	
 }

@@ -7,22 +7,17 @@ public class ClassRoom {
 
 	private int id;
 	private String cname;
-	
+
 	private Set<Teacher> teachers = new HashSet<Teacher>();
 	private Set<Student> students = new HashSet<Student>();
 	private Set<Desk> desks = new HashSet<Desk>();
-	
-	
+
 	public ClassRoom() {
 	}
-	
-	
 
 	public ClassRoom(String cname) {
 		this.cname = cname;
 	}
-
-
 
 	public ClassRoom(int id, String cname) {
 		this.id = id;
@@ -44,7 +39,7 @@ public class ClassRoom {
 	public void setCname(String cname) {
 		this.cname = cname;
 	}
-	
+
 	public Set<Teacher> getTeachers() {
 		return teachers;
 	}
@@ -74,7 +69,7 @@ public class ClassRoom {
 		desk.setClassRoom(this); // 建立关系
 		this.desks.add(desk);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -101,9 +96,5 @@ public class ClassRoom {
 	public String toString() {
 		return "ClassRoom [id=" + id + ", cname=" + cname + "]";
 	}
-	
-	
 
-	
-		
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -28,48 +28,59 @@ package org.fastquery.bean;
  */
 public class Student {
 
-	 private String no;
-	 private String name;
-	 private String sex;
-	 private Integer age; 
-	 private String dept;
+	private String no;
+	private String name;
+	private String sex;
+	private Integer age;
+	private String dept;
 
-	 public Student(){}
-	 
-	 public Student(String no, String name, String sex, Integer age, String dept) {
+	public Student() {
+	}
+
+	public Student(String no, String name, String sex, Integer age, String dept) {
 		this.no = no;
 		this.name = name;
 		this.sex = sex;
 		this.age = age;
 		this.dept = dept;
 	}
+
 	public String getNo() {
 		return no;
 	}
+
 	public void setNo(String no) {
 		this.no = no;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getSex() {
 		return sex;
 	}
+
 	public void setSex(String sex) {
 		this.sex = sex;
 	}
+
 	public Integer getAge() {
 		return age;
 	}
+
 	public void setAge(Integer age) {
 		this.age = age;
 	}
+
 	public String getDept() {
 		return dept;
 	}
+
 	public void setDept(String dept) {
 		this.dept = dept;
 	}
@@ -78,6 +89,5 @@ public class Student {
 	public String toString() {
 		return "Student [no=" + no + ", name=" + name + ", sex=" + sex + ", age=" + age + ", dept=" + dept + "]";
 	}
-	 
 
 }

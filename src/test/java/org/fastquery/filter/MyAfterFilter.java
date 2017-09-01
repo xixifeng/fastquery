@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -35,14 +35,14 @@ public class MyAfterFilter extends AfterFilter<Repository> {
 
 	@Override
 	public Object doFilter(Repository repository, Method method, Object[] args, Object returnVal) {
-		
+
 		// repository: 当前拦截到的实例
 		// method: 当前拦截到的method
 		// args: 当前传递进来的参数
 		// returnVal 即将返回的值
-		
+
 		// 在这里可以中途修改 returnVal
-		
+
 		return returnVal;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -29,12 +29,12 @@ import org.fastquery.core.Id;
  * @author xixifeng (fastquery@126.com)
  */
 public class UserInfo {
-	
+
 	@Id
 	private Integer id;
 	private String name;
 	private Integer age;
-	
+
 	public UserInfo() {
 	}
 
@@ -43,31 +43,36 @@ public class UserInfo {
 		this.name = name;
 		this.age = age;
 	}
-	
+
 	public UserInfo(String name, Integer age) {
 		this.name = name;
 		this.age = age;
 	}
-		
-	
+
 	public Integer getId() {
 		return id;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public Integer getAge() {
 		return age;
 	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public void setAge(Integer age) {
 		this.age = age;
 	}
+
 	@Override
 	public String toString() {
 		return "UserInfo [id=" + id + ", name=" + name + ", age=" + age + "]";

@@ -7,10 +7,10 @@ public class Card {
 	@Id
 	private Integer id;
 	private String number;
-	
+
 	private Teacher teacher;
 	private Student student;
-	
+
 	public Card() {
 	}
 
@@ -55,5 +55,5 @@ public class Card {
 	public void setStudent(Student student) {
 		this.student = student;
 	}
-	
+
 }

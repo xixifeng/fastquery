@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -57,7 +57,7 @@ public class FQueryTest {
 
 		// 连接池配置
 		Properties properties = new Properties();
-		properties.setProperty("driverClass", "com.mysql.jdbc.Driver");
+		properties.setProperty("driverClass", "com.mysql.cj.jdbc.Driver");
 		properties.setProperty("jdbcUrl", "jdbc:mysql://192.168.8.10:3306/xk1");
 		properties.setProperty("user", "xk1");
 		properties.setProperty("password", "abc1");
@@ -68,21 +68,21 @@ public class FQueryTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testReset() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, IntrospectionException {
+	public void testReset() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+			InstantiationException, IntrospectionException {
 		Class<PManager> clazz = PManager.class;
 		PManager tempPmanager = FQuery.reset(clazz);
 		clazz = (Class<PManager>) tempPmanager.getClass();
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
-			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
+			if (field.getType().isArray() || !TypeUtil.isWarrp(field.getType())) {
 				continue;
 			}
-			
-		   Object readValue = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(tempPmanager);
-		   assertThat(readValue, nullValue());
+
+			Object readValue = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(tempPmanager);
+			assertThat(readValue, nullValue());
 		}
-		
-		
+
 	}
 
 }

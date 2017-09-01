@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.21.M1</version>
+    <version>1.0.22.M1</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.21.M1'
+compile 'org.fastquery:fastquery:1.0.22.M1'
 ```
 
 ### Apache Archive
@@ -30,7 +30,7 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 
 ## FastQuery 主要特性如下:
 1. 设计优雅,配置简单,极易上手.
-2. 采用ASM动态生成字节码,因此支持编译前预处理,可最大限度减少运行期的错误.显著提升程序的强壮性.
+2. 在项目初始化阶段采用ASM动态生成好字节码,因此支持编译前预处理,可最大限度减少运行期的错误.显著提升程序的强壮性.
 3. 支持安全查询,防止SQL注入.
 4. 支持与主流数据库连接池框架集成,如集成c3p0,dbcp等等
 5. 支持 `@Query` 查询,使用 `@Condition`,可实现动态 `where` 条件查询.
@@ -52,13 +52,13 @@ jdk1.8+
 <jdbc-config>  
         <!-- 配置第一个数据源 -->
         <named-config name="xk_db">  
-        <property name="driverClass">com.mysql.jdbc.Driver</property>  
+        <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
         <property name="url">jdbc:mysql://192.168.1.1:3306/xk?user=xk&amp;password=abc123</property>
         </named-config>
 
         <!-- 配置第二个数据源 -->
         <named-config name="shtest_db">  
-        <property name="driverClass">com.mysql.jdbc.Driver</property>  <!-- jdbc 驱动 -->
+        <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  <!-- jdbc 驱动 -->
         <property name="databaseName">dbname</property>                <!-- 数据库的名称 -->
         <property name="user">username</property>                      <!-- 数据库用户名称 -->
         <property name="password">userpasswd</property>                <!-- 数据库用户的密码 --> 
@@ -75,7 +75,7 @@ jdk1.8+
 <?xml version="1.0" encoding="UTF-8"?>
 <c3p0-config>  
     <named-config name="xk-c3p0">  
-        <property name="driverClass">com.mysql.jdbc.Driver</property>  
+        <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
         <property name="jdbcUrl">jdbc:mysql://192.168.1.1:3306/xk</property>  
         <property name="user">xk</property>  
         <property name="password">abc123</property>  
@@ -209,7 +209,7 @@ List<UserInfo> findSome(Integer id);
 ```
 
 **注意**: 在没有查询到数据的情况下,如果返回值是集合类型或`JSON`类型或者是数组类型,返回具体的值不会是`null`,而是一个空对象(empty object)集合或空对象`JSON`或者是长度为0的数组.   
-使用空对象来代替返回`null`,它与有意义的对象一样,并且能避免`NullPointerException`,可以减少运行期错误.反对者一般都从性能的角度来考虑,认为`new`一个空对象替代`null`,会增加系统的开销.可是,&lt;&lt;Effective Java&gt;&gt;的作者`Josh Bloch`说,在这个级别上担心性能问题是不明智的,除非有分析表明,返回空对象来替代返回null正是造成性能问题的源头.      
+使用空对象来代替返回`null`,它与有意义的对象一样,并且能避免`NullPointerException`,可以减少运行期错误.反对者一般都从性能的角度来考虑,认为`new`一个空对象替代`null`,会增加系统的开销.可是,&lt;&lt;Effective Java&gt;&gt;的作者**Josh Bloch**说,在这个级别上担心性能问题是不明智的,除非有分析表明,返回空对象来替代返回null正是造成性能问题的源头.      
 举例说明: 
 
 ```java
@@ -772,7 +772,7 @@ String dataSourceName = "xk1";
 
 // 连接池配置
 Properties properties = new Properties();
-properties.setProperty("driverClass", "com.mysql.jdbc.Driver");
+properties.setProperty("driverClass", "com.mysql.cj.jdbc.Driver");
 properties.setProperty("jdbcUrl", "jdbc:mysql://192.168.8.10:3306/xk1");
 properties.setProperty("user", "xk1");
 properties.setProperty("password", "abc1");

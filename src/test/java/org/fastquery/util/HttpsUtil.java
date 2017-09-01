@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -21,7 +21,6 @@
  */
 
 package org.fastquery.util;
-
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -47,89 +46,88 @@ import javax.net.ssl.X509TrustManager;
  */
 public class HttpsUtil {
 
-    private static class TrustAnyTrustManager implements X509TrustManager {
+	private static class TrustAnyTrustManager implements X509TrustManager {
 
-        public void checkClientTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-        }
+		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+		}
 
-        public void checkServerTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-        }
+		public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+		}
 
-        public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[]{};
-        }
-    }
+		public X509Certificate[] getAcceptedIssuers() {
+			return new X509Certificate[] {};
+		}
+	}
 
-    private static class TrustAnyHostnameVerifier implements HostnameVerifier {
+	private static class TrustAnyHostnameVerifier implements HostnameVerifier {
 
-        public boolean verify(String hostname, SSLSession session) {
-            return true;
-        }
-    }
+		public boolean verify(String hostname, SSLSession session) {
+			return true;
+		}
+	}
 
-    /**
-     * post方式请求服务器(https协议)
-     *
-     * @param url 请求地址
-     * @param content 参数
-     * @param charset 编码
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws KeyManagementException
-     * @throws IOException
-     */
-    public static String post(String url, String content, String charset)
-            throws NoSuchAlgorithmException, KeyManagementException,
-            IOException {
-        SSLContext sc = SSLContext.getInstance("TLS");
-        sc.init(null, new TrustManager[]{new TrustAnyTrustManager()},
-                new java.security.SecureRandom());
-        URL console = new URL(url);
-        HttpsURLConnection conn = (HttpsURLConnection) console.openConnection();
-        conn.setSSLSocketFactory(sc.getSocketFactory());
-        conn.setHostnameVerifier(new TrustAnyHostnameVerifier());
-        conn.setRequestProperty("accept", " text/javascript, text/html, application/xml, text/xml, */*");
-        conn.setRequestProperty("X-Requested-With", "XMLHttpRequest");
-        conn.setRequestProperty("X-Request", "JSON");
-        conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-        conn.setRequestProperty("connection", "Keep-Alive");
-        conn.setRequestProperty("user-agent",
-                "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-        conn.setRequestProperty("Accept-Language", "zh-CN");
-        conn.setDoOutput(true);
-        conn.setDoInput(true);
-        DataOutputStream out = new DataOutputStream(conn.getOutputStream());
-        out.write(content.getBytes(charset));
-        // 刷新、关闭
-        out.flush();
-        out.close();
-        InputStream is = conn.getInputStream();
-        String result="";
-        if (is != null) {
-              BufferedReader in = new BufferedReader(
-                        new InputStreamReader(is, "utf-8"));
-                String line;
-                while ((line = in.readLine()) != null) {
-                    result += line;
-                }
-                in.close();
-                is.close();
-                return result;
-        }
-        return null;
-    }
+	/**
+	 * post方式请求服务器(https协议)
+	 *
+	 * @param url
+	 *            请求地址
+	 * @param content
+	 *            参数
+	 * @param charset
+	 *            编码
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws KeyManagementException
+	 * @throws IOException
+	 */
+	public static String post(String url, String content, String charset)
+			throws NoSuchAlgorithmException, KeyManagementException, IOException {
+		SSLContext sc = SSLContext.getInstance("TLS");
+		sc.init(null, new TrustManager[] { new TrustAnyTrustManager() }, new java.security.SecureRandom());
+		URL console = new URL(url);
+		HttpsURLConnection conn = (HttpsURLConnection) console.openConnection();
+		conn.setSSLSocketFactory(sc.getSocketFactory());
+		conn.setHostnameVerifier(new TrustAnyHostnameVerifier());
+		conn.setRequestProperty("accept", " text/javascript, text/html, application/xml, text/xml, */*");
+		conn.setRequestProperty("X-Requested-With", "XMLHttpRequest");
+		conn.setRequestProperty("X-Request", "JSON");
+		conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+		conn.setRequestProperty("connection", "Keep-Alive");
+		conn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+		conn.setRequestProperty("Accept-Language", "zh-CN");
+		conn.setDoOutput(true);
+		conn.setDoInput(true);
+		DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+		out.write(content.getBytes(charset));
+		// 刷新、关闭
+		out.flush();
+		out.close();
+		InputStream is = conn.getInputStream();
+		String result = "";
+		if (is != null) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(is, "utf-8"));
+			String line;
+			while ((line = in.readLine()) != null) {
+				result += line;
+			}
+			in.close();
+			is.close();
+			return result;
+		}
+		return null;
+	}
 
-    public static void main(String[] args) {
-        
-        
-        try {
-//                         Http_send.post("https://115.238.43.206:3631/api/v1/parks","{\"parkinginfo\":[{\"arrival_time\":\"20160425160905\",\"parking_num\":2000,\"card_type\":1,\"change\":0,\"berth_status\":0,\"gate_name\":\"主车库入口控制机\",\"card_id\":\"4031017044\",\"spare_berth\":1999,\"car_type\":2}],\"park_name\":\"主车库\",\"park_code\":\"1\"}", "UTF-8");
-            String res=HttpsUtil.post("https://115.238.43.206:3631/api/v1/parks","{\"parkinginfo\":[{\"arrival_time\":\"20160425160905\",\"parking_num\":2000,\"card_type\":1,\"change\":0,\"berth_status\":0,\"gate_name\":\"主车库入口控制机\",\"card_id\":\"4031017044\",\"spare_berth\":1999,\"car_type\":2}],\"park_name\":\"主车库\",\"park_code\":\"1\"}", "UTF-8");
-            System.out.println(res);
-        } catch (Exception ex) {
-        	ex.printStackTrace();
-        }
-       }
+	public static void main(String[] args) {
+
+		try {
+			// Http_send.post("https://115.238.43.206:3631/api/v1/parks","{\"parkinginfo\":[{\"arrival_time\":\"20160425160905\",\"parking_num\":2000,\"card_type\":1,\"change\":0,\"berth_status\":0,\"gate_name\":\"主车库入口控制机\",\"card_id\":\"4031017044\",\"spare_berth\":1999,\"car_type\":2}],\"park_name\":\"主车库\",\"park_code\":\"1\"}",
+			// "UTF-8");
+			String res = HttpsUtil.post("https://115.238.43.206:3631/api/v1/parks",
+					"{\"parkinginfo\":[{\"arrival_time\":\"20160425160905\",\"parking_num\":2000,\"card_type\":1,\"change\":0,\"berth_status\":0,\"gate_name\":\"主车库入口控制机\",\"card_id\":\"4031017044\",\"spare_berth\":1999,\"car_type\":2}],\"park_name\":\"主车库\",\"park_code\":\"1\"}",
+					"UTF-8");
+			System.out.println(res);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 }

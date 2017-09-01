@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -36,33 +36,20 @@ import static org.hamcrest.Matchers.*;
  * @author xixifeng (fastquery@126.com)
  */
 public class UserInfoDBServiceTest3 {
-	
+
 	private UserInfoDBService3 userInfoDBService;
-	
+
 	@Before
-	public void before() throws ClassNotFoundException{
+	public void before() throws ClassNotFoundException {
 		userInfoDBService = FQuery.getRepository(UserInfoDBService3.class);
 	}
-	
+
 	@Test
 	public void testUpdateBatch() {
-		
+
 		// 修改 xk3 里的数据 (xk3是用jdbc连接的,未使用到连接池)
-		int effect = userInfoDBService.updateBatch("大张张", 66, 1,"xk3");
-		assertThat("断言该行修改操作一共影响了3行",effect, equalTo(3));
+		int effect = userInfoDBService.updateBatch("大张张", 66, 1, "xk3");
+		assertThat("断言该行修改操作一共影响了3行", effect, equalTo(3));
 	}
-	
-	
+
 }
-
-
-
-
-
-
-
-
-
-
-
-

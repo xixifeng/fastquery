@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -38,47 +38,49 @@ public class JarListClass {
 
 	/**
 	 * 遍历目录下的所有jar包中的所有class
-	 * @param d jar包目录地址
+	 * 
+	 * @param d
+	 *            jar包目录地址
 	 * @return
 	 */
 	public static List<Class<?>> jarClasses(String d) {
 		List<Class<?>> list = new ArrayList<>();
-		
+
 		File[] fs = new File(d).listFiles();
 		for (File f : fs) {
-			  if(f.isDirectory() || !f.getAbsolutePath().endsWith(".jar"))
-	          continue;
+			if (f.isDirectory() || !f.getAbsolutePath().endsWith(".jar"))
+				continue;
 			JarFile jar = null;
 			try {
-					jar = new JarFile(f.getAbsolutePath());
-					Enumeration<JarEntry> entry = jar.entries();
-					while (entry.hasMoreElements()) {
-						JarEntry jarEntry = entry.nextElement();
-						if (jarEntry.isDirectory() || !jarEntry.getName().endsWith(".class"))
-							continue;
-						String name = jarEntry.getName().replace(".class", "").replace("/", ".");
-						//System.out.println(name);
-						try {
-							if(name.indexOf("sun.")==-1 && name.indexOf("jdk.")==-1){
-								list.add(Class.forName(name));	
-							}
-						} catch (Exception e) {
+				jar = new JarFile(f.getAbsolutePath());
+				Enumeration<JarEntry> entry = jar.entries();
+				while (entry.hasMoreElements()) {
+					JarEntry jarEntry = entry.nextElement();
+					if (jarEntry.isDirectory() || !jarEntry.getName().endsWith(".class"))
+						continue;
+					String name = jarEntry.getName().replace(".class", "").replace("/", ".");
+					// System.out.println(name);
+					try {
+						if (name.indexOf("sun.") == -1 && name.indexOf("jdk.") == -1) {
+							list.add(Class.forName(name));
 						}
+					} catch (Exception e) {
 					}
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
 				try {
-					if(jar!=null){
-						jar.close();	
+					if (jar != null) {
+						jar.close();
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			
+
 		}
-		
+
 		return list;
 	}
 }

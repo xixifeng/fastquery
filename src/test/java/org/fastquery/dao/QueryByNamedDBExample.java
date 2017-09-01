@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -52,8 +52,8 @@ public interface QueryByNamedDBExample extends QueryRepository {
 	@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
 	Page<Student> findPage(Pageable pageable, @Param("no") String no, @Param("name") String name,
 			@Param("age") Integer age);
-	
+
 	@Modifying
 	@QueryByNamed("updateUserInfoById")
-	int updateUserInfoById(@Param("id") int id,@Param("name") String name,@Param("age") int age);
+	int updateUserInfoById(@Param("id") int id, @Param("name") String name, @Param("age") int age);
 }

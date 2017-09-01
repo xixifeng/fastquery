@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2016, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -38,12 +38,13 @@ import org.fastquery.core.QueryRepository;
 public interface SQLInExample extends QueryRepository {
 
 	@Query("select * from UserInfo where name in (?1)")
-	List<UserInfo> findByNameIn(String...names);
+	List<UserInfo> findByNameIn(String... names);
 
 	@Query("select * from UserInfo where name in (?1) and id > ?2")
-	List<UserInfo> findByNameListIn(List<String> names,Integer id);
-	
+	List<UserInfo> findByNameListIn(List<String> names, Integer id);
+
 	@Query("select * from student where sex = :sex and age > :age and name in(:names)")
-	List<Student> findByIn(@Param(value="sex",defaultVal="",format="")String sex,@Param("age")Integer age,@Param("names")Set<String> names);
-	
+	List<Student> findByIn(@Param(value = "sex", defaultVal = "", format = "") String sex, @Param("age") Integer age,
+			@Param("names") Set<String> names);
+
 }

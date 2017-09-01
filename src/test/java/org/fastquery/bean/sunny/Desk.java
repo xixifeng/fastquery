@@ -4,12 +4,12 @@ public class Desk {
 
 	private int id;
 	private String dname;
-	
+
 	private ClassRoom classRoom;
 
 	public Desk() {
 	}
-	
+
 	public Desk(int id, String dname) {
 		this.id = id;
 		this.dname = dname;
@@ -43,9 +43,5 @@ public class Desk {
 	public String toString() {
 		return "Desk [id=" + id + ", dname=" + dname + "]";
 	}
-	
-	
 
-	
-	
 }
