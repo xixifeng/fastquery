@@ -158,6 +158,11 @@ public interface StudentDBService extends QueryRepository {
 	@Modifying(id = "id", table = "userinfo")
 	@Query("insert into #{#table} (name,age) values (?1, ?2)")
 	Map<String, Object> addUserInfo(String name, Integer age);
+	
+	// 把查询出的字段值包装成字符串,而不是Object
+	@Modifying(id = "id", table = "userinfo")
+	@Query("insert into #{#table} (name,age) values (?1, ?2)")
+	Map<String, String> addUserInfo2(String name, Integer age);
 
 	// 增加一条数据,返回主键信息.
 	@Modifying(id = "id", table = "userinfo")

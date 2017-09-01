@@ -59,11 +59,11 @@ jdk1.8+
         <!-- 配置第二个数据源 -->
         <named-config name="shtest_db">  
         <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  <!-- jdbc 驱动 -->
-        <property name="databaseName">dbname</property>                <!-- 数据库的名称 -->
-        <property name="user">username</property>                      <!-- 数据库用户名称 -->
-        <property name="password">userpasswd</property>                <!-- 数据库用户的密码 --> 
-        <property name="portNumber">3306</property>                    <!-- 端口 -->
-        <property name="serverName">192.168.1.1</property>             <!-- 数据库主机地址 -->
+        <property name="databaseName">dbname</property>                   <!-- 数据库的名称 -->
+        <property name="user">username</property>                         <!-- 数据库用户名称 -->
+        <property name="password">userpasswd</property>                   <!-- 数据库用户的密码 --> 
+        <property name="portNumber">3306</property>                       <!-- 端口 -->
+        <property name="serverName">192.168.1.1</property>                <!-- 数据库主机地址 -->
     </named-config>
 </jdbc-config>
 ```
@@ -207,6 +207,8 @@ List<Map<String, Object>> findBy(String sex,Integer age);
 @Query("select id,name,age from `userinfo` as u where u.id>?1")
 List<UserInfo> findSome(Integer id);
 ```
+
+若返回`List<Map<String, String>>`或`Map<String, String>`,表示把查询出的字段值(value)包装成字符串.   
 
 **注意**: 在没有查询到数据的情况下,如果返回值是集合类型或`JSON`类型或者是数组类型,返回具体的值不会是`null`,而是一个空对象(empty object)集合或空对象`JSON`或者是长度为0的数组.   
 使用空对象来代替返回`null`,它与有意义的对象一样,并且能避免`NullPointerException`,可以减少运行期错误.反对者一般都从性能的角度来考虑,认为`new`一个空对象替代`null`,会增加系统的开销.可是,&lt;&lt;Effective Java&gt;&gt;的作者**Josh Bloch**说,在这个级别上担心性能问题是不明智的,除非有分析表明,返回空对象来替代返回null正是造成性能问题的源头.      

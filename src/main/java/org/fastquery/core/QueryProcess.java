@@ -229,7 +229,7 @@ public class QueryProcess {
 		} else if(returnType == int[].class ){
 			return effects;
 		} else if(returnType == Map.class) { // 如果然会值是Map,那么一定是insert或update,在生成实现的时候已经做安全检测
-			return mh.mapType(packageName,sourceName,table,id,pk.getPrimarykey(),pk.getSpecifyPrimarykey());
+			return mh.mapType(packageName,sourceName,table,id,pk.getPrimarykey(),pk.getSpecifyPrimarykey(),mapValueTyep(method));
 		} else if(returnType == JSONObject.class) {
 			return mh.jsonObjectType(packageName,sourceName,table,id,pk.getPrimarykey(),pk.getSpecifyPrimarykey());
 		} else if(returnType == Primarykey.class) {

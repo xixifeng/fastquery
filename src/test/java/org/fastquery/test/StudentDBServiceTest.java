@@ -256,7 +256,16 @@ public class StudentDBServiceTest {
 	public void addUserInfo() {
 		Map<String, Object> map = studentDBService.addUserInfo("张三", 36);
 		assertThat(map, notNullValue());
+		assertThat(map.get("name"), equalTo("张三"));
 		assertThat(map.get("age"), equalTo(36));
+	}
+	
+	@Test
+	public void addUserInfo2() {
+		Map<String, String> map = studentDBService.addUserInfo2("Lisi", 32);
+		assertThat(map, notNullValue());
+		assertThat(map.get("name"), equalTo("Lisi"));
+		assertThat(map.get("age"), equalTo("32"));
 	}
 
 	@Test

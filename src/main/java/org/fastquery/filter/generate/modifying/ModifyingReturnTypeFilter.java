@@ -48,7 +48,7 @@ public class ModifyingReturnTypeFilter implements MethodFilter {
 		
 		String errmsg = String.format(
 				"为这个方法设置返回值错误!%n该方法允许的返回值类型如下: %n%s \t- 没有返回值;%n%s \t- 用来获取影响行数;%n%s \t- 保存的实体以Map封装后输出;%n%s \t- 保存的实体JSON格式;%n%s \t- 保存的实体Bean(注意:该bean必须有默认不带参数的构造方法);%n%s \t- 获取主键;%n%s \t - 操作是否正确.",
-				"void", "int", "java.util.Map<String, Object>", "com.alibaba.fastjson.JSONObject", "Bean",
+				"void", "int", "java.util.Map<String, Object>或java.util.Map<String, String>", "com.alibaba.fastjson.JSONObject", "Bean",
 				Primarykey.class.getName(),boolean.class);
 		String errmsg2 = " 该SQL的操作结果不能映射成Map格式";
 		Type genericReturnType = method.getGenericReturnType();
@@ -100,7 +100,7 @@ public class ModifyingReturnTypeFilter implements MethodFilter {
 				ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
 				Type[] types = parameterizedType.getActualTypeArguments(); // 获取<>中的参数类型
 				if ((parameterizedType.getRawType() == Map.class) && (types[0] == String.class)
-						&& (types[1] == Object.class)) {
+						&& (types[1] == Object.class || types[1] == String.class )) {
 					return method;
 				} else {
 					this.abortWith(method, errmsg);

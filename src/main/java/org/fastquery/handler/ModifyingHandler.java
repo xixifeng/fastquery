@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -77,7 +78,7 @@ public final class ModifyingHandler {
 		return null;
 	}
 	
-	public Map<String, Object> mapType(String packageName,String dataSourceName,String tableName, String keyFieldName, long autoIncKey, String pkey){
+	public Map<String, Object> mapType(String packageName,String dataSourceName,String tableName, String keyFieldName, long autoIncKey, String pkey,Class<?> convertType){
 		String sql = null;
 		if (autoIncKey != -1) {
 			sql = "select * from " + tableName + " where " + keyFieldName + "=" + autoIncKey; // 在这里拼接SQL不会造成SQL注入问题,因为这些变量不是由用户层传递进来的.
@@ -106,12 +107,19 @@ public final class ModifyingHandler {
 			throw new RepositoryException(e.getMessage(),e);
 		} finally {
 			qp.close(rs, stat, conn);
-		}		
+		}	
+		
+		if(keyval!=null && convertType == String.class) {
+			Map<String, Object> map2 = new HashMap<>();
+			keyval.forEach((k,v)-> map2.put(k, v.toString()));
+			return map2;
+		}
+		
 		return keyval;
 	}
 	
 	public JSONObject jsonObjectType(String packageName,String dataSourceName,String tableName, String keyFieldName, long autoIncKey, String pkey){
-		Map<String, Object> map = mapType(packageName,dataSourceName, tableName, keyFieldName, autoIncKey, pkey);
+		Map<String, Object> map = mapType(packageName,dataSourceName, tableName, keyFieldName, autoIncKey, pkey,Object.class);
 		return new JSONObject(map);
 	}
 
@@ -129,7 +137,7 @@ public final class ModifyingHandler {
 	
 	
 	public Object beanType(String packageName,String dataSourceName,String tableName, String keyFieldName, long autoIncKey, String pkey,Class<?> returnType){
-		Map<String, Object> map = mapType(packageName,dataSourceName, tableName, keyFieldName, autoIncKey, pkey);
+		Map<String, Object> map = mapType(packageName,dataSourceName, tableName, keyFieldName, autoIncKey, pkey,Object.class);
 		return JSON.toJavaObject(new JSONObject(map), returnType);	
 	}
 	
