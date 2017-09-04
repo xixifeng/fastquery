@@ -91,7 +91,6 @@ public class Prepared {
 	
 	private static Object businessProcess(Class<? extends Repository> iclazz,Method method,Object...args) {
 		
-		String methodName = method.getName();
 		Class<?> returnType = method.getReturnType();
 		//String packageName = iclazz.getPackage().getName()
 		String packageName = iclazz.getName();
@@ -133,15 +132,7 @@ public class Prepared {
 			}
 			
 		} else {
-			// QuartzRepository 的方法 可分成2类
-			// 1. 带有@Quartz注解
-			// 2. 没有带@Quartz注解
-			Quartz quartz = method.getAnnotation(Quartz.class);
-			if(quartz != null) {
-				return QuartzProcess.quartz(returnType,quartz,args);
-			} else {
-				return QuartzProcess.methodQuartz(methodName,returnType,quartz,args);
-			}
+			throw new RepositoryException("不能识别的Repository");
 		}
 	}
 	

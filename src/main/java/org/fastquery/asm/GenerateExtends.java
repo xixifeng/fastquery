@@ -25,7 +25,6 @@ package org.fastquery.asm;
 import java.lang.reflect.Method;
 
 import org.fastquery.core.Modifying;
-import org.fastquery.core.QuartzRepository;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
@@ -38,7 +37,6 @@ import org.fastquery.filter.generate.global.ReturnTypeFilter;
 import org.fastquery.filter.generate.modifying.AnnotationSynxFilter;
 import org.fastquery.filter.generate.modifying.ArgsFilter;
 import org.fastquery.filter.generate.modifying.ModifyingReturnTypeFilter;
-import org.fastquery.filter.generate.quartza.IllegalAnnotation;
 import org.fastquery.filter.generate.query.NotAllowedRepeat;
 import org.fastquery.filter.generate.query.PageFilter;
 import org.fastquery.filter.generate.query.ParameterFilter;
@@ -92,7 +90,7 @@ class GenerateExtends {
 			Class<?> declaringClass = method.getDeclaringClass();
 			
 			// 规范接口中的方法不参与校验
-			if(declaringClass == QueryRepository.class || declaringClass == Repository.class || declaringClass == QuartzRepository.class) {
+			if(declaringClass == QueryRepository.class || declaringClass == Repository.class) {
 				continue;
 			}
 			
@@ -168,20 +166,6 @@ class GenerateExtends {
 					// 有待扩展...
 				}
 
-				
-			} else if(QuartzRepository.class.isAssignableFrom(repositoryClazz)) { // 若: QuartzRepository 是 repositoryClazz的父类
-				// filter/quartza
-				quartzFilterChain.addFilter(new IllegalAnnotation());
-				/**
-				// filter/quartz 
-				if(quartz!=null) {
-					
-				} else {
-				
-				// filter/mquartz
-				// 有待扩展...	
-				}
-				*/
 				
 			} else {
 				throw new RepositoryException(repositoryClazz+"不能解析");
