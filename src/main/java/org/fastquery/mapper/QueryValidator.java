@@ -79,7 +79,7 @@ public class QueryValidator {
 					// m2: 标识有@QueryByNamed的方法,必须有对应的模板
 					String tmp = getTemplate(className, id, mapQueryMapper.get(className));
 					if(tmp==null) {
-						error(method, String.format("从%s.queries.xml里没有找到id为%s的模板", className,id));
+						error(method, String.format("从%s.queries.xml里没有找到id为%s的模板,模板文件区分大小写,很有可能%s.queries.xml不存在.", className,id,className));
 					}
 					if("".equals(tmp.trim())) {
 						error(method, String.format("在%s.queries.xml里,id为%s的模板不能为空字符串", className,id));
