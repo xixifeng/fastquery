@@ -754,6 +754,11 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 - 如果明确指定不统计行数,那么设置`countField`和`countQuery`就会变得无意义.    
 - `#{#limit}`不仅能使用在 XML 文件里,也可以使用在`@Query`里,无特殊要求,建议不要指定`#{#limit}`.
 
+## JavaScript分页插件
+[PJAXPage](https://gitee.com/xixifeng.com/pjaxpage)分页插件,完美支持`Page`数据结构.        
+项目地址: https://gitee.com/xixifeng.com/pjaxpage      
+使用例子: http://xixifeng.com.oschina.io/pjaxpage/example/   
+
 ## 执行SQL文件
 ```java
 String sqlName = "update.sql";
