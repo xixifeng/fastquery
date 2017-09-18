@@ -27,24 +27,24 @@ package org.fastquery.page;
  * @author xixifeng (fastquery@126.com)
  */
 public interface Pageable {
-	/**
-	 * Returns the page to be returned.
-	 * 
-	 * @return the page to be returned.
-	 */
-	int getPageNumber();
 
 	/**
-	 * Returns the number of items to be returned.
-	 * 
-	 * @return the number of items of that page
+	 * 或取当前页索引(从1开始计数)
+	 * @return
+	 */
+	int getPageIndex();
+
+
+	/**
+	 * 或取当前页数据条数
+	 * @return
 	 */
 	int getPageSize();
 
 	/**
-	 * Returns the offset to be taken according to the underlying page and page size.
+	 * 翻页的偏移量
 	 * 
-	 * @return the offset to be taken
+	 * @return 偏移量
 	 */
 	int getOffset();
 }

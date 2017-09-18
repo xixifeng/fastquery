@@ -179,11 +179,11 @@ public class BeanUtilTest {
 		Class<UserInfo> clazz = UserInfo.class;
 		Field[] fields = clazz.getDeclaredFields();
 		UserInfo bean = new UserInfo(null, "叶'兰", null);
-		String str = BeanUtil.toFields(clazz, fields, bean);
+		String str = BeanUtil.toFields(fields, bean);
 		assertThat(str, equalTo("(`name`,`age`)"));
 
 		bean = new UserInfo(1, "叶'兰", null);
-		str = BeanUtil.toFields(clazz, fields, bean);
+		str = BeanUtil.toFields(fields, bean);
 		assertThat(str, equalTo("(`id`,`name`,`age`)"));
 	}
 
@@ -192,15 +192,15 @@ public class BeanUtilTest {
 		UserInfo u = new UserInfo();
 		Class<UserInfo> clazz = UserInfo.class;
 		Field[] fields = clazz.getDeclaredFields();
-		String str = BeanUtil.toValue(clazz, fields, u);
+		String str = BeanUtil.toValue(fields, u);
 		assertThat(str, equalTo("(null,null)"));
 
 		u = new UserInfo(null, "叶'兰", null);
-		str = BeanUtil.toValue(clazz, fields, u);
+		str = BeanUtil.toValue(fields, u);
 		assertThat(str, equalTo("('叶''兰',null)"));
 
 		u = new UserInfo(1, "叶'兰", 2);
-		str = BeanUtil.toValue(clazz, fields, u);
+		str = BeanUtil.toValue(fields, u);
 		assertThat(str, equalTo("('1','叶''兰','2')"));
 	}
 

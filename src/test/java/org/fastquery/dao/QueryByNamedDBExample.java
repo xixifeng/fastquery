@@ -39,8 +39,9 @@ import com.alibaba.fastjson.JSONArray;
  */
 public interface QueryByNamedDBExample extends QueryRepository {
 
+	// @QueryByNamed 中的value值如果没有指定,默认是当前方法名.
 	// 从该类的配置文件里寻找id="findUserInfoAll"节点,然后绑定其SQL代码段
-	@QueryByNamed("findUserInfoAll")
+	@QueryByNamed
 	JSONArray findUserInfoAll();
 
 	@QueryByNamed("findUserInfoOne")

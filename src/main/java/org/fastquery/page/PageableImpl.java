@@ -38,18 +38,16 @@ public class PageableImpl implements Pageable {
 		this.size = size;
 		
 		if (page < 1) {
-			//throw new IllegalArgumentException("页码索引不能小于1 !")
 			this.page = 1;
 		}
 
 		if (size < 1) {
-			//throw new IllegalArgumentException("Page size 不能小于1 !")
 			this.size = 1;
 		}
 	}
 
 	@Override
-	public int getPageNumber() {
+	public int getPageIndex() {
 		return page;
 	}
 

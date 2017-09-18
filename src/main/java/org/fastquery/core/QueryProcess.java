@@ -440,7 +440,7 @@ public class QueryProcess {
 		long totalElements = -1L;               // 总行数,如果不求和默认-1L
 		int totalPages = -1;                    // 总页数,如果不求和默认-1
 		int numberOfElements = keyvals.size();  // 每页实际显示多少条数据
-		int number = pageable.getPageNumber();  // 当前页码
+		int number = pageable.getPageIndex();  // 当前页码
 		boolean hasContent = !keyvals.isEmpty();// 这页有内容吗?
 		boolean hasPrevious = (number > 1) && hasContent;// number不是第1页且当前页有数据,就可以断言它有上一页.
 		boolean hasNext;                                 // 有下一页吗? 在这里不用给默认值,如下一定会给他赋值.
@@ -668,7 +668,7 @@ public class QueryProcess {
 			long totalElements = -1L;               // 总行数,如果不求和默认-1L
 			int totalPages = -1;                    // 总页数,如果不求和默认-1
 			int numberOfElements = keyvals.size();  // 每页实际显示多少条数据
-			int number = pageable.getPageNumber();  // 当前页码
+			int number = pageable.getPageIndex();  // 当前页码
 			boolean hasContent = !keyvals.isEmpty();// 这页有内容吗?
 			boolean hasPrevious = (number > 1) && hasContent;// number不是第1页且当前页有数据,就可以断言它有上一页.
 			boolean hasNext;                                 // 有下一页吗? 在这里不用给默认值,如下一定会给他赋值.

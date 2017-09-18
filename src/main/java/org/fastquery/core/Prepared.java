@@ -94,7 +94,7 @@ public class Prepared {
 		Class<?> returnType = method.getReturnType();
 		//String packageName = iclazz.getPackage().getName()
 		String packageName = iclazz.getName();
-		// 目前有两种可能: 1).Query Interface 2).Quartz Interface
+		// 目前只有一种可能:Query Interface
 		// 在这里是一个分水岭
 		if(QueryRepository.class.isAssignableFrom(iclazz)){ // 判断iclazz 是否就是QueryRepository.class,或是其子类
 			// QueryRepository 中的方法可分成4类

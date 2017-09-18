@@ -28,8 +28,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 该注解故意不设置为public类型, 它仅仅是为了能支持 Query 重复注解. <br>
- * 若把Querys 公开,会让人歧义
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 @Retention(RetentionPolicy.RUNTIME)

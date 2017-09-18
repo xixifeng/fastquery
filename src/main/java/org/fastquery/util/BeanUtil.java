@@ -22,10 +22,8 @@
 
 package org.fastquery.util;
 
-import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -129,7 +127,7 @@ public final class BeanUtil {
 	}
 	
 	
-	public static <B> String toFields(Class<B> clazz,Field[] fields,B bean) {
+	public static <B> String toFields(Field[] fields,B bean) {
 		StringBuilder sb = new StringBuilder();
 		sb.append('(');
 		for (Field field : fields) {
@@ -160,7 +158,7 @@ public final class BeanUtil {
 	 * @param bean 实体
 	 * @return sql value部分
 	 */
-	public static <B> String toValue(Class<B> clazz,Field[] fields,B bean) {
+	public static <B> String toValue(Field[] fields,B bean) {
 		StringBuilder sb = new StringBuilder();
 		sb.append('(');
 		for (Field field : fields) {
@@ -194,11 +192,11 @@ public final class BeanUtil {
 	 * @param beans 实体集
 	 * @return sql 中的 values 部分
 	 */
-	private static <B> String toValues(Class<B> clazz,Field[] fields,Iterable<B> beans) {
+	private static <B> String toValues(Field[] fields,Iterable<B> beans) {
 		StringBuilder sbValues = new StringBuilder();
 		sbValues.append("values");
 		for (B b : beans) {
-			sbValues.append(toValue(clazz,fields,b));
+			sbValues.append(toValue(fields,b));
 			sbValues.append(',');
 		}
 		sbValues.deleteCharAt(sbValues.length() - 1);
@@ -244,10 +242,10 @@ public final class BeanUtil {
 		String tableName = sb.toString();
 		
 		// 表字段
-		String fs = toFields(clazz, fields, bean);
+		String fs = toFields(fields, bean);
 		
 		// values 部分
-		String values = toValues(clazz, fields, beans);
+		String values = toValues(fields, beans);
 		
 		// insert into 语句
 		String insertStr;

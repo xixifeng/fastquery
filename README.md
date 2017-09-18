@@ -19,8 +19,7 @@ https://repo1.maven.org/maven2/org/fastquery/fastquery/
 https://github.com/xixifeng/fastquery/archive/master.zip
 
 ### Javadoc Api
-CN: http://xixifeng.com.oschina.io/fastquery/docs/api/
-EN: http://xixifeng.github.io/fastquery/docs/api/
+https://xixifeng.github.io/fastquery/docs/api/
 
 # FastQuery 数据持久层框架
 FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />

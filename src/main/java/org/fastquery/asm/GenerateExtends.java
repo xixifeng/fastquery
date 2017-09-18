@@ -75,13 +75,9 @@ class GenerateExtends {
 		
 		// 主要是针对QueryRepository的过滤链条
 		MethodFilterChain queryFilterChain;
-		
-		// 主要是针对QuartzRepository的过滤链条
-		MethodFilterChain quartzFilterChain;
-		
+				
 		Modifying modifying;
 		Query[] querys;
-		//Quartz quartz
 		QueryByNamed queryByNamed;
 		
 		Method[] methods = repositoryClazz.getMethods();
@@ -96,20 +92,16 @@ class GenerateExtends {
 			
 			modifying = method.getAnnotation(Modifying.class);
 			querys = method.getAnnotationsByType(Query.class);
-			//quartz = method.getAnnotation(Quartz.class)
 			queryByNamed = method.getAnnotation(QueryByNamed.class);
 			
-			// 对过滤器做10个分类
+			// 对过滤器进行分类
 			// filter/global          拦截全局的方法
 			// filter/mqueryn         拦截标注有@QueryByNamed @modifying的方法,并且是QueryRepository的实现方法
 			// filter/queryn          拦截既标注有@QueryByNamed,没有标注@modifying的方法, 并且是QueryRepository的实现方法
 			// filter/modifying       拦截标注有@Query @modifying的方法,并且是QueryRepository的实现方法
-			// filter/mquartz         拦截没有标注@Quartz的方法,并且是QuartzRepository的实现方法
 			// filter/mquery          拦截既没有标注@Query,又没有标注@modifying的方法, 并且是QueryRepository的实现方法
-			// filter/quartz          拦截标注有@Quartz的方法,并且是QuartzRepository的实现方法
 			// filter/query           拦截既标注有@Query,没有标注@modifying的方法, 并且是QueryRepository的实现方法
 			// filter/querya          拦截QueryRepository的实现方法
-			// filter/quartza         拦截QuartzRepository的实现方法
 			
 			// 全局责任链
 			// filter/global   
@@ -120,7 +112,6 @@ class GenerateExtends {
 			
 			
 			queryFilterChain = new MethodFilterChain();
-			quartzFilterChain = new MethodFilterChain();
 			
 			if(QueryRepository.class.isAssignableFrom(repositoryClazz)) { // 若:QueryRepository 是 repositoryClazz的父类
 				
@@ -172,10 +163,9 @@ class GenerateExtends {
 			}
 			
 			
-			// 把3根责任链条连接起来
-			// globalFilterChain + queryFilterChain + quartzFilterChain
+			// 把责任链条连接起来
 			// 多根链接衔接完毕之后就执行过滤
-			globalFilterChain.addFilter(queryFilterChain).addFilter(quartzFilterChain).doFilter(method);
+			globalFilterChain.addFilter(queryFilterChain).doFilter(method);
 			
 		}
 	}
