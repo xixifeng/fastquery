@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.23.M1</version>
+    <version>1.0.24</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.23.M1'
+compile 'org.fastquery:fastquery:1.0.24'
 ```
 
 ### Apache Archive

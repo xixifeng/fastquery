@@ -32,7 +32,7 @@ public class Slice {
 	private int size;    // 每页多少条数据
 		
 	/**
-	 * 构造 TenetPageable
+	 * 构造 Slice(页片)
 	 * @param number 当前页码
 	 * @param size   每页多少条数据
 	 */

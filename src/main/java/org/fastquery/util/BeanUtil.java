@@ -95,7 +95,8 @@ public final class BeanUtil {
 					if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
 						continue;
 					}
-					Object val = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(bean);
+					field.setAccessible(true);
+					Object val = field.get(bean);
 					if(field.getAnnotation(Id.class)!=null) {
 						if (val != null) {
 							sqlsb.insert(idOfSet, new StringBuilder().append("`").append(field.getName()).append("`"));
@@ -136,13 +137,13 @@ public final class BeanUtil {
 				continue;
 			}
 			try {
-				if(field.getAnnotation(Id.class) == null || new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(bean) != null) {
+				field.setAccessible(true);
+				if(field.getAnnotation(Id.class) == null || field.get(bean) != null) {
 					sb.append("`");
 					sb.append(field.getName());
 					sb.append("`,");
 				}
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
-					| IntrospectionException e) {
+			} catch (IllegalAccessException | IllegalArgumentException e) {
 				throw new RepositoryException(e);
 			}
 		}
@@ -168,9 +169,9 @@ public final class BeanUtil {
 			}
 			Object val = null;
 			try {
-				val = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(bean);
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
-					| IntrospectionException e) {
+				field.setAccessible(true);
+				val = field.get(bean);
+			} catch (IllegalAccessException | IllegalArgumentException e) {
 				throw new RepositoryException(e);
 			}
 			if( val!= null ) {
@@ -299,7 +300,8 @@ public final class BeanUtil {
 				if(key==null) {
 					// 顺便取主键的值
 					try {
-						key = new PropertyDescriptor(field.getName(), cls).getReadMethod().invoke(bean);	
+						field.setAccessible(true);
+						key = field.get(bean);
 					} catch (Exception e) {
 						throw new RepositoryException(e);
 					}	
@@ -349,7 +351,8 @@ public final class BeanUtil {
 				keyFeild = field.getName();
 				// 顺便取主键的值
 				try {
-					key = new PropertyDescriptor(field.getName(), cls).getReadMethod().invoke(bean);	
+					field.setAccessible(true);
+					key = field.get(bean);	
 				} catch (Exception e) {
 					throw new RepositoryException(e);
 				}
@@ -372,7 +375,8 @@ public final class BeanUtil {
 				if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
 					continue;
 				}
-				Object val = new PropertyDescriptor(field.getName(), cls).getReadMethod().invoke(bean);
+				field.setAccessible(true);
+				Object val = field.get(bean);
 				Id id = field.getAnnotation(Id.class);
 				if(val!=null && id == null) {
 					args.add(val);
@@ -439,7 +443,8 @@ public final class BeanUtil {
 				if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
 					continue;
 				}
-				Object val = new PropertyDescriptor(field.getName(), cls).getReadMethod().invoke(bean);
+				field.setAccessible(true);
+				Object val = field.get(bean);
 				if(val!=null && !wps.contains(":"+field.getName())) {
 					args.add(val);
 					sb.append(" `");
@@ -505,8 +510,8 @@ public final class BeanUtil {
 		try {
 			ns = (S) beanClass.newInstance();
 			for (Field field : fields) {
-				// 这里虽然只是调用getWriteMethod, 但是如果get方法写错了,也会导致getWriteMethod不能用
-				new PropertyDescriptor(field.getName(), beanClass).getWriteMethod().invoke(ns, new Object[]{null});
+				field.setAccessible(true);
+				field.set(ns, null);
 			}
 		} catch (Exception e) {
 			throw new RepositoryException(e);
