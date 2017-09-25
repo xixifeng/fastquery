@@ -151,6 +151,7 @@ public class QueryProcess {
 					// sql 中的"?"号调整 End
 					// Statement.RETURN_GENERATED_KEYS
 					LOG.info(sql);
+					QueryContext.getQueryContext().addSqls(sql);
 					stat = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS); // stat 会在下面的finally里关闭.
 					// 注意: preparedStatement的参数索引是从1开始的!
 					/*
@@ -296,7 +297,7 @@ public class QueryProcess {
 			}
 			// sql 中的"?"号调整 End
 			LOG.info(sql);
-
+			QueryContext.getQueryContext().addSqls(sql);
 			stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
 			/*
 			for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
@@ -412,6 +413,7 @@ public class QueryProcess {
 						}
 						// sql 中的"?"号调整 End
 						LOG.info(sql);
+						QueryContext.getQueryContext().addSqls(sql);
 			stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
 			/*
 			for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
@@ -492,6 +494,7 @@ public class QueryProcess {
 				}
 				// sql 中的"?"号调整 End
 				LOG.debug("求和语句: " + sql);
+				QueryContext.getQueryContext().addSqls(sql);
 				stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
 				/*
 				for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
@@ -544,6 +547,7 @@ public class QueryProcess {
 				}
 				// sql 中的"?"号调整 End
 				LOG.debug("下一页的SQL:" + sql);
+				QueryContext.getQueryContext().addSqls(sql);
 				stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
 				/*
 				for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
@@ -644,6 +648,7 @@ public class QueryProcess {
 				}
 				// sql 中的"?"号调整 End
 				LOG.info(sql);
+				QueryContext.getQueryContext().addSqls(sql);
 				stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
 				/*
 				for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
@@ -692,6 +697,7 @@ public class QueryProcess {
 					}
 					// sql 中的"?"号调整 End
 					LOG.info("求和语句: " + sql);
+					QueryContext.getQueryContext().addSqls(sql);
 					stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
 					/*
 					for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
@@ -751,6 +757,7 @@ public class QueryProcess {
 					}
 					// sql 中的"?"号调整 End
 					LOG.debug("下一页的SQL:" + sql);
+					QueryContext.getQueryContext().addSqls(sql);
 					stat = conn.prepareStatement(sql); // stat 会在下面的finally里关闭.
 					/*
 					for (int i = 1; i <= ints.length; i++) { // 注意: ints并不是args的长度,而是sql中包含的参数与方法参数的对应关系数组
@@ -1127,6 +1134,7 @@ public class QueryProcess {
 		try {
 			conn = dataSource.getConnection();
 			//conn.setAutoCommit(false);
+			QueryContext.getQueryContext().addSqls(sql);
 			stat = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			stat.executeUpdate();
 			rs = stat.getGeneratedKeys();
@@ -1157,6 +1165,7 @@ public class QueryProcess {
 		try {
 			conn = dataSource.getConnection();
 			stat = conn.createStatement();
+			QueryContext.getQueryContext().addSqls(sql);
 			return stat.executeUpdate(sql);
 		} catch (SQLException e) {
 			throw new RepositoryException(e);
@@ -1174,6 +1183,7 @@ public class QueryProcess {
 			conn = dataSource.getConnection();	
 			stat = conn.createStatement();
 			LOG.info(sql);
+			QueryContext.getQueryContext().addSqls(sql);
 			rs = stat.executeQuery(sql);
 			List<Map<String, Object>> maps = rs2Map(rs,null);
 			if(maps.isEmpty()) {
@@ -1193,6 +1203,7 @@ public class QueryProcess {
 		try {
 			conn = dataSource.getConnection();	
 			stat = conn.createStatement();
+			QueryContext.getQueryContext().addSqls(sql);
 			rs = stat.executeQuery(sql);
 			return rs.next();
 		} catch (SQLException e) {
@@ -1217,6 +1228,7 @@ public class QueryProcess {
 		try {
 			conn = dataSource.getConnection();
 			//conn.setAutoCommit(false);
+			QueryContext.getQueryContext().addSqls(sql);
 			stat = conn.prepareStatement(sql);
 			for (int i = 1; i <= count; i++) {
 				stat.setObject(i, args.get(i-1));
@@ -1254,6 +1266,7 @@ public class QueryProcess {
 		try {
 			conn = dataSource.getConnection();
 			//conn.setAutoCommit(false);
+			QueryContext.getQueryContext().addSqls(sql);
 			stat = conn.prepareStatement(sql);
 			for (int i = 1; i <= count; i++) {
 				stat.setObject(i, args.get(i-1));

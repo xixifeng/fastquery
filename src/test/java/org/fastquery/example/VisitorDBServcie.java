@@ -20,35 +20,21 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.example;
+
+import org.fastquery.core.Modifying;
+import org.fastquery.core.Query;
+import org.fastquery.core.QueryRepository;
 
 /**
- * deprecated
  * 
- * @see QueryContext
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
+ * @date 2017年9月25日
  */
-@Deprecated
-public class Session {
+public interface VisitorDBServcie extends QueryRepository {
 
-	private Session() {
-	}
-
-	/**
-	 * @see QueryContext
-	 * @return lang
-	 */
-	@Deprecated
-	public static String getLang() {
-		return QueryContext.getQueryContext().getLang();
-	}
-
-	/**
-	 * @see QueryContext
-	 * @param lang 语言编码
-	 */
-	@Deprecated
-	public static void setLang(String lang) {
-		QueryContext.getQueryContext().setLang(lang);
-	}
+	@Query("DELETE FROM `visitor` WHERE `iden` = ?1")
+	@Modifying
+	int deleteByIden(String iden);
+	
 }

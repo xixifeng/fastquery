@@ -33,6 +33,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.fastquery.core.Primarykey;
+import org.fastquery.core.QueryContext;
 import org.fastquery.core.QueryProcess;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dsm.DataSourceManage;
@@ -97,6 +98,7 @@ public final class ModifyingHandler {
 		Map<String, Object> keyval = null;
 		try {
 			conn = dataSource.getConnection();
+			QueryContext.getQueryContext().addSqls(sql);
 			stat = conn.prepareStatement(sql); // stat会在下面的finally中关闭
 			rs = stat.executeQuery();
 			keyvals = qp.rs2Map(rs,null); // rs2Map 远不会返回null

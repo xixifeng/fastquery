@@ -45,9 +45,9 @@ import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
+import org.fastquery.core.QueryContext;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
-import org.fastquery.core.Session;
 import org.fastquery.core.Source;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.PageIndex;
@@ -896,9 +896,9 @@ public class TypeUtil implements Opcodes{
 	public static Object i18n(Object obj) {
 		try {
 			JSONObject json = (JSONObject) JSON.parse(obj.toString());
-			String lang = Session.getLang();
-			if(json.containsKey(lang)){
-				return json.get(Session.getLang());	
+			String lang = QueryContext.getQueryContext().getLang();
+			if(json.containsKey(lang)){ // 这个过程中有可能set,因此QueryContext.getQueryContext().getLang()
+				return json.get(QueryContext.getQueryContext().getLang());	
 			}
 			return "i18n error";
 		} catch (Exception e) {

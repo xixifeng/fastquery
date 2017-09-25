@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.fastquery.core.Id;
 import org.fastquery.core.Placeholder;
@@ -48,6 +49,11 @@ public final class BeanUtil {
 	private BeanUtil() {
 	}
 
+	private static String escapeSql(String str) {
+		String s = StringEscapeUtils.escapeSql(str);
+		return StringUtils.replace(s, "\\", "\\\\");
+	}
+	
 	/**
 	 * 将1个bean 转换成 insert sql语句, 注意: 主键值为null,将不参与运算.
 	 * 
@@ -98,7 +104,7 @@ public final class BeanUtil {
 					if(field.getAnnotation(Id.class)!=null) {
 						if (val != null) {
 							sqlsb.insert(idOfSet, new StringBuilder().append("`").append(field.getName()).append("`"));
-							sqlsb.append("'" + StringEscapeUtils.escapeSql(val.toString()) + "',");
+							sqlsb.append("'" + escapeSql(val.toString()) + "',");
 						} else {
 							if(sqlsb.charAt(idOfSet) == ',') {
 								sqlsb.deleteCharAt(idOfSet);	
@@ -106,7 +112,7 @@ public final class BeanUtil {
 						}
 					} else {
 						if (val != null) {
-							sqlsb.append("'" + StringEscapeUtils.escapeSql(val.toString()) + "',");
+							sqlsb.append("'" + escapeSql(val.toString()) + "',");
 						} else {
 							sqlsb.append(val);
 							sqlsb.append(',');
@@ -153,7 +159,6 @@ public final class BeanUtil {
 	/**
 	 * 将bean 转换成这样的格式: ('12','sunny','20')
 	 * @param <B> 实体
-	 * @param clazz 实体class
 	 * @param fields 实体字段集
 	 * @param bean 实体
 	 * @return sql value部分
@@ -174,7 +179,7 @@ public final class BeanUtil {
 			}
 			if( val!= null ) {
 				sb.append("'");
-				sb.append(StringEscapeUtils.escapeSql(val.toString()));
+				sb.append(escapeSql(val.toString()));
 				sb.append("',");
 			} else if(field.getAnnotation(Id.class) == null) {
 				sb.append("null,");

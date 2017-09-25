@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.24</version>
+    <version>1.0.25</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.24'
+compile 'org.fastquery:fastquery:1.0.25'
 ```
 
 ### Apache Archive
@@ -18,16 +18,13 @@ https://repo1.maven.org/maven2/org/fastquery/fastquery/
 ### Current Source
 https://github.com/xixifeng/fastquery/archive/master.zip
 
-### Javadoc Api
-https://xixifeng.github.io/fastquery/docs/api/
-
 # FastQuery 数据持久层框架
 FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 提供少许`Annotation`,消费者只用关心注解的含义,这就使得框架的核心便于重构,便于持续良性发展.<br />
 
 ## FastQuery 主要特性如下:
 1. 遵循非侵入式原则,设计优雅或简单,极易上手
-2. 在项目初始化阶段采用ASM动态生成好字节码,因此支持编译前预处理,可最大限度减少运行期的错误,显著提升程序的强壮性
+2. 在项目初始化阶段采用ASM生成好字节码,因此支持编译前预处理,可最大限度减少运行期的错误,显著提升程序的强壮性
 3. 支持安全查询,防止SQL注入
 4. 支持与主流数据库连接池框架集成,如集成c3p0,dbcp等等
 5. 支持 `@Query` 查询,使用 `@Condition`,可实现动态 `where` 条件查询
@@ -36,6 +33,7 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 8. 支持`AOP`,注入拦截器只需要标识几个简单的注解,如: `@Before` , `@After`
 9. 使用`@Source`可实现动态适配数据源.这个特性特别适合多租户系统中要求数据库彼此隔离其结构相同的场景里
 10. 支持`@QueryByNamed`命名式查询,SQL动态模板.
+<!-- 列表长度不要大于2.(第二项)的长度 -->
 
 ## 运行环境要求
 jdk1.8+
@@ -138,7 +136,7 @@ fastquery.json其他可选配置选项:
 | velocity | string | 无 | 指定velocity的配置文件 | "/tmp/velocity.properties" |
 
 
-## 一个完整的入门例子
+## 入门例子
 - 准备一个实体
 
 ```java

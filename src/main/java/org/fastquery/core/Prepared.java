@@ -23,6 +23,7 @@
 package org.fastquery.core;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.fastquery.filter.FilterChainHandler;
@@ -75,6 +76,9 @@ public class Prepared {
 	                return object;
 	        }
 
+	        // QueryContext 生命开始
+	        QueryContext.getQueryContext().setMethod(method);
+	        LOG.info("准备执行方法:" + method);
 	        // 取出当前线程中method和args(BeforeFilter 有可能中途修换其他method, 因为过滤器有个功能this.change(..,...) )
 	        object = businessProcess(iclazz,method, args);
 
@@ -84,8 +88,30 @@ public class Prepared {
 	        
 	        return object;	
 		} catch (Exception e) {
-			LOG.error(e.getMessage(),e);
+			
+			QueryContext context = QueryContext.getQueryContext();
+			
+			StringBuilder sb = new StringBuilder();
+			String msg = e.getMessage();
+			if(msg!=null) {
+				sb.append(msg);
+			}
+			
+			sb.append('\n');
+			sb.append("发生方法:" + context.getMethod());
+			sb.append('\n');
+			sb.append("执行过的sql:");
+			
+			List<String> sqls = context.getSqls();
+			sqls.forEach(sql -> {
+				sb.append(sql);
+				sb.append('\n');
+			});
+			LOG.error(sb.toString(),e);
 			throw new RepositoryException(e);
+		} finally {
+	        // QueryContext 生命终止
+	        QueryContext.getQueryContext().clear();
 		}
 	}
 	

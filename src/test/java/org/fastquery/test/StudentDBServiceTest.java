@@ -30,8 +30,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.fastquery.bean.Student;
 import org.fastquery.core.Primarykey;
+import org.fastquery.core.QueryContext;
 import org.fastquery.core.QueryRepository;
-import org.fastquery.core.Session;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
 
@@ -109,12 +109,12 @@ public class StudentDBServiceTest {
 
 	@Test
 	public void findOne2() {
-		Session.setLang("en");
+		QueryContext.getQueryContext().setLang("en");
 		JSONObject student = studentDBService.findOne("9921103");
 		assertThat(student.get("name"), equalTo("Lily"));
 		assertThat(student.get("dept"), equalTo("Chinese"));
 
-		Session.setLang("zh");
+		QueryContext.getQueryContext().setLang("zh");
 		student = studentDBService.findOne("9921103");
 		assertThat(student.get("name"), equalTo("丽丽"));
 		assertThat(student.get("dept"), equalTo("语文"));
