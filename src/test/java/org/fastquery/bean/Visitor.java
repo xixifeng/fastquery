@@ -44,13 +44,14 @@ public class Visitor {
 	private Long lastDate;
 	private Long createDate;
 	private String iden;
+	private Integer dId;
 
 	public Visitor() {
 
 	}
 
 	public Visitor(Long punitId, String vname, String idCard, String mobile, String email, Byte gender, String toAddr,
-			String remark, Long lastDate, String iden) {
+			String remark, Long lastDate, String iden,Integer dId) {
 		this.punitId = punitId;
 		this.vname = vname;
 		this.idCard = idCard;
@@ -61,6 +62,7 @@ public class Visitor {
 		this.remark = remark;
 		this.lastDate = lastDate;
 		this.iden = iden;
+		this.dId = dId;
 	}
 
 	public Long getId() {
@@ -157,6 +159,14 @@ public class Visitor {
 
 	public void setCreateDate(Long createDate) {
 		this.createDate = createDate;
+	}
+
+	public Integer getdId() {
+		return dId;
+	}
+
+	public void setdId(Integer dId) {
+		this.dId = dId;
 	}
 
 }

@@ -53,8 +53,9 @@ public class SaveToIdTest {
 		Long lastDate = 1506233249L; 
 		Long createDate = 1506233208L; 
 		String iden = "J6X1HH15ExIkvqSNSHXa"; 
+		Integer dId = 1;
 		
-		Visitor v = new Visitor(punitId, vname, idCard, mobile, email, gender, toAddr, remark, lastDate, iden);
+		Visitor v = new Visitor(punitId, vname, idCard, mobile, email, gender, toAddr, remark, lastDate, iden,dId);
 		v.setCreateDate(createDate);
 		
 		BigInteger bigInteger = vdbs.saveToId(v);

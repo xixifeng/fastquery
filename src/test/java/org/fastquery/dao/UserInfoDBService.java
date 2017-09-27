@@ -163,4 +163,9 @@ public interface UserInfoDBService extends QueryRepository {
 
 	@Query("select age from UserInfo where id = ?1")
 	Integer findAge(Integer id);
+	
+	@Query("select * from UserInfo #{#where}")
+	@Condition(value="age = ?1",ignoreNull=false)
+	List<UserInfo> findUserInfoByNullAge(Integer age);
+	
 }

@@ -342,19 +342,12 @@ public class UserInfoDBServiceTest {
 		Integer age = userInfoDBService.findAge(35);
 		assertThat(age, nullValue());
 	}
-
-	/*
-	 * @Test public void initv(){ VelocityContext velocityContext = new
-	 * VelocityContext();
-	 * 
-	 * Template t = Velocity.getTemplate("hello4.vm");
-	 * 
-	 * velocityContext.put("hi", "xxx");
-	 * 
-	 * StringWriter sw = new StringWriter();
-	 * 
-	 * t.merge(velocityContext, sw);
-	 * 
-	 * System.out.println( sw.toString() ); }
-	 */
+	
+	@Test
+	public void findUserInfoByNullAge(){
+		// 查询age为null的UserInfo
+		List<UserInfo> us = userInfoDBService.findUserInfoByNullAge(null);
+		assertThat(us.size(), greaterThanOrEqualTo(1));
+		us.forEach( u -> assertThat(u.getAge(), nullValue()));
+	}
 }

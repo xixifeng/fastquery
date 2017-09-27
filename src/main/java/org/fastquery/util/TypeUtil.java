@@ -209,7 +209,7 @@ public class TypeUtil implements Opcodes{
 	}
 	
 	/**
-	 * 为描述方便: 若返回的值时 arrs
+	 * 为描述方便: 假设返回的值是 arrs
 	 * 
 	 * arrs[0]: 返回sql中的"?"需要变化的地方.例如:若返回Map&lt;Integer, Integer&gt; -&gt; {1=3,5=2} <br>
      * 表示sql中的第1个(从0开始计数)"?"号,应该调整3个"?"号,问号彼此用","号隔开 <br>
@@ -595,6 +595,14 @@ public class TypeUtil implements Opcodes{
 				int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
 				if (ignoreCondition(conditions[i], args[index - 1])) {
 					continue o; // 跳出最外层的当次循环,不进行条件追加
+				} else if(args[index - 1] == null) {
+					// 如果传递null 还要求参与运算.
+					// sql中null无法跟比较运算符(如 =, <, 或者 <>),一起运算,必须使用 is null 和 is not null 操作符. 
+					value = value.replaceAll("\\s+", " "); // 把多个空白换成一个空格
+					value = value.replaceAll("=\\?", "= ?"); // 将"=?" 替换成 "= ?"  
+					value = value.replaceAll(" = \\?" + index," is null");
+					value = value.replaceAll(" <> \\?" + index," is not null");
+					value = value.replaceAll(" != \\?" + index," is not null");
 				}
 			}
 

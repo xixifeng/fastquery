@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.25</version>
+    <version>1.0.26</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.25'
+compile 'org.fastquery:fastquery:1.0.26'
 ```
 
 ### Apache Archive
@@ -33,7 +33,6 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 8. 支持`AOP`,注入拦截器只需要标识几个简单的注解,如: `@Before` , `@After`
 9. 使用`@Source`可实现动态适配数据源.这个特性特别适合多租户系统中要求数据库彼此隔离其结构相同的场景里
 10. 支持`@QueryByNamed`命名式查询,SQL动态模板.
-<!-- 列表长度不要大于2.(第二项)的长度 -->
 
 ## 运行环境要求
 jdk1.8+
@@ -265,6 +264,9 @@ Student[] findAllStudent(... args ...);
 - 如果参数是`String`类型,值若为`null`或""(空字符串),在默认情况下,都会使条件移除
 - `ignoreNull=false` : 参数值即便为null,条件也参与
 - `ignoreEmpty=false` : 参数值即使为"",条件也保留
+
+`@Condition(value="name = ?1",ignoreNull=false)`表示`?1`接受到的值若是`null`,该条件也参与运算,最终会翻译成`name is null`.`SQL`中的`null`无法跟比较运算符(如`=`,`<`,或者`<>`)一起运算,但允许跟`is null`,`is not null`,`<=>`操作符一起运算,故,将`name = null`想表达的意思,解释成`name is null`.  
+`@Condition(value="name != ?1",ignoreNull=false)` 若`?1`的值为`null`,最终会解释成`name is not null`.  
 
 当然,实现动态`SQL`,`FastQuery`还提供了另一种方案:采用`@QueryByNamed`(命名式查询),将`SQL`写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活.下面章节有详细描述.
 
