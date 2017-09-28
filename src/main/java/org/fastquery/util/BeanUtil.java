@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.fastquery.core.Id;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.RepositoryException;
+import org.fastquery.core.Transient;
 
 import com.alibaba.fastjson.JSONArray;
 
@@ -58,7 +59,7 @@ public final class BeanUtil {
 	 * 将1个bean 转换成 insert sql语句, 注意: 主键值为null,将不参与运算.
 	 * 
 	 * @param bean 实体
-	 * @param dbNamePrefix 数据库名称前缀
+	 * @param dbNamePrefix 是否显示数据库名称前缀(暂用表达式)
 	 * @return insert 语句
 	 */
 	public static String toInsertSQL(Object bean,boolean dbNamePrefix) {
@@ -78,7 +79,7 @@ public final class BeanUtil {
 		sqlsb.append("(");
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
-			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
+			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null){
 				continue;
 			}
 			// 如果是主键,记录一下应该插入的位置
@@ -96,7 +97,7 @@ public final class BeanUtil {
 		try {
 				sqlsb.append('(');
 				for (Field field : fields) {
-					if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
+					if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null){
 						continue;
 					}
 					field.setAccessible(true);
@@ -132,12 +133,15 @@ public final class BeanUtil {
 		return toInsertSQL(bean, true).replace("${dbpre}", dbName);
 	}
 	
+	public static String toInsertSQL(Object bean) {
+		return toInsertSQL(bean, false);
+	}
 	
 	public static <B> String toFields(Field[] fields,B bean) {
 		StringBuilder sb = new StringBuilder();
 		sb.append('(');
 		for (Field field : fields) {
-			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
+			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null){
 				continue;
 			}
 			try {
@@ -167,7 +171,7 @@ public final class BeanUtil {
 		StringBuilder sb = new StringBuilder();
 		sb.append('(');
 		for (Field field : fields) {
-			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
+			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null){
 				continue;
 			}
 			Object val = null;
@@ -347,7 +351,7 @@ public final class BeanUtil {
 		Field[] files = cls.getDeclaredFields();
 		
 		for (Field field : files) {
-			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
+			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null){
 				continue;
 			}
 			if(field.getAnnotation(Id.class)!=null){
@@ -375,7 +379,7 @@ public final class BeanUtil {
 		try {
 			Field[] fields = cls.getDeclaredFields();
 			for (Field field : fields) {
-				if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
+				if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null){
 					continue;
 				}
 				field.setAccessible(true);
@@ -443,7 +447,7 @@ public final class BeanUtil {
 		try {
 			Field[] fields = cls.getDeclaredFields();
 			for (Field field : fields) {
-				if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
+				if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null){
 					continue;
 				}
 				field.setAccessible(true);

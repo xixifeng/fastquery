@@ -94,6 +94,10 @@
 			<part name="feids">name</part>
 		</parts>
 	</query>
+	
+	<query id="findUserInfoByFuzzyName">
+		select * from UserInfo where name like %:name%
+	</query>
 </queries>
 
 

@@ -31,6 +31,7 @@ import static org.junit.Assert.assertThat;
 
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
+import org.fastquery.bean.Visitor;
 import org.junit.Test;
 
 /**
@@ -149,6 +150,13 @@ public class BeanUtilTest {
 		String str = BeanUtil.toInsertSQL(userInfos, null, false);
 		assertThat(str,
 				equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('牵牛花','3'),('10','松''鼠','5')"));
+	}
+	
+	@Test
+	public void beansToInsertSQL4() {
+		Visitor v = new Visitor();
+		String sql = BeanUtil.toInsertSQL(v);
+		assertThat(sql, not(containsString("dectiption")));
 	}
 
 	@Test

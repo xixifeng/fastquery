@@ -23,6 +23,7 @@
 package org.fastquery.bean;
 
 import org.fastquery.core.Id;
+import org.fastquery.core.Transient;
 
 /**
  * 
@@ -45,9 +46,8 @@ public class Visitor {
 	private Long createDate;
 	private String iden;
 	private Integer dId;
-
+	
 	public Visitor() {
-
 	}
 
 	public Visitor(Long punitId, String vname, String idCard, String mobile, String email, Byte gender, String toAddr,
@@ -169,4 +169,12 @@ public class Visitor {
 		this.dId = dId;
 	}
 
+	@Transient
+	private String description;
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
 }

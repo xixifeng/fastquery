@@ -23,6 +23,7 @@
 package org.fastquery.bean;
 
 import org.fastquery.core.Id;
+import org.fastquery.core.Transient;
 
 /**
  * 
@@ -76,5 +77,14 @@ public class UserInfo {
 	@Override
 	public String toString() {
 		return "UserInfo [id=" + id + ", name=" + name + ", age=" + age + "]";
+	}
+	
+	@Transient
+	private String description;
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

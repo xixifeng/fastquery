@@ -31,6 +31,7 @@ import org.fastquery.page.Page;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.service.FQuery;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.alibaba.fastjson.JSON;
@@ -38,6 +39,7 @@ import com.alibaba.fastjson.JSONArray;
 
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -163,5 +165,13 @@ public class QueryByNamedDBExampleTest {
 		assertThat(userInfo.getName(), equalTo(name));
 		assertThat(userInfo.getAge().intValue(), is(age));
 
+	}
+	
+	@Test
+	public void findUserInfoByFuzzyName(){
+		String name = "三";
+		List<UserInfo> uis = queryByNamedDBExample.findUserInfoByFuzzyName(name);
+		assertThat(uis.size(), greaterThanOrEqualTo(2));
+		uis.forEach(u->assertThat(u.getName(), containsString(name)));
 	}
 }

@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.fastquery.core.GenerateRepository;
 import org.fastquery.core.Prepared;
 import org.fastquery.core.Repository;
@@ -42,6 +43,8 @@ import org.objectweb.asm.commons.GeneratorAdapter;
  */
 public class AsmRepository implements Opcodes {
 
+	private static final Logger LOG = Logger.getLogger(AsmRepository.class);
+	
 	private AsmRepository(){
 	}
 	
@@ -231,6 +234,8 @@ public class AsmRepository implements Opcodes {
 	public static void after(List<Class<Repository>> classes) {
 		QueryValidator.check(classes);
 		classes.clear();
+		
+		LOG.debug("\n\n\n\n初始化阶段结束\n");
 	}
 
 }

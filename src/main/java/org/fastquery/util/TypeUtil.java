@@ -455,11 +455,12 @@ public class TypeUtil implements Opcodes{
 					Param param = (Param) ann;
 					Object objx = args[i];
 					objx = BeanUtil.parseList(objx);
-					// '{' 是正则语法的关键字,必须转义
-					s = s.replaceAll("\\$\\{"+param.value()+"\\}", objx!=null?objx.toString():param.defaultVal());
 					// 将 ":xx" 格式的 替换成 "?num"
 					// 替换时必须加单词分界符(\\b),举例说明: sql中同时存在":ABCD",":A", 不加单词分界符,":A"替换成"?num"后,会使":ABCD"变成":?numBCD"
-					s = s.replaceAll("\\:"+param.value()+"\\b", "?"+(i+1)); 
+					s = s.replaceAll("\\:"+param.value()+"\\b", "?"+(i+1));
+					// 这两个replaceAll的先后顺序很重要
+					// '{' 是正则语法的关键字,必须转义
+					s = s.replaceAll("\\$\\{"+param.value()+"\\}", objx!=null?objx.toString():param.defaultVal());
 				}
 			}
 		}

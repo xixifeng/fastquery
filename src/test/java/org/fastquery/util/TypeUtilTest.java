@@ -30,7 +30,6 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.fastquery.core.Id;
@@ -189,79 +188,6 @@ public class TypeUtilTest implements Opcodes {
 	// 别删除用做测试用
 	@Query("select * from Student #{#where} order by desc")
 	public void method01() {
-	}
-
-	@Test
-	public void placeholder() {
-		// 匹配 (?4,?5,?6)的正则(允许有首尾空格)
-		String reg1 = Placeholder.INV_REG;
-		assertThat(Pattern.matches(reg1, "(?3,?7,?8)"), is(true));
-		assertThat(Pattern.matches(reg1, "( ?3,?7 ,?8 ) "), is(true));
-		assertThat(Pattern.matches(reg1, " ( ?3 ,?7 , ?8 )"), is(true));
-		assertThat(Pattern.matches(reg1, "     (?3,   ?7,  ?8 )"), is(true));
-		assertThat(Pattern.matches(reg1, " (?3, ?7,   ?8)"), is(true));
-		assertThat(Pattern.matches(reg1, "( ?3,     ?7,?8)"), is(true));
-		assertThat(Pattern.matches(reg1, "( ?3,?7, ?8 )      "), is(true));
-		assertThat(Pattern.matches(reg1, "( ?3, ?7, ?8) "), is(true));
-
-		assertThat(Pattern.matches(reg1, "( ?3, ?7 ?8) "), is(false));
-		assertThat(Pattern.matches(reg1, "( ?3?7?8) "), is(false));
-		assertThat(Pattern.matches(reg1, "( ?s,?7, ?8) "), is(false));
-		assertThat(Pattern.matches(reg1, "( ?3, ?7, ?8)s "), is(false));
-		assertThat(Pattern.matches(reg1, "(?3, ?7, ?8)12 "), is(false));
-
-		assertThat(Pattern.matches(reg1, "(?3?7?8)"), is(false));
-		assertThat(Pattern.matches(reg1, "( ?3666,?7 ?8 ) "), is(false));
-		assertThat(Pattern.matches(reg1, " ( ?3777 32?7 , ?8 )"), is(false));
-		assertThat(Pattern.matches(reg1, "     (?3xx,   ?7,  ?8 )"), is(false));
-		assertThat(Pattern.matches(reg1, " (?3a, ?7,   ?8)"), is(false));
-		assertThat(Pattern.matches(reg1, "( ?3,  263, ?7,?8)"), is(false));
-		assertThat(Pattern.matches(reg1, "( ?3,?7, ?8,? )      "), is(false));
-		assertThat(Pattern.matches(reg1, "( ?3, ?x5, ?8) "), is(false));
-
-		// 不区分大小写匹配格式 "?8 and ?9"
-		reg1 = Placeholder.ANDV_REG;
-		assertThat(Pattern.matches(reg1, "?12 AnD ?456"), is(true));
-		assertThat(Pattern.matches(reg1, "?1 AnD ?45"), is(true));
-		assertThat(Pattern.matches(reg1, "?3 AnD ?6"), is(true));
-		assertThat(Pattern.matches(reg1, "?3 AnD ?456"), is(true));
-		assertThat(Pattern.matches(reg1, " ?123     AnD ?456 "), is(true));
-		assertThat(Pattern.matches(reg1, "    ?123 AnD ?456         "), is(true));
-		assertThat(Pattern.matches(reg1, "    ?123 AnD     ?456"), is(true));
-		assertThat(Pattern.matches(reg1, "?123      AnD ?456"), is(true));
-		assertThat(Pattern.matches(reg1, "?123 AnD        ?456 "), is(true));
-
-		assertThat(Pattern.matches(reg1, "?12AnD ?456"), is(false));
-		assertThat(Pattern.matches(reg1, "?1 AnD?45"), is(false));
-		assertThat(Pattern.matches(reg1, "?3 AndD ?6"), is(false));
-		assertThat(Pattern.matches(reg1, "?3 AnD ?45x"), is(false));
-		assertThat(Pattern.matches(reg1, " ?123  AAnD ?456 "), is(false));
-		assertThat(Pattern.matches(reg1, "    ? AnD ?456         "), is(false));
-		assertThat(Pattern.matches(reg1, "    ?123 AnD     ?"), is(false));
-		assertThat(Pattern.matches(reg1, "?123      AnND ?456"), is(false));
-		assertThat(Pattern.matches(reg1, "? 123 AnD ?456 "), is(false));
-
-		// 匹配格式 "?2"(允许首尾空格)
-		reg1 = Placeholder.SP2_REG;
-		assertThat(Pattern.matches(reg1, "?1"), is(true));
-		assertThat(Pattern.matches(reg1, "?12"), is(true));
-		assertThat(Pattern.matches(reg1, "?13"), is(true));
-		assertThat(Pattern.matches(reg1, " ?1 "), is(true));
-		assertThat(Pattern.matches(reg1, "?12 "), is(true));
-		assertThat(Pattern.matches(reg1, " ?123"), is(true));
-		assertThat(Pattern.matches(reg1, "?1       "), is(true));
-		assertThat(Pattern.matches(reg1, " ?1234242"), is(true));
-		assertThat(Pattern.matches(reg1, "?1 "), is(true));
-		assertThat(Pattern.matches(reg1, " ?1365    "), is(true));
-
-		assertThat(Pattern.matches(reg1, " ? 1"), is(false));
-		assertThat(Pattern.matches(reg1, " ?1x"), is(false));
-		assertThat(Pattern.matches(reg1, " ?S"), is(false));
-		assertThat(Pattern.matches(reg1, " ?a"), is(false));
-		assertThat(Pattern.matches(reg1, " ?1 1"), is(false));
-		assertThat(Pattern.matches(reg1, " ?3,3"), is(false));
-
-		assertThat(Pattern.matches(reg1, "%?1"), is(false));
 	}
 
 	@Test

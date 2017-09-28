@@ -20,57 +20,19 @@
  * 
  */
 
-package org.fastquery.bean;
+package org.fastquery.core;
 
-import org.fastquery.core.Transient;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- *
- * @author xixifeng (fastquery@126.com)
+ * 标识属性是临时的,save对象时,该属性不存储到数据库里
+ * @author mei.sir@aliyun.cn
  */
-public class UserInformation {
-
-	private Integer uid;
-	private String myname;
-	private Integer myage;
-
-	public Integer getUid() {
-		return uid;
-	}
-
-	public String getMyname() {
-		return myname;
-	}
-
-	public Integer getMyage() {
-		return myage;
-	}
-
-	public void setUid(Integer uid) {
-		this.uid = uid;
-	}
-
-	public void setMyname(String myname) {
-		this.myname = myname;
-	}
-
-	public void setMyage(Integer myage) {
-		this.myage = myage;
-	}
-
-	@Override
-	public String toString() {
-		return "UserInformation [uid=" + uid + ", myname=" + myname + ", myage=" + myage + "]";
-	}
-	
-	@Transient
-	private String description;
-	public String getDescription() {
-		return description;
-	}
-	
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
+@Target(FIELD)
+@Retention(RUNTIME)
+public @interface Transient {
 }

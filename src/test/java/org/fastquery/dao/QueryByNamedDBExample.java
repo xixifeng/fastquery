@@ -22,6 +22,8 @@
 
 package org.fastquery.dao;
 
+import java.util.List;
+
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Modifying;
@@ -57,4 +59,7 @@ public interface QueryByNamedDBExample extends QueryRepository {
 	@Modifying
 	@QueryByNamed("updateUserInfoById")
 	int updateUserInfoById(@Param("id") int id, @Param("name") String name, @Param("age") int age);
+	
+	@QueryByNamed
+	List<UserInfo> findUserInfoByFuzzyName(@Param("name") String name); 
 }

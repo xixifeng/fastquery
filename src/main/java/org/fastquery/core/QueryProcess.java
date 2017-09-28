@@ -295,6 +295,11 @@ public class QueryProcess {
 			for (Entry<Integer, Integer> entry : entities) {
 				sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
 			}
+			// 处理sql中的匹配符(%_)问题
+			// 取出需要处理的片段
+			LOG.info("处理匹配符之前:" + sql);
+			List<String> ssms = TypeUtil.matches(sql, Placeholder.Q_MATCH);
+			sql = sql.replaceAll(Placeholder.Q_MATCH, " ? ");
 			// sql 中的"?"号调整 End
 			LOG.info(sql);
 			QueryContext.getQueryContext().addSqls(sql);
@@ -306,8 +311,22 @@ public class QueryProcess {
 			
 			// 设置sql参数值
 			int lenTmp = objs.size();
+			int ssmlen = ssms.size();
 			for (int i = 0; i < lenTmp; i++) {
-				stat.setObject(i+1, objs.get(i));
+				
+				String tpl = "?";
+				
+				if(ssmlen >= i+1) {
+					// 注意: ssms.get(i) 至少包含一个字符 因此不存在 "".trim()问题!
+					tpl = ssms.get(i).trim();
+				}
+				
+				if(!"?".equals(tpl) ) {
+					LOG.info(String.format("实际给第%d个?设置的值是'%s'%n", i+1,tpl.replaceAll("\\?", objs.get(i).toString())));
+					stat.setObject(i+1, tpl.replaceAll("\\?", objs.get(i).toString()));
+				} else {
+					stat.setObject(i+1, objs.get(i));
+				}
 			}
 			// 设置sql参数值 End
 			rs = stat.executeQuery();
@@ -592,7 +611,7 @@ public class QueryProcess {
 		
 	}
 
-	    // 分页查询
+	    // 分页查询(仅针对Query分页查询,不针对QueryByNamed Page)
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		Object queryPage(Method method,String query,String countQuery,String packageName, Object[] args) {
 			
