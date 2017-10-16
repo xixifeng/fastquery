@@ -80,11 +80,11 @@ public class ModifyingReturnTypeFilter implements MethodFilter {
 				this.abortWith(method, sql + errmsg2);
 			}
 			
-			// 4). 校验:如果是删除操作,那么返回值只能是void 或者 int
+			// 4). 校验:如果是删除操作,那么返回值只能是void 或是 int, 或者int[]
 			// 返回值既不是void类型又不是int并且也不是boolean类型,才会返回true.
-			boolean hsx = (returnType!=void.class) && (returnType!=int.class) && (returnType!=boolean.class);
+			boolean hsx = (returnType!=void.class) && (returnType!=int.class) && (returnType!=int[].class) && (returnType!=boolean.class);
 			if(TypeUtil.containsIgnoreCase(sql, "delete") && hsx) {
-				this.abortWith(method, sql + "该SQL是删除操作,返回值只能是void,int或boolean类型.");
+				this.abortWith(method, sql + "该SQL是删除操作,返回值只能是void,int,int[]或boolean类型.");
 			}
 
 			

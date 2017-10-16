@@ -29,7 +29,7 @@ package org.fastquery.core;
  */
 public class Primarykey {
 
-	private long autoIncKey;
+	private Long autoIncKey;
 	private String pkey;
 	
 	/**
@@ -37,7 +37,7 @@ public class Primarykey {
 	 * @param autoIncKey 若为-1表示不存在
 	 * @param pkey 若为 null 表示不存在
 	 */
-	public Primarykey(long autoIncKey, String pkey) {
+	public Primarykey(Long autoIncKey, String pkey) {
 		this.autoIncKey = autoIncKey;
 		this.pkey = pkey;
 	}
@@ -46,7 +46,7 @@ public class Primarykey {
 	 * 获取主键
 	 * @return 主键
 	 */
-	public long getPrimarykey() {
+	public Long getPrimarykey() {
 		return autoIncKey;
 	}
 	

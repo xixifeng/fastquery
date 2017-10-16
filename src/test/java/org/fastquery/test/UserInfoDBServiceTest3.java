@@ -24,7 +24,7 @@ package org.fastquery.test;
 
 import org.fastquery.dao2.UserInfoDBService3;
 import org.fastquery.service.FQuery;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertThat;
@@ -37,12 +37,10 @@ import static org.hamcrest.Matchers.*;
  */
 public class UserInfoDBServiceTest3 {
 
-	private UserInfoDBService3 userInfoDBService;
+	private UserInfoDBService3 userInfoDBService = FQuery.getRepository(UserInfoDBService3.class);
 
-	@Before
-	public void before() throws ClassNotFoundException {
-		userInfoDBService = FQuery.getRepository(UserInfoDBService3.class);
-	}
+	@Rule  
+	public FastQueryTestRule rule = new FastQueryTestRule(); 
 
 	@Test
 	public void testUpdateBatch() {

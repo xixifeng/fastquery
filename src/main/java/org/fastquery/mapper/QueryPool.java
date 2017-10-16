@@ -42,6 +42,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.fastquery.core.Param;
 import org.fastquery.core.QueryByNamed;
+import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
 import org.fastquery.util.FastQueryJSONObject;
@@ -279,7 +280,10 @@ public class QueryPool {
 	}
 	
 	// 该方法永远不会返回null或空,因为在初始化时就做了检测
-	public static String render(String className,Method method,boolean isQuery,Object...args){
+	public static String render(boolean isQuery){
+		String className = QueryContext.getIclass().getName();
+		Method method = QueryContext.getMethod();
+		Object[] args = QueryContext.getArgs();
 		String id = method.getAnnotation(QueryByNamed.class).value();
 		if("".equals(id)) {
 			id = method.getName();

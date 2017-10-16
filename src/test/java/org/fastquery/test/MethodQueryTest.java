@@ -27,10 +27,8 @@ import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -44,18 +42,12 @@ import java.util.Collection;
  */
 public class MethodQueryTest {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
-	private StudentDBService studentDBService;
-	private UserInfoDBService userInfoDBService;
-
-	@Before
-	public void before() {
-		studentDBService = FQuery.getRepository(StudentDBService.class);
-		userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
-	}
-
+	@Rule  
+	public FastQueryTestRule rule = new FastQueryTestRule(); 
+	
+	private StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
+	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
+	
 	@Test
 	public void testSave() {
 
@@ -97,17 +89,17 @@ public class MethodQueryTest {
 		assertThat(effect, is(0));
 	}
 
-	@Test
+	@Test(expected=RepositoryException.class)
 	public void save4() {
 		UserInfo u1 = new UserInfo(1, "equ", 10);
 		UserInfo u2 = new UserInfo(2, "Ecl", 3);
 		UserInfo u3 = new UserInfo(3, "ement", 2);
 		// 断言: 在执行studentDBService.save(false, u1,u2,u3)之后,将会抛出
 		// RepositoryException 异常!
-		thrown.expect(RepositoryException.class);
+		//thrown.expect(RepositoryException.class);
 		// 断言: 在执行studentDBService.save(false, u1,u2,u3)之后,抛出的异常信息中包含有"Duplicate
 		// entry '1' for key 'PRIMARY'"字符串
-		thrown.expectMessage(containsString("Duplicate entry '1' for key 'PRIMARY'"));
+		//thrown.expectMessage(containsString("Duplicate entry '1' for key 'PRIMARY'"));
 		int effect = studentDBService.saveArray(false, u1, u2, u3);
 		assertThat(effect, is(0));
 	}
@@ -216,4 +208,5 @@ public class MethodQueryTest {
 		int i = userInfoDBService.update(ui, "id = :id");
 		assertThat(i, lessThan(1));
 	}
+	
 }

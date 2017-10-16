@@ -33,6 +33,7 @@ import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.dao.SQLInExample;
 import org.fastquery.service.FQuery;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
@@ -44,7 +45,11 @@ import static org.hamcrest.Matchers.*;
 public class SQLInExampleTest {
 
 	private SQLInExample sqlInExample = FQuery.getRepository(SQLInExample.class);
-
+	
+	@Rule  
+	public FastQueryTestRule rule = new FastQueryTestRule(); 
+	
+	
 	@Test
 	public void testFindByNameIn1() {
 		String name = "袁承志";

@@ -78,7 +78,7 @@ public class AsmRepository implements Opcodes {
 		// 根据接口clazz 生成实现的方法
 		Method[] methods = repositoryClazz.getMethods();
 		for (Method method : methods) {
-			cw = generateMethod(cw, method,repositoryClazz.getName(), Prepared.class);
+			cw = generateMethod(cw, method,Prepared.class);
 		}
 		cw.visitEnd();
 
@@ -92,25 +92,24 @@ public class AsmRepository implements Opcodes {
 	 * @param exceptions
 	 * @param interfaceClazz
 	 */
-	private static ClassWriter generateMethod(ClassWriter cw,java.lang.reflect.Method method,String interfaceClazz,Class<Prepared> prepared){
+	private static ClassWriter generateMethod(ClassWriter cw,java.lang.reflect.Method method,Class<Prepared> prepared){
 		
 		org.objectweb.asm.commons.Method m = new org.objectweb.asm.commons.Method(method.getName(), Type.getMethodDescriptor(method));
 		GeneratorAdapter mv = new GeneratorAdapter(ACC_PUBLIC, m, null, null,cw);
 	
-		mv.visitLdcInsn(interfaceClazz); // excute的第1参数
-		mv.visitLdcInsn(method.getName()); // excute的第2参数
-		mv.visitLdcInsn(Type.getType(method).getDescriptor()); // excute的第3参数
+		mv.visitLdcInsn(method.getName()); // excute的第1参数
+		mv.visitLdcInsn(Type.getType(method).getDescriptor()); // excute的第2参数
 		
-		//  excute的第4参数(是可变参数)
+		//  excute的第3参数(是可变参数)
 		Parameter[] parameters = method.getParameters();
 		mv = setIn(mv, parameters); 
 	
-		// excute的第5个参数
+		// excute的第4个参数
 		mv.visitVarInsn(ALOAD, 0);
 		
 		// 调用Prepared中的excute方法
 		// INVOKESTATIC
-		mv.visitMethodInsn(INVOKESTATIC, Type.getType(prepared).getInternalName(), "excute", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/Repository;)Ljava/lang/Object;", false);
+		mv.visitMethodInsn(INVOKESTATIC, Type.getType(prepared).getInternalName(), "excute", "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/Repository;)Ljava/lang/Object;", false);
 		
 		// 返回值处理
 		String internalName  = Type.getInternalName(method.getReturnType());

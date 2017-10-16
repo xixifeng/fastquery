@@ -20,28 +20,39 @@
  * 
  */
 
-package org.fastquery.dao;
-
-import org.fastquery.core.Modifying;
-import org.fastquery.core.Param;
-import org.fastquery.core.Query;
-import org.fastquery.core.QueryRepository;
-
-import com.alibaba.fastjson.JSONObject;
+package org.fastquery.struct;
 
 /**
  * 
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
  */
-public interface ProcedureExample extends QueryRepository {
+public class RespUpdate {
 
-	/*
-	 * @Modifying
-	 * 
-	 * @Query("call addStudent(:no,:name,:sex,:age,:dept,@a,@b)") JSONObject
-	 * addStudent(@Param("no")String no,@Param("name")String
-	 * name, @Param("sex")String sex,@Param("age")Integer age,@Param("dept")
-	 * String dept);
-	 */
+	private int effect; // 影响行数
+	private Long pk; // 主健
+
+	public RespUpdate() {
+	}
+
+	public RespUpdate(int effect, Long pk) {
+		this.effect = effect;
+		this.pk = pk;
+	}
+
+	public int getEffect() {
+		return effect;
+	}
+
+	public Long getPk() {
+		return pk;
+	}
+
+	public void setEffect(int effect) {
+		this.effect = effect;
+	}
+
+	public void setPk(Long pk) {
+		this.pk = pk;
+	}
 
 }

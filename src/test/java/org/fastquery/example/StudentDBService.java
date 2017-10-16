@@ -220,4 +220,6 @@ public interface StudentDBService extends QueryRepository {
 
 	@Query("select * from Student limit 1")
 	Map<String, String> findTop1Student();
+	
+	public void db();
 }

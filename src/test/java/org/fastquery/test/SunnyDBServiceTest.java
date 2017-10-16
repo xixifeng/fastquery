@@ -32,6 +32,7 @@ import org.fastquery.bean.sunny.Card;
 import org.fastquery.bean.sunny.Tenant;
 import org.fastquery.dao.SunnyDBService;
 import org.fastquery.service.FQuery;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -42,6 +43,11 @@ public class SunnyDBServiceTest {
 
 	private SunnyDBService sunnyDBService = FQuery.getRepository(SunnyDBService.class);
 
+	@Rule  
+	public FastQueryTestRule rule = new FastQueryTestRule(); 
+	
+	
+	
 	@Test
 	public void save() {
 		Card card = new Card();

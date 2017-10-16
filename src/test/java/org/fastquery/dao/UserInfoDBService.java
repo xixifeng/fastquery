@@ -106,9 +106,14 @@ public interface UserInfoDBService extends QueryRepository {
 	@Modifying
 	@Query("update `userinfo` set `name`=?1 where id=?3")
 	@Query("update `userinfo` set `age`=?2 where id=?3")
-	@Query("update `userinfo` set `name`=?1,`age`=?2 where id=?3")
-	@Query("update `userinfo` set `name`=?1 where age > ?2")
 	int[] updateBatch3(String name, Integer age, Integer id);
+	
+	
+	@Transactional
+	@Modifying
+	@Query("delete from ${db}.PMSchedule where id in (${ids})")
+	@Query("delete from ${db}.PMSchedule_User where scheduleId in (${ids})")
+	int[] deleteByIds(@Source String dsName, @Param("db") String db, @Param("ids") String ids);
 
 	// countField : 明确指定求和字段count(countField),默认值是"id"
 	@Query(value = "select id,name,age from `userinfo` where 1", countField = "id")
@@ -125,6 +130,11 @@ public interface UserInfoDBService extends QueryRepository {
 	@Condition("age > :age")
 	@Condition("and id < :id")
 	Page<UserInfo> findSome1(@Param("age") Integer age, @Param("id") Integer id, Pageable pageable);
+	
+	@Query(value = "select count(name) from `userinfo` #{#where}")
+	@Condition("age > :age")
+	@Condition("and id < :id")
+	long countByAgeAndId(@Param("age") Integer age, @Param("id") Integer id);
 
 	@NotCount // 标识分页不统计总行数. 从上百万的数据里求和很消耗性能.
 	@Query(value = "select id,name,age from `userinfo` #{#where}")
@@ -168,4 +178,12 @@ public interface UserInfoDBService extends QueryRepository {
 	@Condition(value="age = ?1",ignoreNull=false)
 	List<UserInfo> findUserInfoByNullAge(Integer age);
 	
+	@Query("select name from UserInfo limit 3")
+	String[] findNames();
+	
+	@Query("select age from UserInfo limit 3")
+	String[] findAges();
+	
+	@Query("select age from UserInfo where age is not null limit 3")
+	Integer[] findAges2();
 }

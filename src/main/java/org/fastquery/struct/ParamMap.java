@@ -20,35 +20,31 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.struct;
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * deprecated
  * 
- * @see QueryContext
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
  */
-@Deprecated
-public class Session {
+public class ParamMap {
 
-	private Session() {
+	private Map<Integer, Integer> rps;
+	private List<Object> objs;
+
+	public ParamMap(Map<Integer, Integer> rps, List<Object> objs) {
+		this.rps = rps;
+		this.objs = objs;
 	}
 
-	/**
-	 * @see QueryContext
-	 * @return lang
-	 */
-	@Deprecated
-	public static String getLang() {
-		return QueryContext.getLang();
+	public Map<Integer, Integer> getRps() {
+		return rps;
 	}
 
-	/**
-	 * @see QueryContext
-	 * @param lang 语言编码
-	 */
-	@Deprecated
-	public static void setLang(String lang) {
-		QueryContext.setLang(lang);
+	public List<Object> getObjs() {
+		return objs;
 	}
+
 }

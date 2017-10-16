@@ -22,21 +22,18 @@
 
 package org.fastquery.handler;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
+import org.fastquery.core.DB;
+import org.fastquery.core.Modifying;
 import org.fastquery.core.Primarykey;
 import org.fastquery.core.QueryContext;
-import org.fastquery.core.QueryProcess;
 import org.fastquery.core.RepositoryException;
-import org.fastquery.dsm.DataSourceManage;
+import org.fastquery.struct.SQLValue;
+import org.fastquery.util.TypeUtil;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -79,58 +76,54 @@ public final class ModifyingHandler {
 		return null;
 	}
 	
-	public Map<String, Object> mapType(String packageName,String dataSourceName,String tableName, String keyFieldName, long autoIncKey, String pkey,Class<?> convertType){
-		String sql = null;
-		if (autoIncKey != -1) {
-			sql = "select * from " + tableName + " where " + keyFieldName + "=" + autoIncKey; // 在这里拼接SQL不会造成SQL注入问题,因为这些变量不是由用户层传递进来的.
-		} else if (pkey != null) {
-			sql = "select * from " + tableName + " where " + keyFieldName + "='" + pkey + "'";
+	public Map<String, Object> mapType(Long autoIncKey, Class<?> convertType) {
+		Modifying modifying = QueryContext.getMethod().getAnnotation(Modifying.class);
+		String keyFieldName = modifying.id(); // 不可能为null
+		String tableName = modifying.table();
+		String sql;
+		List<Object> values = new ArrayList<>(1);
+		Object e;
+		if (autoIncKey != null) {
+			e = autoIncKey;
 		} else {
-			// 返回map, 是需要主键值的,要而没有,那么就报错.
-			throw new RepositoryException("没有找到主键值,请在方法参数中用@Id标识哪个是主键.");
-		}
-		QueryProcess qp = QueryProcess.getInstance();
-		DataSource dataSource = DataSourceManage.getDataSource(dataSourceName,packageName);
-		Connection conn = null;
-		PreparedStatement stat = null;
-		ResultSet rs = null;
-		List<Map<String, Object>> keyvals = null;
-		Map<String, Object> keyval = null;
-		try {
-			conn = dataSource.getConnection();
-			QueryContext.getQueryContext().addSqls(sql);
-			stat = conn.prepareStatement(sql); // stat会在下面的finally中关闭
-			rs = stat.executeQuery();
-			keyvals = qp.rs2Map(rs,null); // rs2Map 远不会返回null
-			if(!keyvals.isEmpty()) {
-				keyval = keyvals.get(0);
+			Object pkey = getId();
+			if (pkey == null) {
+				throw new RepositoryException("针对改需求,需要主键值,可是没有找到主键值,请在方法参数中用@Id标识哪个是主键.");
 			}
-		} catch (SQLException e) {
-			throw new RepositoryException(e.getMessage(),e);
-		} finally {
-			qp.close(rs, stat, conn);
-		}	
+			e = pkey;
+		}
+		sql = "select * from " + tableName + " where " + keyFieldName + " = ?";
+		values.add(e);
+		Map<String, Object> keyval = null;
+		SQLValue sqlValue = new SQLValue(sql, values);
+		List<Map<String, Object>> keyvals = DB.find(sqlValue);
+		if (!keyvals.isEmpty()) {
+			keyval = keyvals.get(0);
+		}
 		
-		if(keyval!=null && convertType == String.class) {
+		System.out.println("keyval>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:" + keyval);
+
+		if (keyval != null && convertType == String.class) {
 			Map<String, Object> map2 = new HashMap<>();
-			keyval.forEach((k,v)-> map2.put(k, v.toString()));
+			keyval.forEach((k, v) -> map2.put(k, v.toString()));
 			return map2;
 		}
-		
+
 		return keyval;
 	}
 	
-	public JSONObject jsonObjectType(String packageName,String dataSourceName,String tableName, String keyFieldName, long autoIncKey, String pkey){
-		Map<String, Object> map = mapType(packageName,dataSourceName, tableName, keyFieldName, autoIncKey, pkey,Object.class);
+	public JSONObject jsonObjectType(Long autoIncKey){
+		Map<String, Object> map = mapType(autoIncKey,Object.class);
 		return new JSONObject(map);
 	}
 
 	// 如果不存在主键直接返回null
-	public Primarykey primarykeyType(long autoIncKey, String pkey){
-		if(( autoIncKey==-1) && (pkey==null) ) {
+	public Primarykey primarykeyType(Long autoIncKey) {
+		Object pkey = getId();
+		if ((autoIncKey == null) && (pkey == null)) {
 			return null;
 		}
-		return new Primarykey(autoIncKey,pkey);
+		return new Primarykey(autoIncKey, pkey == null ? null : pkey.toString());
 	}
 	
 	public boolean booleanType(long effect){
@@ -138,9 +131,19 @@ public final class ModifyingHandler {
 	}
 	
 	
-	public Object beanType(String packageName,String dataSourceName,String tableName, String keyFieldName, long autoIncKey, String pkey,Class<?> returnType){
-		Map<String, Object> map = mapType(packageName,dataSourceName, tableName, keyFieldName, autoIncKey, pkey,Object.class);
-		return JSON.toJavaObject(new JSONObject(map), returnType);	
+	public Object beanType(Long autoIncKey){
+		Map<String, Object> map = mapType(autoIncKey,Object.class);
+		return JSON.toJavaObject(new JSONObject(map), QueryContext.getReturnType());	
 	}
 	
+	
+	private Object getId() { // 获取指定的主健,没有找到返回null
+		Object[] args = QueryContext.getArgs();
+			int index = TypeUtil.findId(QueryContext.getMethod().getParameters());
+			if( index != -1 ) {
+				return args[index];
+			} else {
+				return null;
+			}
+	}
 }

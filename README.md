@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.26</version>
+    <version>1.0.27</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.26'
+compile 'org.fastquery:fastquery:1.0.27'
 ```
 
 ### Apache Archive
@@ -222,16 +222,16 @@ Map<String,Object> find(Integer id);
 List<Map<String, Object>> find(String sex);
 ```
 
-**注意**: 查询单个字段,支持返回如下格式:
-- `List<String>` 或 `String`
-- `List<Byte>` 或 `Byte`
-- `List<Short>` 或 `Short`
-- `List<Integer>` 或 `Integer`
-- `List<Long>` 或 `Long`
-- `List<Float>` 或 `Float`
-- `List<Double>` 或 `Double`
-- `List<Character>` 或 `Character`
-- `List<Boolean>` 或 `Boolean`  
+**注意**: 查询单个字段,还支持返回如下类型:
+- `List<String>`,`String[]` 或 `String`
+- `List<Byte>`,`Byte[]` 或 `Byte`
+- `List<Short>`,`Short[]` 或 `Short`
+- `List<Integer>`,`Integer[]` 或 `Integer`
+- `List<Long>`,`Long[]` 或 `Long`
+- `List<Float>`,`Float[]` 或 `Float`
+- `List<Double>`,`Double[]` 或 `Double`
+- `List<Character>`,`Character[]` 或 `Character`
+- `List<Boolean>`,`Boolean[]` 或 `Boolean`  
 
 除了改操作或count外,查单个字段不能返回基本类型,因为:基本类型不能接受`null`值,而SQL表字段可以为`null`.
 返回类型若是基本类型的包装类型,若返回null, 表示:没有查到或字段的值本身就是null.

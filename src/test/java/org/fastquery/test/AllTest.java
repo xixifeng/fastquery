@@ -44,7 +44,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({ FQueryTest.class, StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class,
 		UserInfoDBServiceTest3.class, TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class,
 		BeanUtilTest.class, PageTest.class, QueryByNamedDBExampleMapperTest.class, FastQueryJSONObjectTest.class,
-		FQueryResourceImplTest.class, SunnyDBServiceTest.class, QueryProcessTest.class, SaveToIdTest.class,PlaceholderTest.class })
+		FQueryResourceImplTest.class, SunnyDBServiceTest.class, QueryProcessTest.class, SaveToIdTest.class,
+		PlaceholderTest.class, DBTest.class })
 public class AllTest {
 
 	@Test

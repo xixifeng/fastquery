@@ -22,33 +22,19 @@
 
 package org.fastquery.core;
 
+import java.sql.Connection;
+
+import org.apache.tools.ant.taskdefs.SQLExec;
+
 /**
- * deprecated
  * 
- * @see QueryContext
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
  */
-@Deprecated
-public class Session {
+public class SQLBatchExec extends SQLExec {
 
-	private Session() {
+	@Override
+	protected Connection getConnection() {
+		return QueryContext.getConnection();
 	}
-
-	/**
-	 * @see QueryContext
-	 * @return lang
-	 */
-	@Deprecated
-	public static String getLang() {
-		return QueryContext.getLang();
-	}
-
-	/**
-	 * @see QueryContext
-	 * @param lang 语言编码
-	 */
-	@Deprecated
-	public static void setLang(String lang) {
-		QueryContext.setLang(lang);
-	}
+	
 }

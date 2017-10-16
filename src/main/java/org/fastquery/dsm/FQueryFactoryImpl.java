@@ -33,8 +33,7 @@ public class FQueryFactoryImpl implements FQueryFactory {
 	private FQueryFactoryImpl() {
 	}
 
-	// 这个方法禁止外界访问
-	static FQueryFactory getInstance() {
+	public static FQueryFactory getInstance() {
 		if (instance == null) {
 			synchronized (FQueryFactoryImpl.class) {
 				if (instance == null) {

@@ -20,35 +20,39 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.struct;
+
+import java.util.List;
 
 /**
- * deprecated
+ * 改操作SQL和值
  * 
- * @see QueryContext
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
  */
-@Deprecated
-public class Session {
+public class SQLValue {
 
-	private Session() {
+	private String sql; // 待执行的sql
+	private List<Object> values;// sql语言中"?"对应的实参
+
+	public SQLValue(String sql, List<Object> values) {
+		this.sql = sql;
+		this.values = values;
 	}
 
-	/**
-	 * @see QueryContext
-	 * @return lang
-	 */
-	@Deprecated
-	public static String getLang() {
-		return QueryContext.getLang();
+	public String getSql() {
+		return sql;
 	}
 
-	/**
-	 * @see QueryContext
-	 * @param lang 语言编码
-	 */
-	@Deprecated
-	public static void setLang(String lang) {
-		QueryContext.setLang(lang);
+	public List<Object> getValues() {
+		return values;
 	}
+
+	public void setSql(String sql) {
+		this.sql = sql;
+	}
+
+	public void setValues(List<Object> values) {
+		this.values = values;
+	}
+
 }

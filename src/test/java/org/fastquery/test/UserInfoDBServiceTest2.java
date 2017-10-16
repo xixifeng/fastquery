@@ -24,8 +24,8 @@ package org.fastquery.test;
 
 import org.fastquery.dao2.UserInfoDBService2;
 import org.fastquery.service.FQuery;
-import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertThat;
@@ -41,8 +41,11 @@ import static org.hamcrest.Matchers.*;
  */
 public class UserInfoDBServiceTest2 {
 
-	private UserInfoDBService2 userInfoDBService;
+	private UserInfoDBService2 userInfoDBService = FQuery.getRepository(UserInfoDBService2.class);
 
+	@Rule  
+	public FastQueryTestRule rule = new FastQueryTestRule(); 
+	
 	@BeforeClass
 	public static void beforeClass() {
 		// 数据源名称
@@ -58,12 +61,7 @@ public class UserInfoDBServiceTest2 {
 		// 创建一个数据源
 		FQuery.createDataSource(dataSourceName, properties);
 	}
-
-	@Before
-	public void before() throws ClassNotFoundException {
-		userInfoDBService = FQuery.getRepository(UserInfoDBService2.class);
-	}
-
+	
 	@Test
 	public void findOne() {
 		int age = 1000;

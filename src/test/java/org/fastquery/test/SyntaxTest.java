@@ -33,7 +33,9 @@ import java.util.regex.Pattern;
 
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Param;
+import org.fastquery.example.StudentDBService;
 import org.junit.Test;
+import org.objectweb.asm.Type;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -108,4 +110,35 @@ public class SyntaxTest {
 		System.out.println("Language:" + locale.getLanguage());
 		System.out.println("Country:" + locale.getCountry());
 	}
+	
+	
+	@Test
+	public void ty() {
+		System.out.println(Type.getDescriptor(StudentDBService.class));
+		/*
+		 {
+mv = cw.visitMethod(ACC_PUBLIC, "findAll", "()Lcom/alibaba/fastjson/JSONArray;", null, null);
+mv.visitCode();
+Label l0 = new Label();
+mv.visitLabel(l0);
+mv.visitLineNumber(18, l0);
+mv.visitLdcInsn(Type.getType("Lorg/fastquery/example/StudentDBService;"));
+mv.visitLdcInsn("findAll");
+mv.visitLdcInsn("()Lcom/alibaba/fastjson/JSONArray;");
+mv.visitInsn(ICONST_0);
+mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
+mv.visitVarInsn(ALOAD, 0);
+mv.visitMethodInsn(INVOKESTATIC, "org/fastquery/core/Prepared", "excute", "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/Repository;)Ljava/lang/Object;", false);
+mv.visitTypeInsn(CHECKCAST, "com/alibaba/fastjson/JSONArray");
+mv.visitInsn(ARETURN);
+Label l1 = new Label();
+mv.visitLabel(l1);
+mv.visitLocalVariable("this", "Lorg/fastquery/bean/StudentDBServiceProxyImpl;", null, l0, l1, 0);
+mv.visitMaxs(5, 1);
+mv.visitEnd();
+}
+
+		 */
+	}
+	
 }

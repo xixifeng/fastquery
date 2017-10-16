@@ -26,11 +26,13 @@ import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInformation;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
+import org.fastquery.filter.SkipFilter;
 import org.fastquery.page.Page;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.page.Slice;
 import org.fastquery.service.FQuery;
-import org.junit.Before;
+import org.fastquery.struct.SQLValue;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.alibaba.fastjson.JSON;
@@ -43,6 +45,7 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import static org.hamcrest.Matchers.*;
 
@@ -52,13 +55,11 @@ import static org.hamcrest.Matchers.*;
  */
 public class UserInfoDBServiceTest {
 
-	UserInfoDBService userInfoDBService;
+	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 
-	@Before
-	public void before() {
-		userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
-	}
-
+	@Rule  
+	public FastQueryTestRule rule = new FastQueryTestRule(); 
+	
 	@Test
 	public void findById() {
 		Integer id = 1;
@@ -66,26 +67,63 @@ public class UserInfoDBServiceTest {
 		UserInfo userInfo = userInfoDBService.findById(sql, id);
 		assertThat(userInfo.getId(), is(id));
 
+		SQLValue sqlValue = rule.getSQLValue();
+		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
+		List<Object> values = sqlValue.getValues();
+		assertThat(values.size(), is(1));
+		Object arg = values.get(0);
+		assertThat((arg instanceof Integer), is(true));
+		assertThat(arg, is(id));
+		
 		sql = "select id,name,age from UserInfo where id = :id";
 		userInfo = userInfoDBService.findById(sql, id);
 		assertThat(userInfo.getId(), is(id));
+		sqlValue = rule.getSQLValue();
+		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
+		values = sqlValue.getValues();
+		assertThat(values.size(), is(1));
+		arg = values.get(0);
+		assertThat((arg instanceof Integer), is(true));
+		assertThat(arg, is(id));
 	}
 
 	@Test
 	public void findById2() {
-		UserInfo userInfo = userInfoDBService.findById(35); // 没有找到 userInfo
-															// 会返回null
+		int id = 35;
+		UserInfo userInfo = userInfoDBService.findById(id); // 没有找到 userInfo会返回null
 		if (userInfo != null) {
 			assertThat(userInfo.getAge(), nullValue());
 		}
+		
+		SQLValue sqlValue = rule.getSQLValue();
+		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
+		List<Object> values = sqlValue.getValues();
+		assertThat(values.size(), is(1));
+		Object arg = values.get(0);
+		assertThat((arg instanceof Integer), is(true));
+		assertThat(arg, is(id));
 	}
 
 	@Test
 	public void findUserInfoByNameOrAge() {
-		UserInfo[] userInfos = userInfoDBService.findUserInfoByNameOrAge("王五", 8);
+		String name = "王五";
+		Integer age = 8;
+		UserInfo[] userInfos = userInfoDBService.findUserInfoByNameOrAge(name, age);
 		for (UserInfo userInfo : userInfos) {
-			assertThat((userInfo.getName().equals("王五") || userInfo.getAge().intValue() == 8), is(true));
+			assertThat((userInfo.getName().equals(name) || userInfo.getAge().intValue() == age), is(true));
 		}
+		
+		SQLValue sqlValue = rule.getSQLValue();
+		assertThat(sqlValue.getSql(), equalTo("select name,age from UserInfo u where u.name=? or u.age=?"));
+		List<Object> values = sqlValue.getValues();
+		assertThat(values.size(), is(2));
+		Object arg = values.get(0);
+		assertThat((arg instanceof String), is(true));
+		assertThat(arg, is(name));
+		arg = values.get(1);
+		assertThat((arg instanceof Integer), is(true));
+		assertThat(arg, is(age));
+		
 	}
 
 	@Test
@@ -161,15 +199,18 @@ public class UserInfoDBServiceTest {
 		assertThat(effect, equalTo(0));
 	}
 
-	@Test
+	@Test(expected=RepositoryException.class)
 	public void testUpdateBatch2_b() {
-		try {
 			int effect = userInfoDBService.updateBatch2("小不点", 6, 2);
 			assertThat(effect, equalTo(0));
-		} catch (RepositoryException e) {
-			// Handle exceptional condition
-			// TODO ...
-		}
+	}
+	
+	@Test
+	public void testUpdateBatch3() {
+		int[] effects = userInfoDBService.updateBatch3("清风习习",23,3);
+		assertThat(effects.length, is(2));
+		assertThat(effects[0], is(1));
+		assertThat(effects[1], is(1));
 	}
 
 	@Test
@@ -187,7 +228,7 @@ public class UserInfoDBServiceTest {
 
 	}
 
-	@Test
+	@Test @SkipFilter
 	public void find() {
 		Page<UserInfo> page = userInfoDBService.find(100, 50, new PageableImpl(1, 3));
 		List<UserInfo> userInfos = page.getContent();
@@ -349,5 +390,34 @@ public class UserInfoDBServiceTest {
 		List<UserInfo> us = userInfoDBService.findUserInfoByNullAge(null);
 		assertThat(us.size(), greaterThanOrEqualTo(1));
 		us.forEach( u -> assertThat(u.getAge(), nullValue()));
+	}
+	
+	@Test
+	public void findNames(){
+		String[] names = userInfoDBService.findNames();
+		assertThat(names.length, is(3));
+		for (String name : names) {
+			assertThat(Pattern.matches("\\{\".+\":\".+\"\\}", name), is(false));
+			System.out.println(name);
+		}
+	}
+	
+	@Test
+	public void findAges1(){
+		String[] ages = userInfoDBService.findAges();
+		assertThat(ages.length, is(3));
+		for (String age : ages) {
+			assertThat(Pattern.matches("\\{\".+\":\".+\"\\}", age), is(false));
+			System.out.println(age);
+		}
+	}
+	
+	@Test
+	public void findAges2(){
+		Integer[] ages = userInfoDBService.findAges2();
+		assertThat(ages.length, is(3));
+		for (Integer age : ages) {
+			assertThat(age,notNullValue());
+		}
 	}
 }

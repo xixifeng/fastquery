@@ -27,6 +27,7 @@ import java.math.BigInteger;
 import org.fastquery.bean.Visitor;
 import org.fastquery.example.VisitorDBServcie;
 import org.fastquery.service.FQuery;
+import org.junit.Rule;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -39,7 +40,11 @@ import static org.junit.Assert.assertThat;
 public class SaveToIdTest {
 
 	private VisitorDBServcie vdbs = FQuery.getRepository(VisitorDBServcie.class);
-
+	
+	@Rule  
+	public FastQueryTestRule rule = new FastQueryTestRule(); 
+	
+	
 	@Test
 	public void saveToId1() {
 		Long punitId = 173L; 

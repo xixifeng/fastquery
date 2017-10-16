@@ -45,13 +45,12 @@ import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
-import org.fastquery.core.QueryContext;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
-import org.fastquery.core.Source;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.PageIndex;
 import org.fastquery.page.PageSize;
+import org.fastquery.struct.ParamMap;
 import org.fastquery.where.Condition;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -235,8 +234,7 @@ public class TypeUtil implements Opcodes{
 	 * 
 	 * @return sql处理信号集
 	 */
-	public static Object[] getParamMap(int[] indexMap,Object[] args) {
-		Object[] os = new Object[2];
+	public static ParamMap getParamMap(int[] indexMap,Object[] args) {
 		Map<Integer, Integer> rps = new HashMap<>();
 		List<Object> objs = new ArrayList<>();
 		int increment = 0;
@@ -276,9 +274,7 @@ public class TypeUtil implements Opcodes{
 			}
 		}
 		
-		os[0] = rps;
-		os[1] = objs;
-		return os;
+		return new ParamMap(rps, objs);
 		
 	}
 	
@@ -430,11 +426,7 @@ public class TypeUtil implements Opcodes{
 	public static int findId(Parameter[] parameters) {
 		return findAnnotationIndex(Id.class, parameters);
 	}
-	
-	public static int findSource(Parameter[] parameters) {
-		return findAnnotationIndex(Source.class, parameters);
-	}
-	
+
 	/**
 	 * 处理 @Param 模板参数
 	 * 
@@ -637,7 +629,7 @@ public class TypeUtil implements Opcodes{
 		
 		// 如果是QueryByNamed
 		if(method.getAnnotation(QueryByNamed.class)!=null){
-			String s = QueryPool.render(method.getDeclaringClass().getName(), method,true,args);
+			String s = QueryPool.render(true);
 			s = paramFilter(method, args, s);
 			sqls.add(s);
 			return sqls;
@@ -794,17 +786,6 @@ public class TypeUtil implements Opcodes{
 	}
 	
 	/**
-	 * 标识有Source注解的参数的具体的实参.
-	 * @param parameters 类型集合
-	 * @param args 实参
-	 * @return 值
-	 */
-	public static String findSource(Parameter[] parameters,Object...args){
-		Object obj = findAnnotationParameterVal(Source.class, parameters, args);
-		return obj !=null ? obj.toString() : null;
-	}
-	
-	/**
 	 * 标识有PageIndex注解的参数的具体的实参.
 	 * @param parameters 类型集合
 	 * @param args 实参
@@ -900,19 +881,6 @@ public class TypeUtil implements Opcodes{
 		}
 		return ct == String.class || ct == Byte.class || ct == Short.class || ct == Integer.class || ct == Long.class || ct == Float.class
 				|| ct == Double.class || ct == Character.class || ct == Boolean.class;
-	}
-	
-	public static Object i18n(Object obj) {
-		try {
-			JSONObject json = (JSONObject) JSON.parse(obj.toString());
-			String lang = QueryContext.getQueryContext().getLang();
-			if(json.containsKey(lang)){ // 这个过程中有可能set,因此QueryContext.getQueryContext().getLang()
-				return json.get(QueryContext.getQueryContext().getLang());	
-			}
-			return "i18n error";
-		} catch (Exception e) {
-			return obj;
-		}
 	}
 }
 

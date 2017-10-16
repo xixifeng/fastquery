@@ -33,11 +33,12 @@ import org.fastquery.core.Primarykey;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.example.StudentDBService;
+import org.fastquery.filter.SkipFilter;
 import org.fastquery.service.FQuery;
 
 import static org.hamcrest.Matchers.*;
 
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.alibaba.fastjson.JSON;
@@ -52,12 +53,10 @@ public class StudentDBServiceTest {
 
 	private static final Logger LOG = Logger.getLogger(StudentDBServiceTest.class);
 
-	private StudentDBService studentDBService;
-
-	@Before
-	public void before() {
-		studentDBService = FQuery.getRepository(StudentDBService.class);
-	}
+	@Rule  
+	public FastQueryTestRule rule = new FastQueryTestRule(); 
+	
+	private StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
 
 	@Test
 	public void testNull() {
@@ -107,14 +106,15 @@ public class StudentDBServiceTest {
 		assertThat(student.getString("dept"), is("化学系"));
 	}
 
+	@SkipFilter
 	@Test
 	public void findOne2() {
-		QueryContext.getQueryContext().setLang("en");
+		QueryContext.setLang("en");
 		JSONObject student = studentDBService.findOne("9921103");
 		assertThat(student.get("name"), equalTo("Lily"));
 		assertThat(student.get("dept"), equalTo("Chinese"));
 
-		QueryContext.getQueryContext().setLang("zh");
+		QueryContext.setLang("zh");
 		student = studentDBService.findOne("9921103");
 		assertThat(student.get("name"), equalTo("丽丽"));
 		assertThat(student.get("dept"), equalTo("语文"));
