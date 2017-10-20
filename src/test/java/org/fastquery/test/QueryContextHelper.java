@@ -20,21 +20,29 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.test;
 
-import java.sql.Connection;
+import java.lang.reflect.Method;
 
-import org.apache.tools.ant.taskdefs.SQLExec;
+import org.fastquery.core.QueryContext;
+
+import static org.junit.Assert.fail;
 
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
-public class SQLBatchExec extends SQLExec {
+public class QueryContextHelper {
 
-	@Override
-	protected Connection getConnection() {
-		return QueryContext.getConnection();
+	public static QueryContext getQueryContext() {
+		try {
+			Method getQueryContextMethod = QueryContext.class.getDeclaredMethod("getQueryContext");
+			getQueryContextMethod.setAccessible(true);
+			return (QueryContext) getQueryContextMethod.invoke(null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+		return null;
 	}
-	
 }

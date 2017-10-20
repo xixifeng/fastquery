@@ -128,7 +128,6 @@ public class Prepared {
 			if( (querys.length>0 || queryById!=null) && modifying !=null) {  // ->进入Modify
 				return QueryProcess.getInstance().modifying();
 			} else if(querys.length>0  || queryById!=null) {
-				
 				if(returnType == Page.class && queryById != null) {  // ->进入QueryByNamed Page
 					return QueryProcess.getInstance().queryByNamedPage();
 				}

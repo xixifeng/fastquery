@@ -29,6 +29,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
 
@@ -39,6 +40,7 @@ import org.junit.Test;
  */
 public class PlaceholderTest {
 
+	private static final Logger LOG = Logger.getLogger(PlaceholderTest.class);
 
 	@Test
 	public void placeholder() {
@@ -112,20 +114,20 @@ public class PlaceholderTest {
 
 		assertThat(Pattern.matches(reg1, "%?1"), is(false));
 	}
-	
+
 	@Test
 	public void Q_MATCH() {
-		String str="select * from UserInfo where name like %?  and age like _? and akjgew %     ?_    % and sge ?";
-		
+		String str = "select * from UserInfo where name like %?  and age like _? and akjgew %     ?_    % and sge ?";
+
 		List<String> ssms = TypeUtil.matches(str, Placeholder.Q_MATCH);
-		assertThat(ssms.size(),is(3));
-				
-		assertThat(ssms.get(0),equalTo(" %?  "));
-		
+		assertThat(ssms.size(), is(3));
+
+		assertThat(ssms.get(0), equalTo(" %?  "));
+
 		assertThat(ssms.get(1), equalTo(" _? "));
-		
+
 		assertThat(ssms.get(2), equalTo(" %     ?_    % "));
-		
-		ssms.forEach(m -> System.out.println(m) );
+
+		ssms.forEach(m -> LOG.debug(m));
 	}
 }

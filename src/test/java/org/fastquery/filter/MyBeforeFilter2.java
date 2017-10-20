@@ -24,6 +24,7 @@ package org.fastquery.filter;
 
 import java.lang.reflect.Method;
 
+import org.apache.log4j.Logger;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.filter.BeforeFilter;
 
@@ -33,11 +34,13 @@ import org.fastquery.filter.BeforeFilter;
  */
 public class MyBeforeFilter2 extends BeforeFilter<StudentDBService> {
 
+	private static final Logger LOG = Logger.getLogger(MyBeforeFilter2.class);
+
 	@Override
 	public void doFilter(StudentDBService repository, Method method, Object[] args) {
 		// repository : 当前拦截到实例对象
 		// method : 当前拦截到的方法
 		// args : 当前传递进来的参数列表
-		System.out.println("MyBeforeFilter2....");
+		LOG.debug("MyBeforeFilter2....");
 	}
 }

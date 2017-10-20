@@ -20,21 +20,36 @@
  * 
  */
 
-package org.fastquery.example;
+package org.fastquery.dao;
 
-import org.fastquery.core.Modifying;
-import org.fastquery.core.Query;
-import org.fastquery.core.QueryRepository;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+
+import org.fastquery.service.FQuery;
+import org.fastquery.test.FastQueryTestRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * 
  * @author mei.sir@aliyun.cn
- * @date 2017年9月25日
  */
-public interface VisitorDBServcie extends QueryRepository {
+public class ProductDBServiceTest {
 
-	@Query("DELETE FROM `visitor` WHERE `iden` = ?1")
-	@Modifying
-	int deleteByIden(String iden);
+	private ProductDBService pdbs = FQuery.getRepository(ProductDBService.class);
+
+	@Rule
+	public FastQueryTestRule rule = new FastQueryTestRule();
+
+	@Test
+	public void testFindOne() {
+		assertThat(pdbs.findOne().isEmpty(), is(false));
+	}
+
+	@Test
+	public void inserts() {
+		int i = pdbs.inserts();
+		assertThat("断言" + i + "要么时4,要么是6", i, either(is(4)).or(is(6)));
+	}
 
 }

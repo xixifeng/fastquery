@@ -45,11 +45,10 @@ import static org.hamcrest.Matchers.*;
 public class SQLInExampleTest {
 
 	private SQLInExample sqlInExample = FQuery.getRepository(SQLInExample.class);
-	
-	@Rule  
-	public FastQueryTestRule rule = new FastQueryTestRule(); 
-	
-	
+
+	@Rule
+	public FastQueryTestRule rule = new FastQueryTestRule();
+
 	@Test
 	public void testFindByNameIn1() {
 		String name = "袁承志";

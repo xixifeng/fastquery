@@ -29,8 +29,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.fastquery.core.Id;
 import org.fastquery.core.Placeholder;
@@ -51,7 +50,7 @@ public final class BeanUtil {
 	}
 
 	private static String escapeSql(String str) {
-		String s = StringEscapeUtils.escapeSql(str);
+		String s = StringUtils.replace(str, "'", "''");
 		return StringUtils.replace(s, "\\", "\\\\");
 	}
 	

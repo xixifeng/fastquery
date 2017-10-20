@@ -35,7 +35,8 @@
             "org.fastquery.dao.UserInfoDBService",// 完整类名称
             "org.fastquery.dao.QueryByNamedDBExample",
             "org.fastquery.dao.SQLInExample",
-            "org.fastquery.dao.ProcedureExample"
+            "org.fastquery.dao.ProcedureExample",
+            "org.fastquery.dao.ProductDBService"
             // 在这可以配置多个DB接口或包地址,以","号隔开
         ]
     }
@@ -66,7 +67,7 @@
  ],
  
   // 基准目录,注意: 后面记得加上 "/"
- "basedir" : "/root/git/fastquery/fastquery/tmp/",
+ "basedir" : "/mywork/myosgi/osgi_workspace/fastquery/tmp/",
  
   // 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目,默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式
   "debug" : false,

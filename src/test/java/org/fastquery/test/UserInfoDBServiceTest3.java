@@ -39,8 +39,8 @@ public class UserInfoDBServiceTest3 {
 
 	private UserInfoDBService3 userInfoDBService = FQuery.getRepository(UserInfoDBService3.class);
 
-	@Rule  
-	public FastQueryTestRule rule = new FastQueryTestRule(); 
+	@Rule
+	public FastQueryTestRule rule = new FastQueryTestRule();
 
 	@Test
 	public void testUpdateBatch() {

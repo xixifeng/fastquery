@@ -24,8 +24,23 @@ package org.fastquery.core;
 
 /**
  * 事务
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public @interface Transactional {
+
+	/**
+	 * 超时,默认-1,表示永不超时
+	 * 
+	 * @return int
+	 */
+	int timeout() default -1;
+
+	/**
+	 * 传播行为
+	 * 
+	 * @return Propagation
+	 */
+	Propagation propagation() default Propagation.REQUIRED;
 
 }

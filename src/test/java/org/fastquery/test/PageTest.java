@@ -46,10 +46,9 @@ public class PageTest {
 
 	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 
-	@Rule  
-	public FastQueryTestRule rule = new FastQueryTestRule(); 
-	
-	
+	@Rule
+	public FastQueryTestRule rule = new FastQueryTestRule();
+
 	@Test
 	public void findSome1() {
 
@@ -63,34 +62,36 @@ public class PageTest {
 		assertThat(page.getSize(), equalTo(1));
 		assertThat(rule.getSQLValue(), nullValue());
 
-		List<SQLValue> sqlValues = rule.getListSQLValue();
-		
-		assertThat(sqlValues.size(), is(2));
-		
-		// 分页主体语句
-		SQLValue sv1 = sqlValues.get(0);
-		assertThat(sv1.getSql(), equalToIgnoringWhiteSpace("select id,name,age from `userinfo` where age > ? and id < ? limit 0,1"));
-		assertThat(sv1.getSql(), equalTo("select id,name,age from `userinfo` where age > ?  and id < ? limit 0,1"));
-		List<Object> ps1 = sv1.getValues();
-		assertThat(ps1.size(), is(2));
-		assertThat(ps1.get(0).getClass()==Integer.class, is(true));
-		assertThat(ps1.get(1).getClass()==Integer.class, is(true));
-		assertThat(ps1.get(0), is(age));
-		assertThat(ps1.get(1), is(id));
-		
-		
-		// 分页求和语句
-		SQLValue sv2 = sqlValues.get(1);	
-		assertThat(sv2.getSql(), equalToIgnoringWhiteSpace("select count(name) from `userinfo` where age > ?  and id < ?"));
-		assertThat(sv2.getSql(), equalTo("select count(name) from `userinfo` where age > ?  and id < ?"));
-		List<Object> ps2 = sv1.getValues();
-		assertThat(ps2.size(), is(2));
-		assertThat(ps2.get(0).getClass()==Integer.class, is(true));
-		assertThat(ps2.get(1).getClass()==Integer.class, is(true));
-		assertThat(ps2.get(0), is(age));
-		assertThat(ps2.get(1), is(id));
-		
-		
+		if (rule.isDebug()) {
+			List<SQLValue> sqlValues = rule.getListSQLValue();
+
+			assertThat(sqlValues.size(), is(2));
+
+			// 分页主体语句
+			SQLValue sv1 = sqlValues.get(0);
+			assertThat(sv1.getSql(),
+					equalToIgnoringWhiteSpace("select id,name,age from `userinfo` where age > ? and id < ? limit 0,1"));
+			assertThat(sv1.getSql(), equalTo("select id,name,age from `userinfo` where age > ? and id < ? limit 0,1"));
+			List<Object> ps1 = sv1.getValues();
+			assertThat(ps1.size(), is(2));
+			assertThat(ps1.get(0).getClass() == Integer.class, is(true));
+			assertThat(ps1.get(1).getClass() == Integer.class, is(true));
+			assertThat(ps1.get(0), is(age));
+			assertThat(ps1.get(1), is(id));
+
+			// 分页求和语句
+			SQLValue sv2 = sqlValues.get(1);
+			assertThat(sv2.getSql(),
+					equalToIgnoringWhiteSpace("select count(name) from `userinfo` where age > ?  and id < ?"));
+			assertThat(sv2.getSql(), equalTo("select count(name) from `userinfo` where age > ? and id < ?"));
+			List<Object> ps2 = sv1.getValues();
+			assertThat(ps2.size(), is(2));
+			assertThat(ps2.get(0).getClass() == Integer.class, is(true));
+			assertThat(ps2.get(1).getClass() == Integer.class, is(true));
+			assertThat(ps2.get(0), is(age));
+			assertThat(ps2.get(1), is(id));
+		}
+
 		long count = userInfoDBService.countByAgeAndId(age, id);
 		assertThat(page.getTotalElements(), is(count));
 	}

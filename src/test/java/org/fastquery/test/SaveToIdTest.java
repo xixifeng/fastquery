@@ -40,55 +40,34 @@ import static org.junit.Assert.assertThat;
 public class SaveToIdTest {
 
 	private VisitorDBServcie vdbs = FQuery.getRepository(VisitorDBServcie.class);
-	
-	@Rule  
-	public FastQueryTestRule rule = new FastQueryTestRule(); 
-	
-	
+
+	@Rule
+	public FastQueryTestRule rule = new FastQueryTestRule();
+
 	@Test
 	public void saveToId1() {
-		Long punitId = 173L; 
-		String vname = "OTU\\"; 
-		String idCard = "&"; 
+		Long punitId = 173L;
+		String vname = "OTU\\";
+		String idCard = "&";
 		String mobile = "\\";
 		String email = "<";
-		Byte gender = (byte) 0; 
-		String toAddr = ""; 
-		String remark = "来访"; 
-		Long lastDate = 1506233249L; 
-		Long createDate = 1506233208L; 
-		String iden = "J6X1HH15ExIkvqSNSHXa"; 
+		Byte gender = (byte) 0;
+		String toAddr = "";
+		String remark = "来访";
+		Long lastDate = 1506233249L;
+		Long createDate = 1506233208L;
+		String iden = "J6X1HH15ExIkvqSNSHXa";
 		Integer dId = 1;
-		
-		Visitor v = new Visitor(punitId, vname, idCard, mobile, email, gender, toAddr, remark, lastDate, iden,dId);
+
+		Visitor v = new Visitor(punitId, vname, idCard, mobile, email, gender, toAddr, remark, lastDate, iden, dId);
 		v.setCreateDate(createDate);
-		
+
 		BigInteger bigInteger = vdbs.saveToId(v);
 		assertThat(bigInteger.longValue(), greaterThanOrEqualTo(1l));
 
 		int effect = vdbs.deleteByIden(iden);
-		
+
 		assertThat(effect, is(1));
-		
+
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

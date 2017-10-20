@@ -27,6 +27,7 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.fastquery.core.Resource;
@@ -44,6 +45,8 @@ import com.alibaba.fastjson.JSONObject;
  * @author xixifeng (fastquery@126.com)
  */
 public class QueryPoolTest {
+
+	private static final Logger LOG = Logger.getLogger(QueryPoolTest.class);
 
 	static Resource resource;
 
@@ -78,7 +81,7 @@ public class QueryPoolTest {
 
 		JSONArray jsonArray = new JSONArray();
 		for (QueryMapper queryMapper : queryMappers) {
-			// System.out.println(String.format("{\n\t\"id\" :
+			// LOG.debug(String.format("{\n\t\"id\" :
 			// \"%s\",\n\t\"template\" : \"%s\"\n}",
 			// queryMapper.getId(),queryMapper.getTemplate()));
 			JSONObject jsonObject = new JSONObject();
@@ -87,7 +90,7 @@ public class QueryPoolTest {
 			jsonArray.add(jsonObject);
 		}
 
-		System.out.println(JSON.toJSONString(jsonArray, true));
+		LOG.debug(JSON.toJSONString(jsonArray, true));
 
 		VelocityContext context = new VelocityContext();
 		// 把数据填入上下文
@@ -97,14 +100,14 @@ public class QueryPoolTest {
 		StringWriter writer = new StringWriter();
 		// 转换输出
 		Velocity.evaluate(context, writer, "", jsonArray.getJSONObject(2).getString("template")); // 关键方法
-		System.out.println(writer.toString());
+		LOG.debug(writer.toString());
 	}
 
 	@Ignore
 	@Test
 	public void put() {
 		String str = QueryPool.render("org.fastquery.dao.UserInfoDBService", "findUserInfoAll", null);
-		System.out.println("str:" + str);
+		LOG.debug("str:" + str);
 	}
 
 	@Ignore
@@ -112,6 +115,6 @@ public class QueryPoolTest {
 	public void reset() {
 		QueryPool.reset("org.fastquery.dao.UserInfoDBService");
 		String str = QueryPool.render("org.fastquery.dao.UserInfoDBService", "findUserInfoAll", null);
-		System.out.println("str:" + str);
+		LOG.debug("str:" + str);
 	}
 }

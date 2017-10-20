@@ -59,7 +59,7 @@ public class JarListClass {
 					if (jarEntry.isDirectory() || !jarEntry.getName().endsWith(".class"))
 						continue;
 					String name = jarEntry.getName().replace(".class", "").replace("/", ".");
-					// System.out.println(name);
+					// LOG.debug(name);
 					try {
 						if (name.indexOf("sun.") == -1 && name.indexOf("jdk.") == -1) {
 							list.add(Class.forName(name));

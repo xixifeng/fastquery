@@ -22,6 +22,8 @@
 
 package org.fastquery.core;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -39,7 +41,6 @@ import org.apache.log4j.Logger;
 import org.fastquery.struct.RespUpdate;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.util.BeanUtil;
-import org.fastquery.util.TypeUtil;
 import org.fastquery.where.I18n;
 
 import com.alibaba.fastjson.JSON;
@@ -63,32 +64,17 @@ public class DB {
 		String sql = sqlValue.getSql();
 		List<Object> objs = sqlValue.getValues();
 		List<Map<String, Object>> keyvals = null;
-		List<String> ssms = TypeUtil.matches(sql, Placeholder.Q_MATCH);
-		sql = sql.replaceAll(Placeholder.Q_MATCH, " ? ");
 		Connection conn = QueryContext.getConnection();
 		PreparedStatement stat = null;
 		ResultSet rs = null;
-		try {			
-			System.out.println("执行:" + sql);
+		try {
+			QueryContext.addSqls(sql);
+			info(sql, objs);
 			stat = conn.prepareStatement(sql);			
 			// 设置sql参数值
 			int lenTmp = objs.size();
-			int ssmlen = ssms.size();
 			for (int i = 0; i < lenTmp; i++) {
-				
-				String tpl = "?";
-				
-				if(ssmlen >= i+1) {
-					// 注意: ssms.get(i) 至少包含一个字符 因此不存在 "".trim()问题!
-					tpl = ssms.get(i).trim();
-				}
-				
-				if(!"?".equals(tpl) ) {
-					LOG.info(String.format("实际给第%d个?设置的值是'%s'%n", i+1,tpl.replaceAll("\\?", objs.get(i).toString())));
-					stat.setObject(i+1, tpl.replaceAll("\\?", objs.get(i).toString()));
-				} else {
 					stat.setObject(i+1, objs.get(i));
-				}
 			}
 			// 设置sql参数值 End
 			rs = stat.executeQuery();
@@ -105,22 +91,21 @@ public class DB {
 	
 	/**
 	 * 
-	 * @param sqlValues
+	 * @param sqlValues 待执行的SQL集
 	 * @param hasEffect 是否需要返回影响行数
 	 * @param hasPK 是否需要返回主健
-	 * @return
+	 * @return 改操作响应数据
 	 */
-	public static List<RespUpdate> modify(List<SQLValue> sqlValues, boolean hasEffect, boolean hasPK) {
-
+	public static List<RespUpdate> modify(List<SQLValue> sqlValues, boolean hasEffect, boolean hasPK) {		
 		List<RespUpdate> rus = null;
 		Connection conn = QueryContext.getConnection(); // 由QueryContext自动关闭
 		try {
-			conn.setAutoCommit(false); // 关闭自动提交
+			QueryContext.setAutoCommit(false); // 关闭自动提交	
 			rus = modify(sqlValues, hasEffect, hasPK, conn);
-			conn.commit(); // 提交事务
+			QueryContext.commit(); // 提交事务
 		} catch (Exception e) {
 				try {
-					conn.rollback();
+					QueryContext.rollback();
 				} catch (SQLException e1) {
 					throw new RepositoryException(e1.getMessage(), e1);
 				}
@@ -137,10 +122,13 @@ public class DB {
 			PreparedStatement stat = null;
 			RespUpdate ru = new RespUpdate();
 			try {
+				String sql = sqlValue.getSql();
+				QueryContext.addSqls(sql);
+				info(sql, sqlValue.getValues());
 				if (hasPK) {
-					stat = conn.prepareStatement(sqlValue.getSql(), Statement.RETURN_GENERATED_KEYS);
+					stat = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 				} else {
-					stat = conn.prepareStatement(sqlValue.getSql());
+					stat = conn.prepareStatement(sql);
 				}
 				List<Object> values = sqlValue.getValues();
 				int len = values.size();
@@ -185,8 +173,8 @@ public class DB {
 		Object key = null;
 		try {
 			conn = QueryContext.getConnection();
-			//conn.setAutoCommit(false);
 			QueryContext.addSqls(sql);
+			QueryContext.setAutoCommit(false);
 			stat = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			stat.executeUpdate();
 			rs = stat.getGeneratedKeys();
@@ -194,15 +182,15 @@ public class DB {
 			if (rs.next()) {
 				key = rs.getObject(1);
 			}
-			//conn.commit();	
+				QueryContext.commit();
 		} catch (SQLException e) {
-			/*if(conn !=null ) {
+			if(conn !=null ) {
 				try {
-					conn.rollback();
+					QueryContext.rollback();
 				} catch (SQLException e1) {
 					throw new RepositoryException(e1);
 				}
-			}*/
+			}
 			throw new RepositoryException(e);
 		} finally {
 			close(rs, stat);
@@ -211,21 +199,33 @@ public class DB {
 	}
 	
 		
-		static int insert2(String sql){
-			Connection conn = null;
-			Statement stat = null;
-			ResultSet rs = null;
-			try {
-				conn = QueryContext.getConnection();
-				stat = conn.createStatement();
-				QueryContext.addSqls(sql);
-				return stat.executeUpdate(sql);
-			} catch (SQLException e) {
-				throw new RepositoryException(e);
-			} finally {
-				close(rs, stat);
+	static int insert2(String sql) {
+		Connection conn = null;
+		Statement stat = null;
+		ResultSet rs = null;
+		int i;
+		try {
+			conn = QueryContext.getConnection();
+			QueryContext.addSqls(sql);
+			QueryContext.setAutoCommit(false);
+			stat = conn.createStatement();
+			QueryContext.addSqls(sql);
+			i = stat.executeUpdate(sql);
+				QueryContext.commit();
+		} catch (SQLException e) {
+			if (conn != null) {
+				try {
+					QueryContext.rollback();
+				} catch (SQLException e1) {
+					throw new RepositoryException(e1);
+				}
 			}
+			throw new RepositoryException(e);
+		} finally {
+			close(rs, stat);
 		}
+		return i;
+	}
 		
 		// 查询一条数据然后转换成一个实体
 		static Object select(String sql,Object bean) {
@@ -281,22 +281,23 @@ public class DB {
 			int count = args.size();
 			try {
 				conn = QueryContext.getConnection();
-				//conn.setAutoCommit(false);
+				QueryContext.setAutoCommit(false);
 				QueryContext.addSqls(sql);
+				info(sql, args);
 				stat = conn.prepareStatement(sql);
 				for (int i = 1; i <= count; i++) {
 					stat.setObject(i, args.get(i-1));
 				}
 				stat.executeUpdate();
-				//conn.commit();	
+					QueryContext.commit();
 			} catch (SQLException e) {
-				/*if(conn !=null ) {
+				if(conn !=null ) {
 					try {
-						conn.rollback();
+						QueryContext.rollback();
 					} catch (SQLException e1) {
 						throw new RepositoryException(e1);
 					}
-				}*/
+				}
 				throw new RepositoryException(e);
 			} finally {
 				close(null, stat);
@@ -319,28 +320,81 @@ public class DB {
 			int count = args.size();
 			try {
 				conn = QueryContext.getConnection();
-				//conn.setAutoCommit(false);
+				QueryContext.setAutoCommit(false);
 				QueryContext.addSqls(sql);
+				info(sql, args);
 				stat = conn.prepareStatement(sql);
 				for (int i = 1; i <= count; i++) {
 					stat.setObject(i, args.get(i-1));
 				}
 				effect = stat.executeUpdate();
-				//conn.commit();	
+					QueryContext.commit();
 			} catch (SQLException e) {
-				/*if(conn !=null ) {
+				if(conn !=null ) {
 					try {
-						conn.rollback();
+						QueryContext.rollback();
 					} catch (SQLException e1) {
 						throw new RepositoryException(e1);
 					}
-				}*/
+				}
 				throw new RepositoryException(e);
 			} finally {
 				close(null, stat);
 			}
 			return effect;
 		}
+		
+
+	    private static List<String> parserSQLFile(String name) {  
+	        List<String> sqlList = new ArrayList<>();  
+	        
+	        try(InputStream inputStream = new FileInputStream(name)) {
+	            StringBuilder sb = new StringBuilder();  
+	            byte[] buff = new byte[1024];  
+	            int b;  
+	            while ((b = inputStream.read(buff)) != -1) {  
+	                sb.append(new String(buff, 0, b));  
+	            }              
+	            String[] sqlArray = sb.toString().split(Placeholder.SQLSPLIT);  
+	            int len = sqlArray.length;
+	            for (int i = 0; i < len; i++) {  
+	            	 // 替换注释  
+	                String sql = sqlArray[i].replaceAll("--.*", "").trim();
+	                if (!"".equals(sql)) {  
+	                    sqlList.add(sql);  
+	                }  
+	            }  
+	            return sqlList;  	
+			} catch (Exception e) {
+				throw new RepositoryException(e);
+			}
+	    }   
+	    
+	    static void executeBatch(String sqlFile) {  
+	        Connection conn = QueryContext.getConnection();  
+	        Statement stat = null;  
+	        List<String> sqlList = parserSQLFile(sqlFile);  
+	        try {  
+	            QueryContext.setAutoCommit(false);  
+	            stat = conn.createStatement();
+	            for (String sql : sqlList) {  
+	                stat.addBatch(sql);
+	            }  
+	           stat.executeBatch();
+	           stat.clearBatch();
+					QueryContext.commit();
+	        } catch (Exception e) {
+	        	try {
+					QueryContext.rollback();
+				} catch (SQLException e1) {
+					throw new RepositoryException(e1.getMessage(), e1);
+				}
+	        	throw new RepositoryException(e);
+	        } finally {  
+	          close(null, stat);
+	        }  
+	    }  
+		
 	/**
 	 * 释放资源
 	 * @param rs ResultSet实例
@@ -352,7 +406,7 @@ public class DB {
 				rs.close();
 			}
 		} catch (SQLException e) {
-			throw new RepositoryException(e.getMessage(),e);
+			throw new RepositoryException(e);
 		} finally {
 			try {
 				if (stat != null) {
@@ -421,15 +475,20 @@ public class DB {
 		}
 	}
 	
-	
-
-	private static void showArgs(int[] ints,Object[] args){
-		StringBuilder sb = new StringBuilder("SQL参数");
-		for (int i = 0; i < ints.length; i++) {
-			// ints[i] 表示的是第几个参数
-			sb.append(String.format("?%s:%s ",ints[i], args[ints[i]-1]));
+	/**
+	 * 输出执行日志
+	 * @param sql
+	 * @param objs
+	 */
+	private static void info(String sql,List<Object> objs){
+		StringBuilder sb = new StringBuilder("\n正在准备执行SQL:");
+		sb.append(sql);
+		sb.append("\n");
+		int len = objs.size();
+		for (int i = 0; i < len; i++) {
+			sb.append(String.format("第%d个\"?\"对应的参数值是:'%s';%n", i+1,objs.get(i)));
 		}
-		LOG.debug(sb.toString());
+		LOG.info(sb.toString());
 	}
 	
 	

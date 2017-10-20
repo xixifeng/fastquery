@@ -60,4 +60,6 @@ public interface Placeholder {
 	// 如,匹配,%?1% , _?1 ?1%等 
 	// 举例: 若str="select * from UserInfo where name like %?X  and age like _?Y ",其中X,Y都是N+,通过该正则能匹配出结果:[ " %?  "," _? "] <br>
 	String Q_MATCH = "[_\\s*%]+\\?[_\\s*%]+";
+	
+	String SQLSPLIT="(;\\s*\\r\\n)|(;\\s*\\n)";
 }

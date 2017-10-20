@@ -22,6 +22,7 @@
 
 package org.fastquery.test;
 
+import org.apache.log4j.Logger;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInformation;
 import org.fastquery.core.RepositoryException;
@@ -55,11 +56,13 @@ import static org.hamcrest.Matchers.*;
  */
 public class UserInfoDBServiceTest {
 
+	private static final Logger LOG = Logger.getLogger(UserInfoDBServiceTest.class);
+
 	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 
-	@Rule  
-	public FastQueryTestRule rule = new FastQueryTestRule(); 
-	
+	@Rule
+	public FastQueryTestRule rule = new FastQueryTestRule();
+
 	@Test
 	public void findById() {
 		Integer id = 1;
@@ -67,41 +70,48 @@ public class UserInfoDBServiceTest {
 		UserInfo userInfo = userInfoDBService.findById(sql, id);
 		assertThat(userInfo.getId(), is(id));
 
-		SQLValue sqlValue = rule.getSQLValue();
-		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
-		List<Object> values = sqlValue.getValues();
-		assertThat(values.size(), is(1));
-		Object arg = values.get(0);
-		assertThat((arg instanceof Integer), is(true));
-		assertThat(arg, is(id));
-		
+		if (rule.isDebug()) {
+			SQLValue sqlValue = rule.getSQLValue();
+			assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
+			List<Object> values = sqlValue.getValues();
+			assertThat(values.size(), is(1));
+			Object arg = values.get(0);
+			assertThat((arg instanceof Integer), is(true));
+			assertThat(arg, is(id));
+		}
+
 		sql = "select id,name,age from UserInfo where id = :id";
 		userInfo = userInfoDBService.findById(sql, id);
 		assertThat(userInfo.getId(), is(id));
-		sqlValue = rule.getSQLValue();
-		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
-		values = sqlValue.getValues();
-		assertThat(values.size(), is(1));
-		arg = values.get(0);
-		assertThat((arg instanceof Integer), is(true));
-		assertThat(arg, is(id));
+		if (rule.isDebug()) {
+			SQLValue sqlValue = rule.getSQLValue();
+			assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
+			List<Object> values = sqlValue.getValues();
+			assertThat(values.size(), is(1));
+			Object arg = values.get(0);
+			assertThat((arg instanceof Integer), is(true));
+			assertThat(arg, is(id));
+		}
 	}
 
 	@Test
 	public void findById2() {
 		int id = 35;
-		UserInfo userInfo = userInfoDBService.findById(id); // 没有找到 userInfo会返回null
+		UserInfo userInfo = userInfoDBService.findById(id); // 没有找到
+															// userInfo会返回null
 		if (userInfo != null) {
 			assertThat(userInfo.getAge(), nullValue());
 		}
-		
-		SQLValue sqlValue = rule.getSQLValue();
-		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
-		List<Object> values = sqlValue.getValues();
-		assertThat(values.size(), is(1));
-		Object arg = values.get(0);
-		assertThat((arg instanceof Integer), is(true));
-		assertThat(arg, is(id));
+
+		if (rule.isDebug()) {
+			SQLValue sqlValue = rule.getSQLValue();
+			assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
+			List<Object> values = sqlValue.getValues();
+			assertThat(values.size(), is(1));
+			Object arg = values.get(0);
+			assertThat((arg instanceof Integer), is(true));
+			assertThat(arg, is(id));
+		}
 	}
 
 	@Test
@@ -112,18 +122,18 @@ public class UserInfoDBServiceTest {
 		for (UserInfo userInfo : userInfos) {
 			assertThat((userInfo.getName().equals(name) || userInfo.getAge().intValue() == age), is(true));
 		}
-		
-		SQLValue sqlValue = rule.getSQLValue();
-		assertThat(sqlValue.getSql(), equalTo("select name,age from UserInfo u where u.name=? or u.age=?"));
-		List<Object> values = sqlValue.getValues();
-		assertThat(values.size(), is(2));
-		Object arg = values.get(0);
-		assertThat((arg instanceof String), is(true));
-		assertThat(arg, is(name));
-		arg = values.get(1);
-		assertThat((arg instanceof Integer), is(true));
-		assertThat(arg, is(age));
-		
+		if (rule.isDebug()) {
+			SQLValue sqlValue = rule.getSQLValue();
+			assertThat(sqlValue.getSql(), equalTo("select name,age from UserInfo u where u.name=? or u.age=?"));
+			List<Object> values = sqlValue.getValues();
+			assertThat(values.size(), is(2));
+			Object arg = values.get(0);
+			assertThat((arg instanceof String), is(true));
+			assertThat(arg, is(name));
+			arg = values.get(1);
+			assertThat((arg instanceof Integer), is(true));
+			assertThat(arg, is(age));
+		}
 	}
 
 	@Test
@@ -144,7 +154,7 @@ public class UserInfoDBServiceTest {
 	@Test
 	public void findUserInfoById() {
 		UserInformation userInformation = userInfoDBService.findUserInfoById(1);
-		System.out.println(userInformation);
+		LOG.debug(userInformation);
 	}
 
 	@Test
@@ -199,15 +209,15 @@ public class UserInfoDBServiceTest {
 		assertThat(effect, equalTo(0));
 	}
 
-	@Test(expected=RepositoryException.class)
+	@Test(expected = RepositoryException.class)
 	public void testUpdateBatch2_b() {
-			int effect = userInfoDBService.updateBatch2("小不点", 6, 2);
-			assertThat(effect, equalTo(0));
+		int effect = userInfoDBService.updateBatch2("小不点", 6, 2);
+		assertThat(effect, equalTo(0));
 	}
-	
+
 	@Test
 	public void testUpdateBatch3() {
-		int[] effects = userInfoDBService.updateBatch3("清风习习",23,3);
+		int[] effects = userInfoDBService.updateBatch3("清风习习", 23, 3);
 		assertThat(effects.length, is(2));
 		assertThat(effects[0], is(1));
 		assertThat(effects[1], is(1));
@@ -224,11 +234,12 @@ public class UserInfoDBServiceTest {
 
 		// 打印出来看看
 		String str = JSON.toJSONString(page, true);
-		System.out.println(str);
+		LOG.debug(str);
 
 	}
 
-	@Test @SkipFilter
+	@Test
+	@SkipFilter
 	public void find() {
 		Page<UserInfo> page = userInfoDBService.find(100, 50, new PageableImpl(1, 3));
 		List<UserInfo> userInfos = page.getContent();
@@ -239,7 +250,7 @@ public class UserInfoDBServiceTest {
 
 		String str = JSON.toJSONString(page, true);
 
-		System.out.println(str);
+		LOG.debug(str);
 	}
 
 	@Test
@@ -286,7 +297,7 @@ public class UserInfoDBServiceTest {
 			if (pageIndex == 0) {
 				pageIndex += 1;
 			}
-			System.out.println("totalElements:" + totalElements + " pageIndex:" + pageIndex + "  pageSize:" + pageSize
+			LOG.debug("totalElements:" + totalElements + " pageIndex:" + pageIndex + "  pageSize:" + pageSize
 					+ "  totalPages:" + totalPages);
 
 			Page<Map<String, Object>> page = userInfoDBService.findSome2(age, id, pageIndex, pageSize);
@@ -296,7 +307,7 @@ public class UserInfoDBServiceTest {
 			assertThat(page.getTotalElements(), equalTo(-1L));
 			assertThat(page.getTotalPages(), equalTo(-1));
 			assertThat(page.getNumberOfElements(), lessThanOrEqualTo(pageSize));
-			// System.out.println(JSON.toJSONString(page, true));
+			// LOG.debug(JSON.toJSONString(page, true));
 
 			boolean hasContent = pageIndex <= totalPages; // 是否有结果集
 			boolean isFirst = pageIndex == 1; // 是否是第一页
@@ -322,7 +333,7 @@ public class UserInfoDBServiceTest {
 	@Test
 	public void countDouble() {
 		Double d = userInfoDBService.countDouble(2100, 2308);
-		System.out.println(d);
+		LOG.debug(d);
 	}
 
 	@Test
@@ -383,41 +394,42 @@ public class UserInfoDBServiceTest {
 		Integer age = userInfoDBService.findAge(35);
 		assertThat(age, nullValue());
 	}
-	
+
 	@Test
-	public void findUserInfoByNullAge(){
+	public void findUserInfoByNullAge() {
 		// 查询age为null的UserInfo
 		List<UserInfo> us = userInfoDBService.findUserInfoByNullAge(null);
 		assertThat(us.size(), greaterThanOrEqualTo(1));
-		us.forEach( u -> assertThat(u.getAge(), nullValue()));
+		us.forEach(u -> assertThat(u.getAge(), nullValue()));
 	}
-	
+
 	@Test
-	public void findNames(){
+	public void findNames() {
 		String[] names = userInfoDBService.findNames();
 		assertThat(names.length, is(3));
 		for (String name : names) {
 			assertThat(Pattern.matches("\\{\".+\":\".+\"\\}", name), is(false));
-			System.out.println(name);
+			LOG.debug(name);
 		}
 	}
-	
+
 	@Test
-	public void findAges1(){
+	public void findAges1() {
 		String[] ages = userInfoDBService.findAges();
 		assertThat(ages.length, is(3));
 		for (String age : ages) {
-			assertThat(Pattern.matches("\\{\".+\":\".+\"\\}", age), is(false));
-			System.out.println(age);
+			if (age != null) {
+				assertThat(Pattern.matches("\\{\".+\":\".+\"\\}", age), is(false));
+			}
 		}
 	}
-	
+
 	@Test
-	public void findAges2(){
+	public void findAges2() {
 		Integer[] ages = userInfoDBService.findAges2();
 		assertThat(ages.length, is(3));
 		for (Integer age : ages) {
-			assertThat(age,notNullValue());
+			assertThat(age, notNullValue());
 		}
 	}
 }

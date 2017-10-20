@@ -882,6 +882,28 @@ public class TypeUtil implements Opcodes{
 		return ct == String.class || ct == Byte.class || ct == Short.class || ct == Integer.class || ct == Long.class || ct == Float.class
 				|| ct == Double.class || ct == Character.class || ct == Boolean.class;
 	}
+	
+	/**
+	 * 获取返回值map泛型的value的类型
+	 * @param method 方法
+	 * @return clazz
+	 */
+	public static Class<?> mapValueTyep(Method method) {
+		ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
+		return (Class<?>) type.getActualTypeArguments()[1];
+	}
+	
+	/**
+	 * 获取返回值listmap泛型的value的类型
+	 * @param method 方法
+	 * @return clazz
+	 */
+	public static Class<?> listMapValueTyep(Method method) {
+		ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
+		type = (ParameterizedType) type.getActualTypeArguments()[0];
+		return (Class<?>) type.getActualTypeArguments()[1];
+	}
+	
 }
 
 

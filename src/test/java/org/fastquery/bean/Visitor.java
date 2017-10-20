@@ -46,12 +46,12 @@ public class Visitor {
 	private Long createDate;
 	private String iden;
 	private Integer dId;
-	
+
 	public Visitor() {
 	}
 
 	public Visitor(Long punitId, String vname, String idCard, String mobile, String email, Byte gender, String toAddr,
-			String remark, Long lastDate, String iden,Integer dId) {
+			String remark, Long lastDate, String iden, Integer dId) {
 		this.punitId = punitId;
 		this.vname = vname;
 		this.idCard = idCard;
@@ -171,9 +171,11 @@ public class Visitor {
 
 	@Transient
 	private String description;
+
 	public String getDescription() {
 		return description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}

@@ -78,12 +78,14 @@ public class UserInfo {
 	public String toString() {
 		return "UserInfo [id=" + id + ", name=" + name + ", age=" + age + "]";
 	}
-	
+
 	@Transient
 	private String description;
+
 	public String getDescription() {
 		return description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}

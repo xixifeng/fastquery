@@ -43,9 +43,9 @@ public class UserInfoDBServiceTest2 {
 
 	private UserInfoDBService2 userInfoDBService = FQuery.getRepository(UserInfoDBService2.class);
 
-	@Rule  
-	public FastQueryTestRule rule = new FastQueryTestRule(); 
-	
+	@Rule
+	public FastQueryTestRule rule = new FastQueryTestRule();
+
 	@BeforeClass
 	public static void beforeClass() {
 		// 数据源名称
@@ -61,7 +61,7 @@ public class UserInfoDBServiceTest2 {
 		// 创建一个数据源
 		FQuery.createDataSource(dataSourceName, properties);
 	}
-	
+
 	@Test
 	public void findOne() {
 		int age = 1000;

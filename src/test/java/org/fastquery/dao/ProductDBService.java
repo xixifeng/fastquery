@@ -20,7 +20,9 @@
  * 
  */
 
-package org.fastquery.example;
+package org.fastquery.dao;
+
+import java.util.Map;
 
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
@@ -29,12 +31,17 @@ import org.fastquery.core.QueryRepository;
 /**
  * 
  * @author mei.sir@aliyun.cn
- * @date 2017年9月25日
  */
-public interface VisitorDBServcie extends QueryRepository {
+public interface ProductDBService extends QueryRepository {
 
-	@Query("DELETE FROM `visitor` WHERE `iden` = ?1")
+	@Query("SELECT * FROM `product` limit 1;")
+	Map<String, Object> findOne();
+
 	@Modifying
-	int deleteByIden(String iden);
+	@Query("DELETE FROM `product` WHERE `pid` = 1")
+	@Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 3, '中国', NULL)")
+	@Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 2, '伟大', NULL)")
+	@Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 1, '复兴', NULL)")
+	int inserts();
 
 }

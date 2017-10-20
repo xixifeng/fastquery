@@ -22,7 +22,6 @@
 
 package org.fastquery.core;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -33,9 +32,6 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.SQLExec;
-import org.apache.tools.ant.types.EnumeratedAttribute;
 import org.fastquery.handler.ModifyingHandler;
 import org.fastquery.handler.QueryHandler;
 import org.fastquery.page.NotCount;
@@ -100,7 +96,7 @@ public class QueryProcess {
 		if(returnType==void.class) {
 			return mh.voidType();
 		} else if(returnType == int.class) {
-			return sumIntArray(respUpdates);
+			return mh.intType(respUpdates);
 		} else if(returnType == int[].class ){
 			int len = respUpdates.size();
 			int[] effects = new int[len];
@@ -109,44 +105,18 @@ public class QueryProcess {
 			}
 			return effects;
 		} else if(returnType == Map.class) { // 如果然会值是Map,那么一定是insert或update,在生成实现的时候已经做安全检测
-			return mh.mapType(autoIncKey,mapValueTyep(method));
+			return mh.mapType(autoIncKey,TypeUtil.mapValueTyep(method));
 		} else if(returnType == JSONObject.class) {
 			return mh.jsonObjectType(autoIncKey);
 		} else if(returnType == Primarykey.class) {
 			return mh.primarykeyType(autoIncKey);
 		} else if(returnType == boolean.class) {
-			return mh.booleanType(sumIntArray(respUpdates));
+			return mh.booleanType(respUpdates);
 		} else { // 把值强制转换成 returnType
 			return mh.beanType(autoIncKey);
 		}
 		// 返回类型分析===================================== End
 		
-	}
-	
-	/**
-	 * 统计一个int数组,所有元素相加的和
-	 * @param ints
-	 * @return
-	 */
-	private int sumIntArray(List<RespUpdate> respUpdates){
-		int sum = 0;
-		for (RespUpdate respUpdate : respUpdates) {
-			sum += respUpdate.getEffect();
-		}
-		return sum;
-	}
-	
-	// 获取返回值map泛型的value的类型
-	private static Class<?> mapValueTyep(Method method) {
-		ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
-		return (Class<?>) type.getActualTypeArguments()[1];
-	}
-	
-	// 获取返回值listmap泛型的value的类型
-	private static Class<?> listMapValueTyep(Method method) {
-		ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
-		type = (ParameterizedType) type.getActualTypeArguments()[0];
-		return (Class<?>) type.getActualTypeArguments()[1];
 	}
 	
 	// 查操作
@@ -167,9 +137,9 @@ public class QueryProcess {
 		} else if(returnType == boolean.class) {
 			return qh.booleanType(keyvals);
 		} else if(returnType == Map.class){
-			return qh.mapType(keyvals,mapValueTyep(method));
+			return qh.mapType(keyvals,TypeUtil.mapValueTyep(method));
 		} else if(TypeUtil.isListMapSO(method.getGenericReturnType())){
-			return qh.listType(keyvals,listMapValueTyep(method));
+			return qh.listType(keyvals,TypeUtil.listMapValueTyep(method));
 		}else if(returnType == List.class){
 			return qh.list(keyvals);
 		}else if(returnType == JSONObject.class){
@@ -473,27 +443,12 @@ public class QueryProcess {
 			return DB.insert2(sql);
 			
 		case MethodId.QUERY6:
-			
-			SQLBatchExec sqlExec = new SQLBatchExec();
-						
 			String basedir = FastQueryJSONObject.getBasedir();
-			
-			// 要执行的脚本
-			sqlExec.setSrc(new File(basedir + (String)iargs[0]));
-			
-			sqlExec.setOnerror((SQLExec.OnError)(EnumeratedAttribute.getInstance(   
-					SQLExec.OnError.class, "abort")));  
-			sqlExec.setPrint(true); // 设置是否输出
-
-			// 输出到文件 sql.out 中；不设置该属性，默认输出到控制台
-			sqlExec.setOutput(new File(basedir + (String)iargs[1]));
-			
-			sqlExec.setProject(new Project()); // 要指定这个属性，不然会出错 
-			
+			String sqlFile = basedir + (String)iargs[0];
 			try {
-				sqlExec.execute();
+				DB.executeBatch(sqlFile);
 			} catch (Exception e) {
-				throw new RepositoryException(String.format("执行%s发生致命错误", iargs[0]), e);
+				throw new RepositoryException(e);
 			}
 			
 			break;

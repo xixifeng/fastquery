@@ -22,7 +22,7 @@
 
 package org.fastquery.test;
 
-
+import org.apache.log4j.Logger;
 import org.fastquery.core.DB;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
@@ -44,18 +44,20 @@ import java.util.List;
  */
 public class DBTest {
 
+	private static final Logger LOG = Logger.getLogger(DBTest.class);
+
 	private StudentDBService db = FQuery.getRepository(StudentDBService.class);
-		
-	@Rule  
-	public FastQueryTestRule rule = new FastQueryTestRule(); 
-	
+
+	@Rule
+	public FastQueryTestRule rule = new FastQueryTestRule();
+
 	public List<RespUpdate> delete(Object... obs) {
 		List<Object> objs = Arrays.asList(obs);
-	
+
 		List<SQLValue> sqlValues = new ArrayList<>();
-		
+
 		sqlValues.add(new SQLValue("DELETE FROM `userinfo` WHERE id = ?", objs));
-		
+
 		return DB.modify(sqlValues, true, true);
 	}
 
@@ -78,7 +80,7 @@ public class DBTest {
 		rus.forEach(ru -> {
 			assertThat(ru.getEffect(), greaterThanOrEqualTo(1));
 			assertThat(ru.getPk(), greaterThanOrEqualTo(1L));
-			System.out.println("正在删除:"+ru.getPk());
+			LOG.debug("正在删除:" + ru.getPk());
 			List<RespUpdate> rusx = delete(ru.getPk());
 			rusx.forEach(r -> {
 				assertThat(r.getEffect(), greaterThanOrEqualTo(1));
@@ -89,10 +91,15 @@ public class DBTest {
 	}
 
 	@Test
-	public void db(){
+	public void db() {
 		db.db();
-		update();
-		assertThat(rule.getSQLValue(), nullValue());		
-		assertThat(rule.getListSQLValue(), nullValue());
+		if (rule.isDebug()) {
+			assertThat(QueryContextHelper.getQueryContext(), notNullValue());
+			update();
+			assertThat(rule.getSQLValue(), nullValue());
+			assertThat(rule.getListSQLValue(), nullValue());
+		} else {
+			assertThat(QueryContextHelper.getQueryContext(), nullValue());
+		}
 	}
 }

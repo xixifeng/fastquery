@@ -145,35 +145,37 @@ public class QueryByNamedDBExampleTest {
 			assertThat(pageObj.getTotalElements(), not(0l)); // 总记录数不为0l
 																// 注意TotalElements是long类型,比较是最好保持类型一致!
 		}
-		System.out.println(JSON.toJSONString(JSON.toJSON(pageObj), true));
+		LOG.debug(JSON.toJSONString(JSON.toJSON(pageObj), true));
 
-		List<SQLValue> sqlValues = rule.getListSQLValue();
-		assertThat(sqlValues.size(), is(2));
+		if (rule.isDebug()) {
+			List<SQLValue> sqlValues = rule.getListSQLValue();
+			assertThat(sqlValues.size(), is(2));
+			// 分页主体语句
+			SQLValue sv1 = sqlValues.get(0);
 
-		// 分页主体语句
-		SQLValue sv1 = sqlValues.get(0);
-		assertThat(sv1.getSql(), equalToIgnoringWhiteSpace(
-				"select no, name, sex from Student where no like ? or age > ? order by age desc limit 0,5"));
-		assertThat(sv1.getSql(),
-				equalTo("select no, name, sex from Student where no like ? or age > ? order by age desc limit 0,5"));
-		List<Object> ps1 = sv1.getValues();
-		assertThat(ps1.size(), is(2));
-		assertThat(ps1.get(0), instanceOf(String.class));
-		assertThat(ps1.get(1), instanceOf(Integer.class));
-		assertThat(ps1.get(0), is(no));
-		assertThat(ps1.get(1), is(age));
+			assertThat(sv1.getSql(), equalToIgnoringWhiteSpace(
+					"select no, name, sex from Student where no like ? or age > ? order by age desc limit 0,5"));
+			assertThat(sv1.getSql(), equalTo(
+					"select no, name, sex from Student where no like ? or age > ? order by age desc limit 0,5"));
+			List<Object> ps1 = sv1.getValues();
+			assertThat(ps1.size(), is(2));
+			assertThat(ps1.get(0), instanceOf(String.class));
+			assertThat(ps1.get(1), instanceOf(Integer.class));
+			assertThat(ps1.get(0), is(no));
+			assertThat(ps1.get(1), is(age));
 
-		// 分页求和语句
-		SQLValue sv2 = sqlValues.get(1);
-		assertThat(sv2.getSql(), equalToIgnoringWhiteSpace("select count(no) from Student where no like ? or age > ?"));
-		assertThat(sv2.getSql(), equalTo("select count(no) from Student where no like ? or age > ?"));
-		List<Object> ps2 = sv1.getValues();
-		assertThat(ps2.size(), is(2));
-		assertThat(ps2.get(0), instanceOf(String.class));
-		assertThat(ps2.get(1), instanceOf(Integer.class));
-		assertThat(ps2.get(0), is(no));
-		assertThat(ps2.get(1), is(age));
-
+			// 分页求和语句
+			SQLValue sv2 = sqlValues.get(1);
+			assertThat(sv2.getSql(),
+					equalToIgnoringWhiteSpace("select count(no) from Student where no like ? or age > ?"));
+			assertThat(sv2.getSql(), equalTo("select count(no) from Student where no like ? or age > ?"));
+			List<Object> ps2 = sv1.getValues();
+			assertThat(ps2.size(), is(2));
+			assertThat(ps2.get(0), instanceOf(String.class));
+			assertThat(ps2.get(1), instanceOf(Integer.class));
+			assertThat(ps2.get(0), is(no));
+			assertThat(ps2.get(1), is(age));
+		}
 	}
 
 	@Test
@@ -198,5 +200,16 @@ public class QueryByNamedDBExampleTest {
 		List<UserInfo> uis = queryByNamedDBExample.findUserInfoByFuzzyName(name);
 		assertThat(uis.size(), greaterThanOrEqualTo(2));
 		uis.forEach(u -> assertThat(u.getName(), containsString(name)));
+
+		if (rule.isDebug()) {
+			SQLValue sqlValue = rule.getSQLValue();
+			assertThat(sqlValue.getSql(), notNullValue());
+			assertThat(sqlValue.getSql(), equalToIgnoringWhiteSpace("select * from UserInfo where name like ?"));
+			assertThat(sqlValue.getSql().trim(), equalTo("select * from UserInfo where name like ?"));
+
+			List<Object> values = sqlValue.getValues();
+			assertThat(values, notNullValue());
+			assertThat(values.get(0), equalTo("%" + name + "%"));
+		}
 	}
 }

@@ -32,6 +32,7 @@ import org.fastquery.core.Modifying;
 import org.fastquery.core.Primarykey;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
+import org.fastquery.struct.RespUpdate;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.util.TypeUtil;
 
@@ -101,8 +102,6 @@ public final class ModifyingHandler {
 			keyval = keyvals.get(0);
 		}
 		
-		System.out.println("keyval>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:" + keyval);
-
 		if (keyval != null && convertType == String.class) {
 			Map<String, Object> map2 = new HashMap<>();
 			keyval.forEach((k, v) -> map2.put(k, v.toString()));
@@ -126,14 +125,22 @@ public final class ModifyingHandler {
 		return new Primarykey(autoIncKey, pkey == null ? null : pkey.toString());
 	}
 	
-	public boolean booleanType(long effect){
-		return effect >= 0;
+	public boolean booleanType(List<RespUpdate> respUpdates){
+		return intType(respUpdates) >= 0;
 	}
 	
 	
 	public Object beanType(Long autoIncKey){
 		Map<String, Object> map = mapType(autoIncKey,Object.class);
 		return JSON.toJavaObject(new JSONObject(map), QueryContext.getReturnType());	
+	}
+	
+	public int intType(List<RespUpdate> respUpdates){
+		int sum = 0;
+		for (RespUpdate respUpdate : respUpdates) {
+			sum += respUpdate.getEffect();
+		}
+		return sum;
 	}
 	
 	

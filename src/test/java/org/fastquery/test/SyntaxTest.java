@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Param;
 import org.fastquery.example.StudentDBService;
@@ -48,6 +49,8 @@ import static org.junit.Assert.*;
  * @author xixifeng (fastquery@126.com)
  */
 public class SyntaxTest {
+
+	private static final Logger LOG = Logger.getLogger(SyntaxTest.class);
 
 	@Test(expected = IndexOutOfBoundsException.class)
 	public void listEmpty() {
@@ -80,11 +83,11 @@ public class SyntaxTest {
 
 	@Test
 	public void testReg() {
-		System.out.println(Pattern.matches("", ""));
+		LOG.debug(Pattern.matches("", ""));
 		// s.replaceAll("\\:"+param.value()+"\\b", "?"+(i+1));
 		assertThat("abckdwgew:name&".replaceAll("\\:name\\b", "?"), equalTo("abckdwgew?&"));
 		assertThat("abckdwgew:name &".replaceAll("\\:name\\b", "?"), equalTo("abckdwgew? &"));
-		System.out.println("-->: " + ("abckdwgew:name222 &".replaceAll("\\:name\\b", "?")));
+		LOG.debug("-->: " + ("abckdwgew:name222 &".replaceAll("\\:name\\b", "?")));
 		assertThat(":name22".replaceAll("\\:name\\b", "?"), equalTo(":name22"));
 		assertThat(":name22 ".replaceAll("\\:name\\b", "?"), equalTo(":name22 "));
 		assertThat(":name,".replaceAll("\\:name\\b", "?"), equalTo("?,"));
@@ -94,51 +97,46 @@ public class SyntaxTest {
 	@Test
 	public void fastjson() {
 		UserInfo userInfo = new UserInfo(1, null, null);
-		System.out.println(JSON.toJSONString(userInfo, SerializerFeature.WriteMapNullValue));
+		LOG.debug(JSON.toJSONString(userInfo, SerializerFeature.WriteMapNullValue));
 		Boolean b = false;
-		System.out.println(JSON.toJSONString(b, SerializerFeature.WriteNullBooleanAsFalse));
-		System.out.println("基本类型:" + boolean.class.isPrimitive());
+		LOG.debug(JSON.toJSONString(b, SerializerFeature.WriteNullBooleanAsFalse));
+		LOG.debug("基本类型:" + boolean.class.isPrimitive());
 
 		StringBuilder sb = new StringBuilder("abc");
 		sb.insert(3, "d");
-		System.out.println(sb.toString());
+		LOG.debug(sb.toString());
 	}
 
 	@Test
 	public void local() {
 		Locale locale = Locale.getDefault();
-		System.out.println("Language:" + locale.getLanguage());
-		System.out.println("Country:" + locale.getCountry());
+		LOG.debug("Language:" + locale.getLanguage());
+		LOG.debug("Country:" + locale.getCountry());
 	}
-	
-	
+
 	@Test
 	public void ty() {
-		System.out.println(Type.getDescriptor(StudentDBService.class));
+		LOG.debug(Type.getDescriptor(StudentDBService.class));
 		/*
-		 {
-mv = cw.visitMethod(ACC_PUBLIC, "findAll", "()Lcom/alibaba/fastjson/JSONArray;", null, null);
-mv.visitCode();
-Label l0 = new Label();
-mv.visitLabel(l0);
-mv.visitLineNumber(18, l0);
-mv.visitLdcInsn(Type.getType("Lorg/fastquery/example/StudentDBService;"));
-mv.visitLdcInsn("findAll");
-mv.visitLdcInsn("()Lcom/alibaba/fastjson/JSONArray;");
-mv.visitInsn(ICONST_0);
-mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
-mv.visitVarInsn(ALOAD, 0);
-mv.visitMethodInsn(INVOKESTATIC, "org/fastquery/core/Prepared", "excute", "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/Repository;)Ljava/lang/Object;", false);
-mv.visitTypeInsn(CHECKCAST, "com/alibaba/fastjson/JSONArray");
-mv.visitInsn(ARETURN);
-Label l1 = new Label();
-mv.visitLabel(l1);
-mv.visitLocalVariable("this", "Lorg/fastquery/bean/StudentDBServiceProxyImpl;", null, l0, l1, 0);
-mv.visitMaxs(5, 1);
-mv.visitEnd();
-}
-
+		 * { mv = cw.visitMethod(ACC_PUBLIC, "findAll",
+		 * "()Lcom/alibaba/fastjson/JSONArray;", null, null); mv.visitCode();
+		 * Label l0 = new Label(); mv.visitLabel(l0); mv.visitLineNumber(18,
+		 * l0); mv.visitLdcInsn(Type.getType(
+		 * "Lorg/fastquery/example/StudentDBService;"));
+		 * mv.visitLdcInsn("findAll");
+		 * mv.visitLdcInsn("()Lcom/alibaba/fastjson/JSONArray;");
+		 * mv.visitInsn(ICONST_0); mv.visitTypeInsn(ANEWARRAY,
+		 * "java/lang/Object"); mv.visitVarInsn(ALOAD, 0);
+		 * mv.visitMethodInsn(INVOKESTATIC, "org/fastquery/core/Prepared",
+		 * "excute",
+		 * "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/Repository;)Ljava/lang/Object;",
+		 * false); mv.visitTypeInsn(CHECKCAST,
+		 * "com/alibaba/fastjson/JSONArray"); mv.visitInsn(ARETURN); Label l1 =
+		 * new Label(); mv.visitLabel(l1); mv.visitLocalVariable("this",
+		 * "Lorg/fastquery/bean/StudentDBServiceProxyImpl;", null, l0, l1, 0);
+		 * mv.visitMaxs(5, 1); mv.visitEnd(); }
+		 * 
 		 */
 	}
-	
+
 }

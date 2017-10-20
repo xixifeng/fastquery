@@ -22,6 +22,7 @@
 
 package org.fastquery.test;
 
+import org.apache.log4j.Logger;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
@@ -42,12 +43,14 @@ import java.util.Collection;
  */
 public class MethodQueryTest {
 
-	@Rule  
-	public FastQueryTestRule rule = new FastQueryTestRule(); 
-	
+	private static final Logger LOG = Logger.getLogger(MethodQueryTest.class);
+
+	@Rule
+	public FastQueryTestRule rule = new FastQueryTestRule();
+
 	private StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
 	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
-	
+
 	@Test
 	public void testSave() {
 
@@ -74,7 +77,7 @@ public class MethodQueryTest {
 		Integer age = 32;
 		UserInfo u = new UserInfo(id, name, age);
 		UserInfo u2 = studentDBService.save("xk-c3p0", "xk", u);
-		System.out.println("id:" + u2.getId());
+		LOG.debug("id:" + u2.getId());
 		assertThat(u2.getId(), notNullValue());
 		assertThat(u2.getName(), equalTo(u.getName()));
 		assertThat(u2.getAge(), equalTo(u.getAge()));
@@ -89,17 +92,18 @@ public class MethodQueryTest {
 		assertThat(effect, is(0));
 	}
 
-	@Test(expected=RepositoryException.class)
+	@Test(expected = RepositoryException.class)
 	public void save4() {
 		UserInfo u1 = new UserInfo(1, "equ", 10);
 		UserInfo u2 = new UserInfo(2, "Ecl", 3);
 		UserInfo u3 = new UserInfo(3, "ement", 2);
 		// 断言: 在执行studentDBService.save(false, u1,u2,u3)之后,将会抛出
 		// RepositoryException 异常!
-		//thrown.expect(RepositoryException.class);
+		// thrown.expect(RepositoryException.class);
 		// 断言: 在执行studentDBService.save(false, u1,u2,u3)之后,抛出的异常信息中包含有"Duplicate
 		// entry '1' for key 'PRIMARY'"字符串
-		//thrown.expectMessage(containsString("Duplicate entry '1' for key 'PRIMARY'"));
+		// thrown.expectMessage(containsString("Duplicate entry '1' for key
+		// 'PRIMARY'"));
 		int effect = studentDBService.saveArray(false, u1, u2, u3);
 		assertThat(effect, is(0));
 	}
@@ -126,9 +130,8 @@ public class MethodQueryTest {
 		assertThat(effect, is(3));
 	}
 
-	@Test(expected = RepositoryException.class)
+	@Test
 	public void executeBatch() {
-		// 参考: http://mxm910821.iteye.com/blog/1701822
 		studentDBService.executeBatch("update.sql", "sqlout.log");
 	}
 
@@ -164,23 +167,23 @@ public class MethodQueryTest {
 	@Test
 	public void update4() {
 		Integer id = 1;
-		String name = "好哇瓦";
+		String name = "框架测试!";
 		Integer age = 3;
 		UserInfo entity = new UserInfo(id, name, age);
 		// 会解析成:update `UserInfo` set `id`=?, `age`=? where name = ?
-		int effect = studentDBService.update(entity, "name = :name");
+		int effect = studentDBService.update(entity, "name = :name or name = '好哇瓦'");
 		// 断言: 影响的行数大于0行
 		assertThat(effect, greaterThan(0));
 
 		// 不想让id字段参与改运算
 		entity.setId(null);
 		// 会解析成:update `UserInfo` set `age`=? where name = ?
-		effect = studentDBService.update(entity, "name = :name");
+		effect = studentDBService.update(entity, "name = :name or name = '好哇瓦'");
 		assertThat(effect, greaterThan(0));
 
 		// 不想让age字段参与改运算
 		entity.setAge(null);
-		effect = studentDBService.update(entity, "name = :name");
+		effect = studentDBService.update(entity, "name = :name or name = '好哇瓦'");
 		assertThat(effect, is(0));
 	}
 
@@ -208,5 +211,5 @@ public class MethodQueryTest {
 		int i = userInfoDBService.update(ui, "id = :id");
 		assertThat(i, lessThan(1));
 	}
-	
+
 }

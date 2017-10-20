@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
+import org.apache.log4j.Logger;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
@@ -43,77 +44,78 @@ import org.junit.runner.Description;
  */
 public class RepositoryInvocationHandler implements InvocationHandler {
 
+	private static final Logger LOG = Logger.getLogger(RepositoryInvocationHandler.class);
+
 	private Repository repository;
 	private FastQueryTestRule rule;
-	private  Description description;
+	private Description description;
 
-	public RepositoryInvocationHandler(Repository repository,FastQueryTestRule rule,Description description) {
+	public RepositoryInvocationHandler(Repository repository, FastQueryTestRule rule, Description description) {
 		this.repository = repository;
 		this.rule = rule;
 		this.description = description;
 	}
-	private void before()  throws Throwable { 
-		if(description.getAnnotation(SkipFilter.class)!=null) {
-			return ;
+
+	private void before() throws Throwable {
+		if (description.getAnnotation(SkipFilter.class) != null) {
+			return;
 		}
-			QueryContext.forceClear();
-			Class<QueryContext> qcclazz = QueryContext.class;
-			Method getQueryContextMethod = qcclazz.getDeclaredMethod("getQueryContext");
-			getQueryContextMethod.setAccessible(true);
-			QueryContext queryContext = (QueryContext) getQueryContextMethod.invoke(null);
-			Field debugField = qcclazz.getDeclaredField("debug");
-			debugField.setAccessible(true);
-			System.out.println("queryContext-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-"+queryContext);
-			debugField.get(queryContext);
-			if( (boolean)debugField.get(queryContext) != true){
-				debugField.setAccessible(true);
-				debugField.set(queryContext, true);
-			}
+		Class<QueryContext> qcclazz = QueryContext.class;
+		Method getQueryContextMethod = qcclazz.getDeclaredMethod("getQueryContext");
+		getQueryContextMethod.setAccessible(true);
+		Field debugField = qcclazz.getDeclaredField("debug");
+		debugField.setAccessible(true);
+		debugField.set(null, true);
 	}
-	
-	
+
 	private void after() throws Throwable {
-		if(description.getAnnotation(SkipFilter.class)!=null) {
-			return ;
+		if (description.getAnnotation(SkipFilter.class) != null) {
+			return;
 		}
 		Class<QueryParser> clazz = QueryParser.class;
-		    Method currentMethod = QueryContext.getMethod();
-			Method  modifyParserMethod = clazz.getDeclaredMethod("modifyParser");
-			Method  queryParserMethod = clazz.getDeclaredMethod("queryParser");
-			modifyParserMethod.setAccessible(true);
-			queryParserMethod.setAccessible(true);
-			System.out.println("modifyParserMethod:" + modifyParserMethod);
-			System.out.println("currentMethod:"+currentMethod);
-			Modifying modifying = currentMethod.getAnnotation(Modifying.class);
-			Class<?> returnType = QueryContext.getReturnType();
-			QueryByNamed queryById = currentMethod.getAnnotation(QueryByNamed.class);
-			
-			Class<FastQueryTestRule> qcclazz = FastQueryTestRule.class;
-			Field sqlValueField = qcclazz.getDeclaredField("sqlValue");
-			Field sqlValuesField = qcclazz.getDeclaredField("sqlValues");
-			sqlValueField.setAccessible(true);
-			sqlValuesField.setAccessible(true);
-			if(modifying!=null) {
-				sqlValuesField.set(rule,modifyParserMethod.invoke(null));
-			} else if(returnType == Page.class && queryById != null) {
-				sqlValuesField.set(rule,QueryParser.pageParserByNamed());
-			} else if(returnType == Page.class) {
-				sqlValuesField.set(rule,QueryParser.pageParser());
-			} else if (currentMethod.getAnnotation(Query.class)==null && modifying==null) {
-			
-			} else {
-				System.out.println("queryParserMethod:" + queryParserMethod);
-				sqlValueField.set(rule,queryParserMethod.invoke(null));
-			}
+		LOG.debug("RepositoryInvocationHandler:当前线程:" + Thread.currentThread());
+		Method currentMethod = QueryContext.getMethod();
+		Method modifyParserMethod = clazz.getDeclaredMethod("modifyParser");
+		Method queryParserMethod = clazz.getDeclaredMethod("queryParser");
+		modifyParserMethod.setAccessible(true);
+		queryParserMethod.setAccessible(true);
+		LOG.debug("modifyParserMethod:" + modifyParserMethod);
+		LOG.info("currentMethod:" + currentMethod);
+		Modifying modifying = currentMethod.getAnnotation(Modifying.class);
+		Class<?> returnType = QueryContext.getReturnType();
+		QueryByNamed queryById = currentMethod.getAnnotation(QueryByNamed.class);
+		Query query = currentMethod.getAnnotation(Query.class);
+
+		Class<FastQueryTestRule> qcclazz = FastQueryTestRule.class;
+		Field sqlValueField = qcclazz.getDeclaredField("sqlValue");
+		Field sqlValuesField = qcclazz.getDeclaredField("sqlValues");
+		sqlValueField.setAccessible(true);
+		sqlValuesField.setAccessible(true);
+		if (modifying != null) {
+			// 改操作设计多条sql语句
+			sqlValuesField.set(rule, modifyParserMethod.invoke(null));
+		} else if (returnType == Page.class && queryById != null) {
+			sqlValuesField.set(rule, QueryParser.pageParserByNamed());
+		} else if (returnType == Page.class) {
+			sqlValuesField.set(rule, QueryParser.pageParser());
+		} else if (queryById != null || query != null) {
+			sqlValueField.set(rule, queryParserMethod.invoke(null));
+		} else {
+			LOG.error("暂时没考虑");
+		}
 	}
-	
+
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws RepositoryException {
 		try {
+			if (method.getDeclaringClass() == Object.class) { // 如果拦截的方法是继承之Object,那么直接放行
+				return method.invoke(repository, args);
+			}
+
 			before();
 			Object result;
 			result = method.invoke(repository, args);
-			after();		
+			after();
 			return result;
 		} catch (Throwable e) {
 			e.printStackTrace();

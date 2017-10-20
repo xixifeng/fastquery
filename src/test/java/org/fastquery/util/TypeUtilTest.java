@@ -25,13 +25,15 @@ package org.fastquery.util;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.fastquery.core.Id;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
@@ -51,6 +53,8 @@ import static org.hamcrest.Matchers.*;
  * @author xixifeng (fastquery@126.com)
  */
 public class TypeUtilTest implements Opcodes {
+
+	private static final Logger LOG = Logger.getLogger(TypeUtilTest.class);
 
 	@Test
 	public void testGetTypeInfo() {
@@ -139,8 +143,7 @@ public class TypeUtilTest implements Opcodes {
 				assertThat(methodDescriptor, equalTo(Type.getType(m2).getDescriptor()));
 			}
 		}
-		System.out.println(
-				"testGetMethod,共测试了" + clazzs.size() + "个类, 用时: " + (System.currentTimeMillis() - start) + " 毫秒!");
+		LOG.debug("testGetMethod,共测试了" + clazzs.size() + "个类, 用时: " + (System.currentTimeMillis() - start) + " 毫秒!");
 	}
 
 	@Test
@@ -405,7 +408,7 @@ public class TypeUtilTest implements Opcodes {
 		String where = "name=:name and age = :age or sex = :sex";
 		List<String> strs = TypeUtil.matches(where, ":\\S+\\b");
 		for (String str : strs) {
-			System.out.println(str);
+			LOG.debug(str);
 		}
 	}
 
@@ -518,4 +521,33 @@ public class TypeUtilTest implements Opcodes {
 		str = TypeUtil.replace(src, 20, 5);
 		assertThat(str, equalTo(""));
 	}
+
+	@Test
+	public void mapValueTyep() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+			NoSuchMethodException, SecurityException {
+		class A {
+			public Map<String, String> todo() {
+				return null;
+			}
+		}
+
+		Class<?> clazz = A.class;
+		Method method = clazz.getMethod("todo");
+		assertThat(TypeUtil.mapValueTyep(method) == String.class, is(true));
+	}
+
+	@Test
+	public void listMapValueTyep() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+			NoSuchMethodException, SecurityException {
+		class B {
+			public List<Map<String, String>> todo() {
+				return null;
+			}
+		}
+
+		Class<?> clazz = B.class;
+		Method method = clazz.getMethod("todo");
+		assertThat(TypeUtil.listMapValueTyep(method) == String.class, is(true));
+	}
+
 }

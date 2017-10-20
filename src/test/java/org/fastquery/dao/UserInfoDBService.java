@@ -107,8 +107,7 @@ public interface UserInfoDBService extends QueryRepository {
 	@Query("update `userinfo` set `name`=?1 where id=?3")
 	@Query("update `userinfo` set `age`=?2 where id=?3")
 	int[] updateBatch3(String name, Integer age, Integer id);
-	
-	
+
 	@Transactional
 	@Modifying
 	@Query("delete from ${db}.PMSchedule where id in (${ids})")
@@ -130,7 +129,7 @@ public interface UserInfoDBService extends QueryRepository {
 	@Condition("age > :age")
 	@Condition("and id < :id")
 	Page<UserInfo> findSome1(@Param("age") Integer age, @Param("id") Integer id, Pageable pageable);
-	
+
 	@Query(value = "select count(name) from `userinfo` #{#where}")
 	@Condition("age > :age")
 	@Condition("and id < :id")
@@ -173,17 +172,17 @@ public interface UserInfoDBService extends QueryRepository {
 
 	@Query("select age from UserInfo where id = ?1")
 	Integer findAge(Integer id);
-	
+
 	@Query("select * from UserInfo #{#where}")
-	@Condition(value="age = ?1",ignoreNull=false)
+	@Condition(value = "age = ?1", ignoreNull = false)
 	List<UserInfo> findUserInfoByNullAge(Integer age);
-	
+
 	@Query("select name from UserInfo limit 3")
 	String[] findNames();
-	
+
 	@Query("select age from UserInfo limit 3")
 	String[] findAges();
-	
+
 	@Query("select age from UserInfo where age is not null limit 3")
 	Integer[] findAges2();
 }

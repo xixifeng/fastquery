@@ -119,9 +119,6 @@ public class QueryParser {
 					for (Entry<Integer, Integer> entry : entities) {
 						sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
 					}
-					// 处理sql中的匹配符(%_)问题
-					// 取出需要处理的片段
-					LOG.info("处理匹配符之前:" + sql);
 					return new SQLValue(sql, objs);
 	}
 

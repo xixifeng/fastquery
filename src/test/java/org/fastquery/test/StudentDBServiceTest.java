@@ -35,6 +35,7 @@ import org.fastquery.core.QueryRepository;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.filter.SkipFilter;
 import org.fastquery.service.FQuery;
+import org.fastquery.struct.SQLValue;
 
 import static org.hamcrest.Matchers.*;
 
@@ -53,9 +54,9 @@ public class StudentDBServiceTest {
 
 	private static final Logger LOG = Logger.getLogger(StudentDBServiceTest.class);
 
-	@Rule  
-	public FastQueryTestRule rule = new FastQueryTestRule(); 
-	
+	@Rule
+	public FastQueryTestRule rule = new FastQueryTestRule();
+
 	private StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
 
 	@Test
@@ -71,8 +72,25 @@ public class StudentDBServiceTest {
 	// int update(String no,String name,int age)
 	@Test
 	public void update() {
-		int seffot = studentDBService.update("9512101", "小不点", 17);
+		String no = "9512101";
+		String name = "小不点";
+		int age = 17;
+		int seffot = studentDBService.update(no, name, age);
 		assertThat(seffot, is(1));
+		assertThat(rule.getSQLValue(), nullValue());
+		if (rule.isDebug()) {
+			List<SQLValue> sqlValues = rule.getListSQLValue();
+			assertThat(sqlValues.size(), is(1));
+			SQLValue sqlValue = sqlValues.get(0);
+			assertThat(sqlValue.getSql(),
+					equalToIgnoringWhiteSpace("update student s set s.age=?,s.name=? where  s.no=?"));
+			assertThat(sqlValue.getSql(), equalTo("update student s set s.age=?,s.name=? where  s.no=?"));
+			List<Object> values = sqlValue.getValues();
+			assertThat(values.size(), is(3));
+			assertThat(values.get(0).getClass() == Integer.class && values.get(0).equals(age), is(true));
+			assertThat(values.get(1).getClass() == String.class && values.get(1).equals(name), is(true));
+			assertThat(values.get(2).getClass() == String.class && values.get(2).equals(no), is(true));
+		}
 	}
 
 	// @Query("update student s set s.age=?2 where s.no=?1")
@@ -174,7 +192,7 @@ public class StudentDBServiceTest {
 	@Test
 	public void count2() {
 		int i = studentDBService.count2();
-		System.out.println("i=" + i);
+		LOG.debug("i=" + i);
 		assertThat(i, greaterThan(1));
 	}
 
@@ -259,7 +277,7 @@ public class StudentDBServiceTest {
 		assertThat(map.get("name"), equalTo("张三"));
 		assertThat(map.get("age"), equalTo(36));
 	}
-	
+
 	@Test
 	public void addUserInfo2() {
 		Map<String, String> map = studentDBService.addUserInfo2("Lisi", 32);
@@ -310,13 +328,13 @@ public class StudentDBServiceTest {
 
 	@Test
 	public void findOneCourse() {
-		System.out.println("xxx:" + studentDBService.findOneCourse());
+		LOG.debug("xxx:" + studentDBService.findOneCourse());
 	}
 
 	@Test
 	public void findStudentByAge() {
 		Integer age = studentDBService.findAgeByStudent();
-		System.out.println("age: " + age);
+		LOG.debug("age: " + age);
 	}
 
 	@Test
@@ -327,7 +345,7 @@ public class StudentDBServiceTest {
 		// desc
 		if (students != null) {
 			for (int i = 0; i < students.length; i++) {
-				System.out.println(students[i]);
+				LOG.debug(students[i]);
 			}
 		}
 	}
@@ -392,7 +410,7 @@ public class StudentDBServiceTest {
 		List<String> names = studentDBService.findNames();
 		assertThat(names.size(), greaterThanOrEqualTo(3));
 		names.forEach(name -> {
-			System.out.println(name);
+			LOG.debug(name);
 		});
 	}
 
@@ -407,7 +425,7 @@ public class StudentDBServiceTest {
 		Map<String, String> map = studentDBService.findTop1Student();
 		map.forEach((k, v) -> assertThat(v, is(instanceOf(String.class))));
 		JSONObject json = (JSONObject) JSONObject.toJSON(map);
-		System.out.println(json.toJSONString());
+		LOG.debug(json.toJSONString());
 	}
 
 }

@@ -151,7 +151,7 @@ public class BeanUtilTest {
 		assertThat(str,
 				equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('牵牛花','3'),('10','松''鼠','5')"));
 	}
-	
+
 	@Test
 	public void beansToInsertSQL4() {
 		Visitor v = new Visitor();

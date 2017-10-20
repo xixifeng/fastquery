@@ -47,19 +47,13 @@ public class FastQueryJSONObjectTest {
 	@Test
 	public void testGetBasedir() {
 		String basedir = FastQueryJSONObject.getBasedir();
-		assertThat(basedir, equalTo("/root/git/fastquery/fastquery/tmp/"));
+		assertThat(basedir, equalTo("/mywork/myosgi/osgi_workspace/fastquery/tmp/"));
 	}
 
 	@Test
 	public void testGetVelocity() {
 		String velocity = FastQueryJSONObject.getVelocity();
 		assertThat(velocity, equalTo("/root/git/fastquery/fastquery/src/test/resources/velocity.properties"));
-	}
-
-	@Test
-	public void testGetDebug() {
-		boolean debug = FastQueryJSONObject.getDebug();
-		assertThat(debug, equalTo(false));
 	}
 
 	@Test

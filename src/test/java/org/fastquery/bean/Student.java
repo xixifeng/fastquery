@@ -91,12 +91,14 @@ public class Student {
 	public String toString() {
 		return "Student [no=" + no + ", name=" + name + ", sex=" + sex + ", age=" + age + ", dept=" + dept + "]";
 	}
-	
+
 	@Transient
 	private String description;
+
 	public String getDescription() {
 		return description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}

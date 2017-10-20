@@ -274,7 +274,7 @@ public class QueryHandler {
 				if (keys.size() == 1) { // 集合中的单个元素是一对键值
 					key = keys.iterator().next();
 					if(componentType==String.class) {
-						Array.set(array, index, map.get(key).toString());
+						Array.set(array, index, map.get(key)!=null?map.get(key).toString():null);
 					} else {
 						Array.set(array, index, map.get(key));
 					}
