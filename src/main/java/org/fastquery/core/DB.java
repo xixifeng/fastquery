@@ -486,7 +486,7 @@ public class DB {
 		sb.append("\n");
 		int len = objs.size();
 		for (int i = 0; i < len; i++) {
-			sb.append(String.format("第%d个\"?\"对应的参数值是:'%s';%n", i+1,objs.get(i)));
+			sb.append(String.format("第%d个\"?\"对应的参数值是:%s;%n", i+1,objs.get(i)));
 		}
 		LOG.info(sb.toString());
 	}

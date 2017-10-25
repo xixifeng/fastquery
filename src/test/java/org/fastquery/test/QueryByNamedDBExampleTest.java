@@ -25,6 +25,7 @@ package org.fastquery.test;
 import org.apache.log4j.Logger;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
+import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.QueryByNamedDBExample;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.page.Page;
@@ -210,6 +211,42 @@ public class QueryByNamedDBExampleTest {
 			List<Object> values = sqlValue.getValues();
 			assertThat(values, notNullValue());
 			assertThat(values.get(0), equalTo("%" + name + "%"));
+		}
+	}
+	
+	@Test(expected=RepositoryException.class)
+	public void findUserInfoByFuzzyName2() {
+		queryByNamedDBExample.findUserInfoByFuzzyName(null);
+	}
+	
+	@Test(expected=RepositoryException.class)
+	public void findUserInfoByFuzzyName3() {
+		queryByNamedDBExample.findUserInfoByFuzzyName("%");
+	}
+	
+	@Test(expected=RepositoryException.class)
+	public void findUserInfoByFuzzyName4() {
+		queryByNamedDBExample.findUserInfoByFuzzyName("");
+	}
+	
+	@Test(expected=RepositoryException.class)
+	public void findUserInfoByFuzzyName5() {
+		queryByNamedDBExample.findUserInfoByFuzzyName("%%");
+	}
+	
+	@Test
+	public void findUserInfo() {
+		Integer id = null;
+		String name = "J";
+		Integer age = null;
+		queryByNamedDBExample.findUserInfo(id, name, age);
+		if(rule.isDebug()) {
+			SQLValue sqlValue = rule.getSQLValue();
+			assertThat(sqlValue.getSql(), equalTo("select * from UserInfo where id > ? and age > 18 or name like ?"));
+			List<Object> vals = sqlValue.getValues();
+			assertThat(vals.size(), is(2));
+			assertThat(vals.get(0), nullValue());
+			assertThat(vals.get(1), equalTo("%"+name+"%"));
 		}
 	}
 }

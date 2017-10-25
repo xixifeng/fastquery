@@ -521,6 +521,13 @@ public class TypeUtilTest implements Opcodes {
 		str = TypeUtil.replace(src, 20, 5);
 		assertThat(str, equalTo(""));
 	}
+	
+	@Test
+	public void replace5() {
+		String src = "?5";
+		String str = TypeUtil.replace(src, 0, 5);
+		assertThat(str, equalTo("?,?,?,?,?5"));
+	}
 
 	@Test
 	public void mapValueTyep() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,

@@ -24,7 +24,6 @@ package org.fastquery.test;
 
 import java.lang.reflect.Field;
 
-import org.fastquery.core.PlaceholderTest;
 import org.fastquery.dao.ProductDBServiceTest;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.service.FQuery;

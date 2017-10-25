@@ -426,7 +426,7 @@ public final class BeanUtil {
 	 * @return 更新语句信息
 	 */
 	public static Object[] toUpdateSQL(Object bean,String dbName,String where) {
-		List<String> wps = TypeUtil.matches(where.replace(",", " ,"), Placeholder.SL_REG);
+		List<String> wps = TypeUtil.matches(where , Placeholder.COLON_REG);
 		Object[] updateinfo = new Object[2];
 		List<Object> args = new ArrayList<>();
 		Class<?> cls = bean.getClass();
@@ -465,7 +465,7 @@ public final class BeanUtil {
 				return null;
 			}
 			// where的后面部分 和 追加sql参数
-			String whef = where.replace(",", " ,").replaceAll(Placeholder.SL_REG, "?");
+			String whef = where.replaceAll(Placeholder.COLON_REG, "?");
 			for (String wp : wps) {
 				Object val = new PropertyDescriptor(wp.replace(":", ""), cls).getReadMethod().invoke(bean);
 				if(val==null) {

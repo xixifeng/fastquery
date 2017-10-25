@@ -62,4 +62,7 @@ public interface QueryByNamedDBExample extends QueryRepository {
 
 	@QueryByNamed
 	List<UserInfo> findUserInfoByFuzzyName(@Param("name") String name);
+	
+	@QueryByNamed
+	List<UserInfo> findUserInfo(@Param("id") Integer id,@Param("name") String name,@Param("age") Integer age);
 }

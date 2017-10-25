@@ -159,13 +159,21 @@ public class TypeUtil implements Opcodes{
 	
 	//给定一个"正则匹配"匹配在另一个字符串,把匹配上的字符串存入一个数组里. 这样一来即可以用,又可以统计出现次数!
 	public static List<String> matches(String str,String regex) {
-		return matcheAll(regex, str, new ArrayList<>());
+		List<String> empty = new ArrayList<>();
+		if(str==null) {
+			return empty;
+		}
+		return matcheAll(regex, str, empty);
 	}
 	
 	
 	// 集合中没有重复
 	public static Set<String> matchesNotrepeat(String str,String regex) {
-		return matcheAll(regex, str, new HashSet<>());
+		Set<String> empty = new HashSet<>();
+		if(str==null) {
+			return empty;
+		}
+		return matcheAll(regex, str, empty);
 	}
 	
 	
@@ -452,7 +460,7 @@ public class TypeUtil implements Opcodes{
 					s = s.replaceAll("\\:"+param.value()+"\\b", "?"+(i+1));
 					// 这两个replaceAll的先后顺序很重要
 					// '{' 是正则语法的关键字,必须转义
-					s = s.replaceAll("\\$\\{"+param.value()+"\\}", objx!=null?objx.toString():param.defaultVal());
+					s = s.replaceAll("\\$\\{?"+param.value()+"\\}?", objx!=null?objx.toString():Matcher.quoteReplacement(param.defaultVal()));
 				}
 			}
 		}
@@ -599,19 +607,20 @@ public class TypeUtil implements Opcodes{
 				}
 			}
 
-			sb.append(' ');
+			int sblen = sb.length();
+			// sb的长度是0 或者 最后一个字符就是空格
+			if( sblen ==0 || (sblen>=1 && sb.charAt(sblen-1) != ' ')   ) {
+				sb.append(' ');	
+			}
 			if (sb.length() == 1 && i != 0) { // 条件成立,表示这个SQL条件的前面还不存在条件,// 那么第一个条件的链接符,必须去掉. (where后面不能直接跟运算符号)
-				sb.append(' ');
 				sb.append(removePart(value));
 			} else {
-				sb.append(' ');
 				sb.append(value);
 			}
-
 		}
 		// 追加条件 End
 		if (!"".equals(sb.toString())) { // 特别注意: 此处不能写成 !sb.equals("")
-			sb.replace(0, 1, "where");
+			sb.insert(0, "where");
 		}
 		return sb.toString();
 	}

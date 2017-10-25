@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.28</version>
+    <version>1.0.29</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.28'
+compile 'org.fastquery:fastquery:1.0.29'
 ```
 
 ### Apache Archive
@@ -423,7 +423,7 @@ UserInfo[] findUserInfoByNameOrAge(@Param("name") String name, @Param("age")Inte
 
 
 **SQL中的变量采用${name}表达式**  
-实现原样替换.不过请注意避免SQL注入问题.   
+实现原样替换,当然,也可以写成`$name`.不过请注意避免SQL注入问题.   
 
 ```java
 @Query("select * from `userinfo` where ${one} ${orderby}")
@@ -449,6 +449,19 @@ UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
 // orderby 若为null, 那么 ${orderby}的值,就取defaultVal的值
 JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") String orderby);
 ```
+
+## 微笑表达式
+定义: 以 **`-** 作为开始,以 **-`** 作为结尾,包裹着若干字符,这样的表达式称之为`微笑表达式`. 例如: ** `-%${name}%-` **.  
+作用:  
+1.可以作为实参的模板,举例: 查询出姓"张"的用户.没有`微笑表达式`时的写法:
+```java
+// 这种写法不好,需要手动拼接模糊搜索关键字
+db.findLikeName(name + "%"); 
+```
+
+现在有`微笑表达式`了,在模板中,可以配置name实参的模板.假设模板中通过**`-:name%-`**引用这个实参,那么**`-:name%-`**将会作为这个实参的模板. 
+
+2.采用`微笑表达式`的片段,会过滤敏感关键字,严格防止SQL注入. 建议用在`$表达式`/`${表达式}`上,因为**$表达式的存在仅仅是为了开发者方便构建SQL**,使用不当很危险,加上`微笑表达式`可以防止由于开发者的疏忽而引发的SQL注入问题.**注意**: 冒号表达式,如`:name`会替换成占位符`?`号,因此不存在注入问题,不必使用`微笑表达式`来预防.
 
 ##  SQL IN
 

@@ -76,7 +76,6 @@ public class QueryParser {
 			// 获取sql
 			String sql = sqls.get(jk);
 			int[] ints = TypeUtil.getSQLParameter(sql);
-			sql = sql.replaceAll(Placeholder.SP1_REG, "?");
 			// 替换SQL中的占位变量符
 			sql = sql.replaceAll(Placeholder.TABLE_REG, table);
 			sql = sql.replaceAll(Placeholder.ID_REG, id);
@@ -107,7 +106,6 @@ public class QueryParser {
 		Query[] queries = method.getAnnotationsByType(Query.class);
 		String sql = TypeUtil.getQuerySQL(method, queries, QueryContext.getArgs()).get(0);
 		int[] ints = TypeUtil.getSQLParameter(sql);
-		sql = sql.replaceAll(Placeholder.SP1_REG, "?");
 		
 					// sql 中的"?"号调整
 					// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
@@ -174,7 +172,6 @@ public class QueryParser {
 				
 				sql = sql.replaceFirst(Placeholder.LIMIT_RGE, limit);
 				
-				sql = sql.replaceAll(Placeholder.SP1_REG, "?");
 				
 				// sql 中的"?"号调整
 				// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
@@ -220,7 +217,6 @@ public class QueryParser {
 						 sql = TypeUtil.getCountQuerySQL(method, sql, args);
 					} else {
 						sql = TypeUtil.getCountQuerySQL(method, countQuery, args);
-						sql = sql.replaceAll(Placeholder.SP1_REG, "?");
 					}
 					
 					 // 求和语句不需要order by 和 limit
@@ -230,7 +226,6 @@ public class QueryParser {
 					 // 过滤limit后面的字符串(包含自身)
 					 sql = sql.replaceFirst("(?i)(limit )(.|\n)+", "");
 
-			try {
 				// sql 中的"?"号调整
 				// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?)
 				// 那么这个?的实际个数取决于传递的集合长度
@@ -244,8 +239,6 @@ public class QueryParser {
 				}
 				// sql 中的"?"号调整 End
 				sqlValues.add(new SQLValue(sql, vos));
-			} catch (Exception e) {
-			}
 		} else {
 			// 在查一下推算出下一页是否有数据, 要不要把下一页的数据存储起来,有待考虑...
 			firstResult = pageable.getOffset()+pageable.getPageSize();
@@ -255,8 +248,6 @@ public class QueryParser {
 			sb.append(maxResults);
 			limit = sb.toString();
 			sql = ssql.replaceFirst(Placeholder.LIMIT_RGE, limit);
-			sql = sql.replaceAll(Placeholder.SP1_REG, "?");
-			try {
 				// sql 中的"?"号调整
 				// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
 				ParamMap paramMap3 = TypeUtil.getParamMap(ints, args);
@@ -269,10 +260,6 @@ public class QueryParser {
 				}
 				// sql 中的"?"号调整 End
 				sqlValues.add(new SQLValue(sql, pjs));
-			} catch (Exception e) {
-				throw new RepositoryException(e.getMessage(),e);
-			} finally {
-			}
 		}
 				
 
@@ -311,7 +298,6 @@ public class QueryParser {
 		String sql = TypeUtil.paramNameFilter(method, args, query);
 		int[] ints = TypeUtil.getSQLParameter(sql);
 				
-		sql = sql.replaceAll(Placeholder.SP1_REG, "?");
 		String limit = getLimit(pageable.getOffset(),pageable.getPageSize());
 		if(sql.indexOf(Placeholder.LIMIT)!=-1){ // 如果#{#limit}存在
 			sql = sql.replaceAll(Placeholder.LIMIT_RGE, limit);	
@@ -320,47 +306,37 @@ public class QueryParser {
 		}
 
 		
-		try {
 			// sql 中的"?"号调整
 			// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
-			ParamMap paramMap = TypeUtil.getParamMap(ints, args);
-			Map<Integer, Integer> rpates = paramMap.getRps();
-			List<Object> objs = paramMap.getObjs();
+			ParamMap paramMap1 = TypeUtil.getParamMap(ints, args);
+			Map<Integer, Integer> rpates1 = paramMap1.getRps();
+			List<Object> objs1 = paramMap1.getObjs();
 			
-			Set<Entry<Integer, Integer>> entities = rpates.entrySet();
-			for (Entry<Integer, Integer> entry : entities) {
+			Set<Entry<Integer, Integer>> entities1 = rpates1.entrySet();
+			for (Entry<Integer, Integer> entry : entities1) {
 				sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
 			}
 			// sql 中的"?"号调整 End
 			LOG.info(sql);
-			sqlValues.add(new SQLValue(sql, objs));
-		} catch (Exception e) {
-			throw new RepositoryException(e.getMessage(),e);
-		} finally {
-		}
+			sqlValues.add(new SQLValue(sql, objs1));
+		
 		
 		if(method.getAnnotation(NotCount.class)==null) { // 需要求和
 			 sql = TypeUtil.paramNameFilter(method, args,countQuery);
 			 ints = TypeUtil.getSQLParameter(sql); // 06-11-11
-			 sql = sql.replaceAll(Placeholder.SP1_REG, "?");
-			try {
 				// sql 中的"?"号调整
 				// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
-				ParamMap paramMap = TypeUtil.getParamMap(ints, args);
-				Map<Integer, Integer> rpates = paramMap.getRps();
-				List<Object> objs = paramMap.getObjs();
+				ParamMap paramMap2 = TypeUtil.getParamMap(ints, args);
+				Map<Integer, Integer> rpates2 = paramMap2.getRps();
+				List<Object> objs2 = paramMap2.getObjs();
 				
-				Set<Entry<Integer, Integer>> entities = rpates.entrySet();
+				Set<Entry<Integer, Integer>> entities = rpates2.entrySet();
 				for (Entry<Integer, Integer> entry : entities) {
 					sql = TypeUtil.replace(sql, entry.getKey(),entry.getValue());
 				}
 				// sql 中的"?"号调整 End
 				LOG.info("求和语句: " + sql);
-				sqlValues.add(new SQLValue(sql, objs));
-			} catch (Exception e) {
-				throw new RepositoryException(e);
-			} finally {
-			}
+				sqlValues.add(new SQLValue(sql, objs2));
 
 			// 求和 --------------------------------------------------- End
 		} else {
@@ -375,8 +351,6 @@ public class QueryParser {
 			} else {
 				sql += limit;
 			}
-			sql = sql.replaceAll(Placeholder.SP1_REG, "?");
-			try {
 				// sql 中的"?"号调整
 				// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
 				ParamMap paramMap = TypeUtil.getParamMap(ints, args);
@@ -390,10 +364,6 @@ public class QueryParser {
 				// sql 中的"?"号调整 End
 				LOG.debug("下一页的SQL:" + sql);
 				sqlValues.add(new SQLValue(sql, objs));
-			} catch (Exception e) {
-				throw new RepositoryException(e.getMessage(),e);
-			} finally {
-			}
 		}
 					
 		return sqlValues;

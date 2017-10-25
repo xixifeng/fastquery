@@ -96,7 +96,11 @@
 	</query>
 	
 	<query id="findUserInfoByFuzzyName">
-		select * from UserInfo where name like %:name%
+		select * from UserInfo where name like `-%:name%-`
+	</query>
+	
+	<query id="findUserInfo">
+		select * from UserInfo where id > :id and age > 18 or name like `-%:name%-`
 	</query>
 </queries>
 

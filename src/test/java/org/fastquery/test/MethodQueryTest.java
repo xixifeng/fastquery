@@ -170,20 +170,26 @@ public class MethodQueryTest {
 		String name = "框架测试!";
 		Integer age = 3;
 		UserInfo entity = new UserInfo(id, name, age);
+		
+		UserInfo u = studentDBService.update(entity);
+		assertThat(u.getId(), is(id));
+		assertThat(u.getName(), equalTo(name));
+		assertThat(u.getAge(), is(3));
+		
 		// 会解析成:update `UserInfo` set `id`=?, `age`=? where name = ?
-		int effect = studentDBService.update(entity, "name = :name or name = '好哇瓦'");
+		int effect = studentDBService.update(entity, "name = :name");
 		// 断言: 影响的行数大于0行
 		assertThat(effect, greaterThan(0));
 
 		// 不想让id字段参与改运算
 		entity.setId(null);
 		// 会解析成:update `UserInfo` set `age`=? where name = ?
-		effect = studentDBService.update(entity, "name = :name or name = '好哇瓦'");
+		effect = studentDBService.update(entity, "name = :name");
 		assertThat(effect, greaterThan(0));
 
 		// 不想让age字段参与改运算
 		entity.setAge(null);
-		effect = studentDBService.update(entity, "name = :name or name = '好哇瓦'");
+		effect = studentDBService.update(entity, "name = :name");
 		assertThat(effect, is(0));
 	}
 

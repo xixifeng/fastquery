@@ -24,42 +24,69 @@ package org.fastquery.core;
 
 /**
  * 占位符/正则 常量
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public interface Placeholder {
-	
-	String TABLE="#{#table}";
-	String TABLE_REG="\\#\\{\\#table\\}";
 
-	String ID="#{#id}";
-	String ID_REG="\\#\\{\\#id\\}";
-	
-	String WHERE="#{#where}";
-	String WHERE_REG="\\#\\{\\#where\\}";
-	
-	String LIMIT="#{#limit}";
-	String LIMIT_RGE="\\#\\{\\#limit\\}";
-	
-	// 匹配 (?4,?5,?6)的正则(允许有首尾空格)
-	String INV_REG = "\\s*\\(\\s*\\?\\d+\\s*,\\s*\\?\\d+\\s*,\\s*\\?\\d+\\s*\\)\\s*"; 
-	
-	// 不区分大小写匹配格式 "?8 and ?9"
+	String TABLE = "#{#table}";
+	String TABLE_REG = "\\#\\{\\#table\\}";
+
+	String ID = "#{#id}";
+	String ID_REG = "\\#\\{\\#id\\}";
+
+	String WHERE = "#{#where}";
+	String WHERE_REG = "\\#\\{\\#where\\}";
+
+	String LIMIT = "#{#limit}";
+	String LIMIT_RGE = "\\#\\{\\#limit\\}";
+
+	/**
+	 *  匹配 (?4,?5,?6)的正则(允许有首尾空格)
+	 */
+	String INV_REG = "\\s*\\(\\s*\\?\\d+\\s*,\\s*\\?\\d+\\s*,\\s*\\?\\d+\\s*\\)\\s*";
+
+	/**
+	 *  不区分大小写匹配格式 "?8 and ?9"
+	 */
 	String ANDV_REG = "(?i)\\s*\\?\\d+\\s+and\\s+\\?\\d+\\s*";
-	
+
 	String SP1_REG = "\\?\\d+";
 	
-	// 匹配格式 "?2"(允许首尾空格)
-	String SP2_REG = "\\s*\\?\\d+\\s*";
+	/**
+	 *  搜索出"?"后面的数字
+	 */
+	String SEARCH_NUM = "(?<=\\?)\\d+";
 	
-	// 注意: 该正则它能把":id,:name,:age"作为一个整体匹配下来
-	String SL_REG = ":\\S+\\b";
+	/**
+	 *  匹配冒号表达式
+	 */
+	String COLON_REG = ":[A-Za-z0-9]+";
+
+	/**
+	 * 匹配EL表达式
+	 */
+	String EL_REG = "\\$\\{?[A-Za-z0-9]+\\}?";
+
 	
-	String P_REG = "\\$\\{\\S+\\}";
+	/**
+	 * 匹配EL表达式或匹配冒号表达式
+	 */
+	String EL_OR_COLON = EL_REG + "|" + COLON_REG;
+
 	
-	// 匹配格式 "sql字符串匹配符 ?N+ sql字符串匹配符"
-	// 如,匹配,%?1% , _?1 ?1%等 
-	// 举例: 若str="select * from UserInfo where name like %?X  and age like _?Y ",其中X,Y都是N+,通过该正则能匹配出结果:[ " %?  "," _? "] <br>
-	String Q_MATCH = "[_\\s*%]+\\?[_\\s*%]+";
+	/**
+	 * 匹配微笑表达式
+	 */
+	String SMILE = "`-[^`]*\\?[^`]*-`";
 	
-	String SQLSPLIT="(;\\s*\\r\\n)|(;\\s*\\n)";
+	String SMILE_BIG = "`-[^`]*[^`]*-`";
+	
+	/**
+	 * 匹配SQL文件中的一行
+	 */
+	String SQLSPLIT = "(;\\s*\\r\\n)|(;\\s*\\n)";
+
+	String PERCENT = "%+";
+
 }

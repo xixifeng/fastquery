@@ -4,7 +4,7 @@
 
 	<groupId>org.fastquery</groupId>
 	<artifactId>fastquery</artifactId>
-	<version>1.0.28</version> 
+	<version>1.0.29</version> 
 	<packaging>jar</packaging>
 
 	<name>fastquery</name>
