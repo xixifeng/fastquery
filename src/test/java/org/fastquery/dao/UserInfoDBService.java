@@ -185,4 +185,9 @@ public interface UserInfoDBService extends QueryRepository {
 
 	@Query("select age from UserInfo where age is not null limit 3")
 	Integer[] findAges2();
+	
+	@Query("select id,name,age from UserInfo #{#where}")
+	@Condition(value="age = ?1",ignoreNull=false)
+	@Condition(value=" and name like ?2")
+	List<Map<String, Object>> findUserSome2(Integer age,String name);
 }

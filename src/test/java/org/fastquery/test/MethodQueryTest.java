@@ -126,8 +126,9 @@ public class MethodQueryTest {
 		userInfos.add(u1);
 		userInfos.add(u2);
 		userInfos.add(u3);
+		userInfos.add(new UserInfo("我是谁", null));
 		int effect = studentDBService.save(false, userInfos);
-		assertThat(effect, is(3));
+		assertThat(effect, is(4));
 	}
 
 	@Test

@@ -417,16 +417,22 @@ public class TypeUtilTest implements Opcodes {
 
 	public void m2(@Param("$^i") int i, @Param("$i1$") int i1, @Param("^i2") int i2) {
 	}
+	
+	private static String paramFilter(Method method, Object[] args, String sql) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		Method pf = TypeUtil.class.getDeclaredMethod("paramFilter",Method.class,Object[].class,String.class);
+		pf.setAccessible(true);
+		return pf.invoke(null, method,args,sql).toString();
+	}
 
 	@Test
-	public void paramFilter() throws NoSuchMethodException, SecurityException {
+	public void paramFilter() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Method m1 = TypeUtilTest.class.getMethod("m1", int.class, int.class, int.class);
 		Object[] agrs = new Object[] { 11, 22, 33 };
 		String sql = "abc :i and :i1 where :i2";
-		String str = TypeUtil.paramFilter(m1, agrs, sql);
+		String str = paramFilter(m1, agrs, sql);
 		assertThat(str, equalTo("abc ?1 and ?2 where ?3"));
 		sql = "abc :i1 and :i2 where :i";
-		str = TypeUtil.paramFilter(m1, agrs, sql);
+		str = paramFilter(m1, agrs, sql);
 		assertThat(str, equalTo("abc ?2 and ?3 where ?1"));
 	}
 

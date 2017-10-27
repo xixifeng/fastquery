@@ -27,7 +27,6 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import org.fastquery.core.QueryByNamed;
 import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.page.Page;
 import org.fastquery.page.PageIndex;
@@ -43,65 +42,67 @@ public class TplPageFilter implements MethodFilter {
 
 	@Override
 	public Method doFilter(Method method) {
-		
-		if(method.getReturnType() == Page.class) {
-			// 0). QueryByNamed的值不能为""
-			if("".equals(method.getAnnotation(QueryByNamed.class).value())){
-				this.abortWith(method, "@QueryByNamed的值不能为空字符串");
-			}
-			
+
+		if (method.getReturnType() == Page.class) {
+
 			// 1). Page<T> 中的T要么是Map,要么是一个实体.
 			ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
-			
+
 			Type[] types = type.getActualTypeArguments();
 			Type t = types[0];
-			if(ParameterizedType.class.isAssignableFrom(t.getClass()) && !("org.fastquery.page.Page<java.util.Map<java.lang.String, java.lang.Object>>".equals( type.getTypeName()))){
+			if (ParameterizedType.class.isAssignableFrom(t.getClass())
+					&& !("org.fastquery.page.Page<java.util.Map<java.lang.String, java.lang.Object>>"
+							.equals(type.getTypeName()))) {
 				this.abortWith(method, "Page<T> 中的T要么是Map<String,Object>,要么是一个实体.");
 			}
-				
-			if(Class.class.isAssignableFrom(t.getClass()) && !(TypeUtil.hasDefaultConstructor((Class<?>)t))){
+
+			if (Class.class.isAssignableFrom(t.getClass()) && !(TypeUtil.hasDefaultConstructor((Class<?>) t))) {
 				this.abortWith(method, "Page<T> 中的T要么是Map<String,Object>,要么是一个实体.");
 			}
-			
+
 			Parameter[] parameters = method.getParameters();
-			
+
 			// 2). 方法参数中,要么出现Pageable类型,要么存在@PageIndex和@PageSize
-			if(!TypeUtil.hasType(Pageable.class, parameters) &&  !hasPageAnn(parameters)) {
+			if (!TypeUtil.hasType(Pageable.class, parameters) && !hasPageAnn(parameters)) {
 				this.abortWith(method, "这是分页,参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize");
 			}
-			
+
 			// 3). 参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize,不能同时都出现
-			if(TypeUtil.hasType(Pageable.class, parameters) &&  hasPageAnn(parameters)) {
+			if (TypeUtil.hasType(Pageable.class, parameters) && hasPageAnn(parameters)) {
 				this.abortWith(method, "这是分页,参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize,不能同时都出现.");
-			}			
-			
+			}
+
 			// 4). @PageIndex或@PageSize 最多只能出现一次
-			if(TypeUtil.countRepeated(PageIndex.class, parameters)>1){
+			if (TypeUtil.countRepeated(PageIndex.class, parameters) > 1) {
 				this.abortWith(method, "@PageIndex 最多只能出现一次");
 			}
-			if(TypeUtil.countRepeated(PageSize.class, parameters)>1) {
+			if (TypeUtil.countRepeated(PageSize.class, parameters) > 1) {
 				this.abortWith(method, "@PageSize 最多只能出现一次");
 			}
-			
+
 			// 5). @PageIndex或@PageSize 不能独存
-			int cou = TypeUtil.countRepeated(PageIndex.class, parameters) + TypeUtil.countRepeated(PageSize.class, parameters);
-			if( cou == 1 ) {
+			int cou = TypeUtil.countRepeated(PageIndex.class, parameters)
+					+ TypeUtil.countRepeated(PageSize.class, parameters);
+			if (cou == 1) {
 				this.abortWith(method, "@PageIndex或@PageSize 不能独存,要么都不要出现.");
 			}
-			
+
 			// 6). @PageIndex或@PageSize 只能标识在int类型上
-			if(TypeUtil.findAnnotationIndex(PageIndex.class, parameters)!=-1 && TypeUtil.findParameter(PageIndex.class, parameters).getType()!=int.class){
+			if (TypeUtil.findAnnotationIndex(PageIndex.class, parameters) != -1
+					&& TypeUtil.findParameter(PageIndex.class, parameters).getType() != int.class) {
 				this.abortWith(method, "@PageIndex 只能标识在int类型的参数上");
 			}
-			if(TypeUtil.findAnnotationIndex(PageSize.class, parameters)!=-1 && TypeUtil.findParameter(PageSize.class, parameters).getType()!=int.class){
+			if (TypeUtil.findAnnotationIndex(PageSize.class, parameters) != -1
+					&& TypeUtil.findParameter(PageSize.class, parameters).getType() != int.class) {
 				this.abortWith(method, "@PageSize 只能标识在int类型的参数上");
 			}
 		}
-		
+
 		return method;
 	}
 
 	private boolean hasPageAnn(Parameter[] parameters) {
-		return (TypeUtil.findAnnotationIndex(PageIndex.class, parameters) != -1) && TypeUtil.findAnnotationIndex(PageSize.class, parameters) != -1;
+		return (TypeUtil.findAnnotationIndex(PageIndex.class, parameters) != -1)
+				&& TypeUtil.findAnnotationIndex(PageSize.class, parameters) != -1;
 	}
 }

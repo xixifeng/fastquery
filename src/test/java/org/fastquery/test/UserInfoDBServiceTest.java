@@ -138,10 +138,10 @@ public class UserInfoDBServiceTest {
 
 	@Test
 	public void findUserInfoByIds() {
-		JSONArray json = userInfoDBService.findUserInfoByIds("4,5,6");
-		assertThat(JSONObject.parseObject(JSON.toJSONString(json.get(0))).getIntValue("id"), equalTo(4));
-		assertThat(JSONObject.parseObject(JSON.toJSONString(json.get(1))).getIntValue("id"), equalTo(5));
-		assertThat(JSONObject.parseObject(JSON.toJSONString(json.get(2))).getIntValue("id"), equalTo(6));
+		JSONArray json = userInfoDBService.findUserInfoByIds("2,3,4");
+		assertThat(JSONObject.parseObject(JSON.toJSONString(json.get(0))).getIntValue("id"), equalTo(2));
+		assertThat(JSONObject.parseObject(JSON.toJSONString(json.get(1))).getIntValue("id"), equalTo(3));
+		assertThat(JSONObject.parseObject(JSON.toJSONString(json.get(2))).getIntValue("id"), equalTo(4));
 	}
 
 	@Test
@@ -432,4 +432,22 @@ public class UserInfoDBServiceTest {
 			assertThat(age, notNullValue());
 		}
 	}
+	
+	@Test
+	public void findUserSome2() {
+		String name = null;
+		Integer age = null;
+		List<Map<String, Object>> maps = userInfoDBService.findUserSome2(age, name);
+		maps.forEach(m -> {
+			m.forEach( (k,v) ->  { if("age".equals(k)) assertThat(v, nullValue()); } );
+		});
+		
+		if(rule.isDebug()) {
+			SQLValue sqlValue = rule.getSQLValue();
+			assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where age is null"));
+			List<Object> objects = sqlValue.getValues();
+			assertThat(objects.isEmpty(),is(true));
+		}
+	}
+	
 }

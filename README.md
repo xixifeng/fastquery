@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.29</version>
+    <version>1.0.30</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.29'
+compile 'org.fastquery:fastquery:1.0.30'
 ```
 
 ### Apache Archive
@@ -451,7 +451,7 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 ```
 
 ## 微笑表达式
-定义: **以<code>\`-</code> 作为开始,以<code>-\`</code>作为结尾,包裹着若干字符,因为<code>\`- -\`</code>酷似微笑表情,因此将这样的表达式称之为`微笑表达式`.** 例如: <code> \`-%${name}%-\` </code>. **\`** 反撇号的位置如下图所示:<br>
+定义: **以<code>\`-</code> 作为开始,以<code>-\`</code>作为结尾,包裹着若干字符,因为<code>\`- -\`</code>酷似微笑表情,因此将这样的表达式称之为`微笑表达式`.** <br>例如: <code> \`-%${name}%-\` </code>. **\`** 反撇号的位置如下图所示:<br>
 ![反撇号](https://xixifeng.github.io/pjaxpage/example/img/fanpie.png "反撇号")    
 作用:  
 1.可以作为实参的模板,举例: 查询出姓"张"的用户.没有`微笑表达式`时的写法:
@@ -461,7 +461,7 @@ db.findLikeName(name + "%");
 这种写法不好,需要手动拼接模糊搜索关键字.  
 现在有`微笑表达式`了,在模板中,可以配置name实参的模板.假设模板中通过<code>\`-:name%-\`</code>引用这个实参,那么<code>\`-:name%-\`</code>将会作为这个实参的模板. name的值为"张",实际上传递的是"张%".   
 
-2.采用`微笑表达式`的片段,会过滤敏感关键字,严格防止SQL注入. 建议将其用在`$表达式`/`${表达式}`上,因为**$表达式的存在仅仅是为了开发者方便构建SQL**,使用不当很危险,加上`微笑表达式`可以防止由于开发者的疏忽而引发的SQL注入问题.**注意**: 冒号表达式,如`:name`最终会解释成SQL占位符`?`号,因此不存在注入问题,不必使用`微笑表达式`来预防.
+2.采用`微笑表达式`的片段,会过滤敏感关键字,严格防止SQL注入. 建议将其用在`$表达式`/`${表达式}`上,因为 **$表达式的存在仅仅是为了开发者方便构建SQL**,使用不当很危险,加上`微笑表达式`可以防止由于开发者的疏忽而引发的SQL注入问题.**注意**: 冒号表达式,如`:name`最终会解释成SQL占位符`?`号,因此不存在注入问题,不必使用`微笑表达式`来预防.
 
 ##  SQL IN
 
