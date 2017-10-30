@@ -35,6 +35,7 @@ import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.Repository;
+import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
 import org.fastquery.util.TypeUtil;
 
@@ -141,17 +142,14 @@ public class QueryValidator {
 				}
 
 				String key = className + "." + id;
-				// m2: 如果是分页,必须有求和语句
-				Class<?> returnType = method.getReturnType();
 				String countQuery = QueryPool.getCountQuery(key);
-				if (returnType == Page.class && countQuery == null) {
+				
+				// m2: 如果是分页,并且没有标识@NotCount,必须有求和语句
+				Class<?> returnType = method.getReturnType();
+				if (returnType == Page.class && (countQuery == null || "".equals(countQuery.trim())) && method.getAnnotation(NotCount.class) == null) {
 					error(method,
-							String.format("该方法指明需要分页. 而在%s.queries.xml里,<query id=\"%s\">下面没有发现求和语句", className, id));
+							String.format("该方法指明需要分页并且没有标识@NotCount. 而在%s.queries.xml里,<query id=\"%s\">下面没有发现求和语句", className, id));
 					return;
-				}
-				if (returnType == Page.class && "".equals(countQuery.trim())) {
-					error(method,
-							String.format("该方法指明需要分页. 而在%s.queries.xml里,<query id=\"%s\">下面的求和语句是空字符串", className, id));
 				}
 				
 				

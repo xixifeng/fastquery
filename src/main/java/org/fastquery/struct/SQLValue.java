@@ -59,7 +59,7 @@ public class SQLValue {
 			ssm = ssm.replaceAll(Placeholder.SP1_REG, "?"); // 这部很重要,不然"?"后面的数字也会融入模板里
 			int index = Integer.parseInt(numStr) - 1;
 			// values 存储着"?"号对应的值,特别注意: values[i] 表示从左至右第i+1次出现的?号的值,并不代表(?i+1)的值
-			values.set(count, ssm.replaceFirst("`-","").replaceFirst("-`","").replaceFirst("\\?", args[index]!=null?args[index].toString():""));
+			values.set(count, ssm.replaceFirst("`-","").replaceFirst("-`","").replaceFirst("\\?", args[index]!=null?args[index].toString().replaceAll("`",""):""));
 			Object obj = values.get(count);
 			if (obj!=null && obj.getClass()==String.class && Pattern.matches(Placeholder.PERCENT, obj.toString())) {
                throw new RepositoryException("这个SQL实参值禁止都是%组成");

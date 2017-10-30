@@ -58,18 +58,18 @@ public class QueryByNamedDBExampleTest {
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
 
-	private QueryByNamedDBExample queryByNamedDBExample = FQuery.getRepository(QueryByNamedDBExample.class);
+	private QueryByNamedDBExample db = FQuery.getRepository(QueryByNamedDBExample.class);
 	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 
 	@Test
 	public void findUserInfoAll() {
-		JSONArray jsonArray = queryByNamedDBExample.findUserInfoAll();
+		JSONArray jsonArray = db.findUserInfoAll();
 		assertThat(jsonArray.isEmpty(), is(false));
 	}
 
 	@Test
 	public void findUserInfoOne() {
-		UserInfo userInfo = queryByNamedDBExample.findUserInfoOne(1);
+		UserInfo userInfo = db.findUserInfoOne(1);
 		assertThat(userInfo.getId().intValue(), is(1));
 	}
 
@@ -77,7 +77,7 @@ public class QueryByNamedDBExampleTest {
 	public void findUserInfoByNameAndAge1() {
 		String name = "张三";
 		Integer age = null;
-		JSONArray jsonArray = queryByNamedDBExample.findUserInfoByNameAndAge(name, age);
+		JSONArray jsonArray = db.findUserInfoByNameAndAge(name, age);
 		for (Object object : jsonArray) {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> map = (Map<String, Object>) object;
@@ -94,7 +94,7 @@ public class QueryByNamedDBExampleTest {
 	public void findUserInfoByNameAndAge2() {
 		String name = null;
 		Integer age = 8;
-		JSONArray jsonArray = queryByNamedDBExample.findUserInfoByNameAndAge(name, age);
+		JSONArray jsonArray = db.findUserInfoByNameAndAge(name, age);
 		for (Object object : jsonArray) {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> map = (Map<String, Object>) object;
@@ -109,10 +109,10 @@ public class QueryByNamedDBExampleTest {
 
 	@Test
 	public void findUserInfoByNameAndAge3() {
-		UserInfo userInfo = queryByNamedDBExample.findUserInfoOne(1);
+		UserInfo userInfo = db.findUserInfoOne(1);
 		String name = userInfo.getName();
 		Integer age = userInfo.getAge();
-		JSONArray jsonArray = queryByNamedDBExample.findUserInfoByNameAndAge(name, age);
+		JSONArray jsonArray = db.findUserInfoByNameAndAge(name, age);
 		for (Object object : jsonArray) {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> map = (Map<String, Object>) object;
@@ -140,7 +140,7 @@ public class QueryByNamedDBExampleTest {
 		String name = null;
 		Integer age = 8;
 
-		Page<Student> pageObj = queryByNamedDBExample.findPage(new PageableImpl(page, size), no, name, age);
+		Page<Student> pageObj = db.findPage(new PageableImpl(page, size), no, name, age);
 		assertThat(pageObj.getContent().size(), lessThanOrEqualTo(size));
 		if (pageObj.getContent().size() > 1) { // 如果当前页有数据,那么总页数肯定不为0l
 			assertThat(pageObj.getTotalElements(), not(0l)); // 总记录数不为0l
@@ -178,6 +178,27 @@ public class QueryByNamedDBExampleTest {
 			assertThat(ps2.get(1), is(age));
 		}
 	}
+	
+	
+	@Test
+	public void findPage2() {
+
+		int page = 1; // 第3页
+		int size = 5; // 指定每页显示5条数据
+
+		String no = "95";
+		String name = null;
+		Integer age = 8;
+
+		Page<Student> pageObj = db.findPage2(new PageableImpl(page, size), no, name, age);
+		int len = pageObj.getContent().size();
+		assertThat(len, lessThanOrEqualTo(size));
+		if (len > 1) { // 如果当前页有数据,那么总页数肯定不为0l
+			assertThat(pageObj.getTotalElements(), not(0l)); 
+		}
+		assertThat(pageObj.getTotalElements(), is(-1L));
+		assertThat(pageObj.getTotalPages(), is(-1));
+	}
 
 	@Test
 	public void updateUserInfoById() {
@@ -185,7 +206,7 @@ public class QueryByNamedDBExampleTest {
 		LOG.debug("正在修改主键为" + id + "的UserInfo.");
 		String name = "清风习习" + new Random().nextInt(8);
 		int age = new Random().nextInt(99);
-		int effect = queryByNamedDBExample.updateUserInfoById(id, name, age);
+		int effect = db.updateUserInfoById(id, name, age);
 		assertThat(effect, is(1));
 
 		// 把改后的数据查询出来进行断言是否改正确
@@ -198,7 +219,7 @@ public class QueryByNamedDBExampleTest {
 	@Test
 	public void findUserInfoByFuzzyName() {
 		String name = "三";
-		List<UserInfo> uis = queryByNamedDBExample.findUserInfoByFuzzyName(name);
+		List<UserInfo> uis = db.findUserInfoByFuzzyName(name);
 		assertThat(uis.size(), greaterThanOrEqualTo(2));
 		uis.forEach(u -> assertThat(u.getName(), containsString(name)));
 
@@ -216,22 +237,22 @@ public class QueryByNamedDBExampleTest {
 	
 	@Test(expected=RepositoryException.class)
 	public void findUserInfoByFuzzyName2() {
-		queryByNamedDBExample.findUserInfoByFuzzyName(null);
+		db.findUserInfoByFuzzyName(null);
 	}
 	
 	@Test(expected=RepositoryException.class)
 	public void findUserInfoByFuzzyName3() {
-		queryByNamedDBExample.findUserInfoByFuzzyName("%");
+		db.findUserInfoByFuzzyName("%");
 	}
 	
 	@Test(expected=RepositoryException.class)
 	public void findUserInfoByFuzzyName4() {
-		queryByNamedDBExample.findUserInfoByFuzzyName("");
+		db.findUserInfoByFuzzyName("");
 	}
 	
 	@Test(expected=RepositoryException.class)
 	public void findUserInfoByFuzzyName5() {
-		queryByNamedDBExample.findUserInfoByFuzzyName("%%");
+		db.findUserInfoByFuzzyName("%%");
 	}
 	
 	@Test
@@ -239,7 +260,7 @@ public class QueryByNamedDBExampleTest {
 		Integer id = null;
 		String name = "J";
 		Integer age = null;
-		queryByNamedDBExample.findUserInfo(id, name, age);
+		db.findUserInfo(id, name, age);
 		if(rule.isDebug()) {
 			SQLValue sqlValue = rule.getSQLValue();
 			assertThat(sqlValue.getSql(), equalTo("select * from UserInfo where id > ? and age > 18 or name like ?"));

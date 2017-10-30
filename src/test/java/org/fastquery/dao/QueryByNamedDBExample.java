@@ -30,6 +30,7 @@ import org.fastquery.core.Modifying;
 import org.fastquery.core.Param;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
+import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
 import org.fastquery.page.Pageable;
 
@@ -54,6 +55,11 @@ public interface QueryByNamedDBExample extends QueryRepository {
 
 	@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
 	Page<Student> findPage(Pageable pageable, @Param("no") String no, @Param("name") String name,
+			@Param("age") Integer age);
+	
+	@NotCount
+	@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
+	Page<Student> findPage2(Pageable pageable, @Param("no") String no, @Param("name") String name,
 			@Param("age") Integer age);
 
 	@Modifying

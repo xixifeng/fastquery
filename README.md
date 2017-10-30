@@ -324,6 +324,28 @@ Primarykey saveUserInfo(String name,Integer age);
 - 改操作返回int类型:表示影响的行数,没有找到可以修改的,那么影响行数为0,并不能视为改失败了
 - 改操作返回boolean类型:表示是否改正确,没有找到可以修改的,那么返回true,并不能视为改失败了
 
+## Annotation
+针对FastQuery中的所有注解,做个说明:
+
+| Annotation | 作用 |
+|:---|:---|
+|`@Id`|用来标识表主键|
+|`@Modifying`|标识改操作|
+|`@Param`|标识参数名称,便于运行期获取|
+|`@Query`|标识查询语句|
+|`@QueryByNamed`|标识根据命名式查询(语句放在配置文件中)|
+|`@Source`|标识用来适配数据源的参数|
+|`@Transactional`|事务|
+|`@Transient`|标识实体中的属性是临时的(例如:save对象时,该属性不存储到数据库里)|
+|`@NotCount`|标识分页中不统计总行数|
+|`@PageIndex`|标识页索引对应哪个参数|
+|`@PageSize`|标识页行数对应哪个参数|
+|`@Condition`|标识条件单元|
+|`@I18n`|标识对哪个字段进行国际化处理|
+|`@Before`|标识函数执行前|
+|`@After`|标识函数执行后|
+|`@SkipFilter`|标识跳过拦截器|
+
 ## QueryRepository的内置方法
 凡是继承`QueryRepository`的接口,都可以使用它的方法,并且不用写实现类.
 
