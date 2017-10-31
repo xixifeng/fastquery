@@ -267,7 +267,7 @@ public class QueryByNamedDBExampleTest {
 			List<Object> vals = sqlValue.getValues();
 			assertThat(vals.size(), is(2));
 			assertThat(vals.get(0), nullValue());
-			assertThat(vals.get(1), equalTo("%"+name+"%"));
+			assertThat(vals.get(1), equalTo("'%"+name+"%'"));
 		}
 	}
 }

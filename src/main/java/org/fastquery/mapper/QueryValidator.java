@@ -23,15 +23,11 @@
 package org.fastquery.mapper;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
-import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.Repository;
@@ -152,32 +148,11 @@ public class QueryValidator {
 					return;
 				}
 				
+				// 注意:  模板中的冒号表达式不必从方法参数中的@Param找到精准匹配, 因为模板是可以共享的
+				// 假设 F1,F2两个方法公用M模板, M中包含:a,:b,而F1只包含@Param("a"),F2只包含@Param("b"),这种情形,当然是允许的.
 				
-				// m3: 模板中的冒号表达式必须从方法参数中的@Param找到精准匹配
-				Set<String> params = new HashSet<>();
-				Parameter[] parameters = method.getParameters();
-				for (Parameter parameter : parameters) {
-					Param param = parameter.getAnnotation(Param.class);
-					if(param != null) {
-						params.add(param.value());
-					}
-				}
-				Set<String> ps = new HashSet<>();
-				ps.addAll(TypeUtil.matchesNotrepeat(tmp, Placeholder.COLON_REG));
-				ps.addAll(TypeUtil.matchesNotrepeat(countQuery, Placeholder.COLON_REG));
-				for (String p : ps) {
-					String s = null;
-					if(Pattern.matches(Placeholder.COLON_REG, p)) {
-						s = p.replaceFirst(":","");
-					} 
-					if(!params.contains(s)) {
-						error(method, String.format("%n%s.queries.xml%n从<query id=\"%s\">节点内的语句中发现存在%s,而从方法参数中没有找到@Param(\"%s\").",className,id,p,s));
-					}
-				}
-				ps.clear();
+				// m3
 				
-				
-				// m4: 
 				
 				
 				
