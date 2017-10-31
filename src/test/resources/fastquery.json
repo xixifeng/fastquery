@@ -64,6 +64,24 @@
              "org.fastquery.dao2.UserInfoDBService3"
         ]
     }
+    
+    ,
+    {
+        "config": "jdbc",           
+        "dataSourceName": "s1", 
+        "basePackages": [   
+             "org.fastquery.db"
+        ]
+    }
+    
+    ,
+    {
+        "config": "jdbc",           
+        "dataSourceName": "s2", 
+        "basePackages": [   
+             "org.fastquery.dbm"
+        ]
+    }
  ],
  
   // 基准目录,注意: 后面记得加上 "/"

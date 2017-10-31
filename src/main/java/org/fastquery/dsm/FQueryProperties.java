@@ -27,7 +27,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -63,21 +62,19 @@ public class FQueryProperties {
 	 * 根据basePackage 查找出 数据源的名字的名字
 	 * 
 	 * @param packageName 包名称
-	 * @return 数据源名称
+	 * @return 数据源名称,没有找到返回null
 	 */
 	public static String findDataSourceName(String packageName) {
 		String dataSourceName = dataSourceIndexs.get(packageName);
-		if(dataSourceName == null) {
-			Set<String> packageNames = dataSourceIndexs.keySet();
-			for (String pkn : packageNames) {
-				// 注意:可能出现这种情况
-				// map中存在 "A.B"
-				// packageName 可能是A.B.C
-				// 因此需要做如下处理
-				if( packageName.length()>= pkn.length() && packageName.substring(0, pkn.length()).equals(pkn)){
-					return dataSourceIndexs.get(pkn);
-				}
-			}
+		String pname = packageName;
+		int len;
+		while(dataSourceName == null && (len = pname.lastIndexOf('.')) != -1) {
+			// 注意:可能出现这种情况
+			// map中存在 "A.B"
+			// packageName 可能是A.B.C
+			// 因此需要做如下处理
+			pname = pname.substring(0, len);
+			dataSourceName = dataSourceIndexs.get(pname);
 		}
 		return dataSourceName;
 	}

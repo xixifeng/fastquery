@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.30</version>
+    <version>1.0.31</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.30'
+compile 'org.fastquery:fastquery:1.0.31'
 ```
 
 ### Apache Archive
@@ -124,7 +124,7 @@ jdk1.8+
 		  ] 
 }
 ```
-**注意**: 在fastquery.json中配置作用域,其中"dataSourceName"不是必须的,"dataSourceName"要么不指定,要指定的话那么必须正确.如果没有指定"dataSourceName",那么在调用接口的时候必须指定数据源的名称.下面的适配数据源章节会讲到.  
+**注意**: 在fastquery.json中配置作用域,其中"dataSourceName"不是必须的,"dataSourceName"要么不指定,要指定的话那么必须正确.如果没有指定"dataSourceName",那么在调用接口的时候必须指定数据源的名称.下面的适配数据源章节会讲到."basePackages"若配置了包地址,那么对应的数据源会作用这个包的所有类,及所有子包中的类.  
 fastquery.json其他可选配置选项:
 
 | 属性名 | 类型 | 默认值 | 作用 | 示例 |

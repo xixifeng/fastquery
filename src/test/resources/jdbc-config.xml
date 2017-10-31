@@ -19,4 +19,15 @@
         <property name="serverName">192.168.8.10</property>               <!-- 数据库主机地址 -->
     </named-config>
     
+    <!-- 测试 -->
+    <named-config name="s1">
+    	  <property name="databaseName">s1</property>
+           <property name="driverClass">com.mysql.cj.jdbc.Driver</property>          
+    </named-config>
+    
+    <named-config name="s2">
+    	   <property name="databaseName">s2</property>
+           <property name="driverClass">com.mysql.cj.jdbc.Driver</property>
+    </named-config>
+    
 </jdbc-config>

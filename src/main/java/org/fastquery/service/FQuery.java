@@ -24,6 +24,7 @@ package org.fastquery.service;
 
 import java.util.Properties;
 
+import org.fastquery.core.GenerateRepository;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dsm.FQueryProperties;
@@ -37,7 +38,10 @@ public class FQuery {
 
 	private FQuery() {
 	}
-
+	
+	private static GenerateRepository init() {
+		return GenerateRepositoryImpl.getInstance();
+	}
 	/**
 	 * 获取 Repository
 	 * @param <T> 接口
@@ -45,7 +49,7 @@ public class FQuery {
 	 * @return 接口的实例
 	 */
 	public static <T extends Repository> T getRepository(Class<T> clazz) {
-		T t = GenerateRepositoryImpl.getInstance().getProxyRepository(clazz);
+		T t = init().getProxyRepository(clazz);
 		if (t == null) {
 			throw new RepositoryException(String.format(
 					"没有找到%s的代理实现,很可能是因为basePackages设置错误! 请检查fastquery.json.",
