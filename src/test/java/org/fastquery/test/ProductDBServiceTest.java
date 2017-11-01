@@ -20,13 +20,13 @@
  * 
  */
 
-package org.fastquery.dao;
+package org.fastquery.test;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
+import org.fastquery.dao.ProductDBService;
 import org.fastquery.service.FQuery;
-import org.fastquery.test.FastQueryTestRule;
 import org.junit.Rule;
 import org.junit.Test;
 

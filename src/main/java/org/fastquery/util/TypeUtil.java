@@ -443,10 +443,11 @@ public class TypeUtil implements Opcodes{
 	 * @param sql sql语句
 	 * @return sql
 	 */
-	public static String paramFilter(Method method, Object[] args, String sql) {
+	private static String paramFilter(Method method, Object[] args, String sql) {
 		String s = sql;
 		// 替换@Param
 		Annotation[][] annotations = method.getParameterAnnotations();
+		QueryByNamed queryByNamed = method.getAnnotation(QueryByNamed.class);
 		int len = annotations.length;
 		for (int i = 0; i < len; i++) {
 			Annotation[] anns = annotations[i];
@@ -458,9 +459,13 @@ public class TypeUtil implements Opcodes{
 					// 将 ":xx" 格式的 替换成 "?num"
 					// 替换时必须加单词分界符(\\b),举例说明: sql中同时存在":ABCD",":A", 不加单词分界符,":A"替换成"?num"后,会使":ABCD"变成":?numBCD"
 					s = s.replaceAll("\\:"+param.value()+"\\b", "?"+(i+1));
-					// 这两个replaceAll的先后顺序很重要
+					// 这里的replaceAll的先后顺序很重要
 					// '{' 是正则语法的关键字,必须转义
-					s = s.replaceAll("\\$\\{?"+param.value()+"\\}?", objx!=null?objx.toString():Matcher.quoteReplacement(param.defaultVal()));
+					if( queryByNamed == null ) {
+						String replacement = objx!=null?objx.toString():Matcher.quoteReplacement(param.defaultVal());
+						s = s.replaceAll("\\$\\{"+param.value()+"\\}", replacement);
+						s = s.replaceAll("\\$"+param.value()+"\\b", replacement);	
+					}
 				}
 			}
 		}

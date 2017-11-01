@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.32</version>
+    <version>1.0.33</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.32'
+compile 'org.fastquery:fastquery:1.0.33'
 ```
 
 ### Apache Archive
@@ -157,7 +157,7 @@ fastquery.json其他可选配置选项:
  public interface StudentDBService extends QueryRepository {
     @Query("select no, name, sex from student")
     JSONArray findAll();
-    @Query("select no as no,name,sex,age,dept from student")
+    @Query("select no,name,sex,age,dept from student")
     Student[] find();      
  }
 ```
@@ -186,7 +186,7 @@ fastquery.json其他可选配置选项:
 //       ?N 表示对应当前方法的第N个参数
 	
 // 查询返回数组格式
-@Query("select no as no,name,sex,age,dept from student s where s.sex=?2 and s.age > ?1")
+@Query("select no,name,sex,age,dept from student s where s.sex=?2 and s.age > ?1")
 Student[] find(Integer age,String sex);
  	
 // 查询返回JSON格式
@@ -322,7 +322,7 @@ Primarykey saveUserInfo(String name,Integer age);
 
 **注意**:
 - 改操作返回int类型:表示影响的行数,没有找到可以修改的,那么影响行数为0,并不能视为改失败了
-- 改操作返回boolean类型:表示是否改正确,没有找到可以修改的,那么返回true,并不能视为改失败了
+- 改操作返回boolean类型:表示是否改正确,修改成功或没有找到可以修改的会返回true,反之,返回false
 
 ## Annotation
 针对FastQuery中的所有注解,做个说明:
@@ -355,7 +355,7 @@ Primarykey saveUserInfo(String name,Integer age);
 | `<B> int save(boolean ignoreRepeat,Collection<B> entities)` | 保存一个集合实体,是否忽略重复主键记录 |
 | `int saveArray(boolean ignoreRepeat,Object...entities)` | 保存一个可变数组实体,是否忽略重复主键记录 |
 | `BigInteger saveToId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
-| `<E> E update(E entity)` | 更新一个实体,返回更新成功之后的实体.**注意**:实体的成员变量如果是null,将不会参与改运算 |
+| `<E> E update(E entity)` | 更新一个实体,返回更新成功之后的实体.**注意**:实体的成员属性如果是null,那么该属性将不会参与改运算 |
 | `<E> E saveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含有主键值) |
 | `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),返回影响行数 |
 
@@ -433,7 +433,7 @@ int updateBatch(String name,Integer age,Integer id);
 
 ## @Param参数模板
 
-**SQL中的变量用命名式**
+**SQL中使用冒号表达式**
  
 ```java
 @Query("select name,age from UserInfo u where u.name = :name or u.age = :age")
@@ -558,11 +558,11 @@ UserInfo[] findByIds(@Param("ids") int[] ids);
 
 | 字符 | 命名实体 | 说明 |
 |:-----:|:----:|:----:|
-|  <   | &amp;lt;  | 小于 |
-|  >   | &amp;gt;  | 大于 |
-|  &   | &amp;amp; | 和号 |
-|  '   | &amp;apos;| 省略号|
-|  "   | &amp;quot;| 引号 |
+|  <   | &amp;lt;  | 小于号 |
+|  >   | &amp;gt;  | 大于号 |
+|  &   | &amp;amp; | 与符号 |
+|  '   | &amp;apos;| 单引号 |
+|  "   | &amp;quot;| 双引号 |
 
 如果想把一些公用的SQL代码片段提取出来,以便重用,通过定义`<parts>`元素(零件集)就可以做到. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件.  
 若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`<query>`都能引用它.一个非分页的函数,如果绑定的是分页模板,那么这个函数只识别查询语句,不理会count语句.

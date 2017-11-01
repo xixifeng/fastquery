@@ -24,7 +24,6 @@ package org.fastquery.test;
 
 import java.lang.reflect.Field;
 
-import org.fastquery.dao.ProductDBServiceTest;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.service.FQuery;
 import org.fastquery.service.FQueryResourceImplTest;
@@ -51,7 +50,8 @@ import com.alibaba.fastjson.JSONObject;
 @SuiteClasses({ FQueryTest.class, StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class,
 		UserInfoDBServiceTest3.class, TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class,
 		BeanUtilTest.class, PageTest.class, FastQueryJSONObjectTest.class, FQueryResourceImplTest.class,
-		SunnyDBServiceTest.class, SaveToIdTest.class, PlaceholderTest.class, DBTest.class, ProductDBServiceTest.class,FQueryPropertiesTest.class  })
+		SunnyDBServiceTest.class, SaveToIdTest.class, PlaceholderTest.class, DBTest.class, ProductDBServiceTest.class,
+		FQueryPropertiesTest.class, QueryPoolTest.class,ParamFilterTest.class })
 public class AllRuleTest {
 
 	@BeforeClass

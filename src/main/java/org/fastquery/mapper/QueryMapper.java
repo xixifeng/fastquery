@@ -26,25 +26,28 @@ package org.fastquery.mapper;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-class QueryMapper {
+public class QueryMapper {
 
-	private String id;        // 重写id的hashCode和equals,用它作为唯一标识
-	private String template;  // 模板
-	
+	private String id; // 重写id的hashCode和equals,用它作为唯一标识
+	private String template; // 模板
+
 	QueryMapper(String id, String template) {
 		this.id = id;
 		this.template = template;
 	}
-	
-	String getId() {
+
+	public String getId() {
 		return id;
 	}
-	String getTemplate() {
+
+	public String getTemplate() {
 		return template;
 	}
+
 	void setId(String id) {
 		this.id = id;
 	}
+
 	void setTemplate(String template) {
 		this.template = template;
 	}
@@ -73,5 +76,5 @@ class QueryMapper {
 			return false;
 		return true;
 	}
-	
+
 }

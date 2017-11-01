@@ -107,7 +107,7 @@ public class QueryPool {
 	 * @param resource
 	 * @return
 	 */
-	static Set<QueryMapper> xml2QueryMapper(String className,Resource resource){
+	private static Set<QueryMapper> xml2QueryMapper(String className,Resource resource){
 		// 用来存储全局parts
 		Map<String, String> gparts = new HashMap<>();
 		Set<QueryMapper> queryMappers = new HashSet<>();
@@ -264,7 +264,7 @@ public class QueryPool {
 	 * @param map 键值
 	 * @return 渲染之后的字符串
 	 */
-	static String render(String tpl,String logTag,Map<String, Object> map){
+	private static String render(String tpl,String logTag,Map<String, Object> map){
 		// 不用判断map是否为空,这个方法没有公开,在作用域
 		VelocityContext context = new VelocityContext();
 		// 往上下文设置值
@@ -338,7 +338,7 @@ public class QueryPool {
 	 * @param id
 	 * @return
 	 */
-	static String getTemplate(String className,String id) {
+	private static String getTemplate(String className,String id) {
 		// 特别注意: 是否有模板,已经在初始化时做了严格校验,在此处就不用判断是否为null了
 		Set<QueryMapper> queryMappers = mapQueryMapper.get(className);
 		for (QueryMapper queryMapper : queryMappers) {

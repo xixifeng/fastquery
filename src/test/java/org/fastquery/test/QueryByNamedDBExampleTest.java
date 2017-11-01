@@ -260,7 +260,8 @@ public class QueryByNamedDBExampleTest {
 		Integer id = null;
 		String name = "J";
 		Integer age = null;
-		db.findUserInfo(id, name, age);
+		Integer num = 1;
+		db.findUserInfo(id, name, age,num);
 		if(rule.isDebug()) {
 			SQLValue sqlValue = rule.getSQLValue();
 			assertThat(sqlValue.getSql(), equalTo("select * from UserInfo where id > ? and age > 18 or name like ?"));
@@ -270,4 +271,5 @@ public class QueryByNamedDBExampleTest {
 			assertThat(vals.get(1), equalTo("'%"+name+"%'"));
 		}
 	}
+
 }

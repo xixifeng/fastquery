@@ -23,7 +23,6 @@
 package org.fastquery.service;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -111,6 +110,7 @@ class GenerateRepositoryImpl implements GenerateRepository {
 			
 			byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
 			
+			/*
 			// 把生成的文件存储起来
 			 try(FileOutputStream fos = new FileOutputStream("/data/tmp/"+name+".class")) {
 				fos.write(bytes);
@@ -118,6 +118,7 @@ class GenerateRepositoryImpl implements GenerateRepository {
 				// TODO: handle exception
 			}
 			// 把生成的文件存储起来 end
+			 */
 
 			return (T) new FqClassLoader(this.getClass().getClassLoader()).defineClassByName(name, bytes, 0, bytes.length);
 		}
