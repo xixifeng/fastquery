@@ -102,6 +102,109 @@
 	<query id="findUserInfo">
 		select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`
 	</query>
+
+	<query id="findCon1">
+		<value>select * from UserInfo #{#condition1}</value>
+		
+		<parts>
+		<part name="condition1">
+			<![CDATA[
+				<where>
+			 		(id > :id)
+			        #if($age && $age>18)
+						and age > 18
+					#end
+				</where>
+				 ]]>
+		</part>
+		<part name="condition2">
+			<![CDATA[
+				<where>
+			 		(id > :id)
+			        #if($age && $age>18)
+						and age > 18
+					#end
+				</where>
+				 ]]>
+		</part>
+	</parts>
+	</query>
+	
+	
+	<query id="findCon2">
+		<value>select * from UserInfo #{#condition2}</value>
+				<parts>
+		<part name="condition1">
+			<![CDATA[
+				<where>
+			 		(id > :id)
+			        #if($age && $age>18)
+						and age > 18
+					#end
+				</where>
+				 ]]>
+		</part>
+		<part name="condition2">
+			<![CDATA[
+				<where>
+			 		(id > :id)
+			        #if($age && $age>18)
+						and age > 18
+					#end
+				</where>
+				 ]]>
+		</part>
+	</parts>
+	</query>
+		
+	<!-- 同时反映有问题的模板 -->
+	<query id="findLastGPSLogPage">
+		<value>
+			select distinct
+				u.uid id,
+			    u.realName,
+			    ul.GPS_long lng,
+			    ul.GPS_lat lat,
+			    ul.lastGPSTime
+			from User u 
+			left join user_location ul on ul.uid=u.uid 
+			join (select id,MAX(`lastGPSTime`) from user_location #{#condition1} group by uid order by id) lo on lo.id=ul.id
+			#{#condition2}
+			order by ul.lastGPSTime desc
+		</value>
+		
+		<countQuery>
+			select count(u.uid) from User u 
+			left join user_location ul on ul.uid=u.uid
+			join (select id,MAX(`lastGPSTime`) from user_location #{#condition1} group by uid order by id) lo on lo.id=ul.id
+			#{#condition2}
+		</countQuery>
+		
+		<parts>
+			<part name="condition1">
+			<![CDATA[
+				<where>
+			 		(GPS_long>0 or GPS_lat>0)
+			        #if($beginTime && $beginTime>0)
+						and lastGPSTime >= :beginTime
+					#end
+				</where>
+				 ]]>
+			</part>
+			<part name="condition2">
+			<![CDATA[
+				<where>
+			 		u.tenantId=:tenantId
+					#if($pname && $pname != "")
+						and u.realName like :pname
+					#end
+				</where>
+				 ]]>
+			</part>
+		</parts>
+	</query>
+
+	
 </queries>
 
 

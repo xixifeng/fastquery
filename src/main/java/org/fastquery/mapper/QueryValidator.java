@@ -107,6 +107,14 @@ public class QueryValidator {
 			   error(String.format("没有找到name=\"%s\"的part", mts.get(0).replace("{", "").replace("}", "").replace("#", "")), query);
 		   }
 		   
+		   // 4). <where> </where> 只能是小写
+			Set<String> ss = TypeUtil.matchesNotrepeat(query, "(?i)</?where>");
+			ss.forEach(s -> {
+				if (!"<where>".equals(s) && !"</where>".equals(s)) {
+					 error("<where> 或 </where> 只能是小写", query);
+				}
+			});
+		   
 	   }
 	   
 

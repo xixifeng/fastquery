@@ -25,6 +25,7 @@ package org.fastquery.test;
 import org.apache.log4j.Logger;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
+import org.fastquery.core.Param;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.QueryByNamedDBExample;
 import org.fastquery.dao.UserInfoDBService;
@@ -270,6 +271,13 @@ public class QueryByNamedDBExampleTest {
 			assertThat(vals.get(0), nullValue());
 			assertThat(vals.get(1), equalTo("'%"+name+"%'"));
 		}
+	}
+	
+	@Test
+	public void findCon1() {
+		Integer id = 1;
+		Integer age = 19;
+		db.findCon1(id, age);
 	}
 
 }

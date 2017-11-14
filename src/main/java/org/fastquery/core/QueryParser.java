@@ -79,8 +79,8 @@ public class QueryParser {
 			// 获取sql
 			String sql = sqls.get(jk);
 			// 替换SQL中的占位变量符
-			sql = sql.replaceAll(Placeholder.TABLE_REG, table);
-			sql = sql.replaceAll(Placeholder.ID_REG, id);
+			sql = sql.replaceAll(Placeholder.TABLE_REG, Matcher.quoteReplacement(table));
+			sql = sql.replaceAll(Placeholder.ID_REG, Matcher.quoteReplacement(id));
 			msvs.add(inParser(sql));
 		}
 
@@ -146,7 +146,7 @@ public class QueryParser {
 
 		String ssql = new String(sql);
 
-		sql = sql.replaceFirst(Placeholder.LIMIT_RGE, limit);
+		sql = sql.replaceFirst(Placeholder.LIMIT_RGE, Matcher.quoteReplacement(limit));
 
 		sqlValues.add(inParser(sql));
 
@@ -168,7 +168,7 @@ public class QueryParser {
 					// 重要: sqlStr.substring(selectStart+6,fromStart) 的值
 					// 很可能包含正则表达式, 因此必须用Pattern.quote
 					sql = sql.replaceFirst(Pattern.quote(sql.substring(beginIndex, endIndex)),
-							new StringBuilder("count(").append(countField).append(')').toString());
+							Matcher.quoteReplacement(new StringBuilder("count(").append(countField).append(')').toString()));
 				} else {
 					throw new RepositoryException("求和SQL错误:" + sql);
 				}
@@ -194,7 +194,7 @@ public class QueryParser {
 			sb.append(',');
 			sb.append(maxResults);
 			limit = sb.toString();
-			sql = ssql.replaceFirst(Placeholder.LIMIT_RGE, limit);
+			sql = ssql.replaceFirst(Placeholder.LIMIT_RGE, Matcher.quoteReplacement(limit));
 
 			sqlValues.add(inParser(sql));
 		}
@@ -234,7 +234,7 @@ public class QueryParser {
 
 		String limit = getLimit(pageable.getOffset(), pageable.getPageSize());
 		if (sql.indexOf(Placeholder.LIMIT) != -1) { // 如果#{#limit}存在
-			sql = sql.replaceAll(Placeholder.LIMIT_RGE, limit);
+			sql = sql.replaceAll(Placeholder.LIMIT_RGE, Matcher.quoteReplacement(limit));
 		} else {
 			sql += limit;
 		}
@@ -255,7 +255,7 @@ public class QueryParser {
 			int firstResult = pageable.getOffset() + pageable.getPageSize();
 			limit = getLimit(firstResult, pageable.getPageSize());
 			if (sql.indexOf(Placeholder.LIMIT) != -1) {
-				sql = sql.replaceAll(Placeholder.LIMIT_RGE, limit);
+				sql = sql.replaceAll(Placeholder.LIMIT_RGE, Matcher.quoteReplacement(limit));
 			} else {
 				sql += limit;
 			}

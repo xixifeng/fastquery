@@ -39,6 +39,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.fastquery.core.Id;
 import org.fastquery.core.Param;
@@ -654,13 +655,13 @@ public class TypeUtil implements Opcodes{
 			
 			sql = paramFilter(method, args, sql);
 			
-			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, getWhereSQL(method, args)));
+			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(getWhereSQL(method, args))));
 		}
 		return sqls;
 	}
 
 	public static String getCountQuerySQL(Method method, String sql, Object[] args) {
-		String csql = sql.replaceFirst(Placeholder.WHERE_REG, getWhereSQL(method, args));
+		String csql = sql.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(getWhereSQL(method, args)));
 		LOG.info("求和:" + csql);
 		return csql;
 	}
@@ -849,22 +850,33 @@ public class TypeUtil implements Opcodes{
 	 * @return 处理之后的字符串
 	 */
 	public static String parWhere(String str) { // 不可能传递null进来
-		// 把where元素拿出来处理
-		List<String> list = matches(str,"(?i)(?<=<where>)(.|\\n)*(?=</where>)"); 
-		if(!list.isEmpty()){
-			String where = list.get(0);
+		
+		// <where> 不存在大小写问题,因为在初始化阶段已经严格要求<where>,</where> 只能是小写
+		String[] wheres = StringUtils.substringsBetween(str, "<where>", "</where>");
+		if(wheres==null) {
+			return str;
+		}
+		
+		String s = str;
+		for (String where : wheres) {
+			
+			// sorce 不会受 where 的变化的变化
+			String sorce = where; // 把值copy一份
+			
 			where = where.trim().replaceFirst("(?i)^where\\b","");
 			// 如果第一个单词是"or"或者and,则去掉
 			where = where.trim().replaceFirst("(?i)^or\\b", "");
 			where = where.trim().replaceFirst("(?i)^and\\b", "");
 			where = where.trim();
+			
+			// 注意: 这里用quote是因为 sorce 很可能会包含有正则符号
 			if("".equals(where)){
-				return str.replaceAll("(?i)<where>(.|\\n)*</where>","");
+				s = s.replaceFirst(Pattern.quote("<where>"+sorce+"</where>"),"");
 			} else {
-				return str.replaceAll("(?i)<where>(.|\\n)*</where>","where " + where);
+				s = s.replaceFirst(Pattern.quote("<where>"+sorce+"</where>"),Matcher.quoteReplacement("where " + where));
 			}
 		}
-		return str;
+		return s;
 	}
 
 	/**

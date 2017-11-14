@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -124,10 +125,10 @@ public class QueryPool {
 			Element element = document.getDocumentElement();
 			NodeList nodeList = element.getChildNodes();
 			int len = nodeList.getLength();
+			
+			// 全局 parts
 			for (int i = 0; i < len; i++) {
 				Node node = nodeList.item(i);
-				
-				// 全局 parts
 				if(node.getNodeType() == Document.ELEMENT_NODE && "parts".equals(node.getNodeName())) {
 					Allocation.center(xmlName, (Element)node);
 					NodeList partNodes = node.getChildNodes();
@@ -138,8 +139,11 @@ public class QueryPool {
 						}
 					}
 				}
-				// 全局 parts End
-				
+			}
+			// 全局 parts End
+			
+			for (int i = 0; i < len; i++) {
+				Node node = nodeList.item(i);
 				if(node.getNodeType() == Document.ELEMENT_NODE && "query".equals(node.getNodeName())) {
 					Allocation.center(xmlName, (Element)node);
 					element = (Element) node;
@@ -195,6 +199,7 @@ public class QueryPool {
 							throw new ExceptionInInitializerError(String.format("%s> 下面的 part 节点没有设置name属性", postion));
 						}
 						// p.getTextContent() 里面很可能包含有$ 或 \ 如果不用Matcher.quoteReplacement进行处理,那么$表示反向引用,就会报错的
+						// 这个name在初始化阶段就被限定只能是字母和数字,应此不存在包含有正则符号
 						template = template.replaceAll("\\#\\{\\#"+name+"\\}",Matcher.quoteReplacement(p.getTextContent()));
 					}
 				}
@@ -210,7 +215,8 @@ public class QueryPool {
 		// 融合全局part
 		Set<Entry<String, String>> entries = gparts.entrySet();
 		for (Entry<String, String> entry : entries) {
-			template = template.replaceAll("\\#\\{\\#"+entry.getKey()+"\\}", Matcher.quoteReplacement(entry.getValue()));
+			// #{#"+entry.getKey()+"}这个值包含有正则关键符号,因此用quote
+			template = template.replaceAll(Pattern.quote("#{#"+entry.getKey()+"}"), Matcher.quoteReplacement(entry.getValue()));
 		}
 		// 融合全局part End
 		return template;

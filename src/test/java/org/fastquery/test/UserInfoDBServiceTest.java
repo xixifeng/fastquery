@@ -244,7 +244,7 @@ public class UserInfoDBServiceTest {
 		Page<UserInfo> page = userInfoDBService.find(100, 50, new PageableImpl(1, 3));
 		List<UserInfo> userInfos = page.getContent();
 		if (page.isHasContent()) {
-			userInfos.forEach(System.out::println);
+			userInfos.forEach( u -> LOG.debug(u));
 		}
 		assertThat(page.isFirst(), is(true));
 

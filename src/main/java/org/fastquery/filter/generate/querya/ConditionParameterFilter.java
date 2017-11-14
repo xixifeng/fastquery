@@ -23,6 +23,7 @@
 package org.fastquery.filter.generate.querya;
 
 import java.lang.reflect.Method;
+import java.util.regex.Pattern;
 
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
@@ -71,7 +72,9 @@ public class ConditionParameterFilter implements MethodFilter {
 			} 
 
 			if(i != 0 && (!"or".equalsIgnoreCase(word) && !"and".equalsIgnoreCase(word))) {
-				this.abortWith(method,"第"+(i+1)+"个@Condition的值,缺少条件连接符,如果上一个条件存在,用什么跟它相连?");
+				if(!Pattern.matches("^\\$\\S+(.|\n)*",value.trim())) {
+					this.abortWith(method,"第"+(i+1)+"个@Condition的值\""+value+"\",缺少条件连接符,如果上一个条件存在,用什么跟它相连?");
+				}
 			} 
 			
 		}

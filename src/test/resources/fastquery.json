@@ -36,7 +36,8 @@
             "org.fastquery.dao.QueryByNamedDBExample",
             "org.fastquery.dao.SQLInExample",
             "org.fastquery.dao.ProcedureExample",
-            "org.fastquery.dao.ProductDBService"
+            "org.fastquery.dao.ProductDBService",
+            "org.fastquery.dao.ConditionDBService"
             // 在这可以配置多个DB接口或包地址,以","号隔开
         ]
     }

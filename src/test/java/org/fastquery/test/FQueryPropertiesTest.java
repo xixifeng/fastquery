@@ -90,7 +90,7 @@ public class FQueryPropertiesTest {
 		maps.forEach((k, v) -> {
 			LOG.debug(k + ":" + v);
 		});
-		assertThat(maps.size(), is(11));
+		assertThat(maps.size(), is(12));
 	}
 
 	@Test

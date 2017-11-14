@@ -29,12 +29,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Param;
 import org.fastquery.example.StudentDBService;
+import org.fastquery.util.TypeUtil;
 import org.junit.Test;
 import org.objectweb.asm.Type;
 
@@ -116,27 +118,10 @@ public class SyntaxTest {
 
 	@Test
 	public void ty() {
-		LOG.debug(Type.getDescriptor(StudentDBService.class));
-		/*
-		 * { mv = cw.visitMethod(ACC_PUBLIC, "findAll",
-		 * "()Lcom/alibaba/fastjson/JSONArray;", null, null); mv.visitCode();
-		 * Label l0 = new Label(); mv.visitLabel(l0); mv.visitLineNumber(18,
-		 * l0); mv.visitLdcInsn(Type.getType(
-		 * "Lorg/fastquery/example/StudentDBService;"));
-		 * mv.visitLdcInsn("findAll");
-		 * mv.visitLdcInsn("()Lcom/alibaba/fastjson/JSONArray;");
-		 * mv.visitInsn(ICONST_0); mv.visitTypeInsn(ANEWARRAY,
-		 * "java/lang/Object"); mv.visitVarInsn(ALOAD, 0);
-		 * mv.visitMethodInsn(INVOKESTATIC, "org/fastquery/core/Prepared",
-		 * "excute",
-		 * "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/Repository;)Ljava/lang/Object;",
-		 * false); mv.visitTypeInsn(CHECKCAST,
-		 * "com/alibaba/fastjson/JSONArray"); mv.visitInsn(ARETURN); Label l1 =
-		 * new Label(); mv.visitLabel(l1); mv.visitLocalVariable("this",
-		 * "Lorg/fastquery/bean/StudentDBServiceProxyImpl;", null, l0, l1, 0);
-		 * mv.visitMaxs(5, 1); mv.visitEnd(); }
-		 * 
-		 */
+		// \\#\\{\\#abc\\}
+		String reg = Pattern.quote("#{#abc\\}");
+		Set<String> ss = TypeUtil.matchesNotrepeat("#{#abc}aa", reg);
+		ss.forEach(s -> LOG.debug(s) );
 	}
 
 }

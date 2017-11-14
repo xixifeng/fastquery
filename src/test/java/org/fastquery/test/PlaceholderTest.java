@@ -101,7 +101,7 @@ public class PlaceholderTest {
 		List<String> ssms = TypeUtil.matches(str, Placeholder.SMILE);
 		
 		for (String string : ssms) {
-			System.out.println(string);
+			LOG.debug(string);
 		}
 		
 		assertThat(ssms.size(), is(4));

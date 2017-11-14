@@ -25,6 +25,7 @@ package org.fastquery.filter.generate.query;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
@@ -66,7 +67,7 @@ class QueryFilterHelper {
 			if(!"".equals(where) && TypeUtil.matches(query.value(),Placeholder.WHERE_REG).size()!=1) {
 				throw new RepositoryException(method + " 如果存在@Condition(条件注解),那么@Query中的value值,必须存在#{#where},有且只能出现一次");
 			}
-			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, sb.toString()));
+			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(sb.toString())));
 		}
 		
 		return sqls;

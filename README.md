@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.33</version>
+    <version>1.0.34</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.33'
+compile 'org.fastquery:fastquery:1.0.34'
 ```
 
 ### Apache Archive
@@ -234,11 +234,11 @@ List<Map<String, Object>> find(String sex);
 - `List<Boolean>`,`Boolean[]` 或 `Boolean`  
 
 除了改操作或count外,查单个字段不能返回基本类型,因为:基本类型不能接受`null`值,而SQL表字段可以为`null`.
-返回类型若是基本类型的包装类型,若返回null, 表示:没有查到或字段的值本身就是null.
+返回类型若是基本类型的包装类型,若返回null, 表示:没有查到或查到的值本身就是null.
 例如: 
 
 ```java
-// 查询单个字段
+// 查询单个字段,若没有查到,就返回空List<String>(非null)
 @Query("select name from Student limit 3")
 List<String> findNames(); 
 ```
@@ -487,7 +487,7 @@ db.findLikeName(name + "%");
 
 ##  SQL IN
 
-### "?"索引方式
+### 使用"?"索引方式
 ```java
 @Query("select * from UserInfo where name in (?1)")
 List<UserInfo> findByNameIn(String...names);
@@ -496,13 +496,13 @@ List<UserInfo> findByNameIn(String...names);
 List<UserInfo> findByNameListIn(List<String> names,Integer id);
 ```
 
-### 冒号(:)命名式参数
+### 使用冒号表达式
 ```java
 @Query("select * from student where sex = :sex and age > :age and name in(:names)")
 List<Student> findByIn(@Param("sex")String sex,@Param("age")Integer age,@Param("names")Set<String> names);
 ```
 
-### 当然,也可以采用${name}表达式
+### 采用${name}表达式
 **注意:** 这种方式请提防SQL注入
 ```java
 @Query("select id,name,age from UserInfo where id in (${ids})")
@@ -553,19 +553,19 @@ UserInfo[] findByIds(@Param("ids") int[] ids);
 </queries>
 ```
 
-假如您在 XML 文档中放置了类似 "<" 或 "&" 字符,那么这个文档会产生一个错误,这是因为 XML 解析器会把它解释为新元素的开始.为了避免此类错误.可以将SQL代码片段定义为CDATA.CDATA中的所有内容都会被 XML 解析器忽略.CDATA 部分由`<![CDATA[` 开始,由 `]]>`结束.   
+假如在 XML 文档中放置了类似 `<` 或 `&` 字符,那么这个文档会产生一个错误,这是因为 XML 解析器会把 `<` 解释为新元素的开始,为了避免此类错误,可以将模板代码片段定义为CDATA. XML 解析器会把CDATA所包含的内容当作字符串处理.CDATA 部分由`<![CDATA[` 开始,由 `]]>`结束.   
 若不用CDATA,那么有些字符必须采用**命名实体**的方式引入. 在 XML 中有 5 个预定义的实体引用:
 
-| 字符 | 命名实体 | 说明 |
-|:-----:|:----:|:----:|
-|  <   | &amp;lt;  | 小于号 |
-|  >   | &amp;gt;  | 大于号 |
-|  &   | &amp;amp; | 与符号 |
-|  '   | &amp;apos;| 单引号 |
-|  "   | &amp;quot;| 双引号 |
+| 字符 | 命名实体 | 实体编码 | 说明 |
+|:-----:|:----:|:----:|:----:|
+|  &lt;   | &amp;lt;  | &amp;#60; | 小于号 |
+|  &gt;   | &amp;gt;  | &amp;#62; | 大于号 |
+|  &amp;  | &amp;amp; | &amp;#38; | 与符号 |
+|  &apos; | &amp;apos;| &amp;#39; | 单引号 |
+|  &quot; | &amp;quot;| &amp;#34; | 双引号 |
 
 如果想把一些公用的SQL代码片段提取出来,以便重用,通过定义`<parts>`元素(零件集)就可以做到. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件.  
-若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`<query>`都能引用它.一个非分页的函数,如果绑定的是分页模板,那么这个函数只识别查询语句,不理会count语句.
+若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`<query>`都能引用它.一个非分页的函数,如果绑定的模板中包含有`<countQuery>`,那么这个函数只会提取查询语句,而不会提取计数语句.
 
 ```java
 public interface QueryByNamedDBExample extends QueryRepository {
@@ -608,7 +608,7 @@ public List<Student> findSomeStudent();
 
 等效于 `@QueryByNamed("findSomeStudent")`  
 
-**注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,用于在模板中做逻辑判断,而`:name`用于标记参数位,解析SQL时会自动替换成`?`号.
+**注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,可用于在模板中做逻辑判断,而`:name`用于标记参数位,SQL解析器会将其翻译成`?`号.
 
 ## 处理异常
 
@@ -709,7 +709,7 @@ public interface UserInfoDBService extends QueryRepository {
 ```
 
 ### @PageIndex和@PageSize
-`@PageIndex` 用来指定当前页索引,如果传递的值小于1,依然视为1   
+`@PageIndex` 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1   
 `@PageSize`  用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1   
 **注意**: 该注解组合不能和`Pageable`一起使用  
 例如:
@@ -725,7 +725,7 @@ Page<Map<String,Object>> findSome(Integer age,Integer id,@PageIndex int pageInde
 `Page`是分页的抽象.通过它可以获取分页中的各种属性. 并且开发者不用去实现.
 
 ```java
-int p = 1;    // 指定访问的是第几页
+int p = 1;    // 指定访问的是第几页(不是从0开始计数)
 int size = 3; // 设定每一页最多显示几条记录
 Integer age=10,id = 50;
 Pageable pageable = new PageableImpl(p, size);

@@ -24,6 +24,7 @@ package org.fastquery.filter.generate.modifying;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Placeholder;
@@ -62,8 +63,8 @@ public class AnnotationSynxFilter implements MethodFilter {
 				}
 				
 				// 替换SQL中的占位变量符
-				sql = sql.replaceAll(Placeholder.TABLE_REG, table);
-				sql = sql.replaceAll(Placeholder.ID_REG, id);
+				sql = sql.replaceAll(Placeholder.TABLE_REG, Matcher.quoteReplacement(table));
+				sql = sql.replaceAll(Placeholder.ID_REG, Matcher.quoteReplacement(id));
 				
 				// 2).检测: table中的值,必须在当前sql语句中出现(证明:指定就是当前正在修改的表)
 				if(!TypeUtil.containsIgnoreCase(sql, table)) {
