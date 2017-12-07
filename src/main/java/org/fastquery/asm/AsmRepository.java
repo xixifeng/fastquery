@@ -26,13 +26,16 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.fastquery.core.GenerateRepository;
 import org.fastquery.core.Prepared;
 import org.fastquery.core.Repository;
 import org.fastquery.mapper.QueryValidator;
 import org.fastquery.util.TypeUtil;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
@@ -43,7 +46,7 @@ import org.objectweb.asm.commons.GeneratorAdapter;
  */
 public class AsmRepository implements Opcodes {
 
-	private static final Logger LOG = Logger.getLogger(AsmRepository.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AsmRepository.class);
 	
 	private AsmRepository(){
 	}
@@ -67,13 +70,39 @@ public class AsmRepository implements Opcodes {
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		cw.visit(V1_1, ACC_PUBLIC, proxyName, null, "java/lang/Object", interfaces);
 
-		// 生成默认的构造方法
-		org.objectweb.asm.commons.Method m = org.objectweb.asm.commons.Method.getMethod("void <init> ()");
-		GeneratorAdapter mg = new GeneratorAdapter(ACC_PUBLIC, m, null, null, cw);
-		mg.loadThis();
-		mg.invokeConstructor(Type.getType(Object.class), m);
-		mg.returnValue();
-		mg.endMethod();
+		// 单例
+		String repositoryDescriptor = Type.getDescriptor(repositoryClazz);
+		// 生成的私有静态方法,用于存储实例对象
+		FieldVisitor fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, "instance", repositoryDescriptor, null, null);
+		fv.visitEnd();
+		
+		org.objectweb.asm.MethodVisitor mv;
+		// 生成私有的不带参的构造方法
+		mv = cw.visitMethod(ACC_PRIVATE, "<init>", "()V", null, null);
+		mv.visitCode();
+		mv.visitVarInsn(ALOAD, 0);
+		mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+		mv.visitInsn(RETURN);
+		mv.visitMaxs(1, 1);
+		mv.visitEnd();
+		
+		// 生成获取实例方法
+		mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "getInstance", "()" + repositoryDescriptor, null, null);
+		mv.visitCode();
+		mv.visitFieldInsn(GETSTATIC, proxyName, "instance", repositoryDescriptor);
+		Label l0 = new Label();
+		mv.visitJumpInsn(IFNONNULL, l0);
+		mv.visitTypeInsn(NEW, proxyName);
+		mv.visitInsn(DUP);
+		mv.visitMethodInsn(INVOKESPECIAL, proxyName, "<init>", "()V", false);
+		mv.visitFieldInsn(PUTSTATIC, proxyName, "instance", repositoryDescriptor);
+		mv.visitLabel(l0);
+		mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+		mv.visitFieldInsn(GETSTATIC, proxyName, "instance", repositoryDescriptor);
+		mv.visitInsn(ARETURN);
+		mv.visitMaxs(2, 0);
+		mv.visitEnd();
+		// 单例 End
 
 		// 根据接口clazz 生成实现的方法
 		Method[] methods = repositoryClazz.getMethods();

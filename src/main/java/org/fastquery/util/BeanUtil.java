@@ -30,7 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.core.Id;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.RepositoryException;
@@ -44,7 +45,7 @@ import com.alibaba.fastjson.JSONArray;
  */
 public final class BeanUtil {
 	
-	private static final Logger LOG = Logger.getLogger(BeanUtil.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BeanUtil.class);
 
 	private BeanUtil() {
 	}

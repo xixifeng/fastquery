@@ -20,36 +20,35 @@
  * 
  */
 
-package org.fastquery.service;
+package org.fastquery.web;
 
-import java.io.InputStream;
-import java.net.URL;
+import java.lang.reflect.InvocationTargetException;
 
-import org.fastquery.core.Resource;
+import javax.servlet.ServletContext;
+
+import org.fastquery.core.RepositoryException;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-class FQueryResourceImpl implements Resource {
-		
-	@Override
-	public InputStream getResourceAsStream(String name) {
-		if(!exist(name)) {
-			return null;
-		}
-		return FQueryResourceImpl.class.getClassLoader().getResourceAsStream(name);
+class FqClassLoader extends ClassLoader {
+
+	private ServletContext context;
+
+	FqClassLoader(ServletContext context) {
+		super(context.getClassLoader()); // 这行不能去掉
+		this.context = context;
 	}
 
-	@Override
-	public boolean exist(String name) {
-		if(name==null || name.charAt(0) == '/') {
-			return false;
+	final Class<?> defineClassByName(String name, byte[] b, int off, int len) {
+		Class<?> clazz = defineClass(name, b, off, len);
+		try {
+			context.setAttribute(clazz.getInterfaces()[0].getName(), clazz.getMethod("getInstance").invoke(null));
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
+			throw new RepositoryException(e);
 		}
-		URL url = FQueryResourceImpl.class.getClassLoader().getResource(name);
-		if (url == null) {
-			return false;
-		}
-		return true;
+		return clazz;
 	}
 }

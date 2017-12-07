@@ -22,44 +22,17 @@
 
 package org.fastquery.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.fastquery.core.RepositoryException;
-
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FqClassLoader extends ClassLoader {
-	
-	private static final Logger LOG = Logger.getLogger(FqClassLoader.class);
-	
-	private static Map<String, Object> beans = new HashMap<>();
+class FqClassLoader extends ClassLoader {
 
-	FqClassLoader(ClassLoader parent){
+	FqClassLoader(ClassLoader parent) {
 		super(parent);
 	}
-	
-	final Object defineClassByName(String name, byte[] b, int off, int len){
-		Class<?> clazz = defineClass(name, b, off, len);
-		Object obj = null;
-		try {
-			obj = clazz.newInstance();
-		} catch (InstantiationException e) {
-			throw new RepositoryException(e.getMessage(),e);
-		} catch (IllegalAccessException e) {
-			LOG.error(e);
-			throw new RepositoryException(e.getMessage(),e);
-		}
-		
-		beans.put(clazz.getName(), obj);
-		
-		return obj;
-	}
-	
-	static final Object findLoadedClassByName(String name) {
-		return beans.get(name);
+
+	final Class<?> defineClassByName(String name, byte[] b, int off, int len) {
+		return defineClass(name, b, off, len);
 	}
 }

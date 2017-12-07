@@ -92,10 +92,5 @@
   "debug" : false,
  
   // 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹下.默认:允许放在classpath根目录下
-  queries: ["queries/","tpl/"], // 表示: SQL模板文件可以放在classpath/queries里 或 classpath/tpl里
- 
-  // velocity.properties 的位置
-  // 该行配置不是必须的, 请注意不要重复配置,如果在其他地方已配置velocity,请删除该行配置
-  "velocity" : "/root/git/fastquery/fastquery/src/test/resources/velocity.properties"
-
+  queries: ["queries/","tpl/"] // 表示: SQL模板文件可以放在classpath/queries里 或 classpath/tpl里
 }

@@ -26,7 +26,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
@@ -44,7 +45,7 @@ import org.junit.runner.Description;
  */
 public class RepositoryInvocationHandler implements InvocationHandler {
 
-	private static final Logger LOG = Logger.getLogger(RepositoryInvocationHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RepositoryInvocationHandler.class);
 
 	private Repository repository;
 	private FastQueryTestRule rule;

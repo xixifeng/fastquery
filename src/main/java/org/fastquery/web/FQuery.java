@@ -20,28 +20,39 @@
  * 
  */
 
-package org.fastquery.filter;
+package org.fastquery.web;
 
-import java.lang.reflect.Method;
+import java.util.Enumeration;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.fastquery.example.StudentDBService;
-import org.fastquery.filter.BeforeFilter;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import org.fastquery.util.FastQueryJSONObject;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class MyBeforeFilter2 extends BeforeFilter<StudentDBService> {
-
-	private static final Logger LOG = LoggerFactory.getLogger(MyBeforeFilter2.class);
+public class FQuery implements ServletContextListener {
+	
+	FqClassLoader classLoader;
+	
+	@Override
+	public void contextInitialized(ServletContextEvent sce) {
+		classLoader = new FqClassLoader(sce.getServletContext());
+		new GenerateRepositoryImpl(classLoader).persistent();
+	}
 
 	@Override
-	public void doFilter(StudentDBService repository, Method method, Object[] args) {
-		// repository : 当前拦截到实例对象
-		// method : 当前拦截到的方法
-		// args : 当前传递进来的参数列表
-		LOG.debug("MyBeforeFilter2....");
+	public void contextDestroyed(ServletContextEvent sce) {
+		ServletContext context = sce.getServletContext();
+		Enumeration<String> enumeration = context.getAttributeNames();
+		while (enumeration.hasMoreElements()) {
+			String key = enumeration.nextElement();
+			context.removeAttribute(key);
+		}
+		classLoader = null;
+		FastQueryJSONObject.removeCurrent();
 	}
 }

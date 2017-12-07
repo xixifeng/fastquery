@@ -47,17 +47,18 @@ public class ClassUtil {
 	/**
 	 * 从包package中获取所有的Class
 	 * @param packageName 包地址
+	 * @param loader 类加载器
 	 * @return clazz 集
 	 */
 	 @SuppressWarnings("unchecked")
-	public static List<Class<Repository>> getClasses(String packageName){
+	public static List<Class<Repository>> getClasses(String packageName,ClassLoader loader){
 	     		 
 	     //第一个class类的集合
 	     List<Class<Repository>> classes = new ArrayList<>();
 	     
 		 // packageName 很可能是一个完整的类
 		 try {
-			 Class<Repository> clazz = (Class<Repository>) Class.forName(packageName);
+			 Class<Repository> clazz = (Class<Repository>) Class.forName(packageName,false,loader);
 			if(Repository.class.isAssignableFrom(clazz)){
 				classes.add(clazz);
 			}

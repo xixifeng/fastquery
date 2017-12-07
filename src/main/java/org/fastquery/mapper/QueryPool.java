@@ -38,7 +38,8 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.fastquery.core.Param;
@@ -59,7 +60,7 @@ import org.w3c.dom.NodeList;
  */
 public class QueryPool {
 	
-	private static final Logger LOG = Logger.getLogger(QueryPool.class);
+	private static final Logger LOG = LoggerFactory.getLogger(QueryPool.class);
 	
 	private static Resource resource;
 

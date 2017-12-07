@@ -29,6 +29,7 @@ import static org.hamcrest.Matchers.*;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
+import org.fastquery.core.FQueryResourceImpl;
 import org.fastquery.core.Resource;
 import org.junit.Test;
 
@@ -38,7 +39,7 @@ import org.junit.Test;
  */
 public class FQueryResourceImplTest {
 
-	private Resource resource = new FQueryResourceImpl();
+	private Resource resource = new FQueryResourceImpl(this.getClass().getClassLoader());
 
 	@Test
 	public void testGetResourceAsStream() {

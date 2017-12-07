@@ -32,7 +32,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Param;
 import org.fastquery.example.StudentDBService;
@@ -52,7 +53,7 @@ import static org.junit.Assert.*;
  */
 public class SyntaxTest {
 
-	private static final Logger LOG = Logger.getLogger(SyntaxTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SyntaxTest.class);
 
 	@Test(expected = IndexOutOfBoundsException.class)
 	public void listEmpty() {
@@ -85,7 +86,7 @@ public class SyntaxTest {
 
 	@Test
 	public void testReg() {
-		LOG.debug(Pattern.matches("", ""));
+		LOG.debug(String.valueOf(Pattern.matches("", "")));
 		// s.replaceAll("\\:"+param.value()+"\\b", "?"+(i+1));
 		assertThat("abckdwgew:name&".replaceAll("\\:name\\b", "?"), equalTo("abckdwgew?&"));
 		assertThat("abckdwgew:name &".replaceAll("\\:name\\b", "?"), equalTo("abckdwgew? &"));

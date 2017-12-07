@@ -25,7 +25,8 @@ package org.fastquery.test;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.bean.sunny.Card;
 import org.fastquery.dao.SunnyDBService;
 import org.fastquery.service.FQuery;
@@ -37,7 +38,7 @@ import org.fastquery.service.FQuery;
  */
 public class MultithreadingTest {
 
-	private static final Logger LOG = Logger.getLogger(MultithreadingTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MultithreadingTest.class);
 
 	static int count = 0;
 

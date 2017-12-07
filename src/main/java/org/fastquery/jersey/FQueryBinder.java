@@ -20,28 +20,27 @@
  * 
  */
 
-package org.fastquery.filter;
+package org.fastquery.jersey;
 
-import java.lang.reflect.Method;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.fastquery.example.StudentDBService;
-import org.fastquery.filter.BeforeFilter;
+import org.glassfish.jersey.internal.inject.AbstractBinder;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class MyBeforeFilter2 extends BeforeFilter<StudentDBService> {
+public class FQueryBinder extends AbstractBinder {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MyBeforeFilter2.class);
+	private ClassLoader webClassLoader;
+	
+	public FQueryBinder(ClassLoader webClassLoader) {
+		this.webClassLoader = webClassLoader;
+	}
+
 
 	@Override
-	public void doFilter(StudentDBService repository, Method method, Object[] args) {
-		// repository : 当前拦截到实例对象
-		// method : 当前拦截到的方法
-		// args : 当前传递进来的参数列表
-		LOG.debug("MyBeforeFilter2....");
+	protected void configure() {
+		FqClassLoader fqClassLoader = new FqClassLoader(webClassLoader,this);
+		new GenerateRepositoryImpl(fqClassLoader).persistent();
 	}
+	
 }

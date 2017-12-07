@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/2002/xmlspec/dtd/2.10/xmlspec.dtd">
+<Configuration status="info">
+    <Appenders>  
+        <Console name="Console" target="SYSTEM_OUT">  
+            <PatternLayout pattern="级别:【%p】 信息:%m 位置: %l  线程:%t 发生时间:%d{yyyy-MM-dd HH:mm:ss} 耗时:%r毫秒%n" />  
+        </Console>
+        <Async name="Async">  
+        	<AppenderRef ref="Console" />  
+        </Async>    
+    </Appenders>
+	<Loggers>
+		<Root level="warn">
+			<AppenderRef ref="Console" />
+		</Root>
+		<Logger name="org.fastquery" level="debug" additivity="false">
+			<AppenderRef ref="Console" />
+		</Logger>
+	</Loggers>  
+</Configuration>

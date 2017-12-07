@@ -24,7 +24,8 @@ package org.fastquery.filter;
 
 import java.lang.reflect.Method;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.filter.AfterFilter;
 
@@ -34,7 +35,7 @@ import org.fastquery.filter.AfterFilter;
  */
 public class MyAfterFilter1 extends AfterFilter<StudentDBService> {
 
-	private static final Logger LOG = Logger.getLogger(MyAfterFilter1.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MyAfterFilter1.class);
 
 	@Override
 	public Object doFilter(StudentDBService repository, Method method, Object[] args, Object returnVal) {

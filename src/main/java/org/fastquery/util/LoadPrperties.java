@@ -25,7 +25,8 @@ package org.fastquery.util;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
 import org.fastquery.dsm.FastQueryJson;
@@ -37,7 +38,7 @@ import org.fastquery.dsm.JdbcConfig;
  */
 public class LoadPrperties {
 	
-	private static final Logger LOG = Logger.getLogger(LoadPrperties.class);
+	private static final Logger LOG = LoggerFactory.getLogger(LoadPrperties.class);
 	
 	private LoadPrperties(){}
 	

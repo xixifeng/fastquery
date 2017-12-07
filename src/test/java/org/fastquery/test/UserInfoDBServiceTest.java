@@ -22,7 +22,8 @@
 
 package org.fastquery.test;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInformation;
 import org.fastquery.core.RepositoryException;
@@ -56,7 +57,7 @@ import static org.hamcrest.Matchers.*;
  */
 public class UserInfoDBServiceTest {
 
-	private static final Logger LOG = Logger.getLogger(UserInfoDBServiceTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UserInfoDBServiceTest.class);
 
 	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 
@@ -154,7 +155,7 @@ public class UserInfoDBServiceTest {
 	@Test
 	public void findUserInfoById() {
 		UserInformation userInformation = userInfoDBService.findUserInfoById(1);
-		LOG.debug(userInformation);
+		LOG.debug(userInformation.toString());
 	}
 
 	@Test
@@ -244,7 +245,7 @@ public class UserInfoDBServiceTest {
 		Page<UserInfo> page = userInfoDBService.find(100, 50, new PageableImpl(1, 3));
 		List<UserInfo> userInfos = page.getContent();
 		if (page.isHasContent()) {
-			userInfos.forEach( u -> LOG.debug(u));
+			userInfos.forEach( u -> LOG.debug(u.toString()));
 		}
 		assertThat(page.isFirst(), is(true));
 
@@ -333,7 +334,9 @@ public class UserInfoDBServiceTest {
 	@Test
 	public void countDouble() {
 		Double d = userInfoDBService.countDouble(2100, 2308);
-		LOG.debug(d);
+		if(d!=null) {
+			LOG.debug(d.toString());	
+		}
 	}
 
 	@Test

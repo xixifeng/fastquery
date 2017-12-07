@@ -20,28 +20,19 @@
  * 
  */
 
-package org.fastquery.filter;
+package org.fastquery.test;
 
-import java.lang.reflect.Method;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.fastquery.example.StudentDBService;
-import org.fastquery.filter.BeforeFilter;
+import org.objectweb.asm.util.ASMifier;
 
 /**
  * 
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
  */
-public class MyBeforeFilter2 extends BeforeFilter<StudentDBService> {
+public class TestASMifier {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MyBeforeFilter2.class);
-
-	@Override
-	public void doFilter(StudentDBService repository, Method method, Object[] args) {
-		// repository : 当前拦截到实例对象
-		// method : 当前拦截到的方法
-		// args : 当前传递进来的参数列表
-		LOG.debug("MyBeforeFilter2....");
+	public static void main(String[] args) throws Exception {
+		// "Hi.class" 对应的字节码通过ASM工具怎样一步一步生成出来呢? 通过调用ASMifier.main, 可以得到通过ASM工具生成bytes的详细源码.
+		// 解释太绕了, 运行一下便知
+		ASMifier.main(new String[]{ "/mywork/myosgi/osgi_workspace/fastquery/target/test-classes/org/fastquery/bean/StudentDBServiceProxyImpl.class"} );
 	}
 }

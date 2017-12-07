@@ -37,7 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.struct.RespUpdate;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.util.BeanUtil;
@@ -53,7 +54,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class DB {
 
-	private static final Logger LOG = Logger.getLogger(DB.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DB.class);
 
 	private DB() {
 	}

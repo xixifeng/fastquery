@@ -20,28 +20,28 @@
  * 
  */
 
-package org.fastquery.filter;
+package org.fastquery.service;
 
-import java.lang.reflect.Method;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.fastquery.example.StudentDBService;
-import org.fastquery.filter.BeforeFilter;
+import org.fastquery.dsm.FQueryProperties;
+import org.fastquery.util.FastQueryJSONObject;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 
 /**
  * 
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
  */
-public class MyBeforeFilter2 extends BeforeFilter<StudentDBService> {
-
-	private static final Logger LOG = LoggerFactory.getLogger(MyBeforeFilter2.class);
+public class Activator implements BundleActivator {
 
 	@Override
-	public void doFilter(StudentDBService repository, Method method, Object[] args) {
-		// repository : 当前拦截到实例对象
-		// method : 当前拦截到的方法
-		// args : 当前传递进来的参数列表
-		LOG.debug("MyBeforeFilter2....");
+	public void start(BundleContext context) throws Exception {
 	}
+
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		// 释放 FastQueryJSONObject 的资源
+		FastQueryJSONObject.clear();
+		FQueryProperties.clear();
+	}
+
 }

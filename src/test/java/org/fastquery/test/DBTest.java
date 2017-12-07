@@ -22,7 +22,8 @@
 
 package org.fastquery.test;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.core.DB;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
@@ -44,7 +45,7 @@ import java.util.List;
  */
 public class DBTest {
 
-	private static final Logger LOG = Logger.getLogger(DBTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DBTest.class);
 
 	private StudentDBService db = FQuery.getRepository(StudentDBService.class);
 

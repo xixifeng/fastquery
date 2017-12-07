@@ -12,6 +12,18 @@ import org.fastquery.core.Primarykey;
 import org.fastquery.example.StudentDBService;
 
 public class StudentDBServiceProxyImpl implements StudentDBService {
+	
+	private static StudentDBService instance;
+
+	private StudentDBServiceProxyImpl() {
+	}
+
+	public static StudentDBService getInstance() {
+		if (instance == null) {
+			instance = new StudentDBServiceProxyImpl();
+		}
+		return instance;
+	}
 
 	public JSONArray findAll() {
 		return (JSONArray) Prepared.excute("findAll", "()Lcom/alibaba/fastjson/JSONArray;", new Object[0], this);

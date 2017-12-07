@@ -30,7 +30,8 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dsm.DataSourceManage;
 
@@ -40,7 +41,7 @@ import org.fastquery.dsm.DataSourceManage;
  */
 public class DBUtils {
 
-	private static final Logger LOG = Logger.getLogger(DBUtils.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DBUtils.class);
 	private static DBUtils dbUtils;
 
 	private DBUtils() {

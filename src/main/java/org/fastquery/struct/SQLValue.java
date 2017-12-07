@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
@@ -40,7 +41,7 @@ import org.fastquery.util.TypeUtil;
  */
 public class SQLValue {
 	
-	private static final Logger LOG = Logger.getLogger(SQLValue.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SQLValue.class);
 	
 	private String sql; // 待执行的sql
 	private List<Object> values;// sql语言中"?"对应的实参
@@ -71,7 +72,7 @@ public class SQLValue {
 		for (String in : ins) {
 			if(PreventSQLInjection.isInjectStr(in) && TypeUtil.matches(in, Placeholder.SMILE).isEmpty()){
 				String tip = in.replace("`-", "").replace("-`", "")+"中包含有危险关键字,正在尝试SQL注入";
-				LOG.fatal(tip);
+				LOG.error(tip);
 				throw new RepositoryException(tip);
 			}
 		}

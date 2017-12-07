@@ -32,7 +32,8 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
@@ -46,7 +47,7 @@ import org.fastquery.util.FastQueryJSONObject;
  */
 public class FastQueryTestRule implements TestRule {
 
-	private static final Logger LOG = Logger.getLogger(FastQueryTestRule.class);
+	private static final Logger LOG = LoggerFactory.getLogger(FastQueryTestRule.class);
 	private SQLValue sqlValue;
 	private List<SQLValue> sqlValues;
 

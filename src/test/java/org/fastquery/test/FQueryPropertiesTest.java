@@ -23,17 +23,16 @@
 package org.fastquery.test;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.dsm.FQueryProperties;
 import org.fastquery.service.FQuery;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
@@ -47,16 +46,9 @@ import static org.junit.Assert.assertThat;
  */
 public class FQueryPropertiesTest {
 
-	private static final Logger LOG = Logger.getLogger(FQueryPropertiesTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(FQueryPropertiesTest.class);
 
-	@BeforeClass
-	public static void beforeClass() throws NoSuchMethodException, SecurityException, IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
-		Class<FQuery> clazz = FQuery.class;
-		Method method = clazz.getDeclaredMethod("init");
-		method.setAccessible(true);
-		method.invoke(null);
-	}
+	public UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 
 	@SuppressWarnings("unchecked")
 	public Map<String, String> getDataSourceIndexs() {

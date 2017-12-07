@@ -22,7 +22,8 @@
 
 package org.fastquery.test;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Param;
@@ -54,7 +55,7 @@ import static org.hamcrest.Matchers.*;
  */
 public class QueryByNamedDBExampleTest {
 
-	private static final Logger LOG = Logger.getLogger(QueryByNamedDBExampleTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(QueryByNamedDBExampleTest.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();

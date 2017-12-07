@@ -1,25 +1,29 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Osgi-fquery
-Bundle-SymbolicName: fquery
-Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: org.fastquery.osgi.act.Activator
+Bundle-Name: fastquery
+Bundle-SymbolicName: fastquery
+Bundle-Version: 1.0.35
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: com.alibaba.fastjson,
  com.mchange.v2.c3p0,
  com.mchange.v2.c3p0.impl,
- com.mysql.jdbc.jdbc2.optional;version="5.1.29",
- org.apache.cxf.bus.blueprint;version="3.1.1",
- org.apache.log4j;version="1.2.15",
+ javax.servlet;version="3.1.0",
+ javax.servlet.http;version="3.1.0";resolution:=optional,
+ javax.ws.rs.core;version="2.0.1";resolution:=optional,
+ org.apache.commons.lang3;version="3.5.0",
  org.apache.velocity,
  org.apache.velocity.app,
  org.apache.velocity.context,
- org.objectweb.asm;version="5.0.2",
- org.objectweb.asm.commons;version="5.0.2",
- org.osgi.framework;version="1.3.0",
- org.osgi.util.tracker;version="1.4.0"
-Bundle-ActivationPolicy: lazy
+ org.glassfish.jersey.internal.inject;resolution:=optional,
+ org.glassfish.jersey.server.mvc;resolution:=optional,
+ org.glassfish.jersey.server.mvc.spi;resolution:=optional,
+ org.objectweb.asm;version="5.0.1",
+ org.objectweb.asm.commons;version="5.0.1",
+ org.osgi.framework;version="1.8.0",
+ org.slf4j;version="1.7.13"
 Export-Package: org.fastquery.core,
- org.fastquery.filter,
- org.fastquery.osgi.service,
- org.fastquery.page
+ org.fastquery.dsm,
+ org.fastquery.page,
+ org.fastquery.jersey,
+ org.fastquery.mvc
+Bundle-Activator: org.fastquery.service.Activator

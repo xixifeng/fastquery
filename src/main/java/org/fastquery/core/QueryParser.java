@@ -32,7 +32,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.NotCount;
 import org.fastquery.page.Pageable;
@@ -47,7 +48,7 @@ import org.fastquery.util.TypeUtil;
  */
 public class QueryParser {
 
-	private static final Logger LOG = Logger.getLogger(QueryParser.class);
+	private static final Logger LOG = LoggerFactory.getLogger(QueryParser.class);
 
 	private static final String LIMIT = " limit ";
 

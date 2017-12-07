@@ -33,7 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.core.Id;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
@@ -54,7 +55,7 @@ import static org.hamcrest.Matchers.*;
  */
 public class TypeUtilTest implements Opcodes {
 
-	private static final Logger LOG = Logger.getLogger(TypeUtilTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(TypeUtilTest.class);
 
 	@Test
 	public void testGetTypeInfo() {

@@ -27,7 +27,8 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.bean.Student;
 import org.fastquery.core.Primarykey;
 import org.fastquery.core.QueryContext;
@@ -52,7 +53,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class StudentDBServiceTest {
 
-	private static final Logger LOG = Logger.getLogger(StudentDBServiceTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(StudentDBServiceTest.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
@@ -199,7 +200,7 @@ public class StudentDBServiceTest {
 	@Test
 	public void testRows() {
 		JSONObject jsonObject = studentDBService.rows();
-		LOG.debug(jsonObject);
+		LOG.debug(jsonObject.toJSONString());
 	}
 
 	// 测试 add 和 delete
@@ -235,7 +236,7 @@ public class StudentDBServiceTest {
 		}
 		// 输出前面三条看看
 		for (int i = 0; i < len; i++) {
-			LOG.debug(students[i]);
+			LOG.debug(students[i].toString());
 		}
 	}
 
@@ -247,7 +248,7 @@ public class StudentDBServiceTest {
 		} else {
 			LOG.debug(JSON.toJSONString(students.subList(0, students.size()), true));
 		}
-		LOG.debug(studentDBService);
+		LOG.debug(studentDBService.toString());
 	}
 
 	@Test
@@ -345,7 +346,7 @@ public class StudentDBServiceTest {
 		// desc
 		if (students != null) {
 			for (int i = 0; i < students.length; i++) {
-				LOG.debug(students[i]);
+				LOG.debug(students[i].toString());
 			}
 		}
 	}

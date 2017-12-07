@@ -9,7 +9,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.dsm.FQueryFactoryImpl;
 import org.fastquery.dsm.FQueryProperties;
 import org.fastquery.util.TypeUtil;
@@ -20,7 +21,7 @@ import org.fastquery.util.TypeUtil;
  */
 public final class QueryContext {
 
-	private static final Logger LOG = Logger.getLogger(QueryContext.class);
+	private static final Logger LOG = LoggerFactory.getLogger(QueryContext.class);
 
 	private static ThreadLocal<QueryContext> threadLocal = new ThreadLocal<>();
 

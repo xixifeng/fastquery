@@ -125,4 +125,13 @@ public class FQueryProperties {
 		*/
 	}
 	// 不用提供set方法,如果提供dataSourceIndexs的set方法,就把它覆盖了.
+	
+	public static void removeDataSource(String key){
+		dataSources.remove(key);
+	}
+	
+	public static void clear() {
+		dataSourceIndexs.clear();
+		dataSources.clear();
+	}
 }

@@ -26,7 +26,8 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.filter.FilterChainHandler;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.Page;
@@ -39,7 +40,7 @@ import org.fastquery.util.TypeUtil;
  */
 public class Prepared {
 	
-	private static final Logger LOG = Logger.getLogger(Prepared.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Prepared.class);
 	
 	private Prepared(){}
   
@@ -106,7 +107,7 @@ public class Prepared {
 	        try {
 	        	QueryContext.clear();
 			} catch (SQLException e) {
-				LOG.fatal("数据库连接无法释放",e);
+				LOG.error("数据库连接无法释放",e);
 			}
 		}
 	}

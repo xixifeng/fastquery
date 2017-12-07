@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.fastquery.core.Resource;
+import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.mapper.QueryMapper;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.service.FQuery;
@@ -47,6 +48,8 @@ public class QueryPoolTest {
 
 	static Resource resource;
 
+	public UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
+	
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		resource = new Resource() {
@@ -64,11 +67,6 @@ public class QueryPoolTest {
 				return true;
 			}
 		};
-
-		Class<FQuery> clazz = FQuery.class;
-		Method method = clazz.getDeclaredMethod("init");
-		method.setAccessible(true);
-		method.invoke(null);
 	}
 
 	@SuppressWarnings("unchecked")

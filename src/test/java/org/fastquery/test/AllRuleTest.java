@@ -23,6 +23,7 @@
 package org.fastquery.test;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.service.FQuery;
@@ -58,9 +59,11 @@ public class AllRuleTest {
 	public static void beforeClass()
 			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		FQuery.getRepository(UserInfoDBService.class);
-		Field jsonObjectField = FastQueryJSONObject.class.getDeclaredField("jsonObject");
-		jsonObjectField.setAccessible(true);
-		JSONObject jsonObject = (JSONObject) jsonObjectField.get(null);
+		Field field = FastQueryJSONObject.class.getDeclaredField("maps");
+		field.setAccessible(true);
+		@SuppressWarnings("unchecked")
+		Map<ClassLoader, JSONObject> maps = (Map<ClassLoader, JSONObject>) field.get(null);
+		JSONObject jsonObject = maps.get(Thread.currentThread().getContextClassLoader());
 		jsonObject.put("debug", true);
 	}
 

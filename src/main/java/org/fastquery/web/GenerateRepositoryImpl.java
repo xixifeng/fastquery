@@ -20,7 +20,7 @@
  * 
  */
 
-package org.fastquery.service;
+package org.fastquery.web;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,15 +47,34 @@ class GenerateRepositoryImpl implements GenerateRepository {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GenerateRepositoryImpl.class);
 
+	private FqClassLoader classLoader;
 	
-	private FqClassLoader classLoader = new FqClassLoader(GenerateRepositoryImpl.class.getClassLoader());
-	
-	private static volatile GenerateRepositoryImpl instance;
-	
-	private GenerateRepositoryImpl() {
-		
+	GenerateRepositoryImpl(FqClassLoader classLoader) {
+		this.classLoader = classLoader;
 		LOG.debug("GenerateRepositoryImpl 已实例化.");
-		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Repository> Class<? extends T> generate(Class<T> repositoryClazz) {
+		String name = repositoryClazz.getName() + SUFFIX;
+
+		byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
+
+		/*
+		// 把生成的文件存储起来
+		try (java.io.FileOutputStream fos = new java.io.FileOutputStream("/data/tmp/" + name + ".class")) {
+			fos.write(bytes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// 把生成的文件存储起来 end
+		 */
+		return (Class<? extends T>) classLoader.defineClassByName(name, bytes, 0, bytes.length);
+	}
+	
+	void persistent() {
+
 		Resource resource = new FQueryResourceImpl(classLoader);
 
 		// 1). 装载配置文件
@@ -80,39 +99,5 @@ class GenerateRepositoryImpl implements GenerateRepository {
 
 		// 3). 生成 Repository之后的检测
 		AsmRepository.after(clses);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Repository> Class<? extends T> generate(Class<T> repositoryClazz) {
-		String name = repositoryClazz.getName() + SUFFIX;
-
-		byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
-
-		/*
-		// 把生成的文件存储起来
-		try (java.io.FileOutputStream fos = new java.io.FileOutputStream("/data/tmp/" + name + ".class")) {
-			fos.write(bytes);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		// 把生成的文件存储起来 end
-		 */
-		return (Class<? extends T>) classLoader.defineClassByName(name, bytes, 0, bytes.length);
-	}
-	
-	static GenerateRepositoryImpl getInstance() {
-		if(instance == null) {
-			synchronized(GenerateRepositoryImpl.class){
-				if(instance == null) {
-					instance = new GenerateRepositoryImpl();
-				}
-			}
-		}
-		return instance;
-	}
-
-	public FqClassLoader getClassLoader() {
-		return classLoader;
 	}
 }

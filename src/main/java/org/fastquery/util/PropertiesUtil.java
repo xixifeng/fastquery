@@ -36,7 +36,8 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
 import org.fastquery.dsm.FastQueryJson;
@@ -55,7 +56,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class PropertiesUtil {
 	
-	private static final Logger LOG = Logger.getLogger(PropertiesUtil.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PropertiesUtil.class);
 	
 	private PropertiesUtil(){}
 	

@@ -22,7 +22,8 @@
 
 package org.fastquery.test;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
@@ -43,7 +44,7 @@ import java.util.Collection;
  */
 public class MethodQueryTest {
 
-	private static final Logger LOG = Logger.getLogger(MethodQueryTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MethodQueryTest.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();

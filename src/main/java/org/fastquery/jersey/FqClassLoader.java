@@ -20,28 +20,32 @@
  * 
  */
 
-package org.fastquery.filter;
+package org.fastquery.jersey;
 
-import java.lang.reflect.Method;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.fastquery.example.StudentDBService;
-import org.fastquery.filter.BeforeFilter;
+import java.lang.reflect.InvocationTargetException;
+import org.fastquery.core.RepositoryException;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class MyBeforeFilter2 extends BeforeFilter<StudentDBService> {
+class FqClassLoader extends ClassLoader {
+	
+	private FQueryBinder binder;
 
-	private static final Logger LOG = LoggerFactory.getLogger(MyBeforeFilter2.class);
+	FqClassLoader(ClassLoader webClassLoader, FQueryBinder binder) {
+		super(webClassLoader); 
+		this.binder = binder;
+	}
 
-	@Override
-	public void doFilter(StudentDBService repository, Method method, Object[] args) {
-		// repository : 当前拦截到实例对象
-		// method : 当前拦截到的方法
-		// args : 当前传递进来的参数列表
-		LOG.debug("MyBeforeFilter2....");
+	final Class<?> defineClassByName(String name, byte[] b, int off, int len) {
+		Class<?> clazz = defineClass(name, b, off, len);
+		try {
+			binder.bind(clazz.getMethod("getInstance").invoke(null)).to(clazz.getInterfaces()[0]);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
+			throw new RepositoryException(e);
+		}
+		return clazz;
 	}
 }

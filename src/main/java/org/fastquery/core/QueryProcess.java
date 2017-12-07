@@ -31,7 +31,9 @@ import java.lang.reflect.TypeVariable;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.fastquery.handler.ModifyingHandler;
 import org.fastquery.handler.QueryHandler;
 import org.fastquery.page.NotCount;
@@ -55,7 +57,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class QueryProcess {
 	
-	private static final Logger LOG = Logger.getLogger(QueryProcess.class);
+	private static final Logger LOG = LoggerFactory.getLogger(QueryProcess.class);
 	
 	private static QueryProcess queryProcess;
 	

@@ -20,28 +20,40 @@
  * 
  */
 
-package org.fastquery.filter;
+package org.fastquery.core;
 
-import java.lang.reflect.Method;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.fastquery.example.StudentDBService;
-import org.fastquery.filter.BeforeFilter;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class MyBeforeFilter2 extends BeforeFilter<StudentDBService> {
-
-	private static final Logger LOG = LoggerFactory.getLogger(MyBeforeFilter2.class);
+public class FQueryResourceImpl implements Resource {
+	
+	private ClassLoader classLoader;
+	
+	public FQueryResourceImpl(ClassLoader classLoader) {
+		this.classLoader = classLoader;
+	}
+	
+	@Override
+	public InputStream getResourceAsStream(String name) {
+		if(!exist(name)) {
+			return null;
+		}
+		return classLoader.getResourceAsStream(name);
+	}
 
 	@Override
-	public void doFilter(StudentDBService repository, Method method, Object[] args) {
-		// repository : 当前拦截到实例对象
-		// method : 当前拦截到的方法
-		// args : 当前传递进来的参数列表
-		LOG.debug("MyBeforeFilter2....");
+	public boolean exist(String name) {
+		if(name==null || name.charAt(0) == '/') {
+			return false;
+		}
+		URL url = classLoader.getResource(name);
+		if (url == null) {
+			return false;
+		}
+		return true;
 	}
 }

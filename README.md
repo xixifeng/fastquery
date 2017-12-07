@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.34</version>
+    <version>1.0.35</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.34'
+compile 'org.fastquery:fastquery:1.0.35'
 ```
 
 ### Apache Archive
@@ -132,7 +132,6 @@ fastquery.json其他可选配置选项:
 | basedir | string | 无 | 基准目录,注意: 后面记得加上 "/" <br> 该目录用来放SQL文件,需要执行SQL文件时,指定其名称就够了 | "/tmp/sql/" |
 | debug | boolean | false | 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目<br>默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式 | false |
 | queries | array | [ ] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
-| velocity | string | 无 | 指定velocity的配置文件 | "/tmp/velocity.properties" |
 
 
 ## 入门例子
@@ -722,7 +721,7 @@ Page<Map<String,Object>> findSome(Integer age,Integer id,@PageIndex int pageInde
 
 
 ### 使用分页     
-`Page`是分页的抽象.通过它可以获取分页中的各种属性. 并且开发者不用去实现.
+`Page`是分页的抽象,通过它可以获取分页中的各种属性,并且开发者不用去实现.
 
 ```java
 int p = 1;    // 指定访问的是第几页(不是从0开始计数)
@@ -929,6 +928,45 @@ String findOneCourse();
 - 标识在类的上方:表示其拦截的作用范围是整个类的方法
 - 标识在方法上:表示其拦截的作用范围是当前方法
 - 一个方法的拦截器总和=它的所属类的拦截器+自己的拦截器
+
+## WEB 支持
+### 应用在 Jersey 环境
+让Jersey容器管理Fastquery:
+
+```java
+import javax.ws.rs.ApplicationPath;
+import org.fastquery.jersey.FQueryBinder;
+@ApplicationPath("rest")
+public class MyApplication extends ResourceConfig {
+	public MyApplication() {
+		register(new FQueryBinder(this.getClassLoader()));
+	}
+}
+```
+
+在JAX-RS resource中注入DB接口:
+
+```java
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+@Path("hi")
+public class Hi {
+
+	@Inject
+	private UserInfoDBService db;
+	
+	@GET
+	@Produces({"text/html"})
+	public String hi() {
+	      // use db...
+		return "hi";
+	}
+}
+```
 
 ## FAQ
 1. 类属性名称与表字段不一致时,如何映射?  
