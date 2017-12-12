@@ -216,7 +216,7 @@ public class BeanUtilTest {
 	@Test
 	public void testToUpdateSQL() {
 		UserInfo userInfo1 = new UserInfo(33, "想向公主", 18);
-		Object[] updateInfo = BeanUtil.toUpdateSQL(userInfo1, "xk");
+		Object[] updateInfo = BeanUtil.toUpdateSQL(userInfo1, "xk",true);
 		assertThat(updateInfo[0].toString(), equalTo("update `xk`.`UserInfo` set `name`=?, `age`=? where `id`=?"));
 		List<Object> args = (List<Object>) updateInfo[1];
 		assertThat(args.get(0).toString(), equalTo("想向公主"));
@@ -225,7 +225,7 @@ public class BeanUtilTest {
 		assertThat(updateInfo[2].toString(), equalTo("select * from `xk`.`UserInfo` where `id` = 33"));
 
 		userInfo1 = new UserInfo(38, "向公主", 23);
-		updateInfo = BeanUtil.toUpdateSQL(userInfo1, null);
+		updateInfo = BeanUtil.toUpdateSQL(userInfo1, null,true);
 		assertThat(updateInfo[0].toString(), equalTo("update `UserInfo` set `name`=?, `age`=? where `id`=?"));
 		args = (List<Object>) updateInfo[1];
 		assertThat(args.get(0).toString(), equalTo("向公主"));

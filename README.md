@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.35</version>
+    <version>1.0.36</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.35'
+compile 'org.fastquery:fastquery:1.0.36'
 ```
 
 ### Apache Archive
@@ -321,7 +321,7 @@ Primarykey saveUserInfo(String name,Integer age);
 
 **注意**:
 - 改操作返回int类型:表示影响的行数,没有找到可以修改的,那么影响行数为0,并不能视为改失败了
-- 改操作返回boolean类型:表示是否改正确,修改成功或没有找到可以修改的会返回true,反之,返回false
+- 改操作返回boolean类型:表示是否改正确,依据是,影响行数若大于或等于0都会返回true,反之,返回false
 
 ## Annotation
 针对FastQuery中的所有注解,做个说明:
@@ -356,7 +356,7 @@ Primarykey saveUserInfo(String name,Integer age);
 | `BigInteger saveToId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
 | `<E> E update(E entity)` | 更新一个实体,返回更新成功之后的实体.**注意**:实体的成员属性如果是null,那么该属性将不会参与改运算 |
 | `<E> E saveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含有主键值) |
-| `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),返回影响行数 |
+| `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),若给where传递null或"",默认按照主健修改,返回影响行数 |
 
 
 举例说明:  
@@ -936,6 +936,7 @@ String findOneCourse();
 ```java
 import javax.ws.rs.ApplicationPath;
 import org.fastquery.jersey.FQueryBinder;
+
 @ApplicationPath("rest")
 public class MyApplication extends ResourceConfig {
 	public MyApplication() {
@@ -953,6 +954,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+
 @Path("hi")
 public class Hi {
 
@@ -963,7 +965,7 @@ public class Hi {
 	@Produces({"text/html"})
 	public String hi() {
 	      // use db...
-		return "hi";
+	      return "hi";
 	}
 }
 ```
@@ -1008,6 +1010,6 @@ build: maven
 https://gitee.com/xixifeng.com/fastquery/issues  
 地球人都知道,开源中国秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://gitee.com/xixifeng.com/fastquery/issues)来向我们反馈.  
 
-## 联系作者
+## 关于作者
 @习习风 fastquery#126.com  
 欢迎批评指正.

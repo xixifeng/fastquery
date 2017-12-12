@@ -327,13 +327,14 @@ public final class BeanUtil {
 	
 	/**
 	 * 如果这个bean已经包含主键的值,就已bean的主键值为准 <br>
-	 * [0]: 更新语句, [1]:参数值集合类型:List&lt;Object&gt; [2]: 根据主键查的sql语句
+	 * [0]: 更新语句, [1]:参数值集合类型:List&lt;Object&gt; [2](是否存在第3个值取决于toSQL是否设置true): 根据主键查的sql语句
 	 * 
 	 * @param bean 待更新的实体
 	 * @param dbName 数据库名称,可以为null
+	 * @param toSQL 是否返回根据主键查的sql语句
 	 * @return 更新语句信息
 	 */
-	public static Object[] toUpdateSQL(Object bean,String dbName) {
+	public static Object[] toUpdateSQL(Object bean,String dbName,boolean toSQL) {
 		Object key = null;
 		Object[] updateinfo = new Object[3];
 		List<Object> args = new ArrayList<>();
@@ -408,8 +409,9 @@ public final class BeanUtil {
 			args.add(key);
 			updateinfo[0] = sb.toString();
 			updateinfo[1] = args;
-			updateinfo[2] = String.format("select * from %s where `%s` = %s",tableName,keyFeild,key.toString());
-			
+			if(toSQL){
+				updateinfo[2] = String.format("select * from %s where `%s` = %s",tableName,keyFeild,key.toString());
+			}
 		} catch (Exception e) {
 			throw new RepositoryException(e);
 		}

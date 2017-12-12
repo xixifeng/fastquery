@@ -91,6 +91,18 @@ public interface UserInfoDBService extends QueryRepository {
 	@Query("update `userinfo` set `name`=?1,`age`=?2 where id=?3")
 	int updateBatch(String name, Integer age, Integer id);
 
+	@Transactional
+	@Modifying
+	@Query("update `userinfo` set `age` = age + 1 where id=?1")
+	@Query("update `userinfo` set `age` = age - 1 where id=?1")
+	boolean update(int id);
+	
+	@Transactional
+	@Modifying
+	@Query("update `userinfo` set `age` = age where id=?1")
+	@Query("update `userinfo` set `age` = age where id=?1")
+	boolean update2(int id);
+	
 	// 将三条改操作纳入到一个事务中.
 	@Transactional
 	@Modifying

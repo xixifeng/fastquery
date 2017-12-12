@@ -184,7 +184,7 @@ public interface QueryRepository extends Repository {
 	/**
 	 * 更新实体
 	 * @param entity 实体
-	 * @param where 自定义条件
+	 * @param where 自定义条件,若传递null或"",默认将主健作为条件进行修改
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY3)

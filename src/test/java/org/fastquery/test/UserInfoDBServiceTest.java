@@ -201,6 +201,21 @@ public class UserInfoDBServiceTest {
 		int effect = userInfoDBService.updateBatch("小张张", 26, 1);
 		assertThat("断言该行修改操作一共影响了3行", effect, equalTo(3));
 	}
+	
+	@Test
+	public void update1(){
+		boolean b = userInfoDBService.update(1);
+		assertThat(b, is(true));
+		
+		b = userInfoDBService.update(-10);
+		assertThat(b, is(true));
+	}
+	
+	@Test
+	public void update2(){
+		boolean b = userInfoDBService.update2(1);
+		assertThat(b, is(true));
+	}
 
 	// 断言: 它会抛出RepositoryException异常
 	@Test(expected = RepositoryException.class)

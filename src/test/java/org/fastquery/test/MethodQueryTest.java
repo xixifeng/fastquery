@@ -136,6 +136,16 @@ public class MethodQueryTest {
 	public void executeBatch() {
 		studentDBService.executeBatch("update.sql", "sqlout.log");
 	}
+	
+	@Test
+	public void update2() {
+		Integer id = 3;
+		UserInfo userInfo = userInfoDBService.findById(id);
+		assertThat(userInfo.getId(), equalTo(id));
+		UserInfo entity = new UserInfo(userInfo.getId(), userInfo.getName(), userInfo.getAge());
+		int i = userInfoDBService.update(entity, null);
+		assertThat(i, is(1));
+	}
 
 	@Test
 	public void update3() {

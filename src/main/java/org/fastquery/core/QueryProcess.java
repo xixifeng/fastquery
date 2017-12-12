@@ -429,7 +429,7 @@ public class QueryProcess {
 				dbName = iargs[1].toString();
 				bean = iargs[2];
 			}
-			return DB.update(bean, dbName,iargs[iargs.length-1].toString());
+			return DB.update(bean, dbName,(String)iargs[iargs.length-1]);
 		case MethodId.QUERY4:
 			ignoreRepeat = (boolean) iargs[0];
 			Object entitiesObj = iargs[iargs.length-1];
