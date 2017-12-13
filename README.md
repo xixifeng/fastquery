@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.36</version>
+    <version>1.0.37</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.36'
+compile 'org.fastquery:fastquery:1.0.37'
 ```
 
 ### Apache Archive
@@ -606,6 +606,8 @@ public List<Student> findSomeStudent();
 ```
 
 等效于 `@QueryByNamed("findSomeStudent")`  
+
+`@QueryByNamed` 中的render属性,表示是否启用模板引擎对配置文件进行渲染,默认是true表示开启. 如果`<query>`节点中没有使用到任何模板语法,仅用于存储目的,那么建议设置为false.  
 
 **注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,可用于在模板中做逻辑判断,而`:name`用于标记参数位,SQL解析器会将其翻译成`?`号.
 

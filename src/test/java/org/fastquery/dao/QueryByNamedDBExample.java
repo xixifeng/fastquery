@@ -46,6 +46,9 @@ public interface QueryByNamedDBExample extends QueryRepository {
 	// 从该类的配置文件里寻找id="findUserInfoAll"节点,然后绑定其SQL代码段
 	@QueryByNamed
 	JSONArray findUserInfoAll();
+	
+	@QueryByNamed(render=false)
+	JSONArray findUAll();
 
 	@QueryByNamed("findUserInfoOne")
 	UserInfo findUserInfoOne(@Param("id") Integer id);

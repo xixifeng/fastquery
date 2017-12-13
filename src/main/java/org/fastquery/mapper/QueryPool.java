@@ -291,17 +291,22 @@ public class QueryPool {
 		String className = QueryContext.getIclass().getName();
 		Method method = QueryContext.getMethod();
 		Object[] args = QueryContext.getArgs();
-		String id = method.getAnnotation(QueryByNamed.class).value();
+		QueryByNamed qbn = method.getAnnotation(QueryByNamed.class);
+		String id = qbn.value();
 		if("".equals(id)) {
 			id = method.getName();
 		}
-		LOG.info("正在渲染模板:" + id);
+		LOG.info("已获得模板:" + id);
 		String tpl;
 		if(isQuery){
 			// getTemplate 永远不会为null,在初始化时已经做了检测
 			tpl = getTemplate(className, id);	
 		} else {
 			tpl = getCountQuery(className+'.'+id);
+		}
+		
+		if(!qbn.render()) {
+			return tpl;
 		}
 		
 		// 处理@Param

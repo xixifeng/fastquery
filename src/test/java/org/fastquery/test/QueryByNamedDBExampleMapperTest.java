@@ -141,13 +141,13 @@ public class QueryByNamedDBExampleMapperTest {
 	@Test
 	public void findUAll() throws Exception {
 		String tpl = getTemplate(className, "findUAll");
-		assertThat(tpl, equalToIgnoringWhiteSpace("select id,name,age from UserInfo"));
+		assertThat(tpl, equalToIgnoringWhiteSpace("select id,name,age from UserInfo limit 3"));
 	}
 
 	@Test
 	public void findUserAll() throws Exception {
 		String tpl = getTemplate(className, "findUserAll");
-		assertThat(tpl, equalToIgnoringWhiteSpace("select name from UserInfo"));
+		assertThat(tpl, equalToIgnoringWhiteSpace("select name from UserInfo limit 3"));
 	}
 
 }

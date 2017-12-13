@@ -70,6 +70,17 @@ public class QueryByNamedDBExampleTest {
 	}
 
 	@Test
+	public void findUAll(){
+		JSONArray jsonArray = db.findUAll();
+		if ( rule.isDebug() ) {
+			SQLValue sqlValue = rule.getSQLValue();
+			String sql = sqlValue.getSql();
+			assertThat(sql, equalTo("select id,name,age from UserInfo limit 3"));
+		}
+		assertThat(jsonArray.size(), is(3));
+	}
+	
+	@Test
 	public void findUserInfoOne() {
 		UserInfo userInfo = db.findUserInfoOne(1);
 		assertThat(userInfo.getId().intValue(), is(1));
