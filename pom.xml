@@ -4,7 +4,7 @@
 
 	<groupId>org.fastquery</groupId>
 	<artifactId>fastquery</artifactId>
-	<version>1.0.37</version>
+	<version>1.0.38</version>
 	<packaging>jar</packaging>
 
 	<name>fastquery</name>
@@ -38,7 +38,7 @@
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
-			<version>1.2.41</version>
+			<version>1.2.42</version>
 		</dependency>
 
 		<dependency>

@@ -89,9 +89,9 @@ public class QueryPoolTest {
 			String id = queryMapper.getId();
 			String template = queryMapper.getTemplate();
 			if ("findUAll".equals(id)) {
-				assertThat(template, equalToIgnoringWhiteSpace("select id,name,age from UserInfo"));
+				assertThat(template, equalToIgnoringWhiteSpace("select id,name,age from UserInfo limit 3"));
 			} else if ("findUserAll".equals(id)) {
-				assertThat(template, equalToIgnoringWhiteSpace("select name from UserInfo"));
+				assertThat(template, equalToIgnoringWhiteSpace("select name from UserInfo limit 3"));
 			} else if ("findUserInfo".equals(id)) {
 				assertThat(template, equalToIgnoringWhiteSpace(
 						"select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`"));

@@ -46,7 +46,7 @@ public class PartSyntaxFilter implements Filter {
 		// 1). part节点必须有name属性
 		String name = element.getAttribute("name");
 		if("".equals(name)) {
-			this.abortWith("解析"+xmlName + "错误,原因:没有给part节点设置name属性.大概位置:它被"+ps+"包裹着");
+			this.abortWith("解析"+xmlName + "错误,原因:没有给<part>节点设置name属性.大概位置:它被"+ps+"包裹着");
 		}
 		
 		return element;

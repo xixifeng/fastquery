@@ -540,6 +540,7 @@ public class TypeUtilTest implements Opcodes {
 	public void mapValueTyep() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
 			NoSuchMethodException, SecurityException {
 		class A {
+			@SuppressWarnings("unused")
 			public Map<String, String> todo() {
 				return null;
 			}
@@ -554,6 +555,7 @@ public class TypeUtilTest implements Opcodes {
 	public void listMapValueTyep() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
 			NoSuchMethodException, SecurityException {
 		class B {
+			@SuppressWarnings("unused")
 			public List<Map<String, String>> todo() {
 				return null;
 			}
@@ -564,4 +566,49 @@ public class TypeUtilTest implements Opcodes {
 		assertThat(TypeUtil.listMapValueTyep(method) == String.class, is(true));
 	}
 
+	@Test(expected=NullPointerException.class)
+	public void toList1() {
+		TypeUtil.toList(null);
+	}
+	
+	@Test(expected=ClassCastException.class)
+	public void toList2() {
+		TypeUtil.toList(1);
+	}
+	
+	@Test
+	public void toList3() {
+		int[] ids = {1,2,3};
+		List<Object> objects = TypeUtil.toList(ids);
+		for (int i = 0; i < ids.length; i++) {
+			assertThat(ids[i], is(objects.get(i)));
+		}
+	}
+	
+	@Test
+	public void toList4() {
+		Integer[] ids = {1,2,3};
+		List<Object> objects = TypeUtil.toList(ids);
+		for (int i = 0; i < ids.length; i++) {
+			assertThat(ids[i], equalTo(objects.get(i)));
+		}
+	}
+	
+	@Test
+	public void toList5() {
+		Object ids = new Integer[]{1,2,3};
+		List<Object> objects = TypeUtil.toList(ids);
+		assertThat(objects.get(0), equalTo(1));
+		assertThat(objects.get(1), equalTo(2));
+		assertThat(objects.get(2), equalTo(3));
+	}
+	
+	@Test
+	public void toList6() {
+		Object ids = new int[]{1,2,3};
+		List<Object> objects = TypeUtil.toList(ids);
+		assertThat(objects.get(0), equalTo(1));
+		assertThat(objects.get(1), equalTo(2));
+		assertThat(objects.get(2), equalTo(3));
+	}
 }

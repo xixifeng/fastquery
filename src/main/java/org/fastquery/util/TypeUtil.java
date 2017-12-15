@@ -23,17 +23,18 @@
 package org.fastquery.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -272,7 +273,7 @@ public class TypeUtil implements Opcodes{
 				}
 			} else if(mpClazz.isArray()) {
 				// asList 是一个可变变量
-				List<Object> arrs = Arrays.asList((Object[]) mp); // 请特别注意: 如果此处写成 Arrays.asList(mp); 即使mp里面有多个成员, arrs的长度是1
+				List<Object> arrs = toList(mp);
 				arrs.forEach(objs::add);
 				count = arrs.size();
 				if(count!=0) {
@@ -931,6 +932,24 @@ public class TypeUtil implements Opcodes{
 		return (Class<?>) type.getActualTypeArguments()[1];
 	}
 	
+	/**
+	 * 将一个数组类型转换成Object[]. 注意: 如果传递的不是一个数组,那么抛出{@link ClassCastException}异常
+	 * @param array 数组
+	 * @return 数组
+	 */
+	public static List<Object> toList(Object array) {
+		 Objects.requireNonNull(array);
+		if(array.getClass().isArray()) {
+			int len = Array.getLength(array);
+			List<Object> objs = new ArrayList<>();
+			for (int i = 0; i < len; i++) {
+				objs.add(Array.get(array, i));
+			}
+			return objs;
+		} else {
+			throw new ClassCastException("你传递的不是一个数组");
+		}
+	}
 }
 
 

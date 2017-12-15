@@ -44,7 +44,7 @@ import static org.hamcrest.Matchers.*;
  */
 public class SQLInExampleTest {
 
-	private SQLInExample sqlInExample = FQuery.getRepository(SQLInExample.class);
+	private SQLInExample db = FQuery.getRepository(SQLInExample.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
@@ -52,7 +52,7 @@ public class SQLInExampleTest {
 	@Test
 	public void testFindByNameIn1() {
 		String name = "袁承志";
-		List<UserInfo> userinfos = sqlInExample.findByNameIn(name);
+		List<UserInfo> userinfos = db.findByNameIn(name);
 		if (userinfos.isEmpty())
 			return;
 		for (UserInfo u : userinfos) {
@@ -64,7 +64,7 @@ public class SQLInExampleTest {
 	public void testFindByNameIn2() {
 		String name1 = "袁承志";
 		String name2 = "安小惠";
-		List<UserInfo> userinfos = sqlInExample.findByNameIn(name1, name2);
+		List<UserInfo> userinfos = db.findByNameIn(name1, name2);
 		if (userinfos.isEmpty())
 			return;
 		for (UserInfo u : userinfos) {
@@ -82,7 +82,7 @@ public class SQLInExampleTest {
 		names.add(name1);
 		names.add(name2);
 		names.add(name3);
-		List<UserInfo> userinfos = sqlInExample.findByNameListIn(names, id);
+		List<UserInfo> userinfos = db.findByNameListIn(names, id);
 		userinfos.forEach(u -> {
 			assertThat(u.getName().equals(name1) || u.getName().equals(name2), is(true));
 			assertThat(u.getName(), not(is(name3)));
@@ -91,7 +91,16 @@ public class SQLInExampleTest {
 	}
 
 	@Test
-	public void findByIn() {
+	public void findByIn1() {
+		int[] ids = {1,2,3};
+		UserInfo[] userInfos = db.findByIn(ids);
+		for (UserInfo u : userInfos) {
+			assertThat(u.getId().intValue(), either(is(1)).or(is(2)).or(is(3)));
+		}
+	}
+	
+	@Test
+	public void findByIn2() {
 		String sex = "女";
 		Integer age = 10;
 		String name1 = "小蚂蚁";
@@ -102,7 +111,7 @@ public class SQLInExampleTest {
 		names.add(name2);
 		names.add(name3);
 
-		List<Student> students = sqlInExample.findByIn(sex, age, names);
+		List<Student> students = db.findByIn(sex, age, names);
 		assertThat(students.isEmpty(), is(false));
 		students.forEach(s -> {
 			assertThat(s.getName().equals(name1) || s.getName().equals(name2) || s.getName().equals(name3), is(true));
