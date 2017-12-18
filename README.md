@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.37</version>
+    <version>1.0.38</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.37'
+compile 'org.fastquery:fastquery:1.0.38'
 ```
 
 ### Apache Archive
@@ -500,14 +500,6 @@ List<UserInfo> findByNameListIn(List<String> names,Integer id);
 @Query("select * from student where sex = :sex and age > :age and name in(:names)")
 List<Student> findByIn(@Param("sex")String sex,@Param("age")Integer age,@Param("names")Set<String> names);
 ```
-
-### 采用${name}表达式
-**注意:** 这种方式请提防SQL注入
-```java
-@Query("select id,name,age from UserInfo where id in (${ids})")
-UserInfo[] findByIds(@Param("ids") int[] ids);
-```
-
 
 ## @QueryByNamed命名式查询
 就是把`SQL`语句写在配置文件里(在配置文件中可以进行逻辑判断),然后用`@QueryByNamed`绑定配置文件中的id值,以便引用到解析后的`SQL`.       
