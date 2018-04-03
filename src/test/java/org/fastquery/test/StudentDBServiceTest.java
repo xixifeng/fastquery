@@ -429,4 +429,23 @@ public class StudentDBServiceTest {
 		LOG.debug(json.toJSONString());
 	}
 
+	@Test
+	public void callProcedure() {
+
+		String no = "008003";
+		int effect = studentDBService.deleteByNo(no);
+
+		assertThat(effect, equalTo(1));
+
+		String name = "百媚鸟";
+		String sex = "女";
+		int age = 3;
+		String dept = "鸟科";
+
+		JSONObject json = studentDBService.callProcedure(no, name, sex, age, dept);
+
+		assertThat(json.getString("pno"), equalTo(no));
+
+	}
+
 }

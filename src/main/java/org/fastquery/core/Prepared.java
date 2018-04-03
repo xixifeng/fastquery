@@ -142,7 +142,7 @@ public class Prepared {
 				return QueryProcess.getInstance().query();
 			} 
 			 else {
-				 // 分两种 是否由@Id
+				 // 分两种 是否有@Id
 				 Id id = method.getAnnotation(Id.class);
 				 if(id!=null) {
 					 return QueryProcess.getInstance().methodQuery(id);

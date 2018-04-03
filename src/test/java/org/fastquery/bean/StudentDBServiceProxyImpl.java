@@ -377,4 +377,10 @@ public class StudentDBServiceProxyImpl implements StudentDBService {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
+	public JSONObject callProcedure(String no, String name, String sex, int age, String dept) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

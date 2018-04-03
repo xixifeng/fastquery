@@ -603,6 +603,40 @@ public List<Student> findSomeStudent();
 
 **注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,可用于在模板中做逻辑判断,而`:name`用于标记参数位,SQL解析器会将其翻译成`?`号.
 
+## 支持存储过程
+
+只支持in(输入)参数,不支持out(输出参数), 如果想输出存储过程的处理结果,在过程内部使用`select`查询输出.  
+举例:  
+插入一条学生，返回学生的总记录数和当前编码,存储过程语句:
+
+```sql
+delimiter $$
+drop procedure if exists `xk`.`addStudent` $$
+create procedure `xk`.`addStudent` (in no char(7), in name char(10), in sex char(2), in age tinyint(4), in dept char(20))
+begin
+
+   -- 定义变量
+   -- 总记录数
+  declare count_num int default 0;
+  -- 编码
+  declare pno varchar(7) default '';
+  
+  INSERT INTO `student` (`no`, `name`, `sex`, `age`, `dept`) VALUES(no, name, sex, age, dept);
+  select count(`no`) into count_num from student;
+  select `no` from student where `no`=no limit 0,1 into pno;
+  -- 输出结果
+  select count_num, pno;  
+end $$
+delimiter ;
+```
+
+调用存储过程:
+
+```java
+@Query("call addStudent(?1,:name,?3,?4,:dept)")
+JSONObject callProcedure(String no,@Param("name") String name,String sex,int age,@Param("dept") String dept);
+```
+
 ## 处理异常
 
 捕获和处理`Repository`实例在运行期抛出的异常.   

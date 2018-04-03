@@ -222,4 +222,8 @@ public interface StudentDBService extends QueryRepository {
 	Map<String, String> findTop1Student();
 
 	public void db();
+	
+	@Query("call addStudent(?1,:name,?3,?4,:dept)")
+	JSONObject callProcedure(String no,@Param("name") String name,String sex,int age,@Param("dept") String dept);
+	
 }
