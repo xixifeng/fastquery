@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.38</version>
+    <version>1.0.39</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.38'
+compile 'org.fastquery:fastquery:1.0.39'
 ```
 
 ### Apache Archive
@@ -612,7 +612,8 @@ public List<Student> findSomeStudent();
 ```sql
 delimiter $$
 drop procedure if exists `xk`.`addStudent` $$
-create procedure `xk`.`addStudent` (in no char(7), in name char(10), in sex char(2), in age tinyint(4), in dept char(20))
+create procedure `xk`.`addStudent` (in no char(7), in name char(10), in sex char(2), in age tinyint(4), 
+	in dept char(20))
 begin
 
    -- 定义变量
@@ -621,7 +622,7 @@ begin
   -- 编码
   declare pno varchar(7) default '';
   
-  INSERT INTO `student` (`no`, `name`, `sex`, `age`, `dept`) VALUES(no, name, sex, age, dept);
+  insert into `student` (`no`, `name`, `sex`, `age`, `dept`) values(no, name, sex, age, dept);
   select count(`no`) into count_num from student;
   select `no` from student where `no`=no limit 0,1 into pno;
   -- 输出结果

@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -158,22 +157,7 @@ public class QueryParser {
 			// 获取求和sql
 			String countQuery = query.countQuery();
 			if ("".equals(countQuery)) { // 表明在声明时没有指定求和语句
-				// 计算求和语句
-				// 把select 与 from 之间的 内容变为 count(countField)
-				// (?i)表示正则中不区分大小写 \\b 表示单词的分界
-				int beginIndex = ignoreCaseWordEndIndex("(?i)\\bselect ", sql);
-				// 作为substring中的endIndex
-				int endIndex = ignoreCaseWordStartIndex("(?i) from ", sql);
-				if (beginIndex != -1 && endIndex != -1) {
-					// 注意: 求和字段默认为 "id"
-					// 重要: sqlStr.substring(selectStart+6,fromStart) 的值
-					// 很可能包含正则表达式, 因此必须用Pattern.quote
-					sql = sql.replaceFirst(Pattern.quote(sql.substring(beginIndex, endIndex)),
-							Matcher.quoteReplacement(new StringBuilder("count(").append(countField).append(')').toString()));
-				} else {
-					throw new RepositoryException("求和SQL错误:" + sql);
-				}
-
+				sql = calcCountStatement(sql, countField);
 				sql = TypeUtil.getCountQuerySQL(method, sql, args);
 			} else {
 				sql = TypeUtil.getCountQuerySQL(method, countQuery, args);
@@ -201,6 +185,18 @@ public class QueryParser {
 		}
 
 		return sqlValues;
+	}
+
+	private static String calcCountStatement(String sql, String countField) {
+		String tmp = sql.toLowerCase();
+		// 计算求和语句
+		// 把select 与 from 之间的 内容变为 count(countField)
+		int fromIndex = tmp.lastIndexOf("from") - 1;
+		StringBuilder sb = new StringBuilder("select count(");
+		sb.append(countField);
+		sb.append(')');
+		sb.append(sql.substring(fromIndex));
+		return sb.toString();
 	}
 
 	public static List<SQLValue> pageParserByNamed() {
@@ -265,47 +261,6 @@ public class QueryParser {
 		}
 
 		return sqlValues;
-	}
-
-	/**
-	 * 根据regex在target中首次匹配到的开始索引, 没有匹配到返回-1
-	 * 
-	 * @param regex
-	 *            正则表达式
-	 * @return
-	 */
-	private static int ignoreCaseWordStartIndex(String regex, String target) {
-		Matcher m = matcherFind(regex, target);
-		if (m == null) {
-			return -1;
-		} else {
-			return m.start();
-		}
-	}
-
-	/**
-	 * 根据regex在target中首次匹配到的结束索引, 没有匹配到返回-1
-	 * 
-	 * @param regex
-	 *            正则表达式
-	 * @return
-	 */
-	private static int ignoreCaseWordEndIndex(String regex, String target) {
-		Matcher m = matcherFind(regex, target);
-		if (m == null) {
-			return -1;
-		} else {
-			return m.end();
-		}
-	}
-
-	private static Matcher matcherFind(String regex, String target) {
-		Pattern pattern = Pattern.compile(regex);
-		Matcher m = pattern.matcher(target);
-		if (m.find()) {
-			return m;
-		}
-		return null;
 	}
 
 	private static String getLimit(int firstResult, int maxResults) {
