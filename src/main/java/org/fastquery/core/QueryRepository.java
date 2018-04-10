@@ -242,6 +242,36 @@ public interface QueryRepository extends Repository {
 	<E> E saveOrUpdate(@Source String dataSourceName,String dbName,E entity);
 	
 	/**
+	 * 批量更新实体
+	 * @param <E> 实体
+	 * @param entities 实体集合
+	 * @return 影响行数
+	 */
+	@Id(MethodId.QUERY5)
+	<E> int update(Collection<E> entities);
+	
+	/**
+	 * 批量更新实体
+	 * @param <E> 实体
+	 * @param dataSourceName 数据源名称
+	 * @param entities 实体集合
+	 * @return 影响行数
+	 */
+	@Id(MethodId.QUERY5)
+	<E> int update(@Source String dataSourceName,Collection<E> entities);
+
+	/**
+	 * 批量更新实体
+	 * @param <E> 实体
+	 * @param dataSourceName 数据源名称
+	 * @param dbName 数据库名称
+	 * @param entities 实体集合
+	 * @return 影响行数
+	 */
+	@Id(MethodId.QUERY5)
+	<E> int update(@Source String dataSourceName,String dbName,Collection<E> entities);
+	
+	/**
 	 * 执行SQL文件
 	 * @param sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置
 	 * @param output 指定执行SQL后的输出将放在哪个文件里. 注意: 会在基准目录里寻找output

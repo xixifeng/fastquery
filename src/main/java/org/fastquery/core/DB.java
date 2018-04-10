@@ -270,6 +270,35 @@ public class DB {
 			close(rs, stat);
 		}
 	}
+	
+	static int update(String sql) {
+		Connection conn = null;
+		Statement stat = null;
+		int effect = 0;
+		
+		try {
+			conn = QueryContext.getConnection();
+			QueryContext.addSqls(sql);
+			info(sql, null);
+			QueryContext.setAutoCommit(false);
+			stat = conn.createStatement();
+			effect = stat.executeUpdate(sql);
+			QueryContext.commit();
+		} catch (SQLException e) {
+			if (conn != null) {
+				try {
+					QueryContext.rollback();
+				} catch (SQLException e1) {
+					throw new RepositoryException(e1);
+				}
+			}
+			throw new RepositoryException(e);
+		} finally {
+			close(null, stat);
+		}
+		
+		return effect;
+	}
 
 	// 更新一条数据,然后返回更新后的数据,返回根据主键查询的sql语句
 	static String update(Object bean, String dbName) {
@@ -496,9 +525,11 @@ public class DB {
 			StringBuilder sb = new StringBuilder("\n正在准备执行SQL:");
 			sb.append(sql);
 			sb.append("\n");
-			int len = objs.size();
-			for (int i = 0; i < len; i++) {
-				sb.append(String.format("第%d个\"?\"对应的参数值是:%s;%n", i + 1, objs.get(i)));
+			if(objs!=null && !objs.isEmpty()) {
+				int len = objs.size();
+				for (int i = 0; i < len; i++) {
+					sb.append(String.format("第%d个\"?\"对应的参数值是:%s;%n", i + 1, objs.get(i)));
+				}
 			}
 			LOG.info(sb.toString());	
 		}

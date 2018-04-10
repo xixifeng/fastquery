@@ -29,6 +29,7 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -443,6 +444,15 @@ public class QueryProcess {
 			}
 			LOG.info(sql);
 			return DB.insert2(sql);
+			
+		case MethodId.QUERY5:
+			Collection<Object> entities = (Collection<Object>) iargs[iargs.length-1];
+			if(iargs.length == 3) {
+				dbName = iargs[1].toString();
+			}
+			sql = BeanUtil.toUpdateSQL(entities, dbName);
+			LOG.info(sql);
+			return DB.update(sql);
 			
 		case MethodId.QUERY6:
 			String basedir = FastQueryJSONObject.getBasedir();

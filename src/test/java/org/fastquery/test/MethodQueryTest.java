@@ -37,6 +37,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 
@@ -229,5 +230,37 @@ public class MethodQueryTest {
 		int i = userInfoDBService.update(ui, "id = :id");
 		assertThat(i, lessThan(1));
 	}
+	
+	// 测试批量更新集合
+	@Test
+	public void updateCollection1() {
+		userInfoDBService.saveOrUpdate(new UserInfo(77,"河虾", 2));
+		userInfoDBService.saveOrUpdate(new UserInfo(88,"番茄", 5));
+		userInfoDBService.saveOrUpdate(new UserInfo(99,"酸奶", 2));
+		
+		List<UserInfo> userInfos = new ArrayList<>();
+		userInfos.add(new UserInfo(77,"茝若", 18));
+		userInfos.add(new UserInfo(88,"芸兮", null));
+		userInfos.add(new UserInfo(99,"梓", 16));
+		
+		int effect = userInfoDBService.update(userInfos);
+		assertThat(effect, is(3));
+	}
+	
+	@Test
+	public void updateCollection2() {
+		userInfoDBService.saveOrUpdate(new UserInfo(77,"河虾", 2));
+		userInfoDBService.saveOrUpdate(new UserInfo(88,"番茄", 5));
+		userInfoDBService.saveOrUpdate(new UserInfo(99,"酸奶", 2));
+		
+		List<UserInfo> userInfos = new ArrayList<>();
+		userInfos.add(new UserInfo(77,"茝若", 18));
+		userInfos.add(new UserInfo(88,"芸兮", null));
+		userInfos.add(new UserInfo(99,null, 16));
+		
+		int effect = userInfoDBService.update(userInfos);
+		assertThat(effect, is(3));
+	}
+	// 测试批量更新集合 End
 
 }

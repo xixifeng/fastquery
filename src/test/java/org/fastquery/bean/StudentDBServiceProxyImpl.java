@@ -383,4 +383,22 @@ public class StudentDBServiceProxyImpl implements StudentDBService {
 		return null;
 	}
 
+	@Override
+	public <E> int update(Collection<E> entities) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public <E> int update(String dataSourceName, Collection<E> entities) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public <E> int update(String dataSourceName, String dbName, Collection<E> entities) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

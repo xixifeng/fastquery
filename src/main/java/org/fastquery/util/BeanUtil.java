@@ -299,9 +299,6 @@ public final class BeanUtil {
 		// 获取主键的名称
 		Field[] files = cls.getDeclaredFields();
 		for (Field field : files) {
-			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType())){
-				continue;
-			}
 			if(field.getAnnotation(Id.class)!=null){
 				keyFeild = field.getName();
 				if(key==null) {
@@ -352,9 +349,6 @@ public final class BeanUtil {
 		Field[] files = cls.getDeclaredFields();
 		
 		for (Field field : files) {
-			if(field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null){
-				continue;
-			}
 			if(field.getAnnotation(Id.class)!=null){
 				keyFeild = field.getName();
 				// 顺便取主键的值
@@ -491,6 +485,129 @@ public final class BeanUtil {
 		return updateinfo;
 		
 	}
+	
+	/**
+	 * 将一个集合转换称批量update语句
+	 * @param <B> 实体
+	 * @param beans 实体集合
+	 * @param dbName 数据库名称
+	 * @return update SQL
+	 */
+	public static <B> String toUpdateSQL(Iterable<B> beans, String dbName) {
+		if (beans == null)
+			return null;
+		Iterator<B> iterator = beans.iterator();
+		if (!iterator.hasNext()) {
+			return null;
+		}
+
+		// 集合中的第一个bean
+		B bean = iterator.next();
+		Class<?> clazz = bean.getClass();
+	
+		// 表名称
+		// 确立表名称
+		StringBuilder sb = new StringBuilder();
+		if(dbName!=null) {
+			sb.append('`');
+			sb.append(dbName);
+			sb.append("`.`");
+			sb.append(clazz.getSimpleName());
+			sb.append('`');
+		} else {
+			sb.append('`');
+			sb.append(clazz.getSimpleName());
+			sb.append('`');
+		}
+		
+		//1. 表名称
+		String tableName = sb.toString();
+		
+		//2. 找出主键的名称
+		String primaryKey = null;
+		Field key = null;
+		Field[] fields = clazz.getDeclaredFields();
+		for (Field field : fields) {
+			if(field.getAnnotation(Id.class)!=null) {
+				primaryKey = field.getName();
+				key = field;
+				key.setAccessible(true);
+				break;
+			}
+		}
+		if(primaryKey==null){
+			throw new RepositoryException(clazz + " 必须有@Id标识,并且主键不能为null");
+		}
+		
+		//3. 
+		boolean addIds = true;
+		StringBuilder ids = new StringBuilder();
+		StringBuilder sets = new StringBuilder();
+			for (Field field : fields) {
+				if(field==key || field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null){
+					continue;
+				}
+				
+				field.setAccessible(true);
+				
+				String fieldName = field.getName();
+				sets.append('`');
+				sets.append(fieldName);
+				sets.append("` = case ");
+				sets.append('`');
+				sets.append(primaryKey);
+				sets.append("` ");
+				for (B b : beans) {
+					Object keyVal;
+					try {
+						keyVal = key.get(b);
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						throw new RepositoryException("无法获取主键的值",e);
+					}
+					if(keyVal==null) {
+						throw new RepositoryException("主键的值不能为null");
+					}
+					if(addIds) {
+						ids.append(keyVal);
+						ids.append(',');	
+					}
+					Object fieldVal;
+					try {
+						fieldVal = field.get(b);
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						throw new RepositoryException("无法获取字段的值",e);
+					}
+					if(fieldVal!=null) {
+						sets.append("when ");
+						sets.append(keyVal);
+						sets.append(" then ");
+						sets.append('\'');
+						sets.append(fieldVal);
+						sets.append("\' ");
+					}
+				}
+				addIds = false;
+				sets.append("else `");
+				sets.append(fieldName);
+				sets.append("` end,");
+			}
+		
+		sets.deleteCharAt(sets.length()-1);
+		ids.deleteCharAt(ids.length()-1);
+		
+		StringBuilder sql = new StringBuilder();
+		sql.append("update ");
+		sql.append(tableName);
+		sql.append(" set ");
+		sql.append(sets);
+		sql.append(" where ");
+		sql.append('`');
+		sql.append(primaryKey);
+		sql.append("` in(");
+		sql.append(ids);
+		sql.append(')');
+		return sql.toString();
+	}
 
 	// 返回sql中in查询需要的值
 	public static Object parseList(Object obj){
@@ -517,7 +634,7 @@ public final class BeanUtil {
 		S ns;
 		Field[] fields = beanClass.getDeclaredFields();
 		try {
-			ns = (S) beanClass.newInstance();
+			ns = beanClass.newInstance();
 			for (Field field : fields) {
 				field.setAccessible(true);
 				field.set(ns, null);

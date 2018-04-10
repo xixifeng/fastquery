@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.39</version>
+    <version>1.0.40</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.39'
+compile 'org.fastquery:fastquery:1.0.40'
 ```
 
 ### Apache Archive
@@ -350,13 +350,14 @@ Primarykey saveUserInfo(String name,Integer age);
 
 | 方法 | 描述 |
 |:---|:---|
-| `<E> E save(E entity)` | 保存一个实体(主键字段的值若为null,那么该字段将不参与运算),返回保存成功之后的实体(返回的实体包含有主键) |
+| `<E> E save(E entity)` | 保存一个实体(主键字段的值若为null,那么该字段将不参与运算),返回保存成功之后的实体(返回的实体包含主键) |
 | `<B> int save(boolean ignoreRepeat,Collection<B> entities)` | 保存一个集合实体,是否忽略重复主键记录 |
 | `int saveArray(boolean ignoreRepeat,Object...entities)` | 保存一个可变数组实体,是否忽略重复主键记录 |
 | `BigInteger saveToId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
 | `<E> E update(E entity)` | 更新一个实体,返回更新成功之后的实体.**注意**:实体的成员属性如果是null,那么该属性将不会参与改运算 |
-| `<E> E saveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含有主键值) |
-| `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),若给where传递null或"",默认按照主健修改,返回影响行数 |
+| `<E> E saveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含主键值) |
+| `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),若给where传递null或"",默认按照主键修改,返回影响行数 |
+| `<E> int update(Collection<E> entities)` | 更新集合实体,成员属性如果是null,那么该属性将不会参与改运算,每个实体必须包含主键 |
 
 
 举例说明:  
@@ -407,6 +408,44 @@ entity.setId(null);
 // 会解析成:update `UserInfo` set `age`=? where name = ?
 effect = studentDBService.update(entity,"name = :name");
 assertThat(effect, greaterThan(0));
+```
+
+批量更新(update),如果是把多条记录更新成相同的内容,没有什么好说的.在此主要解决:批量更新不同字段,不同内容.  
+举例:  
+假设需求是:
+
+- 把id=77的用户的姓名修改成"茝若",年龄修改成18
+- 把id=88的用户的姓名修改成"芸兮",注意:不修改年龄
+- 把id=99的用户的年龄修改成16
+
+实现代码:
+
+```java
+// 步骤1: 准备要修改的实体
+List<UserInfo> userInfos = new ArrayList<>();
+userInfos.add(new UserInfo(77,"茝若", 18));
+userInfos.add(new UserInfo(88,"芸兮", null));
+userInfos.add(new UserInfo(99,null, 16));
+
+// 步骤2: 批量更新
+int effect = userInfoDBService.update(userInfos);
+assertThat(effect, is(3));
+```
+
+最终会解释成一条SQL语句:
+
+```sql
+UPDATE `UserInfo`
+SET `name` = CASE `id`
+	WHEN 77 THEN '茝若'
+	WHEN 88 THEN '芸兮'
+	ELSE `name`
+END, `age` = CASE `id`
+	WHEN 77 THEN '18'
+	WHEN 99 THEN '16'
+	ELSE `age`
+END
+WHERE `id` IN (77, 88, 99)
 ```
 
 更多内置方法,请参阅fastquery javadoc.  
@@ -556,7 +595,7 @@ List<Student> findByIn(@Param("sex")String sex,@Param("age")Integer age,@Param("
 |  &quot; | &amp;quot;| &amp;#34; | 双引号 |
 
 如果想把一些公用的SQL代码片段提取出来,以便重用,通过定义`<parts>`元素(零件集)就可以做到. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件.  
-若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`<query>`都能引用它.一个非分页的函数,如果绑定的模板中包含有`<countQuery>`,那么这个函数只会提取查询语句,而不会提取计数语句.
+若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`<query>`都能引用它.一个非分页的函数,如果绑定的模板中包含`<countQuery>`,那么这个函数只会提取查询语句,而不会提取计数语句.
 
 ```java
 public interface QueryByNamedDBExample extends QueryRepository {
@@ -613,7 +652,7 @@ public List<Student> findSomeStudent();
 delimiter $$
 drop procedure if exists `xk`.`addStudent` $$
 create procedure `xk`.`addStudent` (in no char(7), in name char(10), in sex char(2), in age tinyint(4), 
-	in dept char(20))
+  in dept char(20))
 begin
 
    -- 定义变量
@@ -701,7 +740,7 @@ try {
 ### 注意: 
 - `#{#limit}`是分页模板的内置零件,表示分页区间. `#{#limit}`默认是放在尾部,在符合`SQL`语法的前提下也可以把它放在`SQL`语句中的其他地方
 - 动态条件部分若用`<where>`元素进行包裹,会自动处理好条件连接符问题(避免出现where紧接`or`或`and`)
-- `<value>`和`<countQuery>`节点引用的零件中已经包含有`<where>`元素,那么该节点中禁止出现where字符串
+- `<value>`和`<countQuery>`节点引用的零件中已经包含`<where>`元素,那么该节点中禁止出现where字符串
 
 DB接口:
 

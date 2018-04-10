@@ -275,6 +275,18 @@ public class BeanUtilTest {
 		String sql = BeanUtil.toInsertSQL(new UserInfo(null, "zhansan", 30), false);
 		assertThat(sql, equalTo("insert into `UserInfo`(`name`,`age`) values('zhansan','30')"));
 	}
+	
+	@Test
+	public void toUpdateSQL() throws IllegalAccessException {
+		List<UserInfo> userInfos = new ArrayList<>();
+		userInfos.add(new UserInfo(77,"茝若", 18));
+		userInfos.add(new UserInfo(88,"芸兮", null));
+		userInfos.add(new UserInfo(99,"梓", 16));
+		
+		String sql = BeanUtil.toUpdateSQL(userInfos, null);
+		
+		assertThat(sql, equalTo("update `UserInfo` set `name` = case `id` when 77 then '茝若' when 88 then '芸兮' when 99 then '梓' else `name` end,`age` = case `id` when 77 then '18' when 99 then '16' else `age` end where `id` in(77,88,99)"));
+	}
 
 	@Test
 	public void testReset() {
