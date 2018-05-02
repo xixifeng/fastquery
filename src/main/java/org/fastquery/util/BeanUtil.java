@@ -577,13 +577,17 @@ public final class BeanUtil {
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						throw new RepositoryException("无法获取字段的值",e);
 					}
+					sets.append("when ");
+					sets.append(keyVal);
+					sets.append(" then ");
 					if(fieldVal!=null) {
-						sets.append("when ");
-						sets.append(keyVal);
-						sets.append(" then ");
 						sets.append('\'');
 						sets.append(fieldVal);
 						sets.append("\' ");
+					} else {
+						sets.append('`');
+						sets.append(fieldName);
+						sets.append("` ");
 					}
 				}
 				addIds = false;

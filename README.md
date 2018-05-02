@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.40</version>
+    <version>1.0.41</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.40'
+compile 'org.fastquery:fastquery:1.0.41'
 ```
 
 ### Apache Archive
@@ -32,7 +32,9 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 7. 拥有非常优雅的`Page`(分页)设计
 8. 支持`AOP`,注入拦截器只需要标识几个简单的注解,如: `@Before` , `@After`
 9. 使用`@Source`可实现动态适配数据源.这个特性特别适合多租户系统中要求数据库彼此隔离其结构相同的场景里
-10. 支持`@QueryByNamed`命名式查询,SQL动态模板.
+10. 支持`@QueryByNamed`命名式查询,SQL动态模板
+11. 支持存储过程
+12. 支持批量更新集合实体(根据主键,批量更新不同字段,不同内容).
 
 ## 运行环境要求
 jdk1.8+

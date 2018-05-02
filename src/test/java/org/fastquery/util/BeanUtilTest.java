@@ -277,7 +277,7 @@ public class BeanUtilTest {
 	}
 	
 	@Test
-	public void toUpdateSQL() throws IllegalAccessException {
+	public void toUpdateSQL1() throws IllegalAccessException {
 		List<UserInfo> userInfos = new ArrayList<>();
 		userInfos.add(new UserInfo(77,"茝若", 18));
 		userInfos.add(new UserInfo(88,"芸兮", null));
@@ -285,7 +285,41 @@ public class BeanUtilTest {
 		
 		String sql = BeanUtil.toUpdateSQL(userInfos, null);
 		
-		assertThat(sql, equalTo("update `UserInfo` set `name` = case `id` when 77 then '茝若' when 88 then '芸兮' when 99 then '梓' else `name` end,`age` = case `id` when 77 then '18' when 99 then '16' else `age` end where `id` in(77,88,99)"));
+		assertThat(sql, equalTo("update `UserInfo` set `name` = case `id` when 77 then '茝若' when 88 then '芸兮' when 99 then '梓' else `name` end,`age` = case `id` when 77 then '18' when 88 then `age` when 99 then '16' else `age` end where `id` in(77,88,99)"));
+	}
+	
+	@Test
+	public void toUpdateSQL2() throws IllegalAccessException {
+		List<UserInfo> userInfos = new ArrayList<>();
+		userInfos.add(new UserInfo(77,"茝若", 18));
+		userInfos.add(new UserInfo(88,null, null));
+		userInfos.add(new UserInfo(99,"梓", 16));
+		
+		String sql = BeanUtil.toUpdateSQL(userInfos, null);
+		assertThat(sql, equalTo("update `UserInfo` set `name` = case `id` when 77 then '茝若' when 88 then `name` when 99 then '梓' else `name` end,`age` = case `id` when 77 then '18' when 88 then `age` when 99 then '16' else `age` end where `id` in(77,88,99)"));
+	}
+	
+	@Test
+	public void toUpdateSQL3() throws IllegalAccessException {
+		List<UserInfo> userInfos = new ArrayList<>();
+		userInfos.add(new UserInfo(77,"茝若", null));
+		userInfos.add(new UserInfo(88,null, null));
+		userInfos.add(new UserInfo(99,"梓", null));
+		
+		String sql = BeanUtil.toUpdateSQL(userInfos, null);
+		
+		assertThat(sql, equalTo("update `UserInfo` set `name` = case `id` when 77 then '茝若' when 88 then `name` when 99 then '梓' else `name` end,`age` = case `id` when 77 then `age` when 88 then `age` when 99 then `age` else `age` end where `id` in(77,88,99)"));
+	}
+	
+	@Test
+	public void toUpdateSQL4() throws IllegalAccessException {
+		List<UserInfo> userInfos = new ArrayList<>();
+		userInfos.add(new UserInfo(77,null, null));
+		userInfos.add(new UserInfo(88,null, null));
+		userInfos.add(new UserInfo(99,null, 16));
+		
+		String sql = BeanUtil.toUpdateSQL(userInfos, null);
+		assertThat(sql, equalTo("update `UserInfo` set `name` = case `id` when 77 then `name` when 88 then `name` when 99 then `name` else `name` end,`age` = case `id` when 77 then `age` when 88 then `age` when 99 then '16' else `age` end where `id` in(77,88,99)"));
 	}
 
 	@Test

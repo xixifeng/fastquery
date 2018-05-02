@@ -137,7 +137,7 @@ public class MethodQueryTest {
 	public void executeBatch() {
 		studentDBService.executeBatch("update.sql", "sqlout.log");
 	}
-	
+
 	@Test
 	public void update2() {
 		Integer id = 3;
@@ -183,12 +183,12 @@ public class MethodQueryTest {
 		String name = "框架测试!";
 		Integer age = 3;
 		UserInfo entity = new UserInfo(id, name, age);
-		
+
 		UserInfo u = studentDBService.update(entity);
 		assertThat(u.getId(), is(id));
 		assertThat(u.getName(), equalTo(name));
 		assertThat(u.getAge(), is(3));
-		
+
 		// 会解析成:update `UserInfo` set `id`=?, `age`=? where name = ?
 		int effect = studentDBService.update(entity, "name = :name");
 		// 断言: 影响的行数大于0行
@@ -230,36 +230,65 @@ public class MethodQueryTest {
 		int i = userInfoDBService.update(ui, "id = :id");
 		assertThat(i, lessThan(1));
 	}
-	
+
 	// 测试批量更新集合
 	@Test
 	public void updateCollection1() {
-		userInfoDBService.saveOrUpdate(new UserInfo(77,"河虾", 2));
-		userInfoDBService.saveOrUpdate(new UserInfo(88,"番茄", 5));
-		userInfoDBService.saveOrUpdate(new UserInfo(99,"酸奶", 2));
-		
+		userInfoDBService.saveOrUpdate(new UserInfo(77, "河虾", 2));
+		userInfoDBService.saveOrUpdate(new UserInfo(88, "番茄", 5));
+		userInfoDBService.saveOrUpdate(new UserInfo(99, "酸奶", 2));
+
 		List<UserInfo> userInfos = new ArrayList<>();
-		userInfos.add(new UserInfo(77,"茝若", 18));
-		userInfos.add(new UserInfo(88,"芸兮", null));
-		userInfos.add(new UserInfo(99,"梓", 16));
-		
+		userInfos.add(new UserInfo(77, "茝若", 18));
+		userInfos.add(new UserInfo(88, "芸兮", null));
+		userInfos.add(new UserInfo(99, "梓", 16));
+
 		int effect = userInfoDBService.update(userInfos);
 		assertThat(effect, is(3));
 	}
-	
+
 	@Test
 	public void updateCollection2() {
-		userInfoDBService.saveOrUpdate(new UserInfo(77,"河虾", 2));
-		userInfoDBService.saveOrUpdate(new UserInfo(88,"番茄", 5));
-		userInfoDBService.saveOrUpdate(new UserInfo(99,"酸奶", 2));
-		
+		userInfoDBService.saveOrUpdate(new UserInfo(77, "河虾", 2));
+		userInfoDBService.saveOrUpdate(new UserInfo(88, "番茄", 5));
+		userInfoDBService.saveOrUpdate(new UserInfo(99, "酸奶", 2));
+
 		List<UserInfo> userInfos = new ArrayList<>();
-		userInfos.add(new UserInfo(77,"茝若", 18));
-		userInfos.add(new UserInfo(88,"芸兮", null));
-		userInfos.add(new UserInfo(99,null, 16));
-		
+		userInfos.add(new UserInfo(77, "茝若", 18));
+		userInfos.add(new UserInfo(88, "芸兮", null));
+		userInfos.add(new UserInfo(99, null, 16));
+
 		int effect = userInfoDBService.update(userInfos);
 		assertThat(effect, is(3));
+	}
+
+	@Test
+	public void updateCollection3() {
+		userInfoDBService.saveOrUpdate(new UserInfo(77, "河虾", 2));
+		userInfoDBService.saveOrUpdate(new UserInfo(88, "番茄", 5));
+		userInfoDBService.saveOrUpdate(new UserInfo(99, "酸奶", 2));
+
+		List<UserInfo> userInfos = new ArrayList<>();
+		userInfos.add(new UserInfo(77, null, null));
+		userInfos.add(new UserInfo(88, null, null));
+		userInfos.add(new UserInfo(99, null, null));
+
+		int effect = userInfoDBService.update(userInfos);
+		assertThat(effect, is(3));
+
+		UserInfo[] uis = userInfoDBService.findByIds(new int[] { 77, 88, 99 });
+		for (UserInfo userInfo : uis) {
+			if (userInfo.getId().equals(77)) {
+				assertThat(userInfo.getName(), equalTo("河虾"));
+				assertThat(userInfo.getAge(), equalTo(2));
+			} else if (userInfo.getId().equals(88)) {
+				assertThat(userInfo.getName(), equalTo("番茄"));
+				assertThat(userInfo.getAge(), equalTo(5));
+			} else if (userInfo.getId().equals(99)) {
+				assertThat(userInfo.getName(), equalTo("酸奶"));
+				assertThat(userInfo.getAge(), equalTo(2));
+			}
+		}
 	}
 	// 测试批量更新集合 End
 
