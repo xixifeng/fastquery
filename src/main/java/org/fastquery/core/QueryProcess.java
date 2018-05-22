@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2088, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -32,6 +32,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -343,7 +344,7 @@ public class QueryProcess {
 		case MethodId.QUERY:
 			if(iargs.length == 3) {
 				bean = iargs[2];
-				sql = BeanUtil.toInsertSQL(iargs[1].toString(),bean);
+				sql = BeanUtil.toInsertSQL((String) iargs[1],bean);
 				LOG.info(sql);
 				Object keyObj = DB.insert(sql);
 				if(keyObj==null){
@@ -366,26 +367,14 @@ public class QueryProcess {
 		case MethodId.QUERY0:
 			if(iargs.length == 3) {
 				bean = iargs[2];
-				sql = BeanUtil.toInsertSQL(iargs[1].toString(),bean);
+				sql = BeanUtil.toInsertSQL((String) iargs[1],bean);
 				LOG.info(sql);
-				Object keyObj = DB.insert(sql);
-				if(keyObj==null){
-					return null;
-				} else {
-					sql = BeanUtil.toSelectSQL(bean, keyObj.toString(), iargs[1].toString());
-					return DB.select(sql, bean);
-				}
+				return DB.insert2(sql);
 			} else {
 				bean = iargs[0];
 				sql = BeanUtil.toInsertSQL(bean,false);
 				LOG.info(sql);
-				Object keyObj = DB.insert(sql);
-				if(keyObj==null){
-					return null;
-				} else {
-					sql = BeanUtil.toSelectSQL(bean, keyObj.toString(), null);
-					return DB.select(sql, bean);	
-				}
+				return DB.insert2(sql);
 			}
 		
 		case MethodId.QUERY1:
@@ -394,14 +383,10 @@ public class QueryProcess {
 			} else if (iargs.length == 2) {
 				bean = iargs[1];
 			} else {
-				dbName = iargs[1].toString();
+				dbName = (String) iargs[1];
 				bean = iargs[2];
 			}
-			sql = DB.update(bean, dbName);
-			if(sql==null){
-				return null;
-			}
-			return DB.select(sql, bean);
+			return DB.update(bean, dbName,null);
 			
 		case MethodId.QUERY2:
 			if (iargs.length == 1) {
@@ -409,25 +394,24 @@ public class QueryProcess {
 			} else if(iargs.length == 2) {
 				bean = iargs[1];
 			} else {
-				dbName = iargs[1].toString();
+				dbName = (String) iargs[1];
 				bean = iargs[2];
 			}
 			sql = BeanUtil.toSelectSQL(bean, null, dbName);
 			if(DB.exists(sql, bean)) {
 				// 更新
-				DB.update(bean, dbName);
+				return DB.update(bean, dbName,null);
 			} else {
 				// 保存
-				DB.insert((iargs.length==3) ? BeanUtil.toInsertSQL(iargs[1].toString(),bean) : BeanUtil.toInsertSQL(bean,false));
+				return DB.insert2((iargs.length==3) ? BeanUtil.toInsertSQL(iargs[1].toString(),bean) : BeanUtil.toInsertSQL(bean,false));
 			}
-			return DB.select(sql, bean);			
 		case MethodId.QUERY3:
 			if (iargs.length == 2) {
 				bean = iargs[0];
 			} else if (iargs.length == 3) {
 				bean = iargs[1];
 			} else {
-				dbName = iargs[1].toString();
+				dbName = (String) iargs[1];
 				bean = iargs[2];
 			}
 			return DB.update(bean, dbName,(String)iargs[iargs.length-1]);
@@ -435,7 +419,7 @@ public class QueryProcess {
 			ignoreRepeat = (boolean) iargs[0];
 			Object entitiesObj = iargs[iargs.length-1];
 			if(iargs.length == 4) {
-				dbName = iargs[2].toString();
+				dbName = (String) iargs[2];
 			}
 			if(entitiesObj.getClass().isArray()) {
 				sql = BeanUtil.arr2InsertSQL((Object[])entitiesObj, dbName, ignoreRepeat);
@@ -448,7 +432,7 @@ public class QueryProcess {
 		case MethodId.QUERY5:
 			Collection<Object> entities = (Collection<Object>) iargs[iargs.length-1];
 			if(iargs.length == 3) {
-				dbName = iargs[1].toString();
+				dbName = (String) iargs[1];
 			}
 			sql = BeanUtil.toUpdateSQL(entities, dbName);
 			LOG.info(sql);
@@ -464,6 +448,27 @@ public class QueryProcess {
 			}
 			
 			break;
+			
+		case MethodId.QUERY7:
+			Class<?> clazz = (Class<?>) iargs[0];  // 类型
+			long i = ((Long)iargs[1]).longValue(); // 主键
+			if(iargs.length == 4) {
+				dbName = (String) iargs[3]; // 数据库名称
+			}
+
+			return DB.select(BeanUtil.toSelectSQL(clazz, i, dbName), clazz);
+			
+		case MethodId.QUERY8:
+			Objects.requireNonNull(iargs[0]);
+			Objects.requireNonNull(iargs[1]);
+			String tableName = iargs[0].toString();  // 表名称
+			String name = iargs[1].toString(); // 主键名
+			long key = ((Long)iargs[2]).longValue(); // 主键值
+			if(iargs.length == 5) {
+				dbName = (String) iargs[4]; // 数据库名称
+			}			
+			return DB.update(BeanUtil.toDelete(tableName, name, key, dbName));
+			
 		default:
 			break;
 		}

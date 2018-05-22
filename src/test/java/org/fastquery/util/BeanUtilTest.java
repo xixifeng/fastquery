@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2088, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -322,6 +322,13 @@ public class BeanUtilTest {
 		assertThat(sql, equalTo("update `UserInfo` set `name` = case `id` when 77 then `name` when 88 then `name` when 99 then `name` else `name` end,`age` = case `id` when 77 then `age` when 88 then `age` when 99 then '16' else `age` end where `id` in(77,88,99)"));
 	}
 
+	@Test
+	public void toDelete() {
+		String tableName = "Student";String keyName = "uuid";long keyVal = 18 ; String dbName = "Pe";
+		String sql = BeanUtil.toDelete(tableName, keyName, keyVal, dbName);
+		assertThat(sql, equalTo("delete from `Pe`.`Student` where `uuid`=18"));
+	}
+	
 	@Test
 	public void testReset() {
 		UserInfo u2 = BeanUtil.newBeanVarNull(UserInfo.class);

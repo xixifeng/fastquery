@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2088, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -26,6 +26,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 
 /**
+ * 查询仓库
  * 
  * @author xixifeng (fastquery@126.com)
  */
@@ -67,13 +68,13 @@ public interface QueryRepository extends Repository {
 	@Id(MethodId.QUERY4)
 	<B> int save(boolean ignoreRepeat,Collection<B> entities);
 	/**
-	 * 保存实体集合
+	 * 保存可变数组实体
 	 * @param ignoreRepeat 忽略重复主键
 	 * @param entities 实体集合
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY4)
-	int saveArray(boolean ignoreRepeat,Object...entities);
+	int save(boolean ignoreRepeat,Object...entities);
 	/**
 	 * 保存实体集合
 	 * @param <B> 实体
@@ -85,14 +86,14 @@ public interface QueryRepository extends Repository {
 	@Id(MethodId.QUERY4)
 	<B> int save(boolean ignoreRepeat,@Source String dataSourceName,Collection<B> entities);
 	/**
-	 * 保存实体集合
+	 * 保存可变数组实体
 	 * @param ignoreRepeat 忽略重复主键
 	 * @param dataSourceName 数据源名称
 	 * @param entities 实体集合
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY4)
-	int saveArray(boolean ignoreRepeat,@Source String dataSourceName,Object...entities);
+	int save(boolean ignoreRepeat,@Source String dataSourceName,Object...entities);
 	/**
 	 * 保存实体集合
 	 * @param <B> 实体
@@ -105,7 +106,7 @@ public interface QueryRepository extends Repository {
 	@Id(MethodId.QUERY4)
 	<B> int save(boolean ignoreRepeat,@Source String dataSourceName,String dbName,Collection<B> entities);
 	/**
-	 * 保存实体集合
+	 * 保存可变数组实体
 	 * @param ignoreRepeat 忽略重复主键
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
@@ -113,73 +114,67 @@ public interface QueryRepository extends Repository {
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY4)
-	int saveArray(boolean ignoreRepeat,@Source String dataSourceName,String dbName,Object...entities);
+	int save(boolean ignoreRepeat,@Source String dataSourceName,String dbName,Object...entities);
 	
 	/**
-	 * 保存一个实体,这个实体必须有一个自增长的主键 <br>
-	 * 注意: 如果该实体没有主键,则返回null
+	 * 保存一个实体 <br>
 	 * @param <E> 实体
 	 * @param entity 实体
-	 * @return 实体
+	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY0)
-	<E> E  save(E entity);
+	<E> int save(E entity);
 	
 	/**
 	 * 往指定的数据源里保存一个实体<br>
-	 * 注意: 如果该实体没有主键,则返回null
 	 * @param <E> 存储的实例
 	 * @param entity 实体
 	 * @param dataSourceName 数据源名称
-	 * @return 存储的实例
+	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY0)
-	<E> E  save(E entity,@Source String dataSourceName);
+	<E> int save(E entity,@Source String dataSourceName);
 	
 	/**
 	 * 往指定的数据源里保存一个实体,并且指定数据库名称<br>
-	 * 注意: 如果该实体没有主键,则返回null
 	 * @param <E> 存储的实例
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
 	 * @param entity 实体
-	 * @return 存储的实例
+	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY0)
-	<E> E  save(@Source String dataSourceName,String dbName,E entity);
+	<E> int save(@Source String dataSourceName,String dbName,E entity);
 		
 	/**
-	 * 更新实体,实体需要包含主键值 <br>
-	 * 注意: 修改失败,或违规操作则返回null
+	 * 更新实体,根据实体的主键值更新 <br>
 	 * @param <E> 存储的实例
 	 * @param entity 实体
-	 * @return 存储的实例
+	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY1)
-	<E> E update(E entity);
+	<E> int update(E entity);
 	
 	/**
-	 * 根据主键更新实体 <br>
-	 * 注意: 修改失败,或违规操作则返回null
+	 * 更新实体,根据实体的主键值更新 <br>
 	 * @param <E> 更新的实例
 	 * @param dataSourceName 数据源名称
 	 * @param entity 实体
-	 * @return 更新的实例
+	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY1)
-	<E> E update(@Source String dataSourceName,E entity);
+	<E> int update(@Source String dataSourceName,E entity);
 
 	/**
-	 * 根据主键更新实体 <br>
-	 * 注意: 修改失败,或违规操作则返回null
+	 * 更新实体,根据实体的主键值更新 <br>
 	 * @param <E> 更新的实例
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
 	 * @param entity 实体
-	 * @return 更新的实例
+	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY1)
-	<E> E update(@Source String dataSourceName,String dbName,E entity);
+	<E> int update(@Source String dataSourceName,String dbName,E entity);
 	
 	/**
 	 * 更新实体
@@ -215,20 +210,20 @@ public interface QueryRepository extends Repository {
 	 * 保存或者更新实体,实体需要包含主键值否则报错 (如果不存在就存储,存在就更新)
 	 * @param <E> 实体
 	 * @param entity 实体
-	 * @return 实体
+	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY2)
-	<E> E saveOrUpdate(E entity);
+	<E> int saveOrUpdate(E entity);
 	
 	/**
 	 * 保存或者更新实体,实体需要包含主键值否则报错 (如果不存在就存储,存在就更新)
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param entity 实体
-	 * @return 实体
+	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY2)
-	<E> E saveOrUpdate(@Source String dataSourceName,E entity);
+	<E> int saveOrUpdate(@Source String dataSourceName,E entity);
 	
 	/**
 	 * 保存或者更新实体,实体需要包含主键值否则报错 (如果不存在就存储,存在就更新)
@@ -236,10 +231,10 @@ public interface QueryRepository extends Repository {
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
 	 * @param entity 实体
-	 * @return 实体
+	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY2)
-	<E> E saveOrUpdate(@Source String dataSourceName,String dbName,E entity);
+	<E> int saveOrUpdate(@Source String dataSourceName,String dbName,E entity);
 	
 	/**
 	 * 批量更新实体
@@ -287,6 +282,72 @@ public interface QueryRepository extends Repository {
 	 */
 	@Id(MethodId.QUERY6)
 	void executeBatch(String sqlName,String output,@Source String dataSourceName);
+	
+	/**
+	 * 根据主键查询实体
+	 * @param <E> 实体
+	 * @param entityClass 实体的class
+	 * @param id 主键值
+	 * @return 返回实体
+	 */
+	@Id(MethodId.QUERY7)
+	<E> E find(Class<E> entityClass,long id);
+	
+	/**
+	 * 根据主键查询实体
+	 * @param <E> 实体
+	 * @param entityClass 实体的class
+	 * @param id 主键值
+	 * @param dataSourceName 数据源名称
+	 * @return 返回实体
+	 */
+	@Id(MethodId.QUERY7)
+	<E> E find(Class<E> entityClass,long id,@Source String dataSourceName);
+	
+	/**
+	 * 根据主键查询实体
+	 * @param <E> 实体
+	 * @param entityClass 实体的class
+	 * @param id 主键值
+	 * @param dataSourceName 数据源名称
+	 * @param dbName 数据库名称
+	 * @return 返回实体
+	 */
+	@Id(MethodId.QUERY7)
+	<E> E find(Class<E> entityClass,long id,@Source String dataSourceName,String dbName);
+	
+	/**
+	 * 根据主键删除实体
+	 * @param tableName 表名称
+	 * @param primaryKeyName 主键名称
+	 * @param id 主键值
+	 * @return 影响行数
+	 */
+	@Id(MethodId.QUERY8)
+	int delete(String tableName,String primaryKeyName,long id);
+	
+	/**
+	 * 根据主键删除实体
+	 * @param tableName 表名称
+	 * @param primaryKeyName 主键名称
+	 * @param id 主键值
+	 * @param dataSourceName 数据源名称
+	 * @return 影响行数
+	 */
+	@Id(MethodId.QUERY8)
+	int delete(String tableName,String primaryKeyName,long id,@Source String dataSourceName);
+	
+	/**
+	 * 根据主键删除实体
+	 * @param tableName 表名称
+	 * @param primaryKeyName 主键名称
+	 * @param id 主键值
+	 * @param dataSourceName 数据源名称
+	 * @param dbName 数据库名称
+	 * @return 影响行数
+	 */
+	@Id(MethodId.QUERY8)
+	int delete(String tableName,String primaryKeyName,long id,@Source String dataSourceName,String dbName);
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2088, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -22,9 +22,13 @@
 
 package org.fastquery.test;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -124,5 +128,4 @@ public class SyntaxTest {
 		Set<String> ss = TypeUtil.matchesNotrepeat("#{#abc}aa", reg);
 		ss.forEach(s -> LOG.debug(s) );
 	}
-
 }

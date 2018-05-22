@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2088, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -22,8 +22,6 @@
 
 package org.fastquery.test;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
@@ -44,9 +42,7 @@ import java.util.List;
  * @author xixifeng (fastquery@126.com)
  */
 public class MethodQueryTest {
-
-	private static final Logger LOG = LoggerFactory.getLogger(MethodQueryTest.class);
-
+	
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
 
@@ -66,10 +62,8 @@ public class MethodQueryTest {
 		}
 
 		u.setId(id);
-		UserInfo u2 = studentDBService.save(u);
-		assertThat(u2.getId(), equalTo(u.getId()));
-		assertThat(u2.getName(), equalTo(u.getName()));
-		assertThat(u2.getAge(), equalTo(u.getAge()));
+		int effect = studentDBService.save(u);
+		assertThat(effect,is(1));
 	}
 
 	@Test
@@ -78,11 +72,8 @@ public class MethodQueryTest {
 		String name = "凤侯";
 		Integer age = 32;
 		UserInfo u = new UserInfo(id, name, age);
-		UserInfo u2 = studentDBService.save("xk-c3p0", "xk", u);
-		LOG.debug("id:" + u2.getId());
-		assertThat(u2.getId(), notNullValue());
-		assertThat(u2.getName(), equalTo(u.getName()));
-		assertThat(u2.getAge(), equalTo(u.getAge()));
+		int effect = studentDBService.save("xk-c3p0", "xk", u);
+		assertThat(effect,is(1));
 	}
 
 	@Test
@@ -90,7 +81,7 @@ public class MethodQueryTest {
 		UserInfo u1 = new UserInfo(1, "equinox", 10);
 		UserInfo u2 = new UserInfo(2, "Eclipse", 3);
 		UserInfo u3 = new UserInfo(3, "ement", 2);
-		int effect = studentDBService.saveArray(true, u1, u2, u3);
+		int effect = studentDBService.save(true, u1, u2, u3);
 		assertThat(effect, is(0));
 	}
 
@@ -106,7 +97,7 @@ public class MethodQueryTest {
 		// entry '1' for key 'PRIMARY'"字符串
 		// thrown.expectMessage(containsString("Duplicate entry '1' for key
 		// 'PRIMARY'"));
-		int effect = studentDBService.saveArray(false, u1, u2, u3);
+		int effect = studentDBService.save(false, u1, u2, u3);
 		assertThat(effect, is(0));
 	}
 
@@ -115,7 +106,7 @@ public class MethodQueryTest {
 		UserInfo u1 = new UserInfo("equ", 10);
 		UserInfo u2 = new UserInfo("Ecl", 3);
 		UserInfo u3 = new UserInfo("ement", 2);
-		int effect = studentDBService.saveArray(false, u1, u2, u3);
+		int effect = studentDBService.save(false, u1, u2, u3);
 		assertThat(effect, is(3));
 	}
 
@@ -153,22 +144,25 @@ public class MethodQueryTest {
 		String dataSourceName = "xk-c3p0";
 		String dbName = "xk";
 		UserInfo entity = new UserInfo(1, "好哇瓦", 3);
-		UserInfo u = studentDBService.update(dataSourceName, dbName, entity);
-		assertThat(u.getId(), equalTo(1));
-		assertThat(u.getName(), equalTo("好哇瓦"));
-		assertThat(u.getAge(), equalTo(3));
+		int effect = studentDBService.update(dataSourceName, dbName, entity);
+		assertThat(effect, is(1));
 	}
 
 	@Test
 	public void saveOrUpdate() {
-		UserInfo userInfo = new UserInfo(100, "小蜜蜂", 5);
-		UserInfo u1 = studentDBService.saveOrUpdate(userInfo);
+		Integer id = 100;
+		UserInfo userInfo = new UserInfo(id, "小蜜蜂", 5);
+		
+		int effect = studentDBService.saveOrUpdate(userInfo);
+		assertThat(effect, either(is(0)).or(is(1)));
+		UserInfo u1 = userInfoDBService.findById(id);
 		Integer id1 = u1.getId();
 		assertThat(id1, notNullValue());
 		assertThat(u1.getName(), equalTo("小蜜蜂"));
 		assertThat(u1.getAge(), equalTo(5));
 
-		UserInfo u2 = studentDBService.saveOrUpdate(u1);
+		effect = studentDBService.saveOrUpdate(u1);
+		UserInfo u2 = userInfoDBService.findById(id1);
 		Integer id2 = u2.getId();
 		assertThat(id2, equalTo(id1));
 		assertThat(u2.getName(), equalTo("小蜜蜂"));
@@ -184,10 +178,8 @@ public class MethodQueryTest {
 		Integer age = 3;
 		UserInfo entity = new UserInfo(id, name, age);
 
-		UserInfo u = studentDBService.update(entity);
-		assertThat(u.getId(), is(id));
-		assertThat(u.getName(), equalTo(name));
-		assertThat(u.getAge(), is(3));
+		int e = studentDBService.update(entity);
+		assertThat(e, is(1));
 
 		// 会解析成:update `UserInfo` set `id`=?, `age`=? where name = ?
 		int effect = studentDBService.update(entity, "name = :name");
@@ -292,4 +284,19 @@ public class MethodQueryTest {
 	}
 	// 测试批量更新集合 End
 
+	@Test
+	public void find() {
+		assertThat(userInfoDBService.find(UserInfo.class, 3).getId().intValue(), is(3));
+		assertThat(userInfoDBService.find(UserInfo.class, 3, null).getId().intValue(), is(3)); // 测试数据源传递null
+		assertThat(userInfoDBService.find(UserInfo.class, 3, null,null).getId().intValue(), is(3)); // 测试数据库名称为null
+	}
+	
+	@Test
+	public void delete() {
+		int id = 89890;
+		int effect = userInfoDBService.save(new UserInfo(id, "植物", 17));
+		assertThat(effect, is(1));
+		effect = userInfoDBService.delete("UserInfo", "id", id);
+		assertThat(effect, is(1));
+	}
 }

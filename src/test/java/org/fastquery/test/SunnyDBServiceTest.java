@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2088, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -52,21 +52,21 @@ public class SunnyDBServiceTest {
 
 	@Test
 	public void save() {
+		String number = "852000XXXXX"; 
 		Card card = new Card();
-		card.setNumber("852000XXXXX");
-		Card c = sunnyDBService.save(card);
-		assertThat(c.getNumber(), equalTo(card.getNumber()));
-		Integer id = c.getId();
-		int effect = sunnyDBService.delete(id);
+		card.setNumber(number);
+		int c = sunnyDBService.save(card);
+		assertThat(c,is(1));
+		int effect = sunnyDBService.deleteByNumber(number);
 		assertThat(effect, is(1));
-		assertThat(sunnyDBService.exists(id), is(false));
+		assertThat(sunnyDBService.exists(number), is(false));
 	}
 
 	@Test
 	public void save2() {
 		Card card = new Card(-1, "32ccczuidazhi");
-		Card c = sunnyDBService.save(card);
-		assertThat(c, nullValue());
+		int c = sunnyDBService.save(card);
+		assertThat(c, is(1));
 		int effect = sunnyDBService.delete(-1);
 		assertThat(effect, is(1));
 		assertThat(sunnyDBService.exists(-1), is(false));

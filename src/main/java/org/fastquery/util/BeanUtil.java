@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2088, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -280,13 +280,13 @@ public final class BeanUtil {
 	
 	/**
 	 * 转换查询语句
-	 * @param bean 实体
+	 * @param bean 实体 或 class
 	 * @param key 主键值, 如果传递null,那么自动获取,获取到的为null那么报错. 指定的值优先
 	 * @param dbName 数据库名称
 	 * @return sql语句
 	 */
 	public static String toSelectSQL(Object bean,Object key,String dbName) {
-		Class<?> cls = bean.getClass();
+		Class<?> cls = (bean instanceof Class)? (Class<?>)bean : bean.getClass();
 		// 表名称
 		String tableName = cls.getSimpleName();
 		if(dbName != null) {
@@ -611,6 +611,24 @@ public final class BeanUtil {
 		sql.append(ids);
 		sql.append(')');
 		return sql.toString();
+	}
+	
+	public static String toDelete(String tableName,String keyName,long keyVal,String dbName) {
+		StringBuilder sq = new StringBuilder();
+		sq.append("delete from `");
+		if(dbName != null) {
+			sq.append(dbName).append('`').append('.').append('`').append(tableName).append('`').toString();
+		} else {
+			sq.append(tableName).append('`').toString();
+		}
+		sq.append(" where ");
+		sq.append('`');
+		sq.append(keyName);
+		sq.append('`');
+		sq.append('=');
+		sq.append(keyVal);
+		
+		return sq.toString();
 	}
 
 	// 返回sql中in查询需要的值

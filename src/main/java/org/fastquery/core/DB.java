@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2088, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -233,6 +233,7 @@ public class DB {
 
 	// 查询一条数据然后转换成一个实体
 	static Object select(String sql, Object bean) {
+		Class<?> cls = (bean instanceof Class)? (Class<?>)bean : bean.getClass();
 		Connection conn = null;
 		Statement stat = null;
 		ResultSet rs = null;
@@ -246,7 +247,7 @@ public class DB {
 			if (maps.isEmpty()) {
 				return null;
 			}
-			return JSON.toJavaObject(new JSONObject(maps.get(0)), bean.getClass());
+			return JSON.toJavaObject(new JSONObject(maps.get(0)),cls);
 		} catch (Exception e) {
 			throw new RepositoryException(e);
 		} finally {
@@ -299,45 +300,7 @@ public class DB {
 		
 		return effect;
 	}
-
-	// 更新一条数据,然后返回更新后的数据,返回根据主键查询的sql语句
-	static String update(Object bean, String dbName) {
-		Connection conn = null;
-		PreparedStatement stat = null;
-		Object[] updateInfo = BeanUtil.toUpdateSQL(bean, dbName,true);
-		if (updateInfo == null) {
-			return null;
-		}
-		String sql = updateInfo[0].toString();
-		@SuppressWarnings("unchecked")
-		List<Object> args = (List<Object>) updateInfo[1];
-		int count = args.size();
-		try {
-			conn = QueryContext.getConnection();
-			QueryContext.setAutoCommit(false);
-			QueryContext.addSqls(sql);
-			info(sql, args);
-			stat = conn.prepareStatement(sql);
-			for (int i = 1; i <= count; i++) {
-				stat.setObject(i, args.get(i - 1));
-			}
-			stat.executeUpdate();
-			QueryContext.commit();
-		} catch (SQLException e) {
-			if (conn != null) {
-				try {
-					QueryContext.rollback();
-				} catch (SQLException e1) {
-					throw new RepositoryException(e1);
-				}
-			}
-			throw new RepositoryException(e);
-		} finally {
-			close(null, stat);
-		}
-		return updateInfo[2].toString();
-	}
-
+	
 	static int update(Object bean, String dbName, String where) {
 		int effect = 0;
 		Connection conn = null;
@@ -534,22 +497,4 @@ public class DB {
 			LOG.info(sb.toString());	
 		}
 	}
-
-	/*
-	public static int modifyEffect(List<Object> objs,String sql) {
-		return modify(objs, true, false,sql).get(0).getEffect();
-	}
-	public static int[] modifyEffects(List<Object> objs,String...queries) {
-		List<RespUpdate> rus = modify(objs, true, false, queries);
-		int size = rus.size();
-		int[] effects = new int[size];
-		for (int i = 0; i < size; i++) {
-			effects[i] = rus.get(i).getEffect();
-		}
-		return effects;
-	}
-	
-	public static long modifyPrimarykey(List<Object> objs,String sql) {
-		return modify(objs, false, true,sql).get(0).getPk();
-	}*/
 }

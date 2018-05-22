@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2088, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -72,6 +72,11 @@ public class MethodId {
 	 * 0X07
 	 */
 	public static final byte QUERY7 = 0X07;
+	
+	/**
+	 * 0X08
+	 */
+	public static final byte QUERY8 = 0X08;
 	
 	/**
 	 * 默认私有构造方法
