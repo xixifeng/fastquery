@@ -33,14 +33,14 @@ import org.fastquery.where.Condition;
 
 /**
  * 条件参数安全检查
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public class ConditionParameterFilter implements MethodFilter {
 
-	
 	@Override
 	public Method doFilter(Method method) {
-		
+
 		// 注意: sql参数与方法参数个数匹配问题,已经在 ParameterFilter里做了安全校验.
 		// 1). @Query中的value值,有且只能出现一次#{#where} (允许不出现). 换言之,出现"#{#where}"的个数不能大于1
 		// 2). 如果有条件注解,那么@Query中的value值,必须有#where
@@ -49,36 +49,36 @@ public class ConditionParameterFilter implements MethodFilter {
 		// 5). 条件运算符如果是Operator.BETWEEN,那么r()的值必须符合正则: "?8 and ?9"
 		// 6). 条件运算符如果不是Operator.BETWEEN又不是Operator.BETWEEN,那么r()的值必须符合正则: "?8"
 		Query[] queries = method.getAnnotationsByType(Query.class);
-		if(queries.length==0){
+		if (queries.length == 0) {
 			return method;
 		}
-		
-		int countWhere = TypeUtil.matches(queries[0].value(),Placeholder.WHERE_REG).size(); // 
+
+		int countWhere = TypeUtil.matches(queries[0].value(), Placeholder.WHERE_REG).size(); //
 		// >1).
-		if( countWhere >1 ) {
-			this.abortWith(method,"@Query中的value值,有且只能出现一次#{#where}");
+		if (countWhere > 1) {
+			this.abortWith(method, "@Query中的value值,有且只能出现一次#{#where}");
 		}
-		
+
 		// >2). 已经在 QueryFilterHelper 里做校验了
-		
+
 		// >3)
 		Condition[] conditions = method.getAnnotationsByType(Condition.class);
 		for (int i = 0; i < conditions.length; i++) {
 			// 截取第一个单词
 			String value = conditions[i].value();
 			String word = TypeUtil.getFirstWord(value);
-			if(i==0 && ("or".equalsIgnoreCase(word) || "and".equalsIgnoreCase(word))) {
-				this.abortWith(method,"第1个@Condition的值,左边加条件连接符\""+word+"\"干什么,这个条件跟谁相连?去掉吧.");
-			} 
+			if (i == 0 && ("or".equalsIgnoreCase(word) || "and".equalsIgnoreCase(word))) {
+				this.abortWith(method, "第1个@Condition的值,左边加条件连接符\"" + word + "\"干什么,这个条件跟谁相连?去掉吧.");
+			}
 
-			if(i != 0 && (!"or".equalsIgnoreCase(word) && !"and".equalsIgnoreCase(word))) {
-				if(!Pattern.matches("^\\$\\S+(.|\n)*",value.trim())) {
-					this.abortWith(method,"第"+(i+1)+"个@Condition的值\""+value+"\",缺少条件连接符,如果上一个条件存在,用什么跟它相连?");
+			if (i != 0 && (!"or".equalsIgnoreCase(word) && !"and".equalsIgnoreCase(word))) {
+				if (!Pattern.matches("^\\$\\S+(.|\n)*", value.trim())) {
+					this.abortWith(method, "第" + (i + 1) + "个@Condition的值\"" + value + "\",缺少条件连接符,如果上一个条件存在,用什么跟它相连?");
 				}
-			} 
-			
+			}
+
 		}
-		
+
 		return method;
 	}
 }

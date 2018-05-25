@@ -29,9 +29,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 标识改操作
  * 
  * @author xixifeng (fastquery@126.com)
- *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
@@ -40,12 +40,14 @@ public @interface Modifying {
 
 	/**
 	 * 主键字段的名称,默认值"id"
+	 * 
 	 * @return String
 	 */
 	String id() default "id";
-	
+
 	/**
 	 * 指定当前正在修改的表
+	 * 
 	 * @return String
 	 */
 	String table() default "";

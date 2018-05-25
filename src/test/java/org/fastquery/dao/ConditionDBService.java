@@ -35,9 +35,9 @@ import org.fastquery.where.Condition;
  * @author mei.sir@aliyun.cn
  */
 public interface ConditionDBService extends QueryRepository {
-	
+
 	@Query("select * ${tname} #{#where}")
 	@Condition(" $nameWhere")
 	@Condition(" $ageCon")
-	List<Student> findUserInfo(@Param("nameWhere")String w1, @Param("ageCon")String w2,@Param("tname") String tname);
+	List<Student> findUserInfo(@Param("nameWhere") String w1, @Param("ageCon") String w2, @Param("tname") String tname);
 }

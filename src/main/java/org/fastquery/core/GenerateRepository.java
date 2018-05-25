@@ -30,18 +30,12 @@ package org.fastquery.core;
  */
 @FunctionalInterface
 public interface GenerateRepository {
-	/**
-	 * 生成类的默认后缀名称
-	 */
-	String SUFFIX = "$ProxyImpl";
 
 	/**
 	 * 生成 Repository 接口的实现
 	 * 
-	 * @param <T>
-	 *            T是Repository的子类
-	 * @param repositoryClazz
-	 *            接口class
+	 * @param <T> T是Repository的子类
+	 * @param repositoryClazz 接口class
 	 * @return 实现类的class
 	 */
 	<T extends Repository> Class<? extends T> generate(Class<T> repositoryClazz);

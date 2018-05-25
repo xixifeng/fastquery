@@ -83,8 +83,7 @@ public class StudentDBServiceTest {
 			List<SQLValue> sqlValues = rule.getListSQLValue();
 			assertThat(sqlValues.size(), is(1));
 			SQLValue sqlValue = sqlValues.get(0);
-			assertThat(sqlValue.getSql(),
-					equalToIgnoringWhiteSpace("update student s set s.age=?,s.name=? where  s.no=?"));
+			assertThat(sqlValue.getSql(), equalToIgnoringWhiteSpace("update student s set s.age=?,s.name=? where  s.no=?"));
 			assertThat(sqlValue.getSql(), equalTo("update student s set s.age=?,s.name=? where  s.no=?"));
 			List<Object> values = sqlValue.getValues();
 			assertThat(values.size(), is(3));

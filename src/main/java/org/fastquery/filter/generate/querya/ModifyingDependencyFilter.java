@@ -40,9 +40,10 @@ public class ModifyingDependencyFilter implements MethodFilter {
 	@Override
 	public Method doFilter(Method method) {
 		Modifying m = method.getAnnotation(Modifying.class);
-		int  queryLen = method.getAnnotationsByType(Query.class).length;
+		int queryLen = method.getAnnotationsByType(Query.class).length;
 		QueryByNamed queryByNamed = method.getAnnotation(QueryByNamed.class);
-		if( m != null && queryLen ==0 && queryByNamed==null ) { // m存在 并且 queryLen为0 并且 queryByNamed不存在
+		if (m != null && queryLen == 0 && queryByNamed == null) { // m存在 并且 queryLen为0 并且
+																	// queryByNamed不存在
 			this.abortWith(method, "@Modifying 要么跟 @Query 组合, 要么跟@QueryByNamed组合不能独存!");
 		}
 		return method;

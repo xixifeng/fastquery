@@ -48,16 +48,15 @@ import com.alibaba.fastjson.JSONObject;
  */
 // 指定运行器
 @RunWith(Suite.class)
-@SuiteClasses({ FQueryTest.class, StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class,
-		UserInfoDBServiceTest3.class, TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class,
-		BeanUtilTest.class, PageTest.class, QueryByNamedDBExampleMapperTest.class, FastQueryJSONObjectTest.class,
-		FQueryResourceImplTest.class, SunnyDBServiceTest.class, SaveToIdTest.class, PlaceholderTest.class, DBTest.class,
-		ProductDBServiceTest.class, FQueryPropertiesTest.class, QueryPoolTest.class,ParamFilterTest.class,ConditionTest.class,QueryParserTest.class })
+@SuiteClasses({ FQueryTest.class, StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class, UserInfoDBServiceTest3.class,
+		TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class, BeanUtilTest.class, PageTest.class,
+		QueryByNamedDBExampleMapperTest.class, FastQueryJSONObjectTest.class, FQueryResourceImplTest.class, SunnyDBServiceTest.class,
+		SaveToIdTest.class, PlaceholderTest.class, DBTest.class, ProductDBServiceTest.class, FQueryPropertiesTest.class, QueryPoolTest.class,
+		ParamFilterTest.class, ConditionTest.class, QueryParserTest.class })
 public class AllTest {
 
 	@BeforeClass
-	public static void beforeClass()
-			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public static void beforeClass() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		FQuery.getRepository(UserInfoDBService.class);
 		Field field = FastQueryJSONObject.class.getDeclaredField("maps");
 		field.setAccessible(true);

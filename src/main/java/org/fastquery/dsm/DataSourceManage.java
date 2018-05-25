@@ -26,29 +26,32 @@ import javax.sql.DataSource;
 
 /**
  * 数据源管理
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public class DataSourceManage {
-	
-	private DataSourceManage(){}
-	
+
+	private DataSourceManage() {
+	}
+
 	/**
 	 * 根据clazz获取数据源
+	 * 
 	 * @param className Repository class
 	 * @return 数据源
 	 */
 	public static DataSource getDataSource(String className) {
-		
-    	// 根据dataSourceName 查
-        DataSource dataSource = FQueryFactoryImpl.getInstance().getDataSource(className);
-    	
+
+		// 根据dataSourceName 查
+		DataSource dataSource = FQueryFactoryImpl.getInstance().getDataSource(className);
+
 		// dataSource 为null 什么也做不了
-		if(dataSource==null) {
-			throw new  ExceptionInInitializerError("没有找到数据源,请键查fastquery.json是否配置正确,或者是没有初始化连接池. \n 连接池的生成有两种模式:\n1).通过配置c3p0-config.xml,jdbc-config.xml \n2).通过FQueryProperties.createDataSource(...)");
+		if (dataSource == null) {
+			throw new ExceptionInInitializerError(
+					"没有找到数据源,请键查fastquery.json是否配置正确,或者是没有初始化连接池. \n 连接池的生成有两种模式:\n1).通过配置c3p0-config.xml,jdbc-config.xml \n2).通过FQueryProperties.createDataSource(...)");
 		}
-		
+
 		return dataSource;
 	}
-	
-	
+
 }

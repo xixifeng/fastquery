@@ -92,13 +92,13 @@ public class SQLInExampleTest {
 
 	@Test
 	public void findByIn1() {
-		int[] ids = {1,2,3};
+		int[] ids = { 1, 2, 3 };
 		UserInfo[] userInfos = db.findByIn(ids);
 		for (UserInfo u : userInfos) {
 			assertThat(u.getId().intValue(), either(is(1)).or(is(2)).or(is(3)));
 		}
 	}
-	
+
 	@Test
 	public void findByIn2() {
 		String sex = "女";

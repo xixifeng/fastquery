@@ -53,8 +53,7 @@ public class PManager {
 	public PManager() {
 	}
 
-	public PManager(Long punitId, String mobile, String password, Byte isdm, Byte isReg, Byte pmRole, String realName,
-			Byte gender) {
+	public PManager(Long punitId, String mobile, String password, Byte isdm, Byte isReg, Byte pmRole, String realName, Byte gender) {
 		this.punitId = punitId;
 		this.mobile = mobile;
 		this.password = password;

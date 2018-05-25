@@ -39,8 +39,7 @@ public class JarListClass {
 	/**
 	 * 遍历目录下的所有jar包中的所有class
 	 * 
-	 * @param d
-	 *            jar包目录地址
+	 * @param d jar包目录地址
 	 * @return
 	 */
 	public static List<Class<?>> jarClasses(String d) {

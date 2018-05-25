@@ -37,12 +37,12 @@ public class OutFilter implements MethodFilter {
 
 	@Override
 	public Method doFilter(Method method) {
-		
-		//1). 不能同时标识@Query,@QueryByNamed
-		if(method.getAnnotationsByType(Query.class).length>0 && method.getAnnotation(QueryByNamed.class)!=null){
+
+		// 1). 不能同时标识@Query,@QueryByNamed
+		if (method.getAnnotationsByType(Query.class).length > 0 && method.getAnnotation(QueryByNamed.class) != null) {
 			this.abortWith(method, "该方法不能同时标识@Query和@QueryByNamed");
 		}
-		
+
 		return method;
 	}
 

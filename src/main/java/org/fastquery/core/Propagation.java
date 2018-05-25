@@ -23,11 +23,11 @@
 package org.fastquery.core;
 
 /**
- * 传播行为
+ * 事务的传播行为
  * 
  * @author mei.sir@aliyun.cn
  */
-public enum Propagation {
+enum Propagation { // NO_UCD (unused code)
 
 	/**
 	 * PROPAGATION_REQUIRED：如果当前没有事务，就创建一个新事务，如果当前存在事务，就加入该事务，该设置是最常用的设置。
@@ -60,8 +60,7 @@ public enum Propagation {
 	NEVER,
 
 	/**
-	 * PROPAGATION_NESTED：如果当前存在事务，则在嵌套事务内执行。如果当前没有事务，
-	 * 则执行与PROPAGATION_REQUIRED类似的操作。
+	 * PROPAGATION_NESTED：如果当前存在事务，则在嵌套事务内执行。如果当前没有事务， 则执行与PROPAGATION_REQUIRED类似的操作。
 	 */
 	NESTED
 }

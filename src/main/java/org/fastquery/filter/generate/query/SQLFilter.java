@@ -29,6 +29,7 @@ import org.fastquery.filter.generate.common.MethodFilter;
 
 /**
  * SQL 安全检测
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public class SQLFilter implements MethodFilter {
@@ -38,16 +39,16 @@ public class SQLFilter implements MethodFilter {
 		Query[] queries = method.getAnnotationsByType(Query.class);
 		for (Query query : queries) {
 			String sql = query.value();
-			
-			if("".equals(sql)) {
-				this.abortWith(method, sql+"该方法,没有标注任何SQL语句");
+
+			if ("".equals(sql)) {
+				this.abortWith(method, sql + "该方法,没有标注任何SQL语句");
 			}
-			
-			if(sql.length()<6) {
-				this.abortWith(method, sql+"SQL语法错误");
+
+			if (sql.length() < 6) {
+				this.abortWith(method, sql + "SQL语法错误");
 			}
 		}
-		
+
 		return method;
 	}
 

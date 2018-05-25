@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.fastquery.asm.AsmRepository;
 import org.fastquery.core.FQueryResourceImpl;
 import org.fastquery.core.GenerateRepository;
+import org.fastquery.core.Placeholder;
 import org.fastquery.core.Repository;
 import org.fastquery.core.Resource;
 import org.fastquery.dsm.FastQueryJson;
@@ -48,7 +49,7 @@ class GenerateRepositoryImpl implements GenerateRepository {
 	private static final Logger LOG = LoggerFactory.getLogger(GenerateRepositoryImpl.class);
 
 	private FqClassLoader classLoader;
-	
+
 	GenerateRepositoryImpl(FqClassLoader classLoader) {
 		this.classLoader = classLoader;
 		LOG.debug("GenerateRepositoryImpl 已实例化.");
@@ -57,29 +58,25 @@ class GenerateRepositoryImpl implements GenerateRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Repository> Class<? extends T> generate(Class<T> repositoryClazz) {
-		String name = repositoryClazz.getName() + SUFFIX;
+		String name = repositoryClazz.getName() + Placeholder.SUFFIX;
 
 		byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
 
 		/*
-		// 把生成的文件存储起来
-		try (java.io.FileOutputStream fos = new java.io.FileOutputStream("/data/tmp/" + name + ".class")) {
-			fos.write(bytes);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		// 把生成的文件存储起来 end
+		 * // 把生成的文件存储起来 try (java.io.FileOutputStream fos = new
+		 * java.io.FileOutputStream("/data/tmp/" + name + ".class")) { fos.write(bytes); } catch
+		 * (Exception e) { e.printStackTrace(); } // 把生成的文件存储起来 end
 		 */
 		return (Class<? extends T>) classLoader.defineClassByName(name, bytes, 0, bytes.length);
 	}
-	
+
 	void persistent() {
 
 		Resource resource = new FQueryResourceImpl(classLoader);
 
 		// 1). 装载配置文件
 		Set<FastQueryJson> fqPropertie = LoadPrperties.load(resource);
-		
+
 		List<Class<Repository>> clses = new ArrayList<>();
 
 		// 3). 批量生成 Repository 的实现类

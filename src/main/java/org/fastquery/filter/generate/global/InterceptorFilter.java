@@ -39,16 +39,17 @@ import org.fastquery.filter.generate.common.MethodFilter;
 
 /**
  * 对Before/After 拦截器安全校验
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public class InterceptorFilter implements MethodFilter {
 
 	@Override
 	public Method doFilter(Method method) {
-		
+
 		// 接口的Class
 		Class<?> iclazz = method.getDeclaringClass();
-		
+
 		// 当前类中所有的@Before
 		List<Before> befores = new ArrayList<>(Arrays.asList(iclazz.getAnnotationsByType(Before.class))); // 获取类级别的before's
 		befores.addAll(Arrays.asList(method.getAnnotationsByType(Before.class))); // 获取方法上的before's
@@ -58,7 +59,7 @@ public class InterceptorFilter implements MethodFilter {
 				compareType(method, iclazz, before, class1);
 			}
 		}
-		
+
 		// 当前类中所有的@After
 		List<After> afters = new ArrayList<>(Arrays.asList(iclazz.getAnnotationsByType(After.class))); // 获取类级别的after's
 		afters.addAll(Arrays.asList(method.getAnnotationsByType(After.class)));// 获取方法上的after's
@@ -71,77 +72,70 @@ public class InterceptorFilter implements MethodFilter {
 
 		return method;
 	}
-	
+
 	// 假设: 有两个类,其class分别为c1和c2. c1的直接父类的范型为X
-	//  设: X=<T>
-	//  若: (c2就是T 或者 c2是T的子类) 并且T是Repository的子类或者就是Repository. 并且X限制只有一个成员.("<>"中是有可能有多个参数的)
-	//  则: 返回true,反之返回false.
-	public void compareType(Method method, Class<?> c2, Annotation annotation,Class<?> c1) {
+	// 设: X=<T>
+	// 若: (c2就是T 或者 c2是T的子类) 并且T是Repository的子类或者就是Repository. 并且X限制只有一个成员.("<>"中是有可能有多个参数的)
+	// 则: 返回true,反之返回false.
+	private void compareType(Method method, Class<?> c2, Annotation annotation, Class<?> c1) {
 		Type type = c1.getGenericSuperclass(); // 获取c1的直接父类的范型
 		// 如果这个type的实例就是ParameterizedType的子类或就是ParameterizedType
-		if(ParameterizedType.class.isAssignableFrom(type.getClass())) { // 判断是否是范型
+		if (ParameterizedType.class.isAssignableFrom(type.getClass())) { // 判断是否是范型
 			ParameterizedType parameterizedType = (ParameterizedType) type; // 如果是范型就转换
 			Type[] tys = parameterizedType.getActualTypeArguments(); // 范型中有多个类型. 换言只尖括号"<>"中有多个类型
 
-			if(tys.length>1) {
-				//当前: X的范型参数个数已大于1
-				this.abortWith(method, annotation.toString()+"错误!");
+			if (tys.length > 1) {
+				// 当前: X的范型参数个数已大于1
+				this.abortWith(method, annotation.toString() + "错误!");
 			}
-			
+
 			Type ty = tys[0];
-			
-			if(Class.class.isAssignableFrom(ty.getClass())) { // 如果当前类型是Class的子类或者就是Class
-				Class<?> t = (Class<?>) ty; 
-				if(Repository.class.isAssignableFrom(t)) { // 如果t是Repository的子类或者t就是Repository
-					if(!t.isAssignableFrom(c2)) { 
-						//当前: c2不是t的子类且不就是t.
+
+			if (Class.class.isAssignableFrom(ty.getClass())) { // 如果当前类型是Class的子类或者就是Class
+				Class<?> t = (Class<?>) ty;
+				if (Repository.class.isAssignableFrom(t)) { // 如果t是Repository的子类或者t就是Repository
+					if (!t.isAssignableFrom(c2)) {
+						// 当前: c2不是t的子类且不就是t.
 						filterScopeError(method, annotation, parameterizedType, c2, t);
 					}
 				} else {
 					// 当前: T 不是Repository,且不是Repository的子类
-					this.abortWith(method, annotation.toString()+"错误!");
+					this.abortWith(method, annotation.toString() + "错误!");
 				}
 			} else {
 				// 当前: T 不是Class,且不是Class的子类
-				this.abortWith(method, annotation.toString()+"错误!");
+				this.abortWith(method, annotation.toString() + "错误!");
 			}
-			
+
 		} else {
-			//当前: c1的直接父类不是范型
-			this.abortWith(method, annotation.toString()+"错误!");
+			// 当前: c1的直接父类不是范型
+			this.abortWith(method, annotation.toString() + "错误!");
 		}
 	}
-	
+
 	/**
 	 * 过滤器作用范围错误提示信息
 	 */
-	private void filterScopeError(Method method,Annotation annotation,ParameterizedType parameterizedType,Class<?> iclazz,Class<?> t){
+	private void filterScopeError(Method method, Annotation annotation, ParameterizedType parameterizedType, Class<?> iclazz, Class<?> t) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\n");
 		sb.append(annotation);
 		sb.append("\n");
-		
+
 		sb.append(parameterizedType.getRawType().getTypeName());
 		sb.append("<");
 		sb.append(t.getSimpleName());
 		sb.append("> 这个拦截器的作用范围不在");
 		sb.append(iclazz);
 		sb.append("上(也就说放在这个类上是非法的)!\n");
-		
+
 		sb.append("它可以放在");
 		sb.append(t.getSimpleName());
 		sb.append("类上\n");
-		
+
 		sb.append("举例说明:若有一个拦截器叫A<T>,那么这个拦截器可以用放在T类或T的子类里.反之是违规操作\n");
 
-		this.abortWith(method,sb.toString());
+		this.abortWith(method, sb.toString());
 	}
 
 }
-
-
-
-
-
-
-

@@ -32,12 +32,13 @@ import java.lang.annotation.Target;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-@Target({ElementType.PARAMETER,ElementType.METHOD,ElementType.FIELD})
-@Retention(value=RetentionPolicy.RUNTIME)
+@Target({ ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD })
+@Retention(value = RetentionPolicy.RUNTIME)
 public @interface Id {
-	
+
 	/**
 	 * 编号
+	 * 
 	 * @return byte
 	 */
 	byte value() default 0X00;

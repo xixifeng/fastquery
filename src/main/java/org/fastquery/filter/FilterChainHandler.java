@@ -38,6 +38,7 @@ public class FilterChainHandler {
 
 	/**
 	 * 绑定before filter
+	 * 
 	 * @param <R> repository
 	 * @param iclazz 类class
 	 * @param repository repository
@@ -45,36 +46,37 @@ public class FilterChainHandler {
 	 * @param args 参数值
 	 * @return 执行结果
 	 */
-	public static <R extends Repository> Object bindBeforeFilterChain(Class<?> iclazz, R repository,Method method, Object[] args) {
+	public static <R extends Repository> Object bindBeforeFilterChain(Class<?> iclazz, R repository, Method method, Object[] args) {
 		SkipFilter skipFilter = method.getAnnotation(SkipFilter.class);
 		List<Before> befores = new ArrayList<>();
-		if(skipFilter==null){
-			befores = new ArrayList<>(Arrays.asList(iclazz.getAnnotationsByType(Before.class))); // 获取当前类级别的before's	
+		if (skipFilter == null) {
+			befores = new ArrayList<>(Arrays.asList(iclazz.getAnnotationsByType(Before.class))); // 获取当前类级别的before's
 		}
 		befores.addAll(Arrays.asList(method.getAnnotationsByType(Before.class))); // 获取当前方法上的before's
-		
+
 		BeforeFilterChain<R> beforeFilterChain = new BeforeFilterChain<>();
 		for (Before before : befores) {
-			// Type safety: 如下是把 Class<? extends BeforeFilter<? extends Repository>>[] 转化成了 Class<BeforeFilter<R>>[]
+			// Type safety: 如下是把 Class<? extends BeforeFilter<? extends Repository>>[] 转化成了
+			// Class<BeforeFilter<R>>[]
 			// 分析后,属于安全转化.
 			@SuppressWarnings("unchecked")
-			Class<BeforeFilter<R>>[] clazzs  =  (Class<BeforeFilter<R>>[]) before.value();
+			Class<BeforeFilter<R>>[] clazzs = (Class<BeforeFilter<R>>[]) before.value();
 			for (Class<BeforeFilter<R>> clazz : clazzs) {
 				try {
 					beforeFilterChain.addFilter(clazz.newInstance());
 				} catch (Exception e) {
-					throw new RepositoryException(e.getMessage(),e);
-				} 
+					throw new RepositoryException(e.getMessage(), e);
+				}
 			}
 		}
-		return beforeFilterChain.start(repository,method, args);
+		return beforeFilterChain.start(repository, method, args);
 	}
-	
-	public static <R extends Repository> Object bindAfterFilterChain(Class<?> iclazz,R repository,Method method,Object[] args,Object object) {
+
+	public static <R extends Repository> Object bindAfterFilterChain(Class<?> iclazz, R repository, Method method, Object[] args, Object object) {
 		SkipFilter skipFilter = method.getAnnotation(SkipFilter.class);
 		List<After> afters = new ArrayList<>();
-		if(skipFilter==null){
-			afters = new ArrayList<>(Arrays.asList(iclazz.getAnnotationsByType(After.class))); // 获取当前类级别的after's	
+		if (skipFilter == null) {
+			afters = new ArrayList<>(Arrays.asList(iclazz.getAnnotationsByType(After.class))); // 获取当前类级别的after's
 		}
 		afters.addAll(Arrays.asList(method.getAnnotationsByType(After.class)));// 获取当前方法上的after's
 		AfterFilterChain<R> afterFilterChain = new AfterFilterChain<>();
@@ -85,10 +87,10 @@ public class FilterChainHandler {
 				try {
 					afterFilterChain.addFilter(clazz.newInstance());
 				} catch (Exception e) {
-					throw new RepositoryException(e.getMessage(),e);
-				} 
+					throw new RepositoryException(e.getMessage(), e);
+				}
 			}
 		}
-		return afterFilterChain.doFilter(repository,method,args,object);
+		return afterFilterChain.doFilter(repository, method, args, object);
 	}
 }

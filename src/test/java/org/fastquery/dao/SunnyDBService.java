@@ -39,14 +39,14 @@ public interface SunnyDBService extends QueryRepository {
 	@Modifying
 	@Query("delete from Card where id = ?1")
 	boolean deleteById(int id);
-	
+
 	@Modifying
-	@Query("delete from Card where number = ?1") 
+	@Query("delete from Card where number = ?1")
 	int deleteByNumber(String number);
 
 	@Query("select id from Card where id = ?1")
 	boolean exists(long id);
-	
+
 	@Query("select id from Card where number = ?1")
 	boolean exists(String number);
 

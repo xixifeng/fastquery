@@ -34,6 +34,6 @@ import java.lang.annotation.Target;
  * @author xixifeng (fastquery@126.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.PARAMETER})
+@Target({ ElementType.PARAMETER })
 public @interface PageSize {
 }

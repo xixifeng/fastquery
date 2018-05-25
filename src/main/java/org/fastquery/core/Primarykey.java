@@ -31,9 +31,10 @@ public class Primarykey {
 
 	private Long autoIncKey;
 	private String pkey;
-	
+
 	/**
 	 * 主键有2中可能 数字类型(int Integer long Long)可视为long, 另一种是字符串类型
+	 * 
 	 * @param autoIncKey 若为-1表示不存在
 	 * @param pkey 若为 null 表示不存在
 	 */
@@ -41,21 +42,23 @@ public class Primarykey {
 		this.autoIncKey = autoIncKey;
 		this.pkey = pkey;
 	}
-	
+
 	/**
 	 * 获取主键
+	 * 
 	 * @return 主键
 	 */
 	public Long getPrimarykey() {
 		return autoIncKey;
 	}
-	
+
 	/**
 	 * 获取主键
+	 * 
 	 * @return 字符串类型的主键
 	 */
 	public String getSpecifyPrimarykey() {
 		return pkey;
 	}
-	
+
 }

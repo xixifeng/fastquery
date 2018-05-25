@@ -30,6 +30,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * 标识属性是临时的,save对象时,该属性不存储到数据库里
+ * 
  * @author mei.sir@aliyun.cn
  */
 @Target(FIELD)

@@ -41,18 +41,18 @@ public class ConditionTest {
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
-	
+
 	@Test
-	public void findUserInfo(){
+	public void findUserInfo() {
 		String tname = "from UserInfo";
 		String w1 = "name like ?1";
 		String w2 = "and age > ?2";
-		db.findUserInfo(w1, w2,tname);
-		if(rule.isDebug()) {
+		db.findUserInfo(w1, w2, tname);
+		if (rule.isDebug()) {
 			SQLValue sqlValue = rule.getSQLValue();
 			String sql = sqlValue.getSql();
 			assertThat(sql, equalTo("select * from UserInfo where  name like ?  and age > ?"));
 		}
 	}
-	
+
 }

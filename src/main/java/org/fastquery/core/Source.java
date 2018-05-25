@@ -29,9 +29,10 @@ import java.lang.annotation.Target;
 
 /**
  * 适配数据源
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.PARAMETER})
+@Target({ ElementType.PARAMETER })
 public @interface Source {
 }

@@ -28,21 +28,22 @@ import java.util.List;
 
 /**
  * 责任链
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public class MethodFilterChain implements MethodFilter {
 
 	private List<MethodFilter> methodFilters = new ArrayList<>();
-	
-	public MethodFilterChain addFilter(MethodFilter methodFilter){
+
+	public MethodFilterChain addFilter(MethodFilter methodFilter) {
 		methodFilters.add(methodFilter);
 		return this;
 	}
-	
+
 	@Override
 	public Method doFilter(Method method) {
 		Method m = method;
-		for(MethodFilter methodFilter : methodFilters){
+		for (MethodFilter methodFilter : methodFilters) {
 			m = methodFilter.doFilter(method);
 		}
 		return m;

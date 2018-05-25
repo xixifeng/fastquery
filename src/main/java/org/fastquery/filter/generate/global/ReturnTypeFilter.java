@@ -39,12 +39,12 @@ public class ReturnTypeFilter implements MethodFilter {
 
 		// 1). 返回值不能是Object
 		Class<?> returnType = method.getReturnType();
-		if ( returnType == Object.class ) {
+		if (returnType == Object.class) {
 			this.abortWith(method, "返回值不能是Object,应用层得到一个Object,显然十分不友好!");
 		}
-		if(returnType.isArray()) {
+		if (returnType.isArray()) {
 			Class<?> comp = returnType.getComponentType();
-			if(comp == Object.class) {
+			if (comp == Object.class) {
 				this.abortWith(method, "返回值不能是Object,应用层得到一个Object,显然十分不友好!");
 			}
 		}
@@ -55,14 +55,14 @@ public class ReturnTypeFilter implements MethodFilter {
 		// 计算"[]" 出现的个数
 		int count = TypeUtil.matches(typeName, "\\[\\]").size();
 		if (count > 1) {
-			this.abortWith(method, "返回值是" + count
-					+ "维数组,针对使用者来说,语义不强,要是没有明文规范每个下标表示什么值,使用者就无法理解,这也是你所不愿意的事情,因此需要禁止,建议使用javax.json.JsonArray 或者List<map>!");
+			this.abortWith(method,
+					"返回值是" + count + "维数组,针对使用者来说,语义不强,要是没有明文规范每个下标表示什么值,使用者就无法理解,这也是你所不愿意的事情,因此需要禁止,建议使用javax.json.JsonArray 或者List<map>!");
 		}
-		
+
 		// 3). 返回值禁止是Boolean类型
 		// Boolean 至少有三种状态 null,true,false, 布尔在db中层中,无非用来表达,有或无, 对或错,因此永不着其包装类型
 		// 没有查询出,可以用false表达,而不是null.
-		if(returnType == Boolean.class) {
+		if (returnType == Boolean.class) {
 			this.abortWith(method, "返回值不支持Boolean类型,换成boolean试试看.");
 		}
 

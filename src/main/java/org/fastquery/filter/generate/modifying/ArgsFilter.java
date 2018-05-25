@@ -44,17 +44,17 @@ public class ArgsFilter implements MethodFilter {
 			currentType = parameters[i].getType();
 			if (parameters[i].getAnnotation(Id.class) != null) {
 				count += 1;
-				if ((currentType != int.class) && (currentType != Integer.class) && (currentType != long.class)
-						&& (currentType != Long.class) && (currentType != String.class)) {
-					this.abortWith(method,
-							String.format("这个方法的第%s个参数用@Id标识了,因此这个参数的可选类型范围为:[int,Integer,long,Long,String],而当前设置的类型是:%s", i + 1,currentType.getName()));
+				if ((currentType != int.class) && (currentType != Integer.class) && (currentType != long.class) && (currentType != Long.class)
+						&& (currentType != String.class)) {
+					this.abortWith(method, String.format("这个方法的第%s个参数用@Id标识了,因此这个参数的可选类型范围为:[int,Integer,long,Long,String],而当前设置的类型是:%s", i + 1,
+							currentType.getName()));
 					break;
 				}
 			}
 		}
 
 		// 2). 检验: 截至这里. 统计@Id出现的次数如果大于1,是错误的!
-		if(count>1){
+		if (count > 1) {
 			this.abortWith(method, "列表中@Id不能出现多次.");
 		}
 		return method;

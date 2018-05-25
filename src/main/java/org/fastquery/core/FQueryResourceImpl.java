@@ -23,23 +23,22 @@
 package org.fastquery.core;
 
 import java.io.InputStream;
-import java.net.URL;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
 public class FQueryResourceImpl implements Resource {
-	
+
 	private ClassLoader classLoader;
-	
+
 	public FQueryResourceImpl(ClassLoader classLoader) {
 		this.classLoader = classLoader;
 	}
-	
+
 	@Override
 	public InputStream getResourceAsStream(String name) {
-		if(!exist(name)) {
+		if (!exist(name)) {
 			return null;
 		}
 		return classLoader.getResourceAsStream(name);
@@ -47,13 +46,10 @@ public class FQueryResourceImpl implements Resource {
 
 	@Override
 	public boolean exist(String name) {
-		if(name==null || name.charAt(0) == '/') {
+		if (name == null || name.charAt(0) == '/') {
 			return false;
 		}
-		URL url = classLoader.getResource(name);
-		if (url == null) {
-			return false;
-		}
-		return true;
+
+		return classLoader.getResource(name) != null;
 	}
 }

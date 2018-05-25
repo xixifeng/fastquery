@@ -35,7 +35,7 @@ import org.w3c.dom.NodeList;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class Allocation {
+class Allocation {
 
 	private Allocation() {
 	}
@@ -60,7 +60,7 @@ public class Allocation {
 		queryFilterChain.addFilter(new StructureFilter());
 		queryFilterChain.doFilter(xmlName, element);
 	}
-	
+
 	private static void doValue(String xmlName, Element element) {
 		FilterChain valueFilterChain = new FilterChain();
 

@@ -41,9 +41,11 @@ import org.glassfish.jersey.server.mvc.spi.TemplateProcessor;
 
 /**
  * jersey velocity模板处理器
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-public class VelocityTemplateProcessor implements TemplateProcessor<String> {
+public class VelocityTemplateProcessor implements TemplateProcessor<String> { // NO_UCD (unused
+																				// code)
 
 	@Context
 	private HttpServletRequest request;
@@ -54,8 +56,8 @@ public class VelocityTemplateProcessor implements TemplateProcessor<String> {
 	}
 
 	@Override
-	public void writeTo(String templateReference, Viewable viewable, MediaType mediaType,
-			MultivaluedMap<String, Object> httpHeaders, OutputStream out) throws IOException {
+	public void writeTo(String templateReference, Viewable viewable, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
+			OutputStream out) throws IOException {
 
 		// 获取 模板引擎
 		VelocityEngine velocityEngine = getVelocityEngine();

@@ -122,14 +122,13 @@ public class QueryParser {
 		Parameter[] parameters = method.getParameters();
 		if (pageable == null) {
 			// 没有传递Pageable,那么必然有 pageIndex, pageSize 不然,不能通过初始化
-			pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args),
-					TypeUtil.findPageSize(parameters, args));
+			pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
 		}
 
 		int firstResult = pageable.getOffset();
 		int maxResults = pageable.getPageSize();
 
-		LOG.debug("firstResult:" + firstResult + " maxResults:" + maxResults);
+		LOG.debug("firstResult:{} maxResults:{}",firstResult,maxResults);
 
 		// 针对 mysql 分页
 		// 获取limit
@@ -144,7 +143,7 @@ public class QueryParser {
 			sql += Placeholder.LIMIT;
 		}
 
-		String ssql = new String(sql);
+		String ssql = sql; // 创建一个副本,String是不可变的,在后面sql不管怎么改变,也不会影响ssql
 
 		sql = sql.replaceFirst(Placeholder.LIMIT_RGE, Matcher.quoteReplacement(limit));
 
@@ -221,13 +220,12 @@ public class QueryParser {
 		Parameter[] parameters = method.getParameters();
 		if (pageable == null) {
 			// 没有传递Pageable,那么必然有 pageIndex, pageSize 不然,不能通过初始化
-			pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args),
-					TypeUtil.findPageSize(parameters, args));
+			pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
 		}
 		// 获取 pageable End
 
 		// 获取sql
-		String sql = TypeUtil.paramNameFilter(method, args, query);
+		String sql = TypeUtil.paramNameFilter(method, query);
 
 		String limit = getLimit(pageable.getOffset(), pageable.getPageSize());
 		if (sql.indexOf(Placeholder.LIMIT) != -1) { // 如果#{#limit}存在
@@ -240,14 +238,14 @@ public class QueryParser {
 
 		if (method.getAnnotation(NotCount.class) == null) { // 需要求和
 			String countQuery = QueryPool.render(false);
-			sql = TypeUtil.paramNameFilter(method, args, countQuery);
+			sql = TypeUtil.paramNameFilter(method, countQuery);
 
 			sqlValues.add(inParser(sql));
 
 			// 求和 --------------------------------------------------- End
 		} else {
 			// 获取sql
-			sql = TypeUtil.paramNameFilter(method, args, query); // 06-11-11
+			sql = TypeUtil.paramNameFilter(method, query); // 06-11-11
 			// 在查一下推算出下一页是否有数据, 要不要把下一页的数据存储起来,有待考虑...
 			int firstResult = pageable.getOffset() + pageable.getPageSize();
 			limit = getLimit(firstResult, pageable.getPageSize());

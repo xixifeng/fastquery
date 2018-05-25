@@ -28,28 +28,31 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 给参数命名
  * 
  * @author xixifeng (fastquery@126.com)
  */
-
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Param {
 	/**
 	 * value值
+	 * 
 	 * @return String
 	 */
 	String value();
-	
+
 	/**
 	 * "" 表示没有设置默认值
+	 * 
 	 * @return String
 	 */
 	String defaultVal() default "";
-	
+
 	/**
 	 * "" 表示无格式
+	 * 
 	 * @return String
 	 */
-	String format() default "";
+	String format() default ""; // NO_UCD (test only)
 }

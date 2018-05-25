@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  * @author xixifeng (fastquery@126.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD,ElementType.ANNOTATION_TYPE })
-public @interface Conditions {
+@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
+public @interface Conditions { // NO_UCD (use default)
 	Condition[] value() default {};
 }

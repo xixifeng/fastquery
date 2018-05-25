@@ -27,66 +27,57 @@ package org.fastquery.core;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public interface Placeholder {
+public final class Placeholder {
 
-	String TABLE = "#{#table}";
-	String TABLE_REG = "\\#\\{\\#table\\}";
-
-	String ID = "#{#id}";
-	String ID_REG = "\\#\\{\\#id\\}";
-
-	String WHERE = "#{#where}";
-	String WHERE_REG = "\\#\\{\\#where\\}";
-
-	String LIMIT = "#{#limit}";
-	String LIMIT_RGE = "\\#\\{\\#limit\\}";
+	private Placeholder() {
+		throw new IllegalStateException("Placeholder is Utility class");
+	}
 
 	/**
-	 *  匹配 (?4,?5,?6)的正则(允许有首尾空格)
+	 * 生成类的默认后缀名称
 	 */
-	String INV_REG = "\\s*\\(\\s*\\?\\d+\\s*,\\s*\\?\\d+\\s*,\\s*\\?\\d+\\s*\\)\\s*";
+	public static final String SUFFIX = "$ProxyImpl";
+
+	public static final String TABLE = "#{#table}";
+	public static final String TABLE_REG = "\\#\\{\\#table\\}";
+
+	public static final String ID = "#{#id}";
+	public static final String ID_REG = "\\#\\{\\#id\\}";
+
+	public static final String WHERE_REG = "\\#\\{\\#where\\}";
+
+	public static final String LIMIT = "#{#limit}";
+	public static final String LIMIT_RGE = "\\#\\{\\#limit\\}";
+
+	public static final String SP1_REG = "\\?\\d+";
 
 	/**
-	 *  不区分大小写匹配格式 "?8 and ?9"
+	 * 搜索出"?"后面的数字
 	 */
-	String ANDV_REG = "(?i)\\s*\\?\\d+\\s+and\\s+\\?\\d+\\s*";
+	public static final String SEARCH_NUM = "(?<=\\?)\\d+";
 
-	String SP1_REG = "\\?\\d+";
-	
 	/**
-	 *  搜索出"?"后面的数字
+	 * 匹配冒号表达式
 	 */
-	String SEARCH_NUM = "(?<=\\?)\\d+";
-	
-	/**
-	 *  匹配冒号表达式
-	 */
-	String COLON_REG = ":[A-Za-z0-9]+";
+	public static final String COLON_REG = ":[A-Za-z0-9]+";
 
 	/**
 	 * 匹配EL表达式
 	 */
-	String EL_REG = "\\$\\{?[A-Za-z0-9]+\\}?";
+	public static final String EL_REG = "\\$\\{?[A-Za-z0-9]+\\}?";
 
-	
 	/**
 	 * 匹配EL表达式或匹配冒号表达式
 	 */
-	String EL_OR_COLON = EL_REG + "|" + COLON_REG;
+	public static final String EL_OR_COLON = EL_REG + "|" + COLON_REG;
 
-	
 	/**
 	 * 匹配微笑表达式
 	 */
-	String SMILE = "`-[^`]*\\?[^`]*-`";
-	
-	String SMILE_BIG = "`-[^`]*[^`]*-`";
-	
-	/**
-	 * 匹配SQL文件中的一行
-	 */
-	String SQLSPLIT = "(;\\s*\\r\\n)|(;\\s*\\n)";
+	public static final String SMILE = "`-[^`]*\\?[^`]*-`";
 
-	String PERCENT = "%+";
+	public static final String SMILE_BIG = "`-[^`]*[^`]*-`";
+
+	public static final String PERCENT = "%+";
 
 }

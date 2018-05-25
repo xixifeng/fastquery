@@ -355,14 +355,14 @@ Primarykey saveUserInfo(String name,Integer age);
 | `<E> E find(Class<E> entityClass,long id)` | 根据主键查询实体 |
 | `<E> int save(E entity)` | 保存一个实体(主键字段的值若为null,那么该字段将不参与运算),返回影响行数 |
 | `<B> int save(boolean ignoreRepeat,Collection<B> entities)` | 保存一个集合实体,是否忽略重复主键记录 |
-| `int saveArray(boolean ignoreRepeat,Object...entities)` | 保存一个可变数组实体,是否忽略重复主键记录 |
+| `int save(boolean ignoreRepeat,Object...entities)` | 保存一个可变数组实体,是否忽略重复主键记录 |
 | `BigInteger saveToId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
 | `<E> int update(E entity)` | 更新一个实体,返回影响行数.**注意**:实体的成员属性如果是null,那么该属性将不会参与改运算 |
 | `<E> int saveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含主键值),返回影响行数 |
 | `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),若给where传递null或"",默认按照主键修改,返回影响行数 |
 | `<E> int update(Collection<E> entities)` | 更新集合实体,成员属性如果是null,那么该属性将不会参与改运算,每个实体必须包含主键 |
 | `int delete(String tableName,String primaryKeyName,long id)` | 根据主键删除实体,返回影响行数 |
-
+| `int[] executeBatch(String sqlName)` | 根据指定的SQL文件名称或绝对路径,执行批量操作SQL语句,返回int[],数组中的每个数对应一条SQL语句执行后所影响的行数 |
 
 举例说明:  
 先准备一个实体  

@@ -6,10 +6,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.slf4j.LoggerFactory;
+
+import com.alibaba.fastjson.JSONObject;
+
 import org.slf4j.Logger;
 import org.fastquery.dsm.FQueryFactoryImpl;
 import org.fastquery.dsm.FQueryProperties;
@@ -26,6 +30,8 @@ public final class QueryContext {
 	private static ThreadLocal<QueryContext> threadLocal = new ThreadLocal<>();
 
 	private Method method; // 当前method
+	private boolean supporTx; // 是否需要事务支持
+	private boolean requirePk;// 改操作的返回值是否依赖主键
 	private Class<?> returnType; // 返回类型
 	private Connection connection; // 当前连接
 	private String sourceName; // 当前数据源名称
@@ -34,7 +40,7 @@ public final class QueryContext {
 	private List<String> sqls = new ArrayList<>(); // 当前method所执行的SQL集合
 
 	private static String lang = "zh_CN"; // 语言编码
-	// 用作调式
+	// 作用于调式
 	private static boolean debug;
 
 	private QueryContext() {
@@ -65,14 +71,22 @@ public final class QueryContext {
 			}
 		}
 
+		Transactional t = context.method.getAnnotation(Transactional.class);
+		context.supporTx = t == null || !t.propagation().equals(Propagation.NOT_SUPPORTED);
+
 		context.returnType = method.getReturnType();
+
+		if (context.returnType == Map.class || context.returnType == JSONObject.class || context.returnType == Primarykey.class
+				|| TypeUtil.hasDefaultConstructor(context.returnType)) {
+			context.requirePk = true;
+		}
 	}
 
-	public static List<String> getSqls() {
+	static List<String> getSqls() {
 		return getQueryContext().sqls;
 	}
 
-	public static void addSqls(String... sqls) {
+	static void addSqls(String... sqls) {
 		if (sqls == null) {
 			return;
 		}
@@ -81,7 +95,7 @@ public final class QueryContext {
 		}
 	}
 
-	public static String getLang() {
+	public static String getLang() { // NO_UCD
 		return lang;
 	}
 
@@ -89,7 +103,7 @@ public final class QueryContext {
 		return getQueryContext().method;
 	}
 
-	public static void setLang(String lang) {
+	public static void setLang(String lang) { // NO_UCD
 		QueryContext.lang = lang;
 	}
 
@@ -97,49 +111,35 @@ public final class QueryContext {
 		return getQueryContext().connection;
 	}
 
-	public static String getSourceName() {
-		return getQueryContext().sourceName;
-	}
-
 	public static Object[] getArgs() {
 		return getQueryContext().args;
-	}
-
-	public static void setConnection(Connection connection) {
-		getQueryContext().connection = connection;
-	}
-
-	public static void setSourceName(String sourceName) {
-		getQueryContext().sourceName = sourceName;
 	}
 
 	public static Class<? extends Repository> getIclass() {
 		return getQueryContext().iclass;
 	}
 
-	public static void clear() throws SQLException {
-		if (debug) {
-			return;
-		}
-
-		try {
-			QueryContext context = getQueryContext();
-			lang = null;
-			context.method = null;
-			context.sqls.clear();
-			if (context.connection != null) {
-				context.connection.close();
+	static void clear() throws SQLException {
+		if (!debug) {
+			try {
+				QueryContext context = getQueryContext();
+				lang = null;
+				context.method = null;
+				context.sqls.clear();
+				if (context.connection != null) {
+					context.connection.close();
+				}
+			} catch (Exception e) {
+				LOG.warn(e.getMessage(), e);
+				throw new SQLException(e);
+			} finally {
+				threadLocal.remove();
+				LOG.info("当前 QueryContext 生命周期结束");
 			}
-		} catch (Exception e) {
-			LOG.warn(e.getMessage(), e);
-			throw new SQLException(e);
-		} finally {
-			threadLocal.remove();
-			LOG.info("当前 QueryContext 生命周期结束");
 		}
 	}
 
-	public static void forceClear() throws SQLException {
+	public static void forceClear() throws SQLException { // NO_UCD (test only)
 		debug = false;
 		clear();
 	}
@@ -147,10 +147,8 @@ public final class QueryContext {
 	/**
 	 * 获取数据源, 注意: 根据dataSourceName查优先
 	 * 
-	 * @param dataSourceName
-	 *            数据源名称
-	 * @param className
-	 *            Repository class
+	 * @param dataSourceName 数据源名称
+	 * @param className Repository class
 	 * @return 数据源
 	 */
 	private static DataSource getDataSource(String dataSourceName, String className) {
@@ -173,10 +171,8 @@ public final class QueryContext {
 	/**
 	 * 标识有Source注解的参数的具体的实参.
 	 * 
-	 * @param parameters
-	 *            类型集合
-	 * @param args
-	 *            实参
+	 * @param parameters 类型集合
+	 * @param args 实参
 	 * @return 值
 	 */
 	private static String findSource(Parameter[] parameters, Object... args) {
@@ -188,31 +184,16 @@ public final class QueryContext {
 		return getQueryContext().returnType;
 	}
 
-	public static void setReturnType(Class<?> returnType) {
-		getQueryContext().returnType = returnType;
-	}
-
-	public static boolean isDebug() {
-		return debug;
-	}
-
 	/**
 	 * 关闭事务自动提交
+	 * 
 	 * @param autoCommit false:不自动提交;true:自动提交
 	 * @throws SQLException 异常
 	 */
-	public static void setAutoCommit(boolean autoCommit) throws SQLException {
-		if (debug) {
-			return;
+	static void setAutoCommit(boolean autoCommit) throws SQLException {
+		if (!debug && getQueryContext().supporTx) {
+			getQueryContext().connection.setAutoCommit(autoCommit);
 		}
-		QueryContext context = getQueryContext();
-		Transactional t = context.method.getAnnotation(Transactional.class);
-		boolean suppor = t == null || !t.propagation().equals(Propagation.NOT_SUPPORTED);
-		if (!suppor) {
-			return;
-		}
-
-		getQueryContext().connection.setAutoCommit(autoCommit);
 	}
 
 	/**
@@ -220,19 +201,10 @@ public final class QueryContext {
 	 * 
 	 * @throws SQLException 异常
 	 */
-	public static void commit() throws SQLException {
-		if (debug) {
-			return;
+	static void commit() throws SQLException {
+		if (!debug && getQueryContext().supporTx) {
+			getQueryContext().connection.commit();
 		}
-		QueryContext context = getQueryContext();
-
-		Transactional t = context.method.getAnnotation(Transactional.class);
-		boolean suppor = t == null || !t.propagation().equals(Propagation.NOT_SUPPORTED);
-		if (!suppor) {
-			return;
-		}
-
-		getQueryContext().connection.commit();
 	}
 
 	/**
@@ -240,19 +212,14 @@ public final class QueryContext {
 	 * 
 	 * @throws SQLException 异常
 	 */
-	public static void rollback() throws SQLException {
-		if (debug) {
-			return;
+	static void rollback() throws SQLException {
+		if (!debug && getQueryContext().supporTx) {
+			getQueryContext().connection.rollback();
 		}
-		QueryContext context = getQueryContext();
+	}
 
-		Transactional t = context.method.getAnnotation(Transactional.class);
-		boolean suppor = t == null || !t.propagation().equals(Propagation.NOT_SUPPORTED);
-		if (!suppor) {
-			return;
-		}
-
-		getQueryContext().connection.rollback();
+	static boolean isRequirePk() {
+		return getQueryContext().requirePk;
 	}
 
 }

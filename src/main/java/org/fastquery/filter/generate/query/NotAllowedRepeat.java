@@ -37,7 +37,7 @@ public class NotAllowedRepeat implements MethodFilter {
 	@Override
 	public Method doFilter(Method method) {
 		Query[] queries = method.getAnnotationsByType(Query.class);
-		if(queries.length>1){
+		if (queries.length > 1) {
 			this.abortWith(method, "@Query注解在这个方法上不能重复! 改操作的情形下@Query可以重复.");
 		}
 		return method;

@@ -22,26 +22,22 @@
 
 package org.fastquery.test;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Param;
-import org.fastquery.example.StudentDBService;
-import org.fastquery.util.TypeUtil;
+import org.fastquery.core.QueryRepository;
 import org.junit.Test;
 import org.objectweb.asm.Type;
 
@@ -121,11 +117,14 @@ public class SyntaxTest {
 		LOG.debug("Country:" + locale.getCountry());
 	}
 
+	public static Map<String, Object> call(Function<Map<String, Object>, Map<String, Object>> fun) {
+		Map<String, Object> m = new HashMap<>();
+		return fun.apply(m);
+	}
+
 	@Test
 	public void ty() {
-		// \\#\\{\\#abc\\}
-		String reg = Pattern.quote("#{#abc\\}");
-		Set<String> ss = TypeUtil.matchesNotrepeat("#{#abc}aa", reg);
-		ss.forEach(s -> LOG.debug(s) );
+		LOG.debug(Type.getType(QueryRepository.class).getInternalName());
+		LOG.debug(Type.getInternalName(QueryRepository.class));
 	}
 }

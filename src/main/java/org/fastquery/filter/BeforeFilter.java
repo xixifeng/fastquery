@@ -37,13 +37,5 @@ public abstract class BeforeFilter<R extends Repository> {
 	 * @param method 当前拦截到的方法
 	 * @param args 客户传递进来的参数
 	 */
-	protected abstract void doFilter(R repository,Method method, Object[] args);
-	
-	/**
-	 * 终止链条,直接返回returnVal
-	 * @param returnVal 放回的值
-	 */
-	protected void abortWith(Object returnVal){
-		BeforeFilterChain.setThreadLocal(returnVal);
-	}
+	protected abstract void doFilter(R repository, Method method, Object[] args);
 }

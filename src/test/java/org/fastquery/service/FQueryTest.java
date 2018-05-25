@@ -68,8 +68,8 @@ public class FQueryTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testReset() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-			InstantiationException, IntrospectionException {
+	public void testReset()
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, IntrospectionException {
 		Class<PManager> clazz = PManager.class;
 		PManager tempPmanager = FQuery.reset(clazz);
 		clazz = (Class<PManager>) tempPmanager.getClass();

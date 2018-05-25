@@ -27,7 +27,6 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,13 +78,12 @@ public class FastQueryTestRule implements TestRule {
 			Repository repository = (Repository) field.get(testTarget);
 			Class<?> interfaceClazz = repository.getClass().getInterfaces()[0];
 			// 代理repository这个对象
-			field.set(testTarget, Proxy.newProxyInstance(this.getClass().getClassLoader(),
-					new Class<?>[] { interfaceClazz }, new RepositoryInvocationHandler(repository, this, description)));
+			field.set(testTarget, Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { interfaceClazz },
+					new RepositoryInvocationHandler(repository, this, description)));
 		}
 	}
 
-	private Object getTestTarget(Statement base)
-			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	private Object getTestTarget(Statement base) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		if (base instanceof org.junit.internal.runners.statements.ExpectException) {
 			Field nextField = base.getClass().getDeclaredField("next");
 			nextField.setAccessible(true);
@@ -122,8 +120,7 @@ public class FastQueryTestRule implements TestRule {
 				}
 				try {
 					proxy(base, description);
-					LOG.debug(description.getMethodName() + "--------------------------------------------开始执行,当前线程:"
-							+ Thread.currentThread());
+					LOG.debug(description.getMethodName() + "--------------------------------------------开始执行,当前线程:" + Thread.currentThread());
 					base.evaluate();
 				} catch (Throwable e) {
 					throw new RepositoryException(e);
@@ -143,9 +140,8 @@ public class FastQueryTestRule implements TestRule {
 	}
 
 	private void after(Description description) throws Exception {
-		LOG.debug(description.getMethodName() + "--------------------------------------------已经结束,当前线程:"
-				+ Thread.currentThread());
-		QueryContext context = getQueryContext();
+		LOG.debug(description.getMethodName() + "--------------------------------------------已经结束,当前线程:" + Thread.currentThread());
+		QueryContext context = QueryContextHelper.getQueryContext();
 		if (context != null) {
 			if (isAutoRollback()) {
 				QueryContext.getConnection().rollback();
@@ -164,12 +160,6 @@ public class FastQueryTestRule implements TestRule {
 
 	public boolean isAutoRollback() {
 		return autoRollback;
-	}
-
-	private QueryContext getQueryContext() throws Exception {
-		Method getQueryContextMethod = QueryContext.class.getDeclaredMethod("getQueryContext");
-		getQueryContextMethod.setAccessible(true);
-		return (QueryContext) getQueryContextMethod.invoke(null);
 	}
 
 	public boolean isDebug() {

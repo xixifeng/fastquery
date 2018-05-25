@@ -26,15 +26,17 @@ import javax.sql.DataSource;
 
 /**
  * 获得数据源
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 @FunctionalInterface
-public interface FQueryFactory {
+interface FQueryFactory {
 	/**
 	 * 根据包地址获取对应的数据源
+	 * 
 	 * @param packageName 包地址
 	 * @return 数据源
 	 */
 	DataSource getDataSource(String packageName);
-	
+
 }

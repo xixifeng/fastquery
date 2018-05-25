@@ -31,14 +31,15 @@ import org.fastquery.core.Repository;
  * @author xixifeng (fastquery@126.com)
  */
 public abstract class AfterFilter<R extends Repository> {
-	
+
 	/**
 	 * 过滤方法执行后的结果
+	 * 
 	 * @param repository 当前拦截到的对象
 	 * @param method 当前拦截到的方法
 	 * @param args 客户端调用当前被拦截到的方法时所传递进来的参数
 	 * @param returnVal 当前方法执行后的结果(你可以中途修改它,但是不能修改它的类型)
 	 * @return 执行之后的结果
 	 */
-	protected abstract Object doFilter(R repository,Method method, Object[] args,Object returnVal);
+	protected abstract Object doFilter(R repository, Method method, Object[] args, Object returnVal);
 }

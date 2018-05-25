@@ -28,6 +28,7 @@ import org.fastquery.core.RepositoryException;
 
 /**
  * Method 检测过滤器
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 @FunctionalInterface
@@ -35,18 +36,20 @@ public interface MethodFilter {
 
 	/**
 	 * 过滤
+	 * 
 	 * @param method 待检测的Method
 	 * @return 检测后的Method,允许中途修改它
 	 */
 	Method doFilter(Method method);
-	
+
 	/**
 	 * 终止(扯断链条)
+	 * 
 	 * @param method 当前方法
 	 * @param msg 终止理由
 	 */
-	default void abortWith(Method method,String msg){
-		throw new RepositoryException(String.format("%s->: %s ", method.toString(),msg));
+	default void abortWith(Method method, String msg) {
+		throw new RepositoryException(String.format("%s->: %s ", method.toString(), msg));
 	}
-	
+
 }

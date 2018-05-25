@@ -35,9 +35,11 @@ import org.junit.Test;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * 
@@ -59,7 +61,7 @@ public class DBTest {
 
 		sqlValues.add(new SQLValue("DELETE FROM `userinfo` WHERE id = ?", objs));
 
-		return DB.modify(sqlValues, true, true);
+		return DB.modify(sqlValues, true);
 	}
 
 	public void update() {
@@ -76,7 +78,7 @@ public class DBTest {
 		sqlValues.add(new SQLValue("INSERT INTO `userinfo`(`name`, `age`) VALUES (?,?)", Arrays.asList("回家孩子10", 30)));
 		sqlValues.add(new SQLValue("INSERT INTO `userinfo`(`name`, `age`) VALUES (?,?)", Arrays.asList("回家孩子11", 31)));
 
-		List<RespUpdate> rus = DB.modify(sqlValues, true, true);
+		List<RespUpdate> rus = DB.modify(sqlValues, true);
 		assertThat(rus.size(), is(11));
 		rus.forEach(ru -> {
 			assertThat(ru.getEffect(), greaterThanOrEqualTo(1));
@@ -102,5 +104,21 @@ public class DBTest {
 		} else {
 			assertThat(QueryContextHelper.getQueryContext(), nullValue());
 		}
+	}
+
+	// 测试 db 中的parserSQLFile 方法
+	@SuppressWarnings("unchecked")
+	private static Stream<String> parserSQLFile(String name) throws Exception {
+		Class<DB> clazz = DB.class;
+		Method method = clazz.getDeclaredMethod("parserSQLFile", String.class);
+		method.setAccessible(true);
+		return (Stream<String>) method.invoke(null, name);
+	}
+
+	@Test
+	public void parserSQLFile() throws Exception {
+		String name = "/mywork/myosgi/osgi_workspace/fastquery/tmp/update.sql";
+		Stream<String> stream = parserSQLFile(name);
+		stream.forEach(System.out::println);
 	}
 }

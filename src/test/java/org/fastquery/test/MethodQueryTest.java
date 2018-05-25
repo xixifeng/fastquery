@@ -42,7 +42,7 @@ import java.util.List;
  * @author xixifeng (fastquery@126.com)
  */
 public class MethodQueryTest {
-	
+
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
 
@@ -63,7 +63,7 @@ public class MethodQueryTest {
 
 		u.setId(id);
 		int effect = studentDBService.save(u);
-		assertThat(effect,is(1));
+		assertThat(effect, is(1));
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class MethodQueryTest {
 		Integer age = 32;
 		UserInfo u = new UserInfo(id, name, age);
 		int effect = studentDBService.save("xk-c3p0", "xk", u);
-		assertThat(effect,is(1));
+		assertThat(effect, is(1));
 	}
 
 	@Test
@@ -125,8 +125,20 @@ public class MethodQueryTest {
 	}
 
 	@Test
-	public void executeBatch() {
-		studentDBService.executeBatch("update.sql", "sqlout.log");
+	public void executeBatch1() {
+		int[] ints = studentDBService.executeBatch("update.sql");
+		assertThat(ints.length, is(10));
+	}
+
+	@Test
+	public void executeBatch2() {
+		int[] ints = studentDBService.executeBatch("/mywork/myosgi/osgi_workspace/fastquery/tmp/update.sql");
+		assertThat(ints.length, is(10));
+	}
+
+	@Test
+	public void executeBatch3() {
+		studentDBService.executeBatch(null);
 	}
 
 	@Test
@@ -152,7 +164,7 @@ public class MethodQueryTest {
 	public void saveOrUpdate() {
 		Integer id = 100;
 		UserInfo userInfo = new UserInfo(id, "小蜜蜂", 5);
-		
+
 		int effect = studentDBService.saveOrUpdate(userInfo);
 		assertThat(effect, either(is(0)).or(is(1)));
 		UserInfo u1 = userInfoDBService.findById(id);
@@ -288,9 +300,9 @@ public class MethodQueryTest {
 	public void find() {
 		assertThat(userInfoDBService.find(UserInfo.class, 3).getId().intValue(), is(3));
 		assertThat(userInfoDBService.find(UserInfo.class, 3, null).getId().intValue(), is(3)); // 测试数据源传递null
-		assertThat(userInfoDBService.find(UserInfo.class, 3, null,null).getId().intValue(), is(3)); // 测试数据库名称为null
+		assertThat(userInfoDBService.find(UserInfo.class, 3, null, null).getId().intValue(), is(3)); // 测试数据库名称为null
 	}
-	
+
 	@Test
 	public void delete() {
 		int id = 89890;

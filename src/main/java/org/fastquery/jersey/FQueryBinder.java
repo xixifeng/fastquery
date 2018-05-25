@@ -28,19 +28,18 @@ import org.glassfish.jersey.internal.inject.AbstractBinder;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FQueryBinder extends AbstractBinder {
+public class FQueryBinder extends AbstractBinder { // NO_UCD (use default)
 
 	private ClassLoader webClassLoader;
-	
+
 	public FQueryBinder(ClassLoader webClassLoader) {
 		this.webClassLoader = webClassLoader;
 	}
 
-
 	@Override
 	protected void configure() {
-		FqClassLoader fqClassLoader = new FqClassLoader(webClassLoader,this);
+		FqClassLoader fqClassLoader = new FqClassLoader(webClassLoader, this);
 		new GenerateRepositoryImpl(fqClassLoader).persistent();
 	}
-	
+
 }

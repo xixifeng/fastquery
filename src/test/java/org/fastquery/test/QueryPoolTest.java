@@ -49,7 +49,7 @@ public class QueryPoolTest {
 	static Resource resource;
 
 	public UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
-	
+
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		resource = new Resource() {
@@ -93,8 +93,7 @@ public class QueryPoolTest {
 			} else if ("findUserAll".equals(id)) {
 				assertThat(template, equalToIgnoringWhiteSpace("select name from UserInfo limit 3"));
 			} else if ("findUserInfo".equals(id)) {
-				assertThat(template, equalToIgnoringWhiteSpace(
-						"select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`"));
+				assertThat(template, equalToIgnoringWhiteSpace("select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`"));
 			}
 
 		});

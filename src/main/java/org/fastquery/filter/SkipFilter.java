@@ -29,9 +29,10 @@ import java.lang.annotation.Target;
 
 /**
  * 跳过类上的过滤器
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD,ElementType.ANNOTATION_TYPE })
+@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
 public @interface SkipFilter {
 }

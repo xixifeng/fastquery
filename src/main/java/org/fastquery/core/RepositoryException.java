@@ -24,22 +24,23 @@ package org.fastquery.core;
 
 /**
  * Repository Exception
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public class RepositoryException extends RuntimeException {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public RepositoryException(Throwable cause) {
 		super(cause);
 	}
-	
+
 	public RepositoryException(String message) {
 		super(message);
 	}
-	
+
 	public RepositoryException(String message, Throwable cause) {
 		super(message, cause);
 	}
-	
+
 }

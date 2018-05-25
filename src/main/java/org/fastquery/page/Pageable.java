@@ -30,13 +30,14 @@ public interface Pageable {
 
 	/**
 	 * 或取当前页索引(从1开始计数)
+	 * 
 	 * @return 当前页索引
 	 */
 	int getPageIndex();
 
-
 	/**
 	 * 或取当前页数据条数
+	 * 
 	 * @return 记录数
 	 */
 	int getPageSize();

@@ -29,29 +29,27 @@ import java.util.List;
  * @author xixifeng (fastquery@126.com)
  */
 public class PageImpl<E> implements Page<E> {
-	
-	private int size;             // 每页行数
-	private int number;           // 当前页码,从0开始
+
+	private int size; // 每页行数
+	private int number; // 当前页码,从0开始
 	private int numberOfElements; // 当前页的真实记录行数
-	private List<E> content;      // 当前页的结果集
+	private List<E> content; // 当前页的结果集
 
-	private long totalElements;   // 总行数
-	private int totalPages;       // 总页码
-	private boolean hasContent;   // 是否有结果集
+	private long totalElements; // 总行数
+	private int totalPages; // 总页码
+	private boolean hasContent; // 是否有结果集
 
-	private boolean isFirst;      // 是否是第一页
-	private boolean isLast;       // 是否是最后一页
+	private boolean isFirst; // 是否是第一页
+	private boolean isLast; // 是否是最后一页
 
-	private boolean hasNext;      // 是否有下一页
-	private boolean hasPrevious;  // 是否有上一页
+	private boolean hasNext; // 是否有下一页
+	private boolean hasPrevious; // 是否有上一页
 
-	private Slice nextPageable;      // 下一页的Pageable对象
-	private Slice previousPageable;  // 上一页的Pageable对象
+	private Slice nextPageable; // 下一页的Pageable对象
+	private Slice previousPageable; // 上一页的Pageable对象
 
-	public PageImpl(int size, int numberOfElements, int number, List<E> content,
-			long totalElements, int totalPages, boolean hasContent, boolean hasNext,
-			boolean hasPrevious, boolean isFirst, boolean isLast, Slice nextPageable,
-			Slice previousPageable) {
+	public PageImpl(int size, int numberOfElements, int number, List<E> content, long totalElements, int totalPages, boolean hasContent,
+			boolean hasNext, boolean hasPrevious, boolean isFirst, boolean isLast, Slice nextPageable, Slice previousPageable) {
 		this.size = size;
 		this.numberOfElements = numberOfElements;
 		this.number = number;

@@ -29,14 +29,14 @@ package org.fastquery.page;
 public class PageableImpl implements Pageable {
 
 	// 这个给默认值是没有意义的, 当前访问的是第几页和每页显示多少条数据,应该让客户端决定.
-	private int page; 
+	private int page;
 	private int size;
-	
+
 	public PageableImpl(int page, int size) {
-		
+
 		this.page = page;
 		this.size = size;
-		
+
 		if (page < 1) {
 			this.page = 1;
 		}

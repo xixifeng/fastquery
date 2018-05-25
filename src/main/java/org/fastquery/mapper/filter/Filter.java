@@ -34,18 +34,20 @@ public interface Filter {
 
 	/**
 	 * 过滤
+	 * 
 	 * @param xmlName xml名称
-	 * @param element  element 待检测的Element
+	 * @param element element 待检测的Element
 	 * @return 元素
 	 */
-	Element doFilter(String xmlName,Element element);
-	
+	Element doFilter(String xmlName, Element element);
+
 	/**
 	 * 终止(扯断链条)
+	 * 
 	 * @param errmsg 终止理由
 	 */
-	default void abortWith(String errmsg){
+	default void abortWith(String errmsg) {
 		throw new RepositoryException(errmsg);
 	}
-	
+
 }

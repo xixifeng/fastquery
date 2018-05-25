@@ -38,27 +38,27 @@ public class QueriesFileFilter implements MethodFilter {
 
 	@Override
 	public Method doFilter(Method method) {
-		
+
 		// osgi不支持 QueriesFileFilter.class.getClassLoader().getResource 这种写法!
 		String className = method.getDeclaringClass().getName();
-		
+
 		List<String> pers = FastQueryJSONObject.getQueries();
 		pers.add("");
-		
+
 		boolean exits = false;
 		for (String per : pers) {
 			String perxml = new StringBuilder().append(per).append(className).append(".queries.xml").toString();
 			URL url = QueriesFileFilter.class.getClassLoader().getResource(perxml);
-			if(url != null) {
+			if (url != null) {
 				exits = true;
 				break;
 			}
 		}
-		
-		if(!exits){
+
+		if (!exits) {
 			this.abortWith(method, "这个方法标识了注解@QueryByNamed,而没有找到文件:" + new StringBuilder().append(className).append(".queries.xml").toString());
 		}
-		
+
 		return method;
 	}
 

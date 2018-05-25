@@ -39,7 +39,7 @@ public class FilterChain implements Filter {
 		filters.add(filter);
 		return this;
 	}
-	
+
 	@Override
 	public Element doFilter(String xmlName, Element element) {
 		Element e = element;

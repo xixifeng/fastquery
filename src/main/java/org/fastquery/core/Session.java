@@ -29,7 +29,7 @@ package org.fastquery.core;
  * @author xixifeng (fastquery@126.com)
  */
 @Deprecated
-public class Session {
+public class Session { // NO_UCD (unused code)
 
 	private Session() {
 	}

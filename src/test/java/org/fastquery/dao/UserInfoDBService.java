@@ -96,13 +96,13 @@ public interface UserInfoDBService extends QueryRepository {
 	@Query("update `userinfo` set `age` = age + 1 where id=?1")
 	@Query("update `userinfo` set `age` = age - 1 where id=?1")
 	boolean update(int id);
-	
+
 	@Transactional
 	@Modifying
 	@Query("update `userinfo` set `age` = age where id=?1")
 	@Query("update `userinfo` set `age` = age where id=?1")
 	boolean update2(int id);
-	
+
 	// 将三条改操作纳入到一个事务中.
 	@Transactional
 	@Modifying
@@ -197,9 +197,9 @@ public interface UserInfoDBService extends QueryRepository {
 
 	@Query("select age from UserInfo where age is not null limit 3")
 	Integer[] findAges2();
-	
+
 	@Query("select id,name,age from UserInfo #{#where}")
-	@Condition(value="age = ?1",ignoreNull=false)
-	@Condition(value=" and name like ?2")
-	List<Map<String, Object>> findUserSome2(Integer age,String name);
+	@Condition(value = "age = ?1", ignoreNull = false)
+	@Condition(value = " and name like ?2")
+	List<Map<String, Object>> findUserSome2(Integer age, String name);
 }

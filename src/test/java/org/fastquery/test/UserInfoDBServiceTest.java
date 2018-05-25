@@ -201,18 +201,18 @@ public class UserInfoDBServiceTest {
 		int effect = userInfoDBService.updateBatch("小张张", 26, 1);
 		assertThat("断言该行修改操作一共影响了3行", effect, equalTo(3));
 	}
-	
+
 	@Test
-	public void update1(){
+	public void update1() {
 		boolean b = userInfoDBService.update(1);
 		assertThat(b, is(true));
-		
+
 		b = userInfoDBService.update(-10);
 		assertThat(b, is(true));
 	}
-	
+
 	@Test
-	public void update2(){
+	public void update2() {
 		boolean b = userInfoDBService.update2(1);
 		assertThat(b, is(true));
 	}
@@ -260,7 +260,7 @@ public class UserInfoDBServiceTest {
 		Page<UserInfo> page = userInfoDBService.find(100, 50, new PageableImpl(1, 3));
 		List<UserInfo> userInfos = page.getContent();
 		if (page.isHasContent()) {
-			userInfos.forEach( u -> LOG.debug(u.toString()));
+			userInfos.forEach(u -> LOG.debug(u.toString()));
 		}
 		assertThat(page.isFirst(), is(true));
 
@@ -313,8 +313,7 @@ public class UserInfoDBServiceTest {
 			if (pageIndex == 0) {
 				pageIndex += 1;
 			}
-			LOG.debug("totalElements:" + totalElements + " pageIndex:" + pageIndex + "  pageSize:" + pageSize
-					+ "  totalPages:" + totalPages);
+			LOG.debug("totalElements:" + totalElements + " pageIndex:" + pageIndex + "  pageSize:" + pageSize + "  totalPages:" + totalPages);
 
 			Page<Map<String, Object>> page = userInfoDBService.findSome2(age, id, pageIndex, pageSize);
 			assertThat(page, notNullValue());
@@ -349,8 +348,8 @@ public class UserInfoDBServiceTest {
 	@Test
 	public void countDouble() {
 		Double d = userInfoDBService.countDouble(2100, 2308);
-		if(d!=null) {
-			LOG.debug(d.toString());	
+		if (d != null) {
+			LOG.debug(d.toString());
 		}
 	}
 
@@ -450,22 +449,25 @@ public class UserInfoDBServiceTest {
 			assertThat(age, notNullValue());
 		}
 	}
-	
+
 	@Test
 	public void findUserSome2() {
 		String name = null;
 		Integer age = null;
 		List<Map<String, Object>> maps = userInfoDBService.findUserSome2(age, name);
 		maps.forEach(m -> {
-			m.forEach( (k,v) ->  { if("age".equals(k)) assertThat(v, nullValue()); } );
+			m.forEach((k, v) -> {
+				if ("age".equals(k))
+					assertThat(v, nullValue());
+			});
 		});
-		
-		if(rule.isDebug()) {
+
+		if (rule.isDebug()) {
 			SQLValue sqlValue = rule.getSQLValue();
 			assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where age is null"));
 			List<Object> objects = sqlValue.getValues();
-			assertThat(objects.isEmpty(),is(true));
+			assertThat(objects.isEmpty(), is(true));
 		}
 	}
-	
+
 }

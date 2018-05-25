@@ -53,14 +53,15 @@ public class QueryByNamedDBExampleMapperTest {
 	public static void beforeClass() {
 		FQuery.getRepository(QueryByNamedDBExample.class);
 	}
-	
-	public String getTemplate(String className,String id) throws Exception{
-		Method method = QueryPool.class.getDeclaredMethod("getTemplate", String.class,String.class);
+
+	public String getTemplate(String className, String id) throws Exception {
+		Method method = QueryPool.class.getDeclaredMethod("getTemplate", String.class, String.class);
 		method.setAccessible(true);
-		return method.invoke(null, className,id).toString();
+		return method.invoke(null, className, id).toString();
 	}
-	public String render(String tpl,String logTag,Map<String, Object> map) throws Exception{
-		Method method = QueryPool.class.getDeclaredMethod("render", String.class,String.class,Map.class);
+
+	public String render(String tpl, String logTag, Map<String, Object> map) throws Exception {
+		Method method = QueryPool.class.getDeclaredMethod("render", String.class, String.class, Map.class);
 		method.setAccessible(true);
 		return method.invoke(null, tpl, logTag, map).toString();
 	}
@@ -96,8 +97,7 @@ public class QueryByNamedDBExampleMapperTest {
 		map.put("name", "zhangsan");
 		map.put("age", 18);
 		str = render(tpl, logTag, map);
-		assertThat(str,
-				equalToIgnoringWhiteSpace("select id,name,age from UserInfo where 1 and name = :name and age = :age"));
+		assertThat(str, equalToIgnoringWhiteSpace("select id,name,age from UserInfo where 1 and name = :name and age = :age"));
 
 		map = new HashMap<>();
 		map.put("age", 18);
@@ -126,8 +126,7 @@ public class QueryByNamedDBExampleMapperTest {
 		map.put("name", "zhangsan");
 		str = render(tpl, logTag, map);
 		str = TypeUtil.parWhere(str);
-		assertThat(str,
-				equalToIgnoringWhiteSpace("select no, name, sex from Student where name like :name order by age desc"));
+		assertThat(str, equalToIgnoringWhiteSpace("select no, name, sex from Student where name like :name order by age desc"));
 	}
 
 	@Test

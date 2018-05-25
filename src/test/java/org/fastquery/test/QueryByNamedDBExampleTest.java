@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
-import org.fastquery.core.Param;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.QueryByNamedDBExample;
 import org.fastquery.dao.UserInfoDBService;
@@ -70,16 +69,16 @@ public class QueryByNamedDBExampleTest {
 	}
 
 	@Test
-	public void findUAll(){
+	public void findUAll() {
 		JSONArray jsonArray = db.findUAll();
-		if ( rule.isDebug() ) {
+		if (rule.isDebug()) {
 			SQLValue sqlValue = rule.getSQLValue();
 			String sql = sqlValue.getSql();
 			assertThat(sql, equalTo("select id,name,age from UserInfo limit 3"));
 		}
 		assertThat(jsonArray.size(), is(3));
 	}
-	
+
 	@Test
 	public void findUserInfoOne() {
 		UserInfo userInfo = db.findUserInfoOne(1);
@@ -167,10 +166,9 @@ public class QueryByNamedDBExampleTest {
 			// 分页主体语句
 			SQLValue sv1 = sqlValues.get(0);
 
-			assertThat(sv1.getSql(), equalToIgnoringWhiteSpace(
-					"select no, name, sex from Student where no like ? or age > ? order by age desc limit 0,5"));
-			assertThat(sv1.getSql(), equalTo(
-					"select no, name, sex from Student where no like ? or age > ? order by age desc limit 0,5"));
+			assertThat(sv1.getSql(),
+					equalToIgnoringWhiteSpace("select no, name, sex from Student where no like ? or age > ? order by age desc limit 0,5"));
+			assertThat(sv1.getSql(), equalTo("select no, name, sex from Student where no like ? or age > ? order by age desc limit 0,5"));
 			List<Object> ps1 = sv1.getValues();
 			assertThat(ps1.size(), is(2));
 			assertThat(ps1.get(0), instanceOf(String.class));
@@ -180,8 +178,7 @@ public class QueryByNamedDBExampleTest {
 
 			// 分页求和语句
 			SQLValue sv2 = sqlValues.get(1);
-			assertThat(sv2.getSql(),
-					equalToIgnoringWhiteSpace("select count(no) from Student where no like ? or age > ?"));
+			assertThat(sv2.getSql(), equalToIgnoringWhiteSpace("select count(no) from Student where no like ? or age > ?"));
 			assertThat(sv2.getSql(), equalTo("select count(no) from Student where no like ? or age > ?"));
 			List<Object> ps2 = sv1.getValues();
 			assertThat(ps2.size(), is(2));
@@ -191,8 +188,7 @@ public class QueryByNamedDBExampleTest {
 			assertThat(ps2.get(1), is(age));
 		}
 	}
-	
-	
+
 	@Test
 	public void findPage2() {
 
@@ -207,7 +203,7 @@ public class QueryByNamedDBExampleTest {
 		int len = pageObj.getContent().size();
 		assertThat(len, lessThanOrEqualTo(size));
 		if (len > 1) { // 如果当前页有数据,那么总页数肯定不为0l
-			assertThat(pageObj.getTotalElements(), not(0l)); 
+			assertThat(pageObj.getTotalElements(), not(0l));
 		}
 		assertThat(pageObj.getTotalElements(), is(-1L));
 		assertThat(pageObj.getTotalPages(), is(-1));
@@ -247,44 +243,44 @@ public class QueryByNamedDBExampleTest {
 			assertThat(values.get(0), equalTo("%" + name + "%"));
 		}
 	}
-	
-	@Test(expected=RepositoryException.class)
+
+	@Test(expected = RepositoryException.class)
 	public void findUserInfoByFuzzyName2() {
 		db.findUserInfoByFuzzyName(null);
 	}
-	
-	@Test(expected=RepositoryException.class)
+
+	@Test(expected = RepositoryException.class)
 	public void findUserInfoByFuzzyName3() {
 		db.findUserInfoByFuzzyName("%");
 	}
-	
-	@Test(expected=RepositoryException.class)
+
+	@Test(expected = RepositoryException.class)
 	public void findUserInfoByFuzzyName4() {
 		db.findUserInfoByFuzzyName("");
 	}
-	
-	@Test(expected=RepositoryException.class)
+
+	@Test(expected = RepositoryException.class)
 	public void findUserInfoByFuzzyName5() {
 		db.findUserInfoByFuzzyName("%%");
 	}
-	
+
 	@Test
 	public void findUserInfo() {
 		Integer id = null;
 		String name = "J";
 		Integer age = null;
 		Integer num = 1;
-		db.findUserInfo(id, name, age,num);
-		if(rule.isDebug()) {
+		db.findUserInfo(id, name, age, num);
+		if (rule.isDebug()) {
 			SQLValue sqlValue = rule.getSQLValue();
 			assertThat(sqlValue.getSql(), equalTo("select * from UserInfo where id > ? and age > 18 or name like ?"));
 			List<Object> vals = sqlValue.getValues();
 			assertThat(vals.size(), is(2));
 			assertThat(vals.get(0), nullValue());
-			assertThat(vals.get(1), equalTo("'%"+name+"%'"));
+			assertThat(vals.get(1), equalTo("'%" + name + "%'"));
 		}
 	}
-	
+
 	@Test
 	public void findCon1() {
 		Integer id = 1;

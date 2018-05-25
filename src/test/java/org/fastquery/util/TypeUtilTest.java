@@ -307,49 +307,6 @@ public class TypeUtilTest implements Opcodes {
 	}
 
 	@Test
-	public void compareType() {
-		assertThat(TypeUtil.compareType(BeforeFilter1.class, DB1.class), is(true));
-		assertThat(TypeUtil.compareType(BeforeFilter2.class, DB2.class), is(true));
-		assertThat(TypeUtil.compareType(BeforeFilter3.class, DB3.class), is(true));
-		assertThat(TypeUtil.compareType(BeforeFilter4.class, DB4.class), is(true));
-		assertThat(TypeUtil.compareType(BeforeFilter5.class, DB5.class), is(true));
-		assertThat(TypeUtil.compareType(BeforeFilter6.class, DB6.class), is(true));
-
-		assertThat(TypeUtil.compareType(BeforeFilter1.class, DB6.class), is(false));
-		assertThat(TypeUtil.compareType(BeforeFilter2.class, DB5.class), is(false));
-		assertThat(TypeUtil.compareType(BeforeFilter3.class, DB4.class), is(false));
-		assertThat(TypeUtil.compareType(BeforeFilter4.class, DB3.class), is(false));
-		assertThat(TypeUtil.compareType(BeforeFilter5.class, DB2.class), is(false));
-		assertThat(TypeUtil.compareType(BeforeFilter6.class, DB1.class), is(false));
-
-		assertThat(TypeUtil.compareType(BeforeFilter1.class, DB2.class), is(false));
-		assertThat(TypeUtil.compareType(BeforeFilter2.class, DB1.class), is(false));
-		assertThat(TypeUtil.compareType(BeforeFilter3.class, DB4.class), is(false));
-		assertThat(TypeUtil.compareType(BeforeFilter4.class, DB3.class), is(false));
-		assertThat(TypeUtil.compareType(BeforeFilter5.class, DB6.class), is(false));
-		assertThat(TypeUtil.compareType(BeforeFilter6.class, DB5.class), is(false));
-
-		assertThat(TypeUtil.compareType(BeforeFilter0.class, DB1.class), is(true));
-		assertThat(TypeUtil.compareType(BeforeFilter0.class, DB2.class), is(true));
-		assertThat(TypeUtil.compareType(BeforeFilter0.class, DB3.class), is(true));
-		assertThat(TypeUtil.compareType(BeforeFilter0.class, DB4.class), is(true));
-		assertThat(TypeUtil.compareType(BeforeFilter0.class, DB5.class), is(true));
-		assertThat(TypeUtil.compareType(BeforeFilter0.class, DB6.class), is(true));
-
-	}
-
-	@Test
-	public void split() {
-		List<String> strs = TypeUtil.tokenizeToStringArray("A.B.C.D.f", ".");
-		assertThat(strs.size(), is(5));
-		assertThat(strs.get(0), equalTo("A"));
-		assertThat(strs.get(1), equalTo("B"));
-		assertThat(strs.get(2), equalTo("C"));
-		assertThat(strs.get(3), equalTo("D"));
-		assertThat(strs.get(4), equalTo("f"));
-	}
-
-	@Test
 	public void removePart() {
 		String sub = TypeUtil.removePart("a ");
 		assertThat(sub, equalTo("a"));
@@ -418,15 +375,17 @@ public class TypeUtilTest implements Opcodes {
 
 	public void m2(@Param("$^i") int i, @Param("$i1$") int i1, @Param("^i2") int i2) {
 	}
-	
-	private static String paramFilter(Method method, Object[] args, String sql) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		Method pf = TypeUtil.class.getDeclaredMethod("paramFilter",Method.class,Object[].class,String.class);
+
+	private static String paramFilter(Method method, Object[] args, String sql)
+			throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		Method pf = TypeUtil.class.getDeclaredMethod("paramFilter", Method.class, Object[].class, String.class);
 		pf.setAccessible(true);
-		return pf.invoke(null, method,args,sql).toString();
+		return pf.invoke(null, method, args, sql).toString();
 	}
 
 	@Test
-	public void paramFilter() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public void paramFilter()
+			throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Method m1 = TypeUtilTest.class.getMethod("m1", int.class, int.class, int.class);
 		Object[] agrs = new Object[] { 11, 22, 33 };
 		String sql = "abc :i and :i1 where :i2";
@@ -440,9 +399,8 @@ public class TypeUtilTest implements Opcodes {
 	@Test
 	public void paramNameFilter() throws NoSuchMethodException, SecurityException {
 		Method m1 = TypeUtilTest.class.getMethod("m1", int.class, int.class, int.class);
-		Object[] agrs = new Object[] { 11, 22, 33 };
 		String sql = "abc :i and :i1 where :i2";
-		String str = TypeUtil.paramNameFilter(m1, agrs, sql);
+		String str = TypeUtil.paramNameFilter(m1, sql);
 		assertThat(str, equalTo("abc ?1 and ?2 where ?3"));
 	}
 
@@ -528,7 +486,7 @@ public class TypeUtilTest implements Opcodes {
 		str = TypeUtil.replace(src, 20, 5);
 		assertThat(str, equalTo(""));
 	}
-	
+
 	@Test
 	public void replace5() {
 		String src = "?5";
@@ -537,8 +495,8 @@ public class TypeUtilTest implements Opcodes {
 	}
 
 	@Test
-	public void mapValueTyep() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-			NoSuchMethodException, SecurityException {
+	public void mapValueTyep()
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		class A {
 			@SuppressWarnings("unused")
 			public Map<String, String> todo() {
@@ -552,8 +510,8 @@ public class TypeUtilTest implements Opcodes {
 	}
 
 	@Test
-	public void listMapValueTyep() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-			NoSuchMethodException, SecurityException {
+	public void listMapValueTyep()
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		class B {
 			@SuppressWarnings("unused")
 			public List<Map<String, String>> todo() {
@@ -566,46 +524,46 @@ public class TypeUtilTest implements Opcodes {
 		assertThat(TypeUtil.listMapValueTyep(method) == String.class, is(true));
 	}
 
-	@Test(expected=NullPointerException.class)
+	@Test(expected = NullPointerException.class)
 	public void toList1() {
 		TypeUtil.toList(null);
 	}
-	
-	@Test(expected=ClassCastException.class)
+
+	@Test(expected = ClassCastException.class)
 	public void toList2() {
 		TypeUtil.toList(1);
 	}
-	
+
 	@Test
 	public void toList3() {
-		int[] ids = {1,2,3};
+		int[] ids = { 1, 2, 3 };
 		List<Object> objects = TypeUtil.toList(ids);
 		for (int i = 0; i < ids.length; i++) {
 			assertThat(ids[i], is(objects.get(i)));
 		}
 	}
-	
+
 	@Test
 	public void toList4() {
-		Integer[] ids = {1,2,3};
+		Integer[] ids = { 1, 2, 3 };
 		List<Object> objects = TypeUtil.toList(ids);
 		for (int i = 0; i < ids.length; i++) {
 			assertThat(ids[i], equalTo(objects.get(i)));
 		}
 	}
-	
+
 	@Test
 	public void toList5() {
-		Object ids = new Integer[]{1,2,3};
+		Object ids = new Integer[] { 1, 2, 3 };
 		List<Object> objects = TypeUtil.toList(ids);
 		assertThat(objects.get(0), equalTo(1));
 		assertThat(objects.get(1), equalTo(2));
 		assertThat(objects.get(2), equalTo(3));
 	}
-	
+
 	@Test
 	public void toList6() {
-		Object ids = new int[]{1,2,3};
+		Object ids = new int[] { 1, 2, 3 };
 		List<Object> objects = TypeUtil.toList(ids);
 		assertThat(objects.get(0), equalTo(1));
 		assertThat(objects.get(1), equalTo(2));

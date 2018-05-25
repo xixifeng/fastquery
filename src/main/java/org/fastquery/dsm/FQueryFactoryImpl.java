@@ -21,37 +21,37 @@
  */
 
 package org.fastquery.dsm;
+
 import javax.sql.DataSource;
+
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
 public class FQueryFactoryImpl implements FQueryFactory {
 
-	private static FQueryFactoryImpl instance;
-	
+	private static class LazyHolder {
+		private static final FQueryFactoryImpl INSTANCE = new FQueryFactoryImpl();
+
+		private LazyHolder() {
+		}
+	}
+
 	private FQueryFactoryImpl() {
 	}
 
-	public static FQueryFactory getInstance() {
-		if (instance == null) {
-			synchronized (FQueryFactoryImpl.class) {
-				if (instance == null) {
-					instance = new FQueryFactoryImpl();
-				}
-			}
-		}
-		return instance;
+	public static FQueryFactoryImpl getInstance() {
+		return LazyHolder.INSTANCE;
 	}
-	
+
 	@Override
 	public DataSource getDataSource(String packageName) {
-		
+
 		// 根据basePackage 查找出 数据源的名字
 		String dataSourceName = FQueryProperties.findDataSourceName(packageName);
-		
+
 		// 在根据数据源的名字查寻出数据库对象
 		return FQueryProperties.findDataSource(dataSourceName);
-		
+
 	}
 }

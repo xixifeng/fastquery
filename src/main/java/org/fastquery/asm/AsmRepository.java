@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.fastquery.core.GenerateRepository;
+import org.fastquery.core.Placeholder;
 import org.fastquery.core.Prepared;
 import org.fastquery.core.Repository;
 import org.fastquery.mapper.QueryValidator;
@@ -47,12 +47,13 @@ import org.objectweb.asm.commons.GeneratorAdapter;
 public class AsmRepository implements Opcodes {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AsmRepository.class);
-	
-	private AsmRepository(){
+
+	private AsmRepository() {
 	}
-	
+
 	/**
 	 * 自动生成Repository接口的实现类并以字节的形式返回, 该方法是线程安全的.
+	 * 
 	 * @param repositoryClazz repository class
 	 * @return 生成的类字节码
 	 */
@@ -60,11 +61,14 @@ public class AsmRepository implements Opcodes {
 		// 安全检测
 		GenerateExtends.safeCheck(repositoryClazz);
 
+		// internal Name 格式: org/fastquery/core/QueryRepository
+		String internalName = Type.getInternalName(repositoryClazz);
+
 		// 需要生成类的接口集合
-		String[] interfaces = new String[] { Type.getType(repositoryClazz).getInternalName() };
+		String[] interfaces = new String[] { internalName };
 
 		// 给待生成的实现类取个名字
-		String proxyName = Type.getType(repositoryClazz).getInternalName() + GenerateRepository.SUFFIX;
+		String proxyName = internalName + Placeholder.SUFFIX;
 
 		// 生成类
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
@@ -75,7 +79,7 @@ public class AsmRepository implements Opcodes {
 		// 生成的私有静态方法,用于存储实例对象
 		FieldVisitor fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, "instance", repositoryDescriptor, null, null);
 		fv.visitEnd();
-		
+
 		org.objectweb.asm.MethodVisitor mv;
 		// 生成私有的不带参的构造方法
 		mv = cw.visitMethod(ACC_PRIVATE, "<init>", "()V", null, null);
@@ -85,7 +89,7 @@ public class AsmRepository implements Opcodes {
 		mv.visitInsn(RETURN);
 		mv.visitMaxs(1, 1);
 		mv.visitEnd();
-		
+
 		// 生成获取实例方法
 		mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "getInstance", "()" + repositoryDescriptor, null, null);
 		mv.visitCode();
@@ -107,7 +111,7 @@ public class AsmRepository implements Opcodes {
 		// 根据接口clazz 生成实现的方法
 		Method[] methods = repositoryClazz.getMethods();
 		for (Method method : methods) {
-			cw = generateMethod(cw, method,Prepared.class);
+			cw = generateMethod(cw, method, Prepared.class);
 		}
 		cw.visitEnd();
 
@@ -116,57 +120,60 @@ public class AsmRepository implements Opcodes {
 
 	/**
 	 * 生成方法
+	 * 
 	 * @param cw
 	 * @param method
 	 * @param exceptions
 	 * @param interfaceClazz
 	 */
-	private static ClassWriter generateMethod(ClassWriter cw,java.lang.reflect.Method method,Class<Prepared> prepared){
-		
+	private static ClassWriter generateMethod(ClassWriter cw, java.lang.reflect.Method method, Class<Prepared> prepared) {
+
 		org.objectweb.asm.commons.Method m = new org.objectweb.asm.commons.Method(method.getName(), Type.getMethodDescriptor(method));
-		GeneratorAdapter mv = new GeneratorAdapter(ACC_PUBLIC, m, null, null,cw);
-	
+		GeneratorAdapter mv = new GeneratorAdapter(ACC_PUBLIC, m, null, null, cw);
+
 		mv.visitLdcInsn(method.getName()); // excute的第1参数
 		mv.visitLdcInsn(Type.getType(method).getDescriptor()); // excute的第2参数
-		
-		//  excute的第3参数(是可变参数)
+
+		// excute的第3参数(是可变参数)
 		Parameter[] parameters = method.getParameters();
-		mv = setIn(mv, parameters); 
-	
+		mv = setIn(mv, parameters);
+
 		// excute的第4个参数
 		mv.visitVarInsn(ALOAD, 0);
-		
+
 		// 调用Prepared中的excute方法
 		// INVOKESTATIC
-		mv.visitMethodInsn(INVOKESTATIC, Type.getType(prepared).getInternalName(), "excute", "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/Repository;)Ljava/lang/Object;", false);
-		
+		mv.visitMethodInsn(INVOKESTATIC, Type.getType(prepared).getInternalName(), "excute",
+				"(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/Repository;)Ljava/lang/Object;", false);
+
 		// 返回值处理
-		String internalName  = Type.getInternalName(method.getReturnType());
+		String internalName = Type.getInternalName(method.getReturnType());
 		int sort = Type.getReturnType(method).getSort();
-		if( sort == 0 ) { // 如果返回值是 Void
+		if (sort == 0) { // 如果返回值是 Void
 			mv.visitInsn(POP);
 			mv.visitInsn(RETURN);
-		} else if( (1 <= sort) && (sort <= 8)  ) { // 如果是基本类型 [1,8]
+		} else if ((1 <= sort) && (sort <= 8)) { // 如果是基本类型 [1,8]
 			Object[] objs = TypeUtil.getTypeInfo(Type.getReturnType(method).getDescriptor());
 			String type = objs[0].toString();
 			mv.visitTypeInsn(CHECKCAST, type);
 			mv.visitMethodInsn(INVOKEVIRTUAL, type, objs[1].toString(), objs[2].toString(), false);
-			// Integer.parseInt(objs[3].toString()) 比 Integer.valueOf(objs[3].toString()).intValue()更优.
+			// Integer.parseInt(objs[3].toString()) 比
+			// Integer.valueOf(objs[3].toString()).intValue()更优.
 			mv.visitInsn(Integer.parseInt(objs[3].toString()));
-			
-		} else { //sort==9 表述数组类型int[]或Integer[], srot=10表示包装类型
+
+		} else { // sort==9 表述数组类型int[]或Integer[], srot=10表示包装类型
 			mv.visitTypeInsn(CHECKCAST, internalName);
 			mv.visitInsn(ARETURN);
 		}
-		
+
 		// mv.visitEnd()
-		mv.endMethod();	
+		mv.endMethod();
 		return cw;
 	}
 
-	private static GeneratorAdapter setIn(GeneratorAdapter mv,Parameter[] parameters){
+	private static GeneratorAdapter setIn(GeneratorAdapter mv, Parameter[] parameters) {
 		int size = parameters.length;
-		if(size < 6) {
+		if (size < 6) {
 			mv.visitInsn(size + ICONST_0);
 			// 注释不要删除
 			// 当 size = 0 时,则: mv.visitInsn(3); 3对应 ICONST_0
@@ -179,11 +186,11 @@ public class AsmRepository implements Opcodes {
 			mv.visitIntInsn(BIPUSH, size);
 		}
 		mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
-		
+
 		int nextIndex = 1; // 指定下一次?LOAD应该的使用的索引
 		for (int i = 0; i < size; i++) {
 			mv.visitInsn(DUP);
-			if(i<6) {
+			if (i < 6) {
 				mv.visitInsn(i + ICONST_0);
 				// 注释不要删除
 				// 当 i = 0 时, 则: mv.visitInsn(3); 3对应ICONST_0
@@ -195,57 +202,57 @@ public class AsmRepository implements Opcodes {
 			} else {
 				mv.visitIntInsn(BIPUSH, i);
 			}
-			
+
 			// 注释不要删除
 			// int -> ILOAD
 			// double -> DLOAD
-			// long -> LLOAD 
+			// long -> LLOAD
 			// short -> ILOAD
-			
+
 			// byte -> ILOAD
 			// boolean -> ILOAD
 			// char -> ILOAD
-			
+
 			// float -> FLOAD
-			
+
 			// 计算当前遍历的参数的类型
 			Class<?> currentType = parameters[i].getType();
 			// int","double","long","short","byte","boolean","char","float"
 			String valueOf = "valueOf";
-			if(currentType == int.class) {
+			if (currentType == int.class) {
 				mv.visitVarInsn(ILOAD, nextIndex);
 				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", valueOf, "(I)Ljava/lang/Integer;", false);
 				// 指定下一次?LOAD应该的使用的索引
 				nextIndex = nextIndex + 1;
-			} else if(currentType == double.class){
+			} else if (currentType == double.class) {
 				mv.visitVarInsn(DLOAD, nextIndex);
 				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", valueOf, "(D)Ljava/lang/Double;", false);
 				nextIndex = nextIndex + 2;
-			}else if(currentType == long.class){
+			} else if (currentType == long.class) {
 				mv.visitVarInsn(LLOAD, nextIndex);
 				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", valueOf, "(J)Ljava/lang/Long;", false);
 				nextIndex = nextIndex + 2;
-			}else if(currentType == short.class){
+			} else if (currentType == short.class) {
 				mv.visitVarInsn(ILOAD, nextIndex);
 				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Short", valueOf, "(S)Ljava/lang/Short;", false);
 				nextIndex = nextIndex + 1;
-			}else if(currentType == byte.class){
+			} else if (currentType == byte.class) {
 				mv.visitVarInsn(ILOAD, nextIndex);
 				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Byte", valueOf, "(B)Ljava/lang/Byte;", false);
 				nextIndex = nextIndex + 1;
-			}else if(currentType == boolean.class){
+			} else if (currentType == boolean.class) {
 				mv.visitVarInsn(ILOAD, nextIndex);
 				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", valueOf, "(Z)Ljava/lang/Boolean;", false);
 				nextIndex = nextIndex + 1;
-			}else if(currentType == char.class){
+			} else if (currentType == char.class) {
 				mv.visitVarInsn(ILOAD, nextIndex);
 				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Character", valueOf, "(C)Ljava/lang/Character;", false);
 				nextIndex = nextIndex + 1;
-			}else if(currentType == float.class){
+			} else if (currentType == float.class) {
 				mv.visitVarInsn(FLOAD, nextIndex);
 				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", valueOf, "(F)Ljava/lang/Float;", false);
 				nextIndex = nextIndex + 1;
-			}else {
+			} else {
 				mv.visitVarInsn(ALOAD, nextIndex);
 				nextIndex = nextIndex + 1;
 			}
@@ -262,7 +269,7 @@ public class AsmRepository implements Opcodes {
 	public static void after(List<Class<Repository>> classes) {
 		QueryValidator.check(classes);
 		classes.clear();
-		
+
 		LOG.debug("\n\n\n\n初始化阶段结束\n");
 	}
 

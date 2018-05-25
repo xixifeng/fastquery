@@ -37,36 +37,37 @@ import org.fastquery.dsm.DataSourceManage;
 
 /**
  * 该类只为fastquery.filter服务
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public class DBUtils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DBUtils.class);
-	private static DBUtils dbUtils;
+
+	private static class LazyHolder {
+		private static final DBUtils INSTANCE = new DBUtils();
+
+		private LazyHolder() {
+		}
+	}
 
 	private DBUtils() {
 	}
 
 	public static DBUtils getInstance() {
-		if (dbUtils == null) {
-			synchronized (DBUtils.class) {
-				if (dbUtils == null) {
-					dbUtils = new DBUtils();
-				}
-			}
-		}
-		return dbUtils;
+		return LazyHolder.INSTANCE;
 	}
-	
+
 	/**
 	 * 判断 field 是否是 table 表的主键
+	 * 
 	 * @param packageName 基本包地址,根据它获取数据源.
 	 * @param table 表名称
 	 * @param field 字段名称
 	 * @return y:true/n:false
 	 */
-	public boolean findColumnKey(String packageName,String table,String field){
-		
+	public boolean findColumnKey(String packageName, String table, String field) {
+
 		DataSource dataSource = DataSourceManage.getDataSource(packageName);
 		Connection conn = null;
 		Statement stat = null;
@@ -76,29 +77,29 @@ public class DBUtils {
 			conn = dataSource.getConnection();
 			DatabaseMetaData databaseMetaData = conn.getMetaData(); // 获取数据库信息
 			String databaseProductName = databaseMetaData.getDatabaseProductName();
-			if("MySQL".equals(databaseProductName)) { 
-				sql = "SHOW COLUMNS from "+table+" where `KEY`='PRI'";
+			if ("MySQL".equals(databaseProductName)) {
+				sql = "SHOW COLUMNS from " + table + " where `KEY`='PRI'";
 				stat = conn.createStatement(); // stat 会在下面的finally里关闭
-				rs = stat.executeQuery(sql);   // stat 会在下面的finally里关闭
-				if(rs.next() && rs.getString("Field").equals(field)) {
+				rs = stat.executeQuery(sql); // stat 会在下面的finally里关闭
+				if (rs.next() && rs.getString("Field").equals(field)) {
 					return true; // 即使在这里return了, 下面的finally也会执行,怎么会把rs阻断呢? 发现sonar的检测有问题.
 				}
 			} else {
 				throw new RepositoryException("该方法暂不支持 " + databaseProductName + " 数据库");
-			}			
+			}
 		} catch (SQLException e) {
-			throw new RepositoryException(e.getMessage(),e);
+			throw new RepositoryException(e.getMessage(), e);
 		} finally {
 			// 如果上面发生异常,或向上抛出了异常,或上面返回了, 这个finally都会执行
 			close(rs, stat, conn);
 		}
-		
+
 		return false;
 	}
-	
-	
+
 	/**
 	 * 释放资源
+	 * 
 	 * @param rs
 	 * @param stat
 	 * @param conn
@@ -129,10 +130,3 @@ public class DBUtils {
 		}
 	}
 }
-
-
-
-
-
-
-

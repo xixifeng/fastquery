@@ -43,8 +43,7 @@ public @interface QueryByNamed {
 	String value() default "";
 
 	/**
-	 * 是否启用模板引擎对配置文件进行渲染,默认是true表示开启. 如果
-	 * &lt;query&gt;节点中没有使用到任何模板语法,仅用于存储目的,那么建议设置为false.
+	 * 是否启用模板引擎对配置文件进行渲染,默认是true表示开启. 如果 &lt;query&gt;节点中没有使用到任何模板语法,仅用于存储目的,那么建议设置为false.
 	 * 
 	 * @return boolean
 	 */

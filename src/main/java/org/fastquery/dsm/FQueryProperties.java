@@ -38,21 +38,22 @@ import org.fastquery.core.RepositoryException;
  * @author xixifeng (fastquery@126.com)
  */
 public class FQueryProperties {
-	
+
 	// <String,String> 第一个参数是basePackage, 第二个参数是数据源的名字
 	private static Map<String, String> dataSourceIndexs = new HashMap<>();
 
 	// 在此用Map,是为了查寻方便, 放在这里我们最终是为了查寻.
 	private static Map<String, DataSource> dataSources = new HashMap<>();
 
-	private FQueryProperties(){}
-	
+	private FQueryProperties() {
+	}
+
 	public static void putDataSourceIndex(String key, String value) {
 		dataSourceIndexs.put(key, value);
 	}
 
 	public static void putDataSource(String key, DataSource value) {
-		if(dataSources.containsKey(key)){
+		if (dataSources.containsKey(key)) {
 			throw new RepositoryException(key + " 已经存在!");
 		}
 		dataSources.put(key, value);
@@ -68,7 +69,7 @@ public class FQueryProperties {
 		String dataSourceName = dataSourceIndexs.get(packageName);
 		String pname = packageName;
 		int len;
-		while(dataSourceName == null && (len = pname.lastIndexOf('.')) != -1) {
+		while (dataSourceName == null && (len = pname.lastIndexOf('.')) != -1) {
 			// 注意:可能出现这种情况
 			// map中存在 "A.B"
 			// packageName 可能是A.B.C
@@ -88,48 +89,41 @@ public class FQueryProperties {
 	public static DataSource findDataSource(String dataSourceName) {
 		return dataSources.get(dataSourceName);
 	}
-	
-	public static void createDataSource(String dataSourceName,Properties properties) {
-		if(dataSources.containsKey(dataSourceName)){ // 这里有必要判断. 而不是等连接池创建后在判断.
+
+	public static void createDataSource(String dataSourceName, Properties properties) {
+		if (dataSources.containsKey(dataSourceName)) { // 这里有必要判断. 而不是等连接池创建后在判断.
 			throw new RepositoryException(dataSourceName + " 已经存在!");
 		}
-		if(dataSourceName==null || "".equals(dataSourceName)) {
+		if (dataSourceName == null || "".equals(dataSourceName)) {
 			throw new RepositoryException("dataSourceName 不能为\"\"或为null");
 		}
 		com.mchange.v2.c3p0.ComboPooledDataSource cpds = new com.mchange.v2.c3p0.ComboPooledDataSource();
 		cpds.setDataSourceName(dataSourceName);
 		Class<?> cls = cpds.getClass();
-		properties.forEach( (k,v) -> {
+		properties.forEach((k, v) -> {
 			try {
-				PropertyDescriptor pd = new PropertyDescriptor(k.toString(),cls);
+				PropertyDescriptor pd = new PropertyDescriptor(k.toString(), cls);
 				Method method = pd.getWriteMethod();
 				Class<?> returnType = method.getParameterTypes()[0];
-				if(returnType == String.class){
+				if (returnType == String.class) {
 					method.invoke(cpds, v.toString());
-				} else if(returnType == int.class) {
+				} else if (returnType == int.class) {
 					method.invoke(cpds, Integer.parseInt(v.toString()));
-				} else if(returnType == boolean.class) {
+				} else if (returnType == boolean.class) {
 					method.invoke(cpds, Boolean.parseBoolean(v.toString()));
 				}
 			} catch (Exception e) {
 				throw new RepositoryException(e);
 			}
-		});	
+		});
 		putDataSource(dataSourceName, cpds);
-		/*
-		if(basePackages==null){
-			putDataSourceIndex(dataSourceName, dataSourceName);// 在此把dataSourceName当作basePackage
-		} else {
-			basePackages.forEach(basePackage -> putDataSourceIndex(basePackage, dataSourceName));
-		}
-		*/
 	}
 	// 不用提供set方法,如果提供dataSourceIndexs的set方法,就把它覆盖了.
-	
-	public static void removeDataSource(String key){
+
+	public static void removeDataSource(String key) { // NO_UCD (unused code)
 		dataSources.remove(key);
 	}
-	
+
 	public static void clear() {
 		dataSourceIndexs.clear();
 		dataSources.clear();

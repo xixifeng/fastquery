@@ -22,8 +22,8 @@
 
 package org.fastquery.core;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,6 +36,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.stream.Stream;
+import java.util.stream.Stream.Builder;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -91,20 +94,16 @@ public class DB {
 
 	/**
 	 * 
-	 * @param sqlValues
-	 *            待执行的SQL集
-	 * @param hasEffect
-	 *            是否需要返回影响行数
-	 * @param hasPK
-	 *            是否需要返回主健
+	 * @param sqlValues 待执行的SQL集
+	 * @param hasPK 是否需要返回主健
 	 * @return 改操作响应数据
 	 */
-	public static List<RespUpdate> modify(List<SQLValue> sqlValues, boolean hasEffect, boolean hasPK) {
+	public static List<RespUpdate> modify(List<SQLValue> sqlValues, boolean hasPK) {
 		List<RespUpdate> rus = null;
 		Connection conn = QueryContext.getConnection(); // 由QueryContext自动关闭
 		try {
 			QueryContext.setAutoCommit(false); // 关闭自动提交
-			rus = modify(sqlValues, hasEffect, hasPK, conn);
+			rus = modify(sqlValues, hasPK, conn);
 			QueryContext.commit(); // 提交事务
 		} catch (Exception e) {
 			try {
@@ -118,8 +117,7 @@ public class DB {
 		return rus;
 	}
 
-	private static List<RespUpdate> modify(List<SQLValue> sqlValues, boolean hasEffect, boolean hasPK, Connection conn)
-			throws SQLException {
+	private static List<RespUpdate> modify(List<SQLValue> sqlValues, boolean hasPK, Connection conn) throws SQLException {
 		List<RespUpdate> rus = new ArrayList<>();
 		for (SQLValue sqlValue : sqlValues) {
 			ResultSet rs = null;
@@ -141,9 +139,7 @@ public class DB {
 					stat.setObject(i + 1, values.get(i));
 				}
 
-				if (hasEffect) {
-					ru.setEffect(stat.executeUpdate());
-				}
+				ru.setEffect(stat.executeUpdate());
 
 				if (hasPK) {
 					rs = stat.getGeneratedKeys();
@@ -165,13 +161,13 @@ public class DB {
 	}
 
 	/**
-	 * 插入数据返回主键值,如果没有主键,返回null
+	 * 改操作,若:isEffect=true,返回影响行数;若:isEffect=false,返回主键值.
 	 * 
-	 * @param dataSource
-	 * @param sql
-	 * @return
+	 * @param sql 语句
+	 * @param isEffect 是否返回影响行数
+	 * @return 影响行数 或 主键值
 	 */
-	static Object insert(String sql) {
+	static Object update(String sql, boolean isEffect) {
 		Connection conn = null;
 		PreparedStatement stat = null;
 		ResultSet rs = null;
@@ -180,14 +176,24 @@ public class DB {
 			conn = QueryContext.getConnection();
 			QueryContext.addSqls(sql);
 			QueryContext.setAutoCommit(false);
-			stat = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-			stat.executeUpdate();
-			rs = stat.getGeneratedKeys();
-			// 获取主键
-			if (rs.next()) {
-				key = rs.getObject(1);
+			if (isEffect) {
+				stat = conn.prepareStatement(sql); // 不需要返回主键
+			} else {
+				stat = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			}
-			QueryContext.commit();
+			int e = stat.executeUpdate();
+			if (isEffect) {
+				QueryContext.commit();
+				return e;
+			} else {
+				rs = stat.getGeneratedKeys();
+				// 获取主键
+				if (rs.next()) {
+					key = rs.getObject(1);
+				}
+				QueryContext.commit();
+				return key;
+			}
 		} catch (SQLException e) {
 			if (conn != null) {
 				try {
@@ -200,112 +206,14 @@ public class DB {
 		} finally {
 			close(rs, stat);
 		}
-		return key;
 	}
 
-	static int insert2(String sql) {
-		Connection conn = null;
-		Statement stat = null;
-		ResultSet rs = null;
-		int i;
-		try {
-			conn = QueryContext.getConnection();
-			QueryContext.addSqls(sql);
-			QueryContext.setAutoCommit(false);
-			stat = conn.createStatement();
-			QueryContext.addSqls(sql);
-			i = stat.executeUpdate(sql);
-			QueryContext.commit();
-		} catch (SQLException e) {
-			if (conn != null) {
-				try {
-					QueryContext.rollback();
-				} catch (SQLException e1) {
-					throw new RepositoryException(e1);
-				}
-			}
-			throw new RepositoryException(e);
-		} finally {
-			close(rs, stat);
-		}
-		return i;
-	}
-
-	// 查询一条数据然后转换成一个实体
-	static Object select(String sql, Object bean) {
-		Class<?> cls = (bean instanceof Class)? (Class<?>)bean : bean.getClass();
-		Connection conn = null;
-		Statement stat = null;
-		ResultSet rs = null;
-		try {
-			conn = QueryContext.getConnection();
-			stat = conn.createStatement();
-			LOG.info(sql);
-			QueryContext.addSqls(sql);
-			rs = stat.executeQuery(sql);
-			List<Map<String, Object>> maps = rs2Map(rs, null);
-			if (maps.isEmpty()) {
-				return null;
-			}
-			return JSON.toJavaObject(new JSONObject(maps.get(0)),cls);
-		} catch (Exception e) {
-			throw new RepositoryException(e);
-		} finally {
-			close(rs, stat);
-		}
-	}
-
-	static boolean exists(String sql, Object bean) {
-		Connection conn = null;
-		Statement stat = null;
-		ResultSet rs = null;
-		try {
-			conn = QueryContext.getConnection();
-			stat = conn.createStatement();
-			QueryContext.addSqls(sql);
-			rs = stat.executeQuery(sql);
-			return rs.next();
-		} catch (SQLException e) {
-			throw new RepositoryException(e);
-		} finally {
-			close(rs, stat);
-		}
-	}
-	
-	static int update(String sql) {
-		Connection conn = null;
-		Statement stat = null;
-		int effect = 0;
-		
-		try {
-			conn = QueryContext.getConnection();
-			QueryContext.addSqls(sql);
-			info(sql, null);
-			QueryContext.setAutoCommit(false);
-			stat = conn.createStatement();
-			effect = stat.executeUpdate(sql);
-			QueryContext.commit();
-		} catch (SQLException e) {
-			if (conn != null) {
-				try {
-					QueryContext.rollback();
-				} catch (SQLException e1) {
-					throw new RepositoryException(e1);
-				}
-			}
-			throw new RepositoryException(e);
-		} finally {
-			close(null, stat);
-		}
-		
-		return effect;
-	}
-	
 	static int update(Object bean, String dbName, String where) {
 		int effect = 0;
 		Connection conn = null;
 		PreparedStatement stat = null;
-		Object[] updateInfo = (where==null || "".equals(where))?BeanUtil.toUpdateSQL(bean, dbName,false):BeanUtil.toUpdateSQL(bean, dbName, where);
+		Object[] updateInfo = (where == null || "".equals(where)) ? BeanUtil.toUpdateSQL(bean, dbName, false)
+				: BeanUtil.toUpdateSQL(bean, dbName, where);
 		if (updateInfo == null) {
 			return effect;
 		}
@@ -340,44 +248,84 @@ public class DB {
 		return effect;
 	}
 
-	private static List<String> parserSQLFile(String name) {
-		List<String> sqlList = new ArrayList<>();
-
-		try (InputStream inputStream = new FileInputStream(name)) {
-			StringBuilder sb = new StringBuilder();
-			byte[] buff = new byte[1024];
-			int b;
-			while ((b = inputStream.read(buff)) != -1) {
-				sb.append(new String(buff, 0, b));
+	// 查询一条数据然后转换成一个实体
+	static Object select(String sql, Object bean) {
+		Class<?> cls = (bean instanceof Class) ? (Class<?>) bean : bean.getClass();
+		Connection conn = null;
+		Statement stat = null;
+		ResultSet rs = null;
+		try {
+			conn = QueryContext.getConnection();
+			stat = conn.createStatement();
+			LOG.info(sql);
+			QueryContext.addSqls(sql);
+			rs = stat.executeQuery(sql);
+			List<Map<String, Object>> maps = rs2Map(rs, null);
+			if (maps.isEmpty()) {
+				return null;
 			}
-			String[] sqlArray = sb.toString().split(Placeholder.SQLSPLIT);
-			int len = sqlArray.length;
-			for (int i = 0; i < len; i++) {
-				// 替换注释
-				String sql = sqlArray[i].replaceAll("--.*", "").trim();
-				if (!"".equals(sql)) {
-					sqlList.add(sql);
-				}
-			}
-			return sqlList;
+			return JSON.toJavaObject(new JSONObject(maps.get(0)), cls);
 		} catch (Exception e) {
 			throw new RepositoryException(e);
+		} finally {
+			close(rs, stat);
 		}
 	}
 
-	static void executeBatch(String sqlFile) {
+	static boolean exists(String sql) {
+		Connection conn = null;
+		Statement stat = null;
+		ResultSet rs = null;
+		try {
+			conn = QueryContext.getConnection();
+			stat = conn.createStatement();
+			QueryContext.addSqls(sql);
+			rs = stat.executeQuery(sql);
+			return rs.next();
+		} catch (SQLException e) {
+			throw new RepositoryException(e);
+		} finally {
+			close(rs, stat);
+		}
+	}
+
+	private static Stream<String> parserSQLFile(String name) {
+		Builder<String> builder = Stream.builder();
+
+		try (FileReader reader = new FileReader(name); BufferedReader br = new BufferedReader(reader)) {
+			StringBuilder buff = new StringBuilder();
+			String str;
+			while ((str = br.readLine()) != null) {
+				str = str.trim();
+				if (!"".equals(str)) {
+					buff.append(str);
+					buff.append(' '); // 有可能一行语句分了多行书写,拼接时行与行要用空格隔开
+					if (buff.charAt(buff.length() - 2) == ';') {
+						builder.add(buff.toString());
+						buff = new StringBuilder();
+					}
+				}
+			}
+		} catch (Exception e) {
+			throw new RepositoryException(e);
+		}
+
+		return builder.build().filter(s -> !s.startsWith("#") && !s.startsWith("-- "));
+	}
+
+	static int[] executeBatch(String sqlFile, BiConsumer<Statement, String> consumer) {
 		Connection conn = QueryContext.getConnection();
 		Statement stat = null;
-		List<String> sqlList = parserSQLFile(sqlFile);
+		Stream<String> stream = parserSQLFile(sqlFile);
 		try {
 			QueryContext.setAutoCommit(false);
-			stat = conn.createStatement();
-			for (String sql : sqlList) {
-				stat.addBatch(sql);
-			}
-			stat.executeBatch();
+			final Statement st = conn.createStatement();
+			stat = st;
+			stream.forEach(s -> consumer.accept(st, s));
+			int[] ints = stat.executeBatch();
 			stat.clearBatch();
 			QueryContext.commit();
+			return ints;
 		} catch (Exception e) {
 			try {
 				QueryContext.rollback();
@@ -393,10 +341,8 @@ public class DB {
 	/**
 	 * 释放资源
 	 * 
-	 * @param rs
-	 *            ResultSet实例
-	 * @param stat
-	 *            Statement实例
+	 * @param rs ResultSet实例
+	 * @param stat Statement实例
 	 */
 	private static void close(ResultSet rs, Statement stat) {
 		try {
@@ -419,13 +365,10 @@ public class DB {
 	/**
 	 * 将 rs 的结果集 转换成 List&lt;Map&gt;,rs没有结果则返回空对象(该方法永不返回null).
 	 * 
-	 * @param rs
-	 *            结果集
-	 * @param method
-	 *            当前方法
+	 * @param rs 结果集
+	 * @param method 当前方法
 	 * @return List map结果集
-	 * @throws SQLException
-	 *             SQL异常
+	 * @throws SQLException SQL异常
 	 */
 	private static List<Map<String, Object>> rs2Map(ResultSet rs, Method method) throws SQLException {
 
@@ -484,17 +427,17 @@ public class DB {
 	 * @param objs
 	 */
 	private static void info(String sql, List<Object> objs) {
-		if(LOG.isInfoEnabled()) { // 这个输出要做很多事情,在此判断一下很有必要,生产环境通常是warn级别
+		if (LOG.isInfoEnabled()) { // 这个输出要做很多事情,在此判断一下很有必要,生产环境通常是warn级别
 			StringBuilder sb = new StringBuilder("\n正在准备执行SQL:");
 			sb.append(sql);
 			sb.append("\n");
-			if(objs!=null && !objs.isEmpty()) {
+			if (objs != null && !objs.isEmpty()) {
 				int len = objs.size();
 				for (int i = 0; i < len; i++) {
 					sb.append(String.format("第%d个\"?\"对应的参数值是:%s;%n", i + 1, objs.get(i)));
 				}
 			}
-			LOG.info(sb.toString());	
+			LOG.info(sb.toString());
 		}
 	}
 }

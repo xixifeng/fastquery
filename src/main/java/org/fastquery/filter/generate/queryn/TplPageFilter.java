@@ -51,8 +51,7 @@ public class TplPageFilter implements MethodFilter {
 			Type[] types = type.getActualTypeArguments();
 			Type t = types[0];
 			if (ParameterizedType.class.isAssignableFrom(t.getClass())
-					&& !("org.fastquery.page.Page<java.util.Map<java.lang.String, java.lang.Object>>"
-							.equals(type.getTypeName()))) {
+					&& !("org.fastquery.page.Page<java.util.Map<java.lang.String, java.lang.Object>>".equals(type.getTypeName()))) {
 				this.abortWith(method, "Page<T> 中的T要么是Map<String,Object>,要么是一个实体.");
 			}
 
@@ -81,8 +80,7 @@ public class TplPageFilter implements MethodFilter {
 			}
 
 			// 5). @PageIndex或@PageSize 不能独存
-			int cou = TypeUtil.countRepeated(PageIndex.class, parameters)
-					+ TypeUtil.countRepeated(PageSize.class, parameters);
+			int cou = TypeUtil.countRepeated(PageIndex.class, parameters) + TypeUtil.countRepeated(PageSize.class, parameters);
 			if (cou == 1) {
 				this.abortWith(method, "@PageIndex或@PageSize 不能独存,要么都不要出现.");
 			}
@@ -102,7 +100,6 @@ public class TplPageFilter implements MethodFilter {
 	}
 
 	private boolean hasPageAnn(Parameter[] parameters) {
-		return (TypeUtil.findAnnotationIndex(PageIndex.class, parameters) != -1)
-				&& TypeUtil.findAnnotationIndex(PageSize.class, parameters) != -1;
+		return (TypeUtil.findAnnotationIndex(PageIndex.class, parameters) != -1) && TypeUtil.findAnnotationIndex(PageSize.class, parameters) != -1;
 	}
 }

@@ -35,22 +35,25 @@ import org.fastquery.where.Condition;
 
 /**
  * 该类的作用范围仅仅是当前包
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 class QueryFilterHelper {
-	
-	private QueryFilterHelper(){}
-	
+
+	private QueryFilterHelper() {
+	}
+
 	/**
 	 * 获取SQL语句,不考虑条件是否参与运算问题.
+	 * 
 	 * @param method
 	 * @param query
 	 * @return
 	 */
-	static List<String> getQuerySQL(Method method,Query[] queries){
-		
+	private static List<String> getQuerySQL(Method method, Query[] queries) {
+
 		List<String> sqls = new ArrayList<>(queries.length);
-		
+
 		for (Query query : queries) {
 
 			String sql = query.value();
@@ -62,18 +65,18 @@ class QueryFilterHelper {
 				sb.append(conditions[i].value());
 			}
 			// 追加条件 End
-			
+
 			String where = sb.toString();
-			if(!"".equals(where) && TypeUtil.matches(query.value(),Placeholder.WHERE_REG).size()!=1) {
+			if (!"".equals(where) && TypeUtil.matches(query.value(), Placeholder.WHERE_REG).size() != 1) {
 				throw new RepositoryException(method + " 如果存在@Condition(条件注解),那么@Query中的value值,必须存在#{#where},有且只能出现一次");
 			}
 			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(sb.toString())));
 		}
-		
+
 		return sqls;
 	}
-	
-	static List<String> getQuerySQL(Method method){
+
+	static List<String> getQuerySQL(Method method) {
 		return getQuerySQL(method, method.getAnnotationsByType(Query.class));
 	}
 }

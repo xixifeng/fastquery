@@ -34,37 +34,42 @@ import java.lang.annotation.Target;
  */
 @Repeatable(Conditions.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD,ElementType.ANNOTATION_TYPE })
+@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
 public @interface Condition {
-	
+
 	/**
 	 * 条件
+	 * 
 	 * @return String
 	 */
 	String value();
-	
+
 	/**
 	 * 默认:允许传递所有的值,都不会使当前条件忽略. <br>
 	 * 当前条件所包含的变量值跟allow所指定的正则表达式逐个进行匹配,如果其中一个能匹配上就追加这个条件. <br>
 	 * 注意: 先 allow(允许) 后 ignore(忽略)
+	 * 
 	 * @return String
 	 */
 	String[] allow() default {};
-	
+
 	/**
 	 * 当前条件所包含的变量值跟ignore所指定的正则表达式逐个进行匹配,如果其中一个能匹配上就忽略该条件
+	 * 
 	 * @return String
 	 */
 	String[] ignore() default {};
-	
+
 	/**
 	 * ignoreNull 为true: 表示该条件中的参数变量如果接受到的值是null,那么该行条件将不参与运算,反之,参与运算(默认:true).
+	 * 
 	 * @return boolean
 	 */
 	boolean ignoreNull() default true;
-	
+
 	/**
 	 * ignoreEmpty 为true: 表示该条件中的参数变量如果接受到的值是""(空字符串),那么该行条件将不参与运算,反之,参与运算(默认:true).
+	 * 
 	 * @return boolean
 	 */
 	boolean ignoreEmpty() default true;

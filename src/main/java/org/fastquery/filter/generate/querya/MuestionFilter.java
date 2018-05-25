@@ -32,6 +32,7 @@ import org.fastquery.util.TypeUtil;
 
 /**
  * 拦截 SQL中 ?N+ 能否从方法参数中找到匹配
+ * 
  * @author mei.sir@aliyun.cn
  */
 public class MuestionFilter implements MethodFilter {
@@ -45,8 +46,9 @@ public class MuestionFilter implements MethodFilter {
 			Set<String> strs = TypeUtil.matchesNotrepeat(value, Placeholder.SP1_REG);
 			strs.forEach(str -> {
 				int index = Integer.valueOf(str.replace("?", ""));
-				if(index > parameterCount) {
-					this.abortWith(method, String.format("%n@Query(%s)中的\"?%d\"表示指定该方法的第%d个参数,可是该方法一共只有%d个参数%n", value,index,index,parameterCount));
+				if (index > parameterCount) {
+					this.abortWith(method,
+							String.format("%n@Query(%s)中的\"?%d\"表示指定该方法的第%d个参数,可是该方法一共只有%d个参数%n", value, index, index, parameterCount));
 				}
 			});
 		}

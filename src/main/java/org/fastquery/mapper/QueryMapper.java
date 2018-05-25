@@ -44,14 +44,6 @@ public class QueryMapper {
 		return template;
 	}
 
-	void setId(String id) {
-		this.id = id;
-	}
-
-	void setTemplate(String template) {
-		this.template = template;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;

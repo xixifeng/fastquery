@@ -31,35 +31,35 @@ import org.fastquery.util.TypeUtil;
 
 /**
  * 检测注解上的SQL 是否是Modifying
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public class MethodAnnotationFilter implements MethodFilter {
 
 	@Override
 	public Method doFilter(Method method) {
-		
-		
+
 		// SQL Modifying 关键字汇总
-		String[] updateFlags = {"update","insert","delete","create","alter"};
-		
+		String[] updateFlags = { "update", "insert", "delete", "create", "alter" };
+
 		// 1). 检测是否是update,如果是,需要加注解Modifying
-		// 返回与该元素关联的注释。如果没有与该元素关联的注释，返回值是一个长度为0的数组。 
+		// 返回与该元素关联的注释。如果没有与该元素关联的注释，返回值是一个长度为0的数组。
 		Query[] querys = method.getAnnotationsByType(Query.class);
 		for (Query query : querys) {
-				// 获取sql语句
-				String sql = query.value();
-				
-				if( method.getAnnotation(Modifying.class)==null ) {
-					for (String updateFlag : updateFlags) {
-						if(TypeUtil.containsIgnoreCase(sql, updateFlag)) {
-							this.abortWith(method, query.value()+"中包含有SQL关键字"+updateFlag+",它属于修改操作,必须要配合@Modifying一起使用.");
-						}
+			// 获取sql语句
+			String sql = query.value();
+
+			if (method.getAnnotation(Modifying.class) == null) {
+				for (String updateFlag : updateFlags) {
+					if (TypeUtil.containsIgnoreCase(sql, updateFlag)) {
+						this.abortWith(method, query.value() + "中包含有SQL关键字" + updateFlag + ",它属于修改操作,必须要配合@Modifying一起使用.");
 					}
 				}
+			}
 		}
-		
-		// 2). 检测... 
-		
+
+		// 2). 检测...
+
 		return method;
 	}
 

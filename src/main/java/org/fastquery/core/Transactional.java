@@ -34,7 +34,7 @@ public @interface Transactional {
 	 * 
 	 * @return int
 	 */
-	int timeout() default -1;
+	int timeout() default -1; // NO_UCD (unused code)
 
 	/**
 	 * 传播行为

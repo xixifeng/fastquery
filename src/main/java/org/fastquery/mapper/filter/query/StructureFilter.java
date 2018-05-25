@@ -34,6 +34,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * query 节点语法约束
+ * 
  * @author xixifeng (fastquery@126.com)
  */
 public class StructureFilter implements Filter {
@@ -51,26 +52,26 @@ public class StructureFilter implements Filter {
 		for (int j = 0; j < partNodes.getLength(); j++) {
 			Node partNode = partNodes.item(j);
 			short nodeType = partNode.getNodeType();
-			if (nodeType == Document.ELEMENT_NODE) { 
+			if (nodeType == Document.ELEMENT_NODE) {
 				elementNames.add(partNode.getNodeName());
 			}
 		}
-		
+
 		// 统计value节点的个数
-		if(Collections.frequency(elementNames, "value")>1) {
-			this.abortWith(sb.toString()+" 该节点下面所包裹的value节点最多只能出现一次");
+		if (Collections.frequency(elementNames, "value") > 1) {
+			this.abortWith(sb.toString() + " 该节点下面所包裹的value节点最多只能出现一次");
 		}
-		
-		if(Collections.frequency(elementNames, "countQuery")>1) {
-			this.abortWith(sb.toString()+" 该节点下面所包裹的countQuery节点最多只能出现一次");
+
+		if (Collections.frequency(elementNames, "countQuery") > 1) {
+			this.abortWith(sb.toString() + " 该节点下面所包裹的countQuery节点最多只能出现一次");
 		}
-		
-		if(Collections.frequency(elementNames, "parts")>1) {
-			this.abortWith(sb.toString()+" 该节点下面所包裹的parts节点最多只能出现一次");
+
+		if (Collections.frequency(elementNames, "parts") > 1) {
+			this.abortWith(sb.toString() + " 该节点下面所包裹的parts节点最多只能出现一次");
 		}
-		
-		if(!elementNames.isEmpty() && !elementNames.contains("value")) { // 如果不为空,且不包含value
-			this.abortWith(sb.toString()+" 该节点下面所包裹的要么全部是文本内容,要么就必须存在value节点");
+
+		if (!elementNames.isEmpty() && !elementNames.contains("value")) { // 如果不为空,且不包含value
+			this.abortWith(sb.toString() + " 该节点下面所包裹的要么全部是文本内容,要么就必须存在value节点");
 		}
 		return element;
 	}

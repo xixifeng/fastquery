@@ -50,8 +50,8 @@ public class Visitor {
 	public Visitor() {
 	}
 
-	public Visitor(Long punitId, String vname, String idCard, String mobile, String email, Byte gender, String toAddr,
-			String remark, Long lastDate, String iden, Integer dId) {
+	public Visitor(Long punitId, String vname, String idCard, String mobile, String email, Byte gender, String toAddr, String remark, Long lastDate,
+			String iden, Integer dId) {
 		this.punitId = punitId;
 		this.vname = vname;
 		this.idCard = idCard;

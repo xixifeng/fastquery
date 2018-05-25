@@ -43,8 +43,7 @@ public class FQueryResourceImplTest {
 
 	@Test
 	public void testGetResourceAsStream() {
-		try (InputStream inputStream = resource
-				.getResourceAsStream("queries/org.fastquery.dao.UserInfoDBService.queries.xml");
+		try (InputStream inputStream = resource.getResourceAsStream("queries/org.fastquery.dao.UserInfoDBService.queries.xml");
 				ByteArrayOutputStream bo = new ByteArrayOutputStream()) {
 			int b = 0;
 			while ((b = inputStream.read()) != -1) {

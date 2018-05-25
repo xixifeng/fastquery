@@ -36,7 +36,7 @@ import org.fastquery.core.Repository;
  */
 @Repeatable(Befores.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD,ElementType.TYPE, ElementType.ANNOTATION_TYPE })
+@Target({ ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE })
 public @interface Before {
 	Class<? extends BeforeFilter<? extends Repository>>[] value() default {};
 }

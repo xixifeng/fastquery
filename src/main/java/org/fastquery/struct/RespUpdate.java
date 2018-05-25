@@ -31,14 +31,6 @@ public class RespUpdate {
 	private int effect; // 影响行数
 	private Long pk; // 主健
 
-	public RespUpdate() {
-	}
-
-	public RespUpdate(int effect, Long pk) {
-		this.effect = effect;
-		this.pk = pk;
-	}
-
 	public int getEffect() {
 		return effect;
 	}

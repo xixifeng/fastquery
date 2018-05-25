@@ -27,14 +27,15 @@ package org.fastquery.page;
  * @author xixifeng (fastquery@126.com)
  */
 public class Slice {
-	
-	private int number;  // 当前页码
-	private int size;    // 每页多少条数据
-		
+
+	private int number; // 当前页码
+	private int size; // 每页多少条数据
+
 	/**
 	 * 构造 Slice(页片)
+	 * 
 	 * @param number 当前页码
-	 * @param size   每页多少条数据
+	 * @param size 每页多少条数据
 	 */
 	public Slice(int number, int size) {
 		this.number = number;

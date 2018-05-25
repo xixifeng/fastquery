@@ -147,10 +147,8 @@ public interface StudentDBService extends QueryRepository {
 	/**
 	 * 查询某个表的主键字段信息, 注意: 一个表中有可能是联合主键,因此返回的是数组
 	 * 
-	 * @param table_name
-	 *            表名称
-	 * @param table_schema
-	 *            所属数据库
+	 * @param table_name 表名称
+	 * @param table_schema 所属数据库
 	 */
 	@Query("select * from information_schema.columns where table_name = ?1 and table_schema = ?2 and column_key='pri'")
 	JSONArray findColumnKey(String table_name, String table_schema);
@@ -201,8 +199,7 @@ public interface StudentDBService extends QueryRepository {
 	@Condition("or dept in(?4,?5,?6)")
 	@Condition("and name not like ?7")
 	@Condition("or age between ?8 and ?9")
-	Student[] findAllStudent(String no, String name, Integer age, String dept1, String dept2, String dept3,
-			String name2, Integer age2, Integer age3);
+	Student[] findAllStudent(String no, String name, Integer age, String dept1, String dept2, String dept3, String name2, Integer age2, Integer age3);
 
 	@Query("select * from Student #{#where} order by age desc")
 	@Condition("name like ?1") // 第1个参数(?1)如果传递null, 该行条件将会被忽略
@@ -222,8 +219,8 @@ public interface StudentDBService extends QueryRepository {
 	Map<String, String> findTop1Student();
 
 	public void db();
-	
+
 	@Query("call addStudent(?1,:name,?3,?4,:dept)")
-	JSONObject callProcedure(String no,@Param("name") String name,String sex,int age,@Param("dept") String dept);
-	
+	JSONObject callProcedure(String no, @Param("name") String name, String sex, int age, @Param("dept") String dept);
+
 }

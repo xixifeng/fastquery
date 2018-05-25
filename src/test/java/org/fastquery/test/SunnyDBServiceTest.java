@@ -52,11 +52,11 @@ public class SunnyDBServiceTest {
 
 	@Test
 	public void save() {
-		String number = "852000XXXXX"; 
+		String number = "852000XXXXX";
 		Card card = new Card();
 		card.setNumber(number);
 		int c = sunnyDBService.save(card);
-		assertThat(c,is(1));
+		assertThat(c, is(1));
 		int effect = sunnyDBService.deleteByNumber(number);
 		assertThat(effect, is(1));
 		assertThat(sunnyDBService.exists(number), is(false));

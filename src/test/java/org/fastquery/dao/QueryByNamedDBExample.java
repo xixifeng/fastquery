@@ -46,8 +46,8 @@ public interface QueryByNamedDBExample extends QueryRepository {
 	// 从该类的配置文件里寻找id="findUserInfoAll"节点,然后绑定其SQL代码段
 	@QueryByNamed
 	JSONArray findUserInfoAll();
-	
-	@QueryByNamed(render=false)
+
+	@QueryByNamed(render = false)
 	JSONArray findUAll();
 
 	@QueryByNamed("findUserInfoOne")
@@ -57,13 +57,11 @@ public interface QueryByNamedDBExample extends QueryRepository {
 	JSONArray findUserInfoByNameAndAge(@Param("name") String name, @Param("age") Integer age);
 
 	@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
-	Page<Student> findPage(Pageable pageable, @Param("no") String no, @Param("name") String name,
-			@Param("age") Integer age);
-	
+	Page<Student> findPage(Pageable pageable, @Param("no") String no, @Param("name") String name, @Param("age") Integer age);
+
 	@NotCount
 	@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
-	Page<Student> findPage2(Pageable pageable, @Param("no") String no, @Param("name") String name,
-			@Param("age") Integer age);
+	Page<Student> findPage2(Pageable pageable, @Param("no") String no, @Param("name") String name, @Param("age") Integer age);
 
 	@Modifying
 	@QueryByNamed("updateUserInfoById")
@@ -71,17 +69,16 @@ public interface QueryByNamedDBExample extends QueryRepository {
 
 	@QueryByNamed
 	List<UserInfo> findUserInfoByFuzzyName(@Param("name") String name);
-	
+
 	@QueryByNamed
-	List<UserInfo> findUserInfo(@Param("id") Integer id,@Param("name") String name,@Param("age") Integer age,@Param("num") Integer num);
-	
+	List<UserInfo> findUserInfo(@Param("id") Integer id, @Param("name") String name, @Param("age") Integer age, @Param("num") Integer num);
+
 	@QueryByNamed("findUserInfo")
-	List<UserInfo> findUserInfo2(@Param("id") Integer id,@Param("age") Integer age);
-	
-	
+	List<UserInfo> findUserInfo2(@Param("id") Integer id, @Param("age") Integer age);
+
 	@QueryByNamed
-	List<UserInfo> findCon1(@Param("id") Integer id,@Param("age") Integer age);
-	
+	List<UserInfo> findCon1(@Param("id") Integer id, @Param("age") Integer age);
+
 	@QueryByNamed
-	List<UserInfo> findCon2(@Param("id") Integer id,@Param("age") Integer age);
+	List<UserInfo> findCon2(@Param("id") Integer id, @Param("age") Integer age);
 }

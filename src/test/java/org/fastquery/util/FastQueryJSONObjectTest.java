@@ -49,7 +49,7 @@ public class FastQueryJSONObjectTest {
 		String basedir = FastQueryJSONObject.getBasedir();
 		assertThat(basedir, equalTo("/mywork/myosgi/osgi_workspace/fastquery/tmp/"));
 	}
-	
+
 	@Test
 	public void testGetQueries() {
 		List<String> queries = FastQueryJSONObject.getQueries();

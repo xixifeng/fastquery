@@ -33,8 +33,8 @@ import org.fastquery.util.TypeUtil;
 /**
  * 一个QueryRepository必须要在fastquery.json配置basePackages.<br>
  * 
- * 在fastquery.json文件中,如果已经正确配置了basePackages,而没有配置数据源.
- * 那么必须通过@Source来获得相应的数据源. Source注解如果标识在方法的参数上,那么该参数只能是字符串类型.
+ * 在fastquery.json文件中,如果已经正确配置了basePackages,而没有配置数据源. 那么必须通过@Source来获得相应的数据源.
+ * Source注解如果标识在方法的参数上,那么该参数只能是字符串类型.
  * 
  * @author xixifeng (fastquery@126.com)
  */
@@ -42,30 +42,31 @@ public class SourceFilter implements MethodFilter {
 
 	@Override
 	public Method doFilter(Method method) {
-		
+
 		Class<?> clazz = method.getDeclaringClass();
-		
+
 		Parameter[] parameters = method.getParameters();
-		
-		//1). 在fastquery.json文件中,如果已经正确配置了basePackages,而没有配置数据源.
-		//那么必须通过@Source来获得相应的数据源. Source注解如果标识在方法的参数上,那么该参数只能是字符串类型.
+
+		// 1). 在fastquery.json文件中,如果已经正确配置了basePackages,而没有配置数据源.
+		// 那么必须通过@Source来获得相应的数据源. Source注解如果标识在方法的参数上,那么该参数只能是字符串类型.
 		String dataSourceName = FQueryProperties.findDataSourceName(clazz.getName());
-		if(dataSourceName==null){ // 表明在fastquery.json中没有配置相应的数据源名称
+		if (dataSourceName == null) { // 表明在fastquery.json中没有配置相应的数据源名称
 			int index = TypeUtil.findAnnotationIndex(Source.class, parameters);
-			if(index == -1) {
-				this.abortWith(method, "* 在fastquery.json文件中,如果已经正确配置了basePackages,而没有配置数据源.\n* 那么必须通过@Source来获得相应的数据源. Source注解如果标识在方法的参数上,那么该参数只能是字符串类型.");
+			if (index == -1) {
+				this.abortWith(method,
+						"* 在fastquery.json文件中,如果已经正确配置了basePackages,而没有配置数据源.\n* 那么必须通过@Source来获得相应的数据源. Source注解如果标识在方法的参数上,那么该参数只能是字符串类型.");
 			}
 			Class<?> ptype = method.getParameterTypes()[index];
-			if(ptype!=String.class){
+			if (ptype != String.class) {
 				this.abortWith(method, "Source注解如果标识在方法的参数上,那么该参数只能是String类型.");
 			}
 		}
-		
+
 		// 2). @Source不能重复出现
-		if(TypeUtil.countRepeated(Source.class, parameters)>1) {
+		if (TypeUtil.countRepeated(Source.class, parameters) > 1) {
 			this.abortWith(method, "@Source 只能出现一次.");
 		}
-		
+
 		return method;
 	}
 

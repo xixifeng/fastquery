@@ -33,6 +33,7 @@ public class TestASMifier {
 	public static void main(String[] args) throws Exception {
 		// "Hi.class" 对应的字节码通过ASM工具怎样一步一步生成出来呢? 通过调用ASMifier.main, 可以得到通过ASM工具生成bytes的详细源码.
 		// 解释太绕了, 运行一下便知
-		ASMifier.main(new String[]{ "/mywork/myosgi/osgi_workspace/fastquery/target/test-classes/org/fastquery/bean/StudentDBServiceProxyImpl.class"} );
+		ASMifier.main(
+				new String[] { "/mywork/myosgi/osgi_workspace/fastquery/target/test-classes/org/fastquery/bean/StudentDBServiceProxyImpl.class" });
 	}
 }

@@ -30,11 +30,11 @@ import org.fastquery.core.RepositoryException;
  * @author xixifeng (fastquery@126.com)
  */
 class FqClassLoader extends ClassLoader {
-	
+
 	private FQueryBinder binder;
 
 	FqClassLoader(ClassLoader webClassLoader, FQueryBinder binder) {
-		super(webClassLoader); 
+		super(webClassLoader);
 		this.binder = binder;
 	}
 
@@ -42,8 +42,7 @@ class FqClassLoader extends ClassLoader {
 		Class<?> clazz = defineClass(name, b, off, len);
 		try {
 			binder.bind(clazz.getMethod("getInstance").invoke(null)).to(clazz.getInterfaces()[0]);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
-				| SecurityException e) {
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			throw new RepositoryException(e);
 		}
 		return clazz;

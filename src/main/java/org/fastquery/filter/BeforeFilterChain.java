@@ -35,47 +35,48 @@ import java.util.Set;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-class  BeforeFilterChain<R extends Repository> extends BeforeFilter<R>  {
-	
+class BeforeFilterChain<R extends Repository> extends BeforeFilter<R> {
+
 	private static ThreadLocal<Object> threadLocal = new ThreadLocal<>(); // 存储:中断时留下的返回值
-	
+
 	// 在此用map 主要目的是为了去重,相同的class后面覆盖前面的.
 	// 用LinkedHashMap而不用hashMap 是为了有顺序
-	private Map<Class<?>,BeforeFilter<R>> beforeFilters = new LinkedHashMap<>();
-	
+	private Map<Class<?>, BeforeFilter<R>> beforeFilters = new LinkedHashMap<>();
+
 	public BeforeFilterChain<R> addFilter(BeforeFilter<R> f) {
 		beforeFilters.put(f.getClass(), f);
 		return this;
 	}
-	
+
 	@Override
 	protected void doFilter(R repository, Method method, Object[] args) {
-		
+
 		// 这里的循环需要中途跳出循环,用Lambda语法,还不知道如何跳出循环,因此不能用
-		
+
 		Set<Entry<Class<?>, BeforeFilter<R>>> entries = beforeFilters.entrySet();
 		for (Entry<Class<?>, BeforeFilter<R>> entry : entries) {
-			if(threadLocal.get()!=void.class) { // 如果是非void.class 表明中断啦
+			if (threadLocal.get() != void.class) { // 如果是非void.class 表明中断啦
 				break;
 			}
-			entry.getValue().doFilter(repository,method,args);
+			entry.getValue().doFilter(repository, method, args);
 		}
-		
+
 	}
-	
+
 	/**
 	 * 开始链条
+	 * 
 	 * @param method
 	 * @param args
 	 */
-	public Object start(R repository,Method method, Object[] args){
+	public Object start(R repository, Method method, Object[] args) {
 		// 设置初始值
 		threadLocal.set(void.class);
-		this.doFilter(repository,method, args);
+		this.doFilter(repository, method, args);
 		return threadLocal.get();
 	}
-	
-	static void setThreadLocal(Object value){
+
+	static void setThreadLocal(Object value) {
 		threadLocal.set(value);
 	}
 }
