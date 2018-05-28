@@ -391,7 +391,7 @@ public final class BeanUtil {
 				}
 			}
 			if (sb.length() == len) {
-				LOG.warn("传递的实体,没有什么可以修改,{}",bean);
+				LOG.warn("传递的实体,没有什么可以修改,{}", bean);
 				return null;
 			}
 			// 去掉sb最后的一个字符
@@ -458,7 +458,7 @@ public final class BeanUtil {
 				}
 			}
 			if (sb.length() == len) {
-				LOG.warn("传递的实体,没有什么可修改,{}",bean);
+				LOG.warn("传递的实体,没有什么可修改,{}", bean);
 				return null;
 			}
 			// where的后面部分 和 追加sql参数
@@ -668,6 +668,30 @@ public final class BeanUtil {
 			throw new RepositoryException(e);
 		}
 		return ns;
+	}
+
+	public static long toId(Object entity) {
+		Class<?> cls = entity.getClass();
+		Object key = null;
+		Field[] files = cls.getDeclaredFields();
+
+		for (Field field : files) {
+			if (field.getAnnotation(Id.class) != null) {
+				try {
+					field.setAccessible(true);
+					key = field.get(entity);
+				} catch (Exception e) {
+					throw new RepositoryException(e);
+				}
+				break;
+			}
+		}
+
+		if (key == null) {
+			throw new RepositoryException(cls + " 必须有@Id标识,并且主键不能为null");
+		}
+
+		return Long.valueOf(key.toString());
 	}
 
 }

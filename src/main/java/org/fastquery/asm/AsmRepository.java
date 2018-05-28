@@ -23,6 +23,7 @@
 package org.fastquery.asm;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.List;
 
@@ -111,7 +112,9 @@ public class AsmRepository implements Opcodes {
 		// 根据接口clazz 生成实现的方法
 		Method[] methods = repositoryClazz.getMethods();
 		for (Method method : methods) {
-			cw = generateMethod(cw, method, Prepared.class);
+			if (Modifier.isAbstract(method.getModifiers())) { // 只针对 abstract 方法
+				cw = generateMethod(cw, method, Prepared.class);
+			}
 		}
 		cw.visitEnd();
 

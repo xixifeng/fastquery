@@ -95,7 +95,7 @@ public class FastQueryJSONObject {
 		}
 	}
 
-	public static void removeCurrent() {
+	public static void removeCurrent() { // NO_UCD (unused code)
 		maps.remove(Thread.currentThread().getContextClassLoader());
 	}
 

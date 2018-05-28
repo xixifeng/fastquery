@@ -25,6 +25,8 @@ package org.fastquery.core;
 import java.math.BigInteger;
 import java.util.Collection;
 
+import org.fastquery.util.BeanUtil;
+
 /**
  * 查询仓库
  * 
@@ -38,7 +40,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 主键
 	 */
 	@Id(MethodId.QUERY)
-	BigInteger saveToId(Object entity);
+	BigInteger saveReturnId(Object entity);
 
 	/**
 	 * 保存一个实体,然后将主键值返回(不适用于联合主键).注意:永不返回null,没有找到主键返回-1
@@ -48,7 +50,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 主键
 	 */
 	@Id(MethodId.QUERY)
-	BigInteger saveToId(Object entity, @Source String dataSourceName);
+	BigInteger saveReturnId(Object entity, @Source String dataSourceName);
 
 	/**
 	 * 保存一个实体,然后将主键值返回(不适用于联合主键).注意:永不返回null,没有找到主键返回-1
@@ -59,7 +61,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 主键
 	 */
 	@Id(MethodId.QUERY)
-	BigInteger saveToId(@Source String dataSourceName, String dbName, Object entity);
+	BigInteger saveReturnId(@Source String dataSourceName, String dbName, Object entity);
 
 	/**
 	 * 保存实体集合
@@ -385,4 +387,145 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 */
 	@Id(MethodId.QUERY8)
 	int delete(String tableName, String primaryKeyName, long id, @Source String dataSourceName, String dbName);
+
+	/**
+	 * 保存一个实体,返回实体
+	 * 
+	 * @param entity 实体
+	 * @return 返回实体
+	 */
+	@SuppressWarnings("unchecked")
+	default <E> E saveReturnEntity(E entity) {
+		long id = saveReturnId(entity).longValue();
+		return (E) find(entity.getClass(), id);
+	}
+
+	/**
+	 * 保存一个实体,返回实体
+	 * 
+	 * @param entity 实体
+	 * @param dataSourceName 数据源名称
+	 * @return 返回实体
+	 */
+	@SuppressWarnings("unchecked")
+	default <E> E saveReturnEntity(E entity, String dataSourceName) {
+		long id = saveReturnId(entity, dataSourceName).longValue();
+		return (E) find(entity.getClass(), id, dataSourceName);
+	}
+
+	/**
+	 * 保存一个实体,返回实体
+	 * 
+	 * @param dataSourceName 数据源名称
+	 * @param dbName 数据库名称
+	 * @param entity 实体
+	 * @return 返回实体
+	 */
+	@SuppressWarnings("unchecked")
+	default <E> E saveReturnEntity(String dataSourceName, String dbName, E entity) {
+		long id = saveReturnId(dataSourceName, dbName, entity).longValue();
+		return (E) find(entity.getClass(), id, dataSourceName, dbName);
+	}
+
+	/**
+	 * 更新一个实体,返回实体
+	 * 
+	 * @param entity 实体
+	 * @return 返回实体
+	 */
+	@SuppressWarnings("unchecked")
+	default <E> E updateReturnEntity(E entity) {
+		long effect = update(entity);
+		if (effect != 1) {
+			throw new RepositoryException("修改失败了");
+		}
+		long id = BeanUtil.toId(entity);
+		return (E) find(entity.getClass(), id);
+	}
+
+	/**
+	 * 更新一个实体,返回实体
+	 * 
+	 * @param dataSourceName 数据源名称
+	 * @param entity 实体
+	 * @return 返回实体
+	 */
+	@SuppressWarnings("unchecked")
+	default <E> E updateReturnEntity(String dataSourceName, E entity) {
+		long effect = update(dataSourceName, entity);
+		if (effect != 1) {
+			throw new RepositoryException("修改失败了");
+		}
+		long id = BeanUtil.toId(entity);
+		return (E) find(entity.getClass(), id, dataSourceName);
+	}
+
+	/**
+	 * 更新一个实体,返回实体
+	 * 
+	 * @param dataSourceName 数据源名称
+	 * @param dbName 数据库名称
+	 * @param entity 实体
+	 * @return 返回实体
+	 */
+	@SuppressWarnings("unchecked")
+	default <E> E updateReturnEntity(String dataSourceName, String dbName, E entity) {
+		long effect = update(dataSourceName, dbName, entity);
+		if (effect != 1) {
+			throw new RepositoryException("修改失败了");
+		}
+		long id = BeanUtil.toId(entity);
+		return (E) find(entity.getClass(), id, dataSourceName, dbName);
+	}
+
+	/**
+	 * 保存或更新一个实体,返回实体
+	 * 
+	 * @param entity 实体
+	 * @return 返回实体
+	 */
+	@SuppressWarnings("unchecked")
+	default <E> E saveOrUpdateReturnEntity(E entity) {
+		long effect = saveOrUpdate(entity);
+		if (effect != 1) {
+			throw new RepositoryException("修改失败了");
+		}
+		long id = BeanUtil.toId(entity);
+		return (E) find(entity.getClass(), id);
+	}
+
+	/**
+	 * 保存或更新一个实体,返回实体
+	 * 
+	 * @param dataSourceName 数据源名称
+	 * @param entity 实体
+	 * @return 返回实体
+	 */
+	@SuppressWarnings("unchecked")
+	default <E> E saveOrUpdateReturnEntity(String dataSourceName, E entity) {
+		long effect = saveOrUpdate(dataSourceName, entity);
+		if (effect != 1) {
+			throw new RepositoryException("修改失败了");
+		}
+		long id = BeanUtil.toId(entity);
+		return (E) find(entity.getClass(), id, dataSourceName);
+	}
+
+	/**
+	 * 保存或更新一个实体,返回实体
+	 * 
+	 * @param dataSourceName 数据源名称
+	 * @param dbName 数据库名称
+	 * @param entity 实体
+	 * @return 返回实体
+	 */
+	@SuppressWarnings("unchecked")
+	default <E> E saveOrUpdateReturnEntity(String dataSourceName, String dbName, E entity) {
+		long effect = saveOrUpdate(dataSourceName, dbName, entity);
+		if (effect != 1) {
+			throw new RepositoryException("修改失败了");
+		}
+		long id = BeanUtil.toId(entity);
+		return (E) find(entity.getClass(), id, dataSourceName, dbName);
+	}
 }

@@ -98,11 +98,17 @@ class GenerateRepositoryImpl implements GenerateRepository {
 
 		byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
 
-		/*
-		 * // 把生成的文件存储起来 try (java.io.FileOutputStream fos = new
-		 * java.io.FileOutputStream("/data/tmp/" + name + ".class")) { fos.write(bytes); } catch
-		 * (Exception e) { e.printStackTrace(); } // 把生成的文件存储起来 end
+		/**
+		 * <pre>
+		// 把生成的文件存储起来
+		try (java.io.FileOutputStream fos = new java.io.FileOutputStream("/data/tmp/" + name + ".class")) {
+			fos.write(bytes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} // 把生成的文件存储起来 end
+		</pre>
 		 */
+
 		return (Class<? extends T>) classLoader.defineClassByName(name, bytes, 0, bytes.length);
 	}
 

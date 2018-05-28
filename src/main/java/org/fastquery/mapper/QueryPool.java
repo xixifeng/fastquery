@@ -303,7 +303,7 @@ public class QueryPool {
 		if ("".equals(id)) {
 			id = method.getName();
 		}
-		LOG.info("已获得模板:{}",id);
+		LOG.info("已获得模板:{}", id);
 		String tpl;
 		if (isQuery) {
 			// getTemplate 永远不会为null,在初始化时已经做了检测

@@ -24,8 +24,10 @@ package org.fastquery.filter.generate.query;
 
 import java.lang.reflect.Method;
 
+import org.fastquery.core.BuilderQuery;
 import org.fastquery.core.Query;
 import org.fastquery.filter.generate.common.MethodFilter;
+import org.fastquery.util.TypeUtil;
 
 /**
  * SQL 安全检测
@@ -37,14 +39,15 @@ public class SQLFilter implements MethodFilter {
 	@Override
 	public Method doFilter(Method method) {
 		Query[] queries = method.getAnnotationsByType(Query.class);
+		boolean b = TypeUtil.hasType(BuilderQuery.class, method.getParameters());
 		for (Query query : queries) {
 			String sql = query.value();
 
-			if ("".equals(sql)) {
-				this.abortWith(method, sql + "该方法,没有标注任何SQL语句");
+			if ("".equals(sql) && !b) { // 如果@Query的value为"",并且又没有传递BuilderQuery(BuilderQuery:用于构建SQL)
+				this.abortWith(method, sql + "该方法,没有标注任何SQL语句. 帮定SQL又多种方式:通过@Query;采用xml模板;用BuilderQuery,或参数传入...");
 			}
 
-			if (sql.length() < 6) {
+			if (sql.length() < 6 && !b) {
 				this.abortWith(method, sql + "SQL语法错误");
 			}
 		}

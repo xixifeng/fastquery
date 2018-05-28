@@ -20,51 +20,45 @@
  * 
  */
 
-package org.fastquery.page;
+package org.fastquery.core;
 
 /**
  * 
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
  */
-public class PageableImpl implements Pageable {
+public class MetaData {
 
-	// 这个给默认值是没有意义的, 当前访问的是第几页和每页显示多少条数据,应该让客户端决定.
-	private int page;
-	private int size;
+	private String query;
+	private String countQuery;
+	private String where = "";
+
+	public void setQuery(String query) {
+		this.query = query;
+	}
+
+	public void setCountQuery(String countQuery) {
+		this.countQuery = countQuery;
+	}
+
+	public String getQuery() {
+		return query + ' ' + where;
+	}
+
+	public String getCountQuery() {
+		return countQuery + ' ' + where;
+	}
+
+	public void clear() {
+		this.query = null;
+		this.countQuery = null;
+	}
 
 	/**
-	 * 构造分页
+	 * 设置查询条件. 支持引用问号表达式(?index) , 冒号表达式(:name) <br>
 	 * 
-	 * @param page 指定访问第几页(从1开始计数)
-	 * @param size 设定每页显示几条数据
+	 * @param where 查询条件
 	 */
-	public PageableImpl(int page, int size) {
-
-		this.page = page;
-		this.size = size;
-
-		if (page < 1) {
-			this.page = 1;
-		}
-
-		if (size < 1) {
-			this.size = 1;
-		}
+	public void setWhere(String where) {
+		this.where = where;
 	}
-
-	@Override
-	public int getPageIndex() {
-		return page;
-	}
-
-	@Override
-	public int getPageSize() {
-		return size;
-	}
-
-	@Override
-	public int getOffset() {
-		return page * size - size;
-	}
-
 }

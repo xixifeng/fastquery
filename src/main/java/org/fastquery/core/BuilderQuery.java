@@ -20,51 +20,18 @@
  * 
  */
 
-package org.fastquery.page;
+package org.fastquery.core;
 
 /**
+ * 构建查询语句
  * 
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
  */
-public class PageableImpl implements Pageable {
-
-	// 这个给默认值是没有意义的, 当前访问的是第几页和每页显示多少条数据,应该让客户端决定.
-	private int page;
-	private int size;
-
+public interface BuilderQuery {
 	/**
-	 * 构造分页
-	 * 
-	 * @param page 指定访问第几页(从1开始计数)
-	 * @param size 设定每页显示几条数据
+	 * 对给定的参数执行此操作.
+	 *
+	 * @param m 元数据
 	 */
-	public PageableImpl(int page, int size) {
-
-		this.page = page;
-		this.size = size;
-
-		if (page < 1) {
-			this.page = 1;
-		}
-
-		if (size < 1) {
-			this.size = 1;
-		}
-	}
-
-	@Override
-	public int getPageIndex() {
-		return page;
-	}
-
-	@Override
-	public int getPageSize() {
-		return size;
-	}
-
-	@Override
-	public int getOffset() {
-		return page * size - size;
-	}
-
+	void accept(MetaData m);
 }

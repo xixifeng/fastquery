@@ -52,7 +52,7 @@ import com.alibaba.fastjson.JSONObject;
 		TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class, BeanUtilTest.class, PageTest.class,
 		QueryByNamedDBExampleMapperTest.class, FastQueryJSONObjectTest.class, FQueryResourceImplTest.class, SunnyDBServiceTest.class,
 		SaveToIdTest.class, PlaceholderTest.class, DBTest.class, ProductDBServiceTest.class, FQueryPropertiesTest.class, QueryPoolTest.class,
-		ParamFilterTest.class, ConditionTest.class, QueryParserTest.class })
+		ParamFilterTest.class, ConditionTest.class, QueryParserTest.class, DefaultMethodTest.class })
 public class AllTest {
 
 	@BeforeClass

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2088, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -20,51 +20,23 @@
  * 
  */
 
-package org.fastquery.page;
+package org.fastquery.dao2;
+
+import java.util.Map;
+
+import org.fastquery.core.BuilderQuery;
+import org.fastquery.core.Param;
+import org.fastquery.core.Query;
+import org.fastquery.core.QueryRepository;
+import org.fastquery.page.Page;
+import org.fastquery.page.Pageable;
 
 /**
  * 
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
  */
-public class PageableImpl implements Pageable {
+public interface DefaultDBService extends QueryRepository {
 
-	// 这个给默认值是没有意义的, 当前访问的是第几页和每页显示多少条数据,应该让客户端决定.
-	private int page;
-	private int size;
-
-	/**
-	 * 构造分页
-	 * 
-	 * @param page 指定访问第几页(从1开始计数)
-	 * @param size 设定每页显示几条数据
-	 */
-	public PageableImpl(int page, int size) {
-
-		this.page = page;
-		this.size = size;
-
-		if (page < 1) {
-			this.page = 1;
-		}
-
-		if (size < 1) {
-			this.size = 1;
-		}
-	}
-
-	@Override
-	public int getPageIndex() {
-		return page;
-	}
-
-	@Override
-	public int getPageSize() {
-		return size;
-	}
-
-	@Override
-	public int getOffset() {
-		return page * size - size;
-	}
-
+	@Query
+	public Page<Map<String, Object>> findPage(@Param("id") Integer id, @Param("age") Integer age, Pageable pageable, BuilderQuery builderQuery);
 }

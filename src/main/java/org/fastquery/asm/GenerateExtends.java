@@ -121,6 +121,7 @@ class GenerateExtends {
 				// filter/querya
 				queryFilterChain.addFilter(new ModifyingDependencyFilter());
 				queryFilterChain.addFilter(new MethodAnnotationFilter());
+				queryFilterChain.addFilter(new SQLFilter());
 				queryFilterChain.addFilter(new ConditionParameterFilter());
 				queryFilterChain.addFilter(new SourceFilter());
 				queryFilterChain.addFilter(new OutFilter());
@@ -137,7 +138,6 @@ class GenerateExtends {
 				// filter/query
 				if (querys.length > 0 && modifying == null) {
 					queryFilterChain.addFilter(new QueryReturnTypeFilter());
-					queryFilterChain.addFilter(new SQLFilter());
 					queryFilterChain.addFilter(new ParameterFilter());
 					queryFilterChain.addFilter(new NotAllowedRepeat());
 					queryFilterChain.addFilter(new PageFilter());

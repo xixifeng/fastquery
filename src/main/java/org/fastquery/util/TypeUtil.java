@@ -42,7 +42,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.fastquery.core.BuilderQuery;
 import org.fastquery.core.Id;
+import org.fastquery.core.MetaData;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
@@ -389,7 +391,7 @@ public class TypeUtil implements Opcodes {
 	/**
 	 * 查询标识有指定注解的参数
 	 * 
-	 * @param clazz 待差找的类型
+	 * @param clazz 待查找的类型
 	 * @param parameters 参数类型集
 	 * @return 参数类型
 	 */
@@ -631,6 +633,25 @@ public class TypeUtil implements Opcodes {
 			return sqls;
 		}
 
+		BuilderQuery bq = null;
+		for (Object arg : args) {
+			if (arg instanceof BuilderQuery) {
+				bq = (BuilderQuery) arg;
+				break;
+			}
+		}
+		if (bq != null) {
+			MetaData m = new MetaData();
+			bq.accept(m);
+			String s = m.getQuery();
+			m.clear();
+			if (s == null) {
+				throw new IllegalArgumentException("在函数式中没有给setQuery设置有效的SQL语句");
+			}
+			s = paramFilter(method, args, s);
+			sqls.add(s);
+		}
+
 		for (Query query : queries) {
 			String sql = query.value();
 
@@ -643,7 +664,7 @@ public class TypeUtil implements Opcodes {
 
 	public static String getCountQuerySQL(Method method, String sql, Object[] args) {
 		String csql = sql.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(getWhereSQL(method, args)));
-		LOG.info("求和:{}",csql);
+		LOG.info("求和:{}", csql);
 		return csql;
 	}
 

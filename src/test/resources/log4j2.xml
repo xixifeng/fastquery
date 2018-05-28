@@ -3,7 +3,8 @@
 <Configuration status="info">
     <Appenders>  
         <Console name="Console" target="SYSTEM_OUT">  
-            <PatternLayout pattern="级别:【%p】 信息:%m 位置: %l  线程:%t 发生时间:%d{yyyy-MM-dd HH:mm:ss} %n" />  
+            <!-- 级别:【%p】 信息:%m 位置: %l  线程:%t 发生时间:%d{yyyy-MM-dd HH:mm:ss} %n -->
+            <PatternLayout pattern="【%p】: %m %l  %n" />  
         </Console>
         <Async name="Async">  
         	<AppenderRef ref="Console" />  

@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.42</version>
+    <version>1.0.44</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.42'
+compile 'org.fastquery:fastquery:1.0.44'
 ```
 
 ### Apache Archive
@@ -356,9 +356,12 @@ Primarykey saveUserInfo(String name,Integer age);
 | `<E> int save(E entity)` | 保存一个实体(主键字段的值若为null,那么该字段将不参与运算),返回影响行数 |
 | `<B> int save(boolean ignoreRepeat,Collection<B> entities)` | 保存一个集合实体,是否忽略重复主键记录 |
 | `int save(boolean ignoreRepeat,Object...entities)` | 保存一个可变数组实体,是否忽略重复主键记录 |
-| `BigInteger saveToId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
+| `BigInteger saveReturnId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
+| `<E> E saveReturnEntity(E entity)` | 保存实体后,返回实体 |
 | `<E> int update(E entity)` | 更新一个实体,返回影响行数.**注意**:实体的成员属性如果是null,那么该属性将不会参与改运算 |
+| `<E> E updateReturnEntity(E entity)` | 更新一个实体,返回被更新的实体 |
 | `<E> int saveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含主键值),返回影响行数 |
+| `<E> E saveOrUpdateReturnEntity(E entity)` | 不存在就保存,反之更新,返回被更新的实体或返回已存储的实体 |
 | `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),若给where传递null或"",默认按照主键修改,返回影响行数 |
 | `<E> int update(Collection<E> entities)` | 更新集合实体,成员属性如果是null,那么该属性将不会参与改运算,每个实体必须包含主键 |
 | `int delete(String tableName,String primaryKeyName,long id)` | 根据主键删除实体,返回影响行数 |
@@ -451,9 +454,6 @@ END, `age` = CASE `id`
 END
 WHERE `id` IN (77, 88, 99)
 ```
-
-更多内置方法,请参阅fastquery javadoc.  
-
 
 ## @Transactional
 
@@ -645,6 +645,37 @@ public List<Student> findSomeStudent();
 `@QueryByNamed` 中的render属性,表示是否启用模板引擎对配置文件进行渲染,默认是true表示开启. 如果`<query>`节点中没有使用到任何模板语法,仅用于存储目的,那么建议设置为false.  
 
 **注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,可用于在模板中做逻辑判断,而`:name`用于标记参数位,SQL解析器会将其翻译成`?`号.
+
+## BuilderQuery
+上面介绍了`SQL`不仅可以绑定在`@Query`里, 也可以写到`XML`里. 还有另一种方式,**通过函数式构建SQL语句**.  
+用法举例:
+
+```java
+@Query
+public interface DefaultDBService extends QueryRepository {
+   // 分页, 查询语句 和 count语句 通过 builderQuery 构建出来
+   @Query
+   Page<Map<String,Object>> findPage(Integer id,@Param("age")Integer age,Pageable p,BuilderQuery builder);
+}
+```
+
+如果分页不要求得到总页数,在接口的方法上加`@NotCount`便可(谁说分页一定要执行count语句?).
+
+不用去实现那个接口,直接调用:
+
+```java
+DefaultDBService db = FQuery.getRepository(DefaultDBService.class);
+Pageable pageable = new PageableImpl(1, 3);
+Integer id = 500;
+Integer age = 18;
+Page<Map<String, Object>> page = db.findPage(id, age, pageable, (m) -> {
+	m.setQuery("select id,name,age from `userinfo`");// 设置查询语句
+	m.setWhere("where id < ?1 and age > :age");// 设置条件(这样设计可以让条件复用)
+	m.setCountQuery("select count(`id`) from `userinfo`");// 设置count语句
+});
+```
+
+引用问号表达式(?expression) , 冒号表达式(:expression), 其中?1表示方法的第一个参数,`:age`表示匹配`@Param("age")`那个参数,采用问号或冒号表达式不会有注入问题.
 
 ## 支持存储过程
 

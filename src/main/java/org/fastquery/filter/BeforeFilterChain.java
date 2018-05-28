@@ -75,8 +75,4 @@ class BeforeFilterChain<R extends Repository> extends BeforeFilter<R> {
 		this.doFilter(repository, method, args);
 		return threadLocal.get();
 	}
-
-	static void setThreadLocal(Object value) {
-		threadLocal.set(value);
-	}
 }
