@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.44</version>
+    <version>1.0.45</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.44'
+compile 'org.fastquery:fastquery:1.0.45'
 ```
 
 ### Apache Archive
@@ -353,15 +353,15 @@ Primarykey saveUserInfo(String name,Integer age);
 | 方法 | 描述 |
 |:---|:---|
 | `<E> E find(Class<E> entityClass,long id)` | 根据主键查询实体 |
-| `<E> int save(E entity)` | 保存一个实体(主键字段的值若为null,那么该字段将不参与运算),返回影响行数 |
+| `<E> int insert(E entity)` | 插入一个实体(主键字段的值若为null,那么该字段将不参与运算),返回影响行数 |
 | `<B> int save(boolean ignoreRepeat,Collection<B> entities)` | 保存一个集合实体,是否忽略重复主键记录 |
-| `int save(boolean ignoreRepeat,Object...entities)` | 保存一个可变数组实体,是否忽略重复主键记录 |
-| `BigInteger saveReturnId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
-| `<E> E saveReturnEntity(E entity)` | 保存实体后,返回实体 |
-| `<E> int update(E entity)` | 更新一个实体,返回影响行数.**注意**:实体的成员属性如果是null,那么该属性将不会参与改运算 |
-| `<E> E updateReturnEntity(E entity)` | 更新一个实体,返回被更新的实体 |
-| `<E> int saveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含主键值),返回影响行数 |
-| `<E> E saveOrUpdateReturnEntity(E entity)` | 不存在就保存,反之更新,返回被更新的实体或返回已存储的实体 |
+| `int saveArray(boolean ignoreRepeat,Object...entities)` | 保存一个可变数组实体,是否忽略重复主键记录 |
+| `BigInteger saveToId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
+| `<E> E save(E entity)` | 保存实体后,返回实体 |
+| `<E> int executeUpdate(E entity)` | 更新一个实体,返回影响行数.**注意**:实体的成员属性如果是null,那么该属性将不会参与改运算 |
+| `<E> E update(E entity)` | 更新一个实体,返回被更新的实体 |
+| `<E> int executeSaveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含主键值),返回影响行数 |
+| `<E> E saveOrUpdate(E entity)` | 不存在就保存,反之更新,返回被更新的实体或返回已存储的实体 |
 | `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),若给where传递null或"",默认按照主键修改,返回影响行数 |
 | `<E> int update(Collection<E> entities)` | 更新集合实体,成员属性如果是null,那么该属性将不会参与改运算,每个实体必须包含主键 |
 | `int delete(String tableName,String primaryKeyName,long id)` | 根据主键删除实体,返回影响行数 |
@@ -442,17 +442,17 @@ assertThat(effect, is(3));
 最终会解释成一条SQL语句:
 
 ```sql
-UPDATE `UserInfo`
-SET `name` = CASE `id`
-	WHEN 77 THEN '茝若'
-	WHEN 88 THEN '芸兮'
-	ELSE `name`
-END, `age` = CASE `id`
-	WHEN 77 THEN '18'
-	WHEN 99 THEN '16'
-	ELSE `age`
-END
-WHERE `id` IN (77, 88, 99)
+update `UserInfo`
+set `name` = case `id`
+	when 77 then '茝若'
+	when 88 then '芸兮'
+	else `name`
+end, `age` = case `id`
+	when 77 then '18'
+	when 99 then '16'
+	else `age`
+end
+where `id` in (77, 88, 99)
 ```
 
 ## @Transactional
@@ -668,7 +668,7 @@ DefaultDBService db = FQuery.getRepository(DefaultDBService.class);
 Pageable pageable = new PageableImpl(1, 3);
 Integer id = 500;
 Integer age = 18;
-Page<Map<String, Object>> page = db.findPage(id, age, pageable, (m) -> {
+Page<Map<String, Object>> page = db.findPage(id, age, pageable, m -> {
 	m.setQuery("select id,name,age from `userinfo`");// 设置查询语句
 	m.setWhere("where id < ?1 and age > :age");// 设置条件(这样设计可以让条件复用)
 	m.setCountQuery("select count(`id`) from `userinfo`");// 设置count语句

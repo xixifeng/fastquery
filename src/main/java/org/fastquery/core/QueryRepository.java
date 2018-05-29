@@ -40,7 +40,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 主键
 	 */
 	@Id(MethodId.QUERY)
-	BigInteger saveReturnId(Object entity);
+	BigInteger saveToId(Object entity);
 
 	/**
 	 * 保存一个实体,然后将主键值返回(不适用于联合主键).注意:永不返回null,没有找到主键返回-1
@@ -50,7 +50,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 主键
 	 */
 	@Id(MethodId.QUERY)
-	BigInteger saveReturnId(Object entity, @Source String dataSourceName);
+	BigInteger saveToId(Object entity, @Source String dataSourceName);
 
 	/**
 	 * 保存一个实体,然后将主键值返回(不适用于联合主键).注意:永不返回null,没有找到主键返回-1
@@ -61,7 +61,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 主键
 	 */
 	@Id(MethodId.QUERY)
-	BigInteger saveReturnId(@Source String dataSourceName, String dbName, Object entity);
+	BigInteger saveToId(@Source String dataSourceName, String dbName, Object entity);
 
 	/**
 	 * 保存实体集合
@@ -82,7 +82,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY4)
-	int save(boolean ignoreRepeat, Object... entities);
+	int saveArray(boolean ignoreRepeat, Object... entities);
 
 	/**
 	 * 保存实体集合
@@ -105,7 +105,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY4)
-	int save(boolean ignoreRepeat, @Source String dataSourceName, Object... entities);
+	int saveArray(boolean ignoreRepeat, @Source String dataSourceName, Object... entities);
 
 	/**
 	 * 保存实体集合
@@ -130,20 +130,20 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY4)
-	int save(boolean ignoreRepeat, @Source String dataSourceName, String dbName, Object... entities);
+	int saveArray(boolean ignoreRepeat, @Source String dataSourceName, String dbName, Object... entities);
 
 	/**
-	 * 保存一个实体 <br>
+	 * 插入一个实体 <br>
 	 * 
 	 * @param <E> 实体
 	 * @param entity 实体
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY0)
-	<E> int save(E entity);
+	<E> int insert(E entity);
 
 	/**
-	 * 往指定的数据源里保存一个实体<br>
+	 * 往指定的数据源里插入一个实体<br>
 	 * 
 	 * @param <E> 存储的实例
 	 * @param entity 实体
@@ -151,10 +151,10 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY0)
-	<E> int save(E entity, @Source String dataSourceName);
+	<E> int insert(E entity, @Source String dataSourceName);
 
 	/**
-	 * 往指定的数据源里保存一个实体,并且指定数据库名称<br>
+	 * 往指定的数据源里插入一个实体,并且指定数据库名称<br>
 	 * 
 	 * @param <E> 存储的实例
 	 * @param dataSourceName 数据源名称
@@ -163,7 +163,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY0)
-	<E> int save(@Source String dataSourceName, String dbName, E entity);
+	<E> int insert(@Source String dataSourceName, String dbName, E entity);
 
 	/**
 	 * 更新实体,根据实体的主键值更新 <br>
@@ -173,7 +173,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY1)
-	<E> int update(E entity);
+	<E> int executeUpdate(E entity);
 
 	/**
 	 * 更新实体,根据实体的主键值更新 <br>
@@ -184,7 +184,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY1)
-	<E> int update(@Source String dataSourceName, E entity);
+	<E> int executeUpdate(@Source String dataSourceName, E entity);
 
 	/**
 	 * 更新实体,根据实体的主键值更新 <br>
@@ -196,7 +196,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY1)
-	<E> int update(@Source String dataSourceName, String dbName, E entity);
+	<E> int executeUpdate(@Source String dataSourceName, String dbName, E entity);
 
 	/**
 	 * 更新实体
@@ -239,7 +239,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY2)
-	<E> int saveOrUpdate(E entity);
+	<E> int executeSaveOrUpdate(E entity);
 
 	/**
 	 * 保存或者更新实体,实体需要包含主键值否则报错 (如果不存在就存储,存在就更新)
@@ -250,7 +250,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY2)
-	<E> int saveOrUpdate(@Source String dataSourceName, E entity);
+	<E> int executeSaveOrUpdate(@Source String dataSourceName, E entity);
 
 	/**
 	 * 保存或者更新实体,实体需要包含主键值否则报错 (如果不存在就存储,存在就更新)
@@ -262,7 +262,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY2)
-	<E> int saveOrUpdate(@Source String dataSourceName, String dbName, E entity);
+	<E> int executeSaveOrUpdate(@Source String dataSourceName, String dbName, E entity);
 
 	/**
 	 * 批量更新实体
@@ -395,8 +395,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 返回实体
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> E saveReturnEntity(E entity) {
-		long id = saveReturnId(entity).longValue();
+	default <E> E save(E entity) {
+		long id = saveToId(entity).longValue();
 		return (E) find(entity.getClass(), id);
 	}
 
@@ -408,8 +408,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 返回实体
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> E saveReturnEntity(E entity, String dataSourceName) {
-		long id = saveReturnId(entity, dataSourceName).longValue();
+	default <E> E save(E entity, String dataSourceName) {
+		long id = saveToId(entity, dataSourceName).longValue();
 		return (E) find(entity.getClass(), id, dataSourceName);
 	}
 
@@ -422,8 +422,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 返回实体
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> E saveReturnEntity(String dataSourceName, String dbName, E entity) {
-		long id = saveReturnId(dataSourceName, dbName, entity).longValue();
+	default <E> E save(String dataSourceName, String dbName, E entity) {
+		long id = saveToId(dataSourceName, dbName, entity).longValue();
 		return (E) find(entity.getClass(), id, dataSourceName, dbName);
 	}
 
@@ -434,8 +434,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 返回实体
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> E updateReturnEntity(E entity) {
-		long effect = update(entity);
+	default <E> E update(E entity) {
+		long effect = executeUpdate(entity);
 		if (effect != 1) {
 			throw new RepositoryException("修改失败了");
 		}
@@ -451,8 +451,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 返回实体
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> E updateReturnEntity(String dataSourceName, E entity) {
-		long effect = update(dataSourceName, entity);
+	default <E> E update(String dataSourceName, E entity) {
+		long effect = executeUpdate(dataSourceName, entity);
 		if (effect != 1) {
 			throw new RepositoryException("修改失败了");
 		}
@@ -469,8 +469,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 返回实体
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> E updateReturnEntity(String dataSourceName, String dbName, E entity) {
-		long effect = update(dataSourceName, dbName, entity);
+	default <E> E update(String dataSourceName, String dbName, E entity) {
+		long effect = executeUpdate(dataSourceName, dbName, entity);
 		if (effect != 1) {
 			throw new RepositoryException("修改失败了");
 		}
@@ -485,8 +485,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 返回实体
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> E saveOrUpdateReturnEntity(E entity) {
-		long effect = saveOrUpdate(entity);
+	default <E> E saveOrUpdate(E entity) {
+		long effect = executeSaveOrUpdate(entity);
 		if (effect != 1) {
 			throw new RepositoryException("修改失败了");
 		}
@@ -502,8 +502,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 返回实体
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> E saveOrUpdateReturnEntity(String dataSourceName, E entity) {
-		long effect = saveOrUpdate(dataSourceName, entity);
+	default <E> E saveOrUpdate(String dataSourceName, E entity) {
+		long effect = executeSaveOrUpdate(dataSourceName, entity);
 		if (effect != 1) {
 			throw new RepositoryException("修改失败了");
 		}
@@ -520,8 +520,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @return 返回实体
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> E saveOrUpdateReturnEntity(String dataSourceName, String dbName, E entity) {
-		long effect = saveOrUpdate(dataSourceName, dbName, entity);
+	default <E> E saveOrUpdate(String dataSourceName, String dbName, E entity) {
+		long effect = executeSaveOrUpdate(dataSourceName, dbName, entity);
 		if (effect != 1) {
 			throw new RepositoryException("修改失败了");
 		}

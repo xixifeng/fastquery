@@ -55,7 +55,7 @@ public class SunnyDBServiceTest {
 		String number = "852000XXXXX";
 		Card card = new Card();
 		card.setNumber(number);
-		int c = sunnyDBService.save(card);
+		int c = sunnyDBService.insert(card);
 		assertThat(c, is(1));
 		int effect = sunnyDBService.deleteByNumber(number);
 		assertThat(effect, is(1));
@@ -65,7 +65,7 @@ public class SunnyDBServiceTest {
 	@Test
 	public void save2() {
 		Card card = new Card(-1, "32ccczuidazhi");
-		int c = sunnyDBService.save(card);
+		int c = sunnyDBService.insert(card);
 		assertThat(c, is(1));
 		int effect = sunnyDBService.delete(-1);
 		assertThat(effect, is(1));
@@ -75,7 +75,7 @@ public class SunnyDBServiceTest {
 	@Test
 	public void save3() {
 		Card card = new Card("32ccczuidazhi");
-		BigInteger bigInteger = sunnyDBService.saveReturnId(card);
+		BigInteger bigInteger = sunnyDBService.saveToId(card);
 		int effect = sunnyDBService.delete(bigInteger.intValue());
 		assertThat(effect, is(1));
 	}
@@ -88,7 +88,7 @@ public class SunnyDBServiceTest {
 			id = id + 1;
 		}
 		Tenant tenant = new Tenant(id, "测试用户" + id);
-		BigInteger bigInteger = sunnyDBService.saveReturnId(tenant);
+		BigInteger bigInteger = sunnyDBService.saveToId(tenant);
 		assertThat(bigInteger.longValue(), is(id));
 	}
 

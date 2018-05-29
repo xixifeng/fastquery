@@ -62,7 +62,7 @@ public class MethodQueryTest {
 		}
 
 		u.setId(id);
-		int effect = studentDBService.save(u);
+		int effect = studentDBService.insert(u);
 		assertThat(effect, is(1));
 	}
 
@@ -72,7 +72,7 @@ public class MethodQueryTest {
 		String name = "凤侯";
 		Integer age = 32;
 		UserInfo u = new UserInfo(id, name, age);
-		int effect = studentDBService.save("xk-c3p0", "xk", u);
+		int effect = studentDBService.insert("xk-c3p0", "xk", u);
 		assertThat(effect, is(1));
 	}
 
@@ -81,7 +81,7 @@ public class MethodQueryTest {
 		UserInfo u1 = new UserInfo(1, "equinox", 10);
 		UserInfo u2 = new UserInfo(2, "Eclipse", 3);
 		UserInfo u3 = new UserInfo(3, "ement", 2);
-		int effect = studentDBService.save(true, u1, u2, u3);
+		int effect = studentDBService.saveArray(true, u1, u2, u3);
 		assertThat(effect, is(0));
 	}
 
@@ -97,7 +97,7 @@ public class MethodQueryTest {
 		// entry '1' for key 'PRIMARY'"字符串
 		// thrown.expectMessage(containsString("Duplicate entry '1' for key
 		// 'PRIMARY'"));
-		int effect = studentDBService.save(false, u1, u2, u3);
+		int effect = studentDBService.saveArray(false, u1, u2, u3);
 		assertThat(effect, is(0));
 	}
 
@@ -106,7 +106,7 @@ public class MethodQueryTest {
 		UserInfo u1 = new UserInfo("equ", 10);
 		UserInfo u2 = new UserInfo("Ecl", 3);
 		UserInfo u3 = new UserInfo("ement", 2);
-		int effect = studentDBService.save(false, u1, u2, u3);
+		int effect = studentDBService.saveArray(false, u1, u2, u3);
 		assertThat(effect, is(3));
 	}
 
@@ -156,7 +156,7 @@ public class MethodQueryTest {
 		String dataSourceName = "xk-c3p0";
 		String dbName = "xk";
 		UserInfo entity = new UserInfo(1, "好哇瓦", 3);
-		int effect = studentDBService.update(dataSourceName, dbName, entity);
+		int effect = studentDBService.executeUpdate(dataSourceName, dbName, entity);
 		assertThat(effect, is(1));
 	}
 
@@ -165,7 +165,7 @@ public class MethodQueryTest {
 		Integer id = 100;
 		UserInfo userInfo = new UserInfo(id, "小蜜蜂", 5);
 
-		int effect = studentDBService.saveOrUpdate(userInfo);
+		int effect = studentDBService.executeSaveOrUpdate(userInfo);
 		assertThat(effect, either(is(0)).or(is(1)));
 		UserInfo u1 = userInfoDBService.findById(id);
 		Integer id1 = u1.getId();
@@ -173,7 +173,7 @@ public class MethodQueryTest {
 		assertThat(u1.getName(), equalTo("小蜜蜂"));
 		assertThat(u1.getAge(), equalTo(5));
 
-		effect = studentDBService.saveOrUpdate(u1);
+		effect = studentDBService.executeSaveOrUpdate(u1);
 		UserInfo u2 = userInfoDBService.findById(id1);
 		Integer id2 = u2.getId();
 		assertThat(id2, equalTo(id1));
@@ -190,7 +190,7 @@ public class MethodQueryTest {
 		Integer age = 3;
 		UserInfo entity = new UserInfo(id, name, age);
 
-		int e = studentDBService.update(entity);
+		int e = studentDBService.executeUpdate(entity);
 		assertThat(e, is(1));
 
 		// 会解析成:update `UserInfo` set `id`=?, `age`=? where name = ?
@@ -238,9 +238,9 @@ public class MethodQueryTest {
 	// 测试批量更新集合
 	@Test
 	public void updateCollection1() {
-		userInfoDBService.saveOrUpdate(new UserInfo(77, "河虾", 2));
-		userInfoDBService.saveOrUpdate(new UserInfo(88, "番茄", 5));
-		userInfoDBService.saveOrUpdate(new UserInfo(99, "酸奶", 2));
+		userInfoDBService.executeSaveOrUpdate(new UserInfo(77, "河虾", 2));
+		userInfoDBService.executeSaveOrUpdate(new UserInfo(88, "番茄", 5));
+		userInfoDBService.executeSaveOrUpdate(new UserInfo(99, "酸奶", 2));
 
 		List<UserInfo> userInfos = new ArrayList<>();
 		userInfos.add(new UserInfo(77, "茝若", 18));
@@ -253,9 +253,9 @@ public class MethodQueryTest {
 
 	@Test
 	public void updateCollection2() {
-		userInfoDBService.saveOrUpdate(new UserInfo(77, "河虾", 2));
-		userInfoDBService.saveOrUpdate(new UserInfo(88, "番茄", 5));
-		userInfoDBService.saveOrUpdate(new UserInfo(99, "酸奶", 2));
+		userInfoDBService.executeSaveOrUpdate(new UserInfo(77, "河虾", 2));
+		userInfoDBService.executeSaveOrUpdate(new UserInfo(88, "番茄", 5));
+		userInfoDBService.executeSaveOrUpdate(new UserInfo(99, "酸奶", 2));
 
 		List<UserInfo> userInfos = new ArrayList<>();
 		userInfos.add(new UserInfo(77, "茝若", 18));
@@ -268,9 +268,9 @@ public class MethodQueryTest {
 
 	@Test
 	public void updateCollection3() {
-		userInfoDBService.saveOrUpdate(new UserInfo(77, "河虾", 2));
-		userInfoDBService.saveOrUpdate(new UserInfo(88, "番茄", 5));
-		userInfoDBService.saveOrUpdate(new UserInfo(99, "酸奶", 2));
+		userInfoDBService.executeSaveOrUpdate(new UserInfo(77, "河虾", 2));
+		userInfoDBService.executeSaveOrUpdate(new UserInfo(88, "番茄", 5));
+		userInfoDBService.executeSaveOrUpdate(new UserInfo(99, "酸奶", 2));
 
 		List<UserInfo> userInfos = new ArrayList<>();
 		userInfos.add(new UserInfo(77, null, null));
@@ -306,7 +306,7 @@ public class MethodQueryTest {
 	@Test
 	public void delete() {
 		int id = 89890;
-		int effect = userInfoDBService.save(new UserInfo(id, "植物", 17));
+		int effect = userInfoDBService.insert(new UserInfo(id, "植物", 17));
 		assertThat(effect, is(1));
 		effect = userInfoDBService.delete("UserInfo", "id", id);
 		assertThat(effect, is(1));

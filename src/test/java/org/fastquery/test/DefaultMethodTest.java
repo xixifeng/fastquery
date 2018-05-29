@@ -60,7 +60,7 @@ public class DefaultMethodTest {
 	@Test
 	public void saveReturnEntity() {
 		UserInfo u1 = new UserInfo("婤姶", 2558);
-		UserInfo u2 = db.saveReturnEntity(u1);
+		UserInfo u2 = db.save(u1);
 		LOG.debug("{}", u2);
 		long id = u2.getId();
 		int effect = db.delete("UserInfo", "id", id);
@@ -72,7 +72,7 @@ public class DefaultMethodTest {
 		String name = "海猫" + UUID.randomUUID().toString().substring(0, 3);
 		Integer age = Math.abs(new Random().nextInt(30));
 		UserInfo u1 = new UserInfo(1, name, age);
-		UserInfo u2 = db.updateReturnEntity(u1);
+		UserInfo u2 = db.update(u1);
 		assertThat(u2.getId(), is(u1.getId()));
 		assertThat(u2.getName(), is(name));
 		assertThat(u2.getAge(), is(age));
@@ -83,7 +83,7 @@ public class DefaultMethodTest {
 		String name = "海猫" + UUID.randomUUID().toString().substring(0, 3);
 		Integer age = Math.abs(new Random().nextInt(30));
 		UserInfo u1 = new UserInfo(1, name, age);
-		UserInfo u2 = db.saveOrUpdateReturnEntity(u1);
+		UserInfo u2 = db.saveOrUpdate(u1);
 		assertThat(u2.getId(), is(u1.getId()));
 		assertThat(u2.getName(), is(name));
 		assertThat(u2.getAge(), is(age));
@@ -95,7 +95,7 @@ public class DefaultMethodTest {
 		String name = "海猫" + UUID.randomUUID().toString().substring(0, 3);
 		Integer age = Math.abs(new Random().nextInt(30));
 		UserInfo u1 = new UserInfo(id, name, age);
-		UserInfo u2 = db.saveOrUpdateReturnEntity(u1);
+		UserInfo u2 = db.saveOrUpdate(u1);
 		assertThat(u2.getId(), is(id));
 		assertThat(u2.getName(), is(name));
 		assertThat(u2.getAge(), is(age));
@@ -109,7 +109,7 @@ public class DefaultMethodTest {
 		Pageable pageable = new PageableImpl(1, 3);
 		Integer id = 500;
 		Integer age = 18;
-		Page<Map<String, Object>> page = db.findPage(id, age, pageable, (m) -> {
+		Page<Map<String, Object>> page = db.findPage(id, age, pageable, m -> {
 			m.setQuery("select id,name,age from `userinfo`");
 			m.setWhere("where id < ?1 and age > :age");// 引用问号表达式(?expression) , 冒号表达式(:expression)
 			m.setCountQuery("select count(`id`) from `userinfo`");

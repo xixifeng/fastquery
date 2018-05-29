@@ -62,7 +62,7 @@ public class SaveToIdTest {
 		Visitor v = new Visitor(punitId, vname, idCard, mobile, email, gender, toAddr, remark, lastDate, iden, dId);
 		v.setCreateDate(createDate);
 
-		BigInteger bigInteger = vdbs.saveReturnId(v);
+		BigInteger bigInteger = vdbs.saveToId(v);
 		assertThat(bigInteger.longValue(), greaterThanOrEqualTo(1l));
 
 		int effect = vdbs.deleteByIden(iden);
