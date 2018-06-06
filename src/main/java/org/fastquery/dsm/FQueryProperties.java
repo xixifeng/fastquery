@@ -42,21 +42,21 @@ public class FQueryProperties {
 	// <String,String> 第一个参数是basePackage, 第二个参数是数据源的名字
 	private static Map<String, String> dataSourceIndexs = new HashMap<>();
 
-	// 在此用Map,是为了查寻方便, 放在这里我们最终是为了查寻.
+	// 第一个参数是dataSourceName,在此用Map,是为了查寻方便, 放在这里我们最终是为了查寻.
 	private static Map<String, DataSource> dataSources = new HashMap<>();
 
 	private FQueryProperties() {
 	}
 
-	public static void putDataSourceIndex(String key, String value) {
-		dataSourceIndexs.put(key, value);
+	public static void putDataSourceIndex(String basePackage, String dataSourceName) {
+		dataSourceIndexs.put(basePackage, dataSourceName);
 	}
 
-	public static void putDataSource(String key, DataSource value) {
-		if (dataSources.containsKey(key)) {
-			throw new RepositoryException(key + " 已经存在!");
+	public static void putDataSource(String dataSourceName, DataSource dataSource) {
+		if (dataSources.containsKey(dataSourceName)) {
+			throw new RepositoryException(dataSourceName + " 已经存在!");
 		}
-		dataSources.put(key, value);
+		dataSources.put(dataSourceName, dataSource);
 	}
 
 	/**
@@ -91,37 +91,37 @@ public class FQueryProperties {
 	}
 
 	public static void createDataSource(String dataSourceName, Properties properties) {
-		if (dataSources.containsKey(dataSourceName)) { // 这里有必要判断. 而不是等连接池创建后在判断.
-			throw new RepositoryException(dataSourceName + " 已经存在!");
-		}
 		if (dataSourceName == null || "".equals(dataSourceName)) {
 			throw new RepositoryException("dataSourceName 不能为\"\"或为null");
-		}
-		com.mchange.v2.c3p0.ComboPooledDataSource cpds = new com.mchange.v2.c3p0.ComboPooledDataSource();
-		cpds.setDataSourceName(dataSourceName);
-		Class<?> cls = cpds.getClass();
-		properties.forEach((k, v) -> {
-			try {
-				PropertyDescriptor pd = new PropertyDescriptor(k.toString(), cls);
-				Method method = pd.getWriteMethod();
-				Class<?> returnType = method.getParameterTypes()[0];
-				if (returnType == String.class) {
-					method.invoke(cpds, v.toString());
-				} else if (returnType == int.class) {
-					method.invoke(cpds, Integer.parseInt(v.toString()));
-				} else if (returnType == boolean.class) {
-					method.invoke(cpds, Boolean.parseBoolean(v.toString()));
-				}
-			} catch (Exception e) {
-				throw new RepositoryException(e);
+		} else {
+			if (dataSources.containsKey(dataSourceName)) { // 这里有必要判断. 而不是等连接池创建后在判断.
+				throw new RepositoryException(dataSourceName + " 已经存在!");
 			}
-		});
-		putDataSource(dataSourceName, cpds);
+			com.mchange.v2.c3p0.ComboPooledDataSource cpds = new com.mchange.v2.c3p0.ComboPooledDataSource();
+			cpds.setDataSourceName(dataSourceName);
+			Class<?> cls = cpds.getClass();
+			properties.forEach((k, v) -> {
+				try {
+					PropertyDescriptor pd = new PropertyDescriptor(k.toString(), cls);
+					Method method = pd.getWriteMethod();
+					Class<?> returnType = method.getParameterTypes()[0];
+					if (returnType == String.class) {
+						method.invoke(cpds, v.toString());
+					} else if (returnType == int.class) {
+						method.invoke(cpds, Integer.parseInt(v.toString()));
+					} else if (returnType == boolean.class) {
+						method.invoke(cpds, Boolean.parseBoolean(v.toString()));
+					}
+				} catch (Exception e) {
+					throw new RepositoryException(e);
+				}
+			});
+			putDataSource(dataSourceName, cpds);	
+		}
 	}
-	// 不用提供set方法,如果提供dataSourceIndexs的set方法,就把它覆盖了.
 
-	public static void removeDataSource(String key) { // NO_UCD (unused code)
-		dataSources.remove(key);
+	public static void removeDataSource(String dataSourceName) { // NO_UCD (unused code)
+		dataSources.remove(dataSourceName);
 	}
 
 	public static void clear() {

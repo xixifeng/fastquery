@@ -22,43 +22,84 @@
 
 package org.fastquery.core;
 
+import java.util.Objects;
+
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
-public class MetaData {
+public class MetaData { // NO_UCD (use default)
 
-	private String query;
-	private String countQuery;
+	private String query; // 为null表示没有设置
+	private String countQuery; // 为null表示没有设置
 	private String where = "";
+	private String countField = "id"; // count字段
 
+	MetaData() {
+	}
+
+	private void requireQuery(String query) {
+		Objects.requireNonNull(query, "query 语句必须设置正确");
+	}
+
+	/**
+	 * 设置查询语句,不能设置null
+	 * 
+	 * @param query 查询语句
+	 */
 	public void setQuery(String query) {
+		requireQuery(query);
 		this.query = query;
 	}
 
 	public void setCountQuery(String countQuery) {
-		this.countQuery = countQuery;
+		if(!"".equals(countQuery)) {
+			this.countQuery = countQuery;
+		}
 	}
 
-	public String getQuery() {
+	/**
+	 * 不设置,默认是"id"
+	 * 
+	 * @param countField count 字段
+	 */
+	public void setCountField(String countField) {
+		if (countField != null && !"".equals(countField)) {
+			this.countField = countField;
+		}
+	}
+
+	String getQuery() {
+		requireQuery(query);
 		return query + ' ' + where;
 	}
 
-	public String getCountQuery() {
+	String getCountQuery() {
+		if (countQuery == null) {
+			return "";
+		}
 		return countQuery + ' ' + where;
 	}
 
-	public void clear() {
-		this.query = null;
-		this.countQuery = null;
+	String getCountField() {
+		return countField;
+	}
+
+	void clear() {
+		query = null;
+		countQuery = null;
+		where = null;
+		countField = null;
 	}
 
 	/**
 	 * 设置查询条件. 支持引用问号表达式(?index) , 冒号表达式(:name) <br>
+	 * 注意: 要么不设置,要设置就别设置null.
 	 * 
 	 * @param where 查询条件
 	 */
 	public void setWhere(String where) {
+		Objects.requireNonNull(where);
 		this.where = where;
 	}
 }

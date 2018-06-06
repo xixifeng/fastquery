@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.45</version>
+    <version>1.0.46</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.45'
+compile 'org.fastquery:fastquery:1.0.46'
 ```
 
 ### Apache Archive
@@ -905,7 +905,7 @@ studentDBService.executeBatch(sqlName, output);
 
 ## 动态适配数据源
 ### 创建数据源
-如果您想在项目运行期间动态创建一个新数据源,那么请使用`FQuery.createDataSource`.
+如果想在项目运行期间动态创建一个新数据源,那么请使用`FQuery.createDataSource`.
 
 ```java
 // 数据源名称
@@ -1034,21 +1034,55 @@ String findOneCourse();
 
 ## WEB 支持
 ### 应用在 Jersey 环境
-让Jersey容器管理Fastquery:
+
+```xml
+<dependency>
+	<groupId>org.glassfish.jersey.containers</groupId>
+	<artifactId>jersey-container-servlet</artifactId>
+	<version>2.27</version>
+</dependency>
+
+<dependency>
+	<groupId>org.glassfish.jersey.inject</groupId>
+	<artifactId>jersey-hk2</artifactId>
+	<version>2.27</version>
+</dependency>
+```
+
+让Jersey容器管理FastQuery:
 
 ```java
 import javax.ws.rs.ApplicationPath;
-import org.fastquery.jersey.FQueryBinder;
 
 @ApplicationPath("rest")
 public class MyApplication extends ResourceConfig {
 	public MyApplication() {
-		register(new FQueryBinder(this.getClassLoader()));
+		// 绑定FastQuery	      
+		org.fastquery.jersey.FQueryBinder.bind(this);
 	}
 }
 ```
 
-在JAX-RS resource中注入DB接口:
+FastQuery支持JAX-RS注解,不需实现类,便能构建极简的RESTful.不得不简单的设计,可见一斑.
+
+```java
+@Path("userInfo")
+public interface UserInfoDBService extends QueryRepository {
+
+      // 查询并实现分页
+	@Path("findAll")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Query(value = "select id,name,age from `userinfo` where 1", countField = "id")
+	Page<Map<String, Object>> findAll(@QueryParam("pageIndex") @PageIndex int pageIndex,
+			                          @QueryParam("pageSize")  @PageSize  int pageSize);
+   
+}
+```
+
+没错, 不用去写任何实现类, 访问 `http://<your host>/rest/userInfo/findAll?pageIndex=1&pageSize=5`, 就可以看到效果.  
+DB接口不仅能当做WEB Service,同时也是一个DB接口.   
+当然,如果不喜欢太简单,可以把DB接口注入到JAX-RS Resource类中:
 
 ```java
 import javax.inject.Inject;

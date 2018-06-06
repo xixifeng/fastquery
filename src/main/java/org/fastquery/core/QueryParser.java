@@ -157,23 +157,15 @@ public class QueryParser {
 			String countQuery = query.countQuery();
 
 			//
-			BuilderQuery bq = null;
-			for (Object arg : args) {
-				if (arg instanceof BuilderQuery) {
-					bq = (BuilderQuery) arg;
-					break;
-				}
-			}
-			if (bq != null) {
-				MetaData m = new MetaData();
-				bq.accept(m);
-				countQuery = m.getCountQuery();
-				m.clear();
+			if (QueryContext.isBuilderQuery()) {
+				countField = QueryContext.getCountField();
+				countQuery = QueryContext.getCountQuery();
 				countQuery = TypeUtil.paramNameFilter(method, countQuery);
 			}
 			// end
 
 			if (countQuery == null || "".equals(countQuery)) { // 表明在声明时没有指定求和语句
+				// 那么通过主体查询语句算出count语句
 				sql = calcCountStatement(sql, countField);
 				sql = TypeUtil.getCountQuerySQL(method, sql, args);
 			} else {

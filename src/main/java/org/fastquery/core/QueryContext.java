@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONObject;
 
 import org.slf4j.Logger;
-import org.fastquery.dsm.FQueryFactoryImpl;
 import org.fastquery.dsm.FQueryProperties;
 import org.fastquery.util.TypeUtil;
 
@@ -38,6 +37,8 @@ public final class QueryContext {
 	private Class<? extends Repository> iclass;// 当前拦截到的接口
 	private Object[] args; // 当前方法的实参
 	private List<String> sqls = new ArrayList<>(); // 当前method所执行的SQL集合
+	private MetaData metaData; // 当前上下文元数据
+	private boolean builderQuery;
 
 	private static String lang = "zh_CN"; // 语言编码
 	// 作用于调式
@@ -79,6 +80,19 @@ public final class QueryContext {
 		if (context.returnType == Map.class || context.returnType == JSONObject.class || context.returnType == Primarykey.class
 				|| TypeUtil.hasDefaultConstructor(context.returnType)) {
 			context.requirePk = true;
+		}
+
+		BuilderQuery bq = null;
+		for (Object arg : args) {
+			if (arg instanceof BuilderQuery) {
+				bq = (BuilderQuery) arg;
+				break;
+			}
+		}
+		if (bq != null) {
+			context.builderQuery = true;
+			context.metaData = new MetaData();
+			bq.accept(context.metaData);
 		}
 	}
 
@@ -124,8 +138,17 @@ public final class QueryContext {
 			try {
 				QueryContext context = getQueryContext();
 				lang = null;
+				if (context.metaData != null) {
+					context.metaData.clear();
+					context.metaData = null;
+				}
 				context.method = null;
 				context.sqls.clear();
+				context.sqls = null;
+				context.returnType = null;
+				context.sourceName = null;
+				context.iclass = null;
+				context.args = null;
 				if (context.connection != null) {
 					context.connection.close();
 				}
@@ -145,9 +168,9 @@ public final class QueryContext {
 	}
 
 	/**
-	 * 获取数据源, 注意: 根据dataSourceName查优先
+	 * 根据数据源名称或者className,获取数据源. 注意: 根据dataSourceName查优先
 	 * 
-	 * @param dataSourceName 数据源名称
+	 * @param dataSourceName 数据源名称, 若为null,那么就根据className来查找
 	 * @param className Repository class
 	 * @return 数据源
 	 */
@@ -156,7 +179,10 @@ public final class QueryContext {
 		// 根据dataSourceName 查
 		DataSource dataSource = FQueryProperties.findDataSource(dataSourceName);
 		if (dataSource == null) {
-			dataSource = FQueryFactoryImpl.getInstance().getDataSource(className);
+			// 根据basePackage 查找出 数据源的名字
+			String name = FQueryProperties.findDataSourceName(className);
+			// 再根据数据源的名字查寻出数据库对象
+			dataSource = FQueryProperties.findDataSource(name);
 		}
 
 		// dataSource 为null 什么也做不了
@@ -222,4 +248,29 @@ public final class QueryContext {
 		return getQueryContext().requirePk;
 	}
 
+	/**
+	 * 获取query语句
+	 * 
+	 * @return 查询语句
+	 */
+	public static String getQuery() {
+		return getQueryContext().metaData.getQuery();
+	}
+
+	/**
+	 * 获取countQuery
+	 * 
+	 * @return count语句
+	 */
+	static String getCountQuery() {
+		return getQueryContext().metaData.getCountQuery();
+	}
+
+	public static boolean isBuilderQuery() {
+		return getQueryContext().builderQuery;
+	}
+
+	static String getCountField() {
+		return getQueryContext().metaData.getCountField();
+	}
 }

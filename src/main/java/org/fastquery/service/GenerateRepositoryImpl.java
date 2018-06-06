@@ -94,7 +94,7 @@ class GenerateRepositoryImpl implements GenerateRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Repository> Class<? extends T> generate(Class<T> repositoryClazz) {
-		String name = repositoryClazz.getName() + Placeholder.SUFFIX;
+		String name = repositoryClazz.getName() + Placeholder.DB_SUF;
 
 		byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
 

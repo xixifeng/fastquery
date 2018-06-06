@@ -25,18 +25,15 @@ package org.fastquery.asm;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.fastquery.core.Placeholder;
-import org.fastquery.core.Prepared;
 import org.fastquery.core.Repository;
-import org.fastquery.mapper.QueryValidator;
+import org.fastquery.jersey.Embed;
 import org.fastquery.util.TypeUtil;
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
@@ -45,11 +42,9 @@ import org.objectweb.asm.commons.GeneratorAdapter;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class AsmRepository implements Opcodes {
+public class AsmRest implements Opcodes {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AsmRepository.class);
-
-	private AsmRepository() {
+	private AsmRest() {
 	}
 
 	/**
@@ -59,8 +54,6 @@ public class AsmRepository implements Opcodes {
 	 * @return 生成的类字节码
 	 */
 	public static synchronized byte[] generateBytes(Class<? extends Repository> repositoryClazz) {
-		// 安全检测
-		GenerateExtends.safeCheck(repositoryClazz);
 
 		// internal Name 格式: org/fastquery/core/QueryRepository
 		String internalName = Type.getInternalName(repositoryClazz);
@@ -69,51 +62,42 @@ public class AsmRepository implements Opcodes {
 		String[] interfaces = new String[] { internalName };
 
 		// 给待生成的实现类取个名字
-		String proxyName = internalName + Placeholder.DB_SUF;
+		String proxyName = internalName + Placeholder.REST_SUF;
 
+		MethodVisitor mv;
+		FieldVisitor fv;
+		AnnotationVisitor av0;
 		// 生成类
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-		cw.visit(V1_1, ACC_PUBLIC, proxyName, null, "java/lang/Object", interfaces);
+		cw.visit(V1_8, ACC_PUBLIC, proxyName, null, "java/lang/Object", interfaces);
 
-		// 单例
-		String repositoryDescriptor = Type.getDescriptor(repositoryClazz);
-		// 生成的私有静态方法,用于存储实例对象
-		FieldVisitor fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, "instance", repositoryDescriptor, null, null);
+		// 给类标识@Singleton注解
+		av0 = cw.visitAnnotation("Ljavax/inject/Singleton;", true);
+		av0.visitEnd();
+
+		String dbDes = Type.getDescriptor(repositoryClazz);
+
+		// 注入依赖的db
+		fv = cw.visitField(ACC_PRIVATE, "d", dbDes, null, null);
+		av0 = fv.visitAnnotation("Ljavax/inject/Inject;", true);
+		av0.visitEnd();
 		fv.visitEnd();
 
-		org.objectweb.asm.MethodVisitor mv;
-		// 生成私有的不带参的构造方法
-		mv = cw.visitMethod(ACC_PRIVATE, "<init>", "()V", null, null);
+		// 生成不带参的构造方法
+		mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 		mv.visitCode();
 		mv.visitVarInsn(ALOAD, 0);
 		mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
 		mv.visitInsn(RETURN);
 		mv.visitMaxs(1, 1);
 		mv.visitEnd();
-
-		// 生成获取实例方法
-		mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "getInstance", "()" + repositoryDescriptor, null, null);
-		mv.visitCode();
-		mv.visitFieldInsn(GETSTATIC, proxyName, "instance", repositoryDescriptor);
-		Label l0 = new Label();
-		mv.visitJumpInsn(IFNONNULL, l0);
-		mv.visitTypeInsn(NEW, proxyName);
-		mv.visitInsn(DUP);
-		mv.visitMethodInsn(INVOKESPECIAL, proxyName, "<init>", "()V", false);
-		mv.visitFieldInsn(PUTSTATIC, proxyName, "instance", repositoryDescriptor);
-		mv.visitLabel(l0);
-		mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-		mv.visitFieldInsn(GETSTATIC, proxyName, "instance", repositoryDescriptor);
-		mv.visitInsn(ARETURN);
-		mv.visitMaxs(2, 0);
-		mv.visitEnd();
-		// 单例 End
+		// 生成不带参的构造方法 End
 
 		// 根据接口clazz 生成实现的方法
 		Method[] methods = repositoryClazz.getMethods();
 		for (Method method : methods) {
 			if (Modifier.isAbstract(method.getModifiers())) { // 只针对 abstract 方法
-				cw = generateMethod(cw, method, Prepared.class);
+				cw = generateMethod(cw, method, proxyName, dbDes);
 			}
 		}
 		cw.visitEnd();
@@ -129,7 +113,7 @@ public class AsmRepository implements Opcodes {
 	 * @param exceptions
 	 * @param interfaceClazz
 	 */
-	private static ClassWriter generateMethod(ClassWriter cw, java.lang.reflect.Method method, Class<Prepared> prepared) {
+	private static ClassWriter generateMethod(ClassWriter cw, java.lang.reflect.Method method, String proxyName, String dbDes) {
 
 		org.objectweb.asm.commons.Method m = new org.objectweb.asm.commons.Method(method.getName(), Type.getMethodDescriptor(method));
 		GeneratorAdapter mv = new GeneratorAdapter(ACC_PUBLIC, m, null, null, cw);
@@ -146,7 +130,8 @@ public class AsmRepository implements Opcodes {
 
 		// 调用Prepared中的excute方法
 		// INVOKESTATIC
-		mv.visitMethodInsn(INVOKESTATIC, Type.getType(prepared).getInternalName(), "excute",
+		mv.visitFieldInsn(GETFIELD, proxyName, "d", dbDes);
+		mv.visitMethodInsn(INVOKESTATIC, Type.getType(Embed.class).getInternalName(), "excute",
 				"(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/Repository;)Ljava/lang/Object;", false);
 
 		// 返回值处理
@@ -262,17 +247,4 @@ public class AsmRepository implements Opcodes {
 			mv.visitInsn(AASTORE);
 		}
 	}
-
-	/**
-	 * 所有的代码生成之后
-	 * 
-	 * @param classes Repository class 集合
-	 */
-	public static void after(List<Class<Repository>> classes) {
-		QueryValidator.check(classes);
-		classes.clear();
-
-		LOG.debug("\n\n\n\n初始化阶段结束\n");
-	}
-
 }

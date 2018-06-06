@@ -22,24 +22,35 @@
 
 package org.fastquery.jersey;
 
+import org.fastquery.core.RepositoryException;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.glassfish.jersey.server.ResourceConfig;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FQueryBinder extends AbstractBinder { // NO_UCD (use default)
+public class FQueryBinder extends AbstractBinder {
 
-	private ClassLoader webClassLoader;
+	private FqClassLoader fqClassLoader;
 
-	public FQueryBinder(ClassLoader webClassLoader) {
-		this.webClassLoader = webClassLoader;
+	private FQueryBinder(ClassLoader webClassLoader) {
+		this.fqClassLoader = new FqClassLoader(webClassLoader, this);
+		new GenerateRepositoryImpl(fqClassLoader).persistent();
 	}
 
 	@Override
 	protected void configure() {
-		FqClassLoader fqClassLoader = new FqClassLoader(webClassLoader, this);
-		new GenerateRepositoryImpl(fqClassLoader).persistent();
+		//
 	}
 
+	public static void bind(ResourceConfig resource) { // NO_UCD (unused code)
+		FQueryBinder fb = new FQueryBinder(resource.getClassLoader());
+		resource.register(fb);
+		try {
+			resource.registerClasses(fb.fqClassLoader.getResourceClasses());
+		} catch (ClassNotFoundException e) {
+			throw new RepositoryException("没有找到类", e);
+		}
+	}
 }

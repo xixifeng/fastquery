@@ -23,6 +23,9 @@
 package org.fastquery.jersey;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.fastquery.core.RepositoryException;
 
 /**
@@ -32,19 +35,38 @@ import org.fastquery.core.RepositoryException;
 class FqClassLoader extends ClassLoader {
 
 	private FQueryBinder binder;
+	private List<String> resourceNames = new ArrayList<>();
 
 	FqClassLoader(ClassLoader webClassLoader, FQueryBinder binder) {
 		super(webClassLoader);
 		this.binder = binder;
 	}
 
-	final Class<?> defineClassByName(String name, byte[] b, int off, int len) {
-		Class<?> clazz = defineClass(name, b, off, len);
-		try {
-			binder.bind(clazz.getMethod("getInstance").invoke(null)).to(clazz.getInterfaces()[0]);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			throw new RepositoryException(e);
+	final Class<?> defineClassByName(String name, byte[] b, boolean isWebQuery) {
+		Class<?> clazz = defineClass(name, b, 0, b.length);
+		if (isWebQuery) {
+			resourceNames.add(name);
+		} else {
+			try {
+				binder.bind(clazz.getMethod("getInstance").invoke(null)).to(clazz.getInterfaces()[0]);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				throw new RepositoryException(e);
+			}
 		}
 		return clazz;
+	}
+
+	Class<?>[] getResourceClasses() throws ClassNotFoundException {
+		int len = resourceNames.size();
+		if (len != 0) {
+			Class<?>[] classes = new Class<?>[len];
+			for (int i = 0; i < len; i++) {
+				classes[i] = this.loadClass(resourceNames.get(i));
+			}
+			resourceNames.clear();
+			return classes;
+		} else {
+			return null;
+		}
 	}
 }

@@ -26,9 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.Path;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.fastquery.asm.AsmRepository;
+import org.fastquery.asm.AsmRest;
 import org.fastquery.core.FQueryResourceImpl;
 import org.fastquery.core.GenerateRepository;
 import org.fastquery.core.Placeholder;
@@ -58,16 +61,27 @@ class GenerateRepositoryImpl implements GenerateRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Repository> Class<? extends T> generate(Class<T> repositoryClazz) {
-		String name = repositoryClazz.getName() + Placeholder.SUFFIX;
+		String name = repositoryClazz.getName() + Placeholder.DB_SUF;
+
+		if (repositoryClazz.getAnnotation(Path.class) != null) { // 如果接口上标识有@Path 就生成rest实现类
+			String n = repositoryClazz.getName() + Placeholder.REST_SUF;
+			byte[] bts = AsmRest.generateBytes(repositoryClazz);
+			classLoader.defineClassByName(n, bts, true);
+		}
 
 		byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
 
-		/*
-		 * // 把生成的文件存储起来 try (java.io.FileOutputStream fos = new
-		 * java.io.FileOutputStream("/data/tmp/" + name + ".class")) { fos.write(bytes); } catch
-		 * (Exception e) { e.printStackTrace(); } // 把生成的文件存储起来 end
+		/**
+		 * <pre>
+		// 把生成的文件存储起来
+		try (java.io.FileOutputStream fos = new java.io.FileOutputStream("/data/tmp/" + name + ".class")) {
+			fos.write(bytes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} // 把生成的文件存储起来 end
+		</pre>
 		 */
-		return (Class<? extends T>) classLoader.defineClassByName(name, bytes, 0, bytes.length);
+		return (Class<? extends T>) classLoader.defineClassByName(name, bytes, false);
 	}
 
 	void persistent() {

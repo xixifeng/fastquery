@@ -90,6 +90,13 @@ public class JdbcConfig {
 		return named;
 	}
 
+	/**
+	 * 设置named <br>
+	 * 注意: 已经根据named重写了hashCode和equals,用于标识该对象在比较时作为唯一标识. 修改这个属性要特别注意.
+	 * 如果把这个对象放入到hash集合中,而在外界修改了这个属性,那么会出现内存溢出
+	 * 
+	 * @param named 数据源名称
+	 */
 	public void setNamed(String named) {
 		this.named = named;
 	}

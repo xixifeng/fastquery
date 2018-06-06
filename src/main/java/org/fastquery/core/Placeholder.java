@@ -34,9 +34,13 @@ public final class Placeholder {
 	}
 
 	/**
-	 * 生成类的默认后缀名称
+	 * 生成db类的后缀名称
 	 */
-	public static final String SUFFIX = "$ProxyImpl";
+	public static final String DB_SUF = "$ProxyImpl";
+	/**
+	 * 生成rest类的后缀名称
+	 */
+	public static final String REST_SUF = "-$RestImpl";
 
 	public static final String TABLE = "#{#table}";
 	public static final String TABLE_REG = "\\#\\{\\#table\\}";

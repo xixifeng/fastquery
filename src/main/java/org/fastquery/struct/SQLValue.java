@@ -35,7 +35,7 @@ import org.fastquery.util.PreventSQLInjection;
 import org.fastquery.util.TypeUtil;
 
 /**
- * 改操作SQL和值
+ * SQL和值
  * 
  * @author mei.sir@aliyun.cn
  */

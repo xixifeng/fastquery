@@ -391,6 +391,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 保存一个实体,返回实体
 	 * 
+	 * @param <E> 实体
 	 * @param entity 实体
 	 * @return 返回实体
 	 */
@@ -403,6 +404,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 保存一个实体,返回实体
 	 * 
+	 * @param <E> 实体
 	 * @param entity 实体
 	 * @param dataSourceName 数据源名称
 	 * @return 返回实体
@@ -416,6 +418,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 保存一个实体,返回实体
 	 * 
+	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
 	 * @param entity 实体
@@ -430,6 +433,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 更新一个实体,返回实体
 	 * 
+	 * @param <E> 实体
 	 * @param entity 实体
 	 * @return 返回实体
 	 */
@@ -446,6 +450,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 更新一个实体,返回实体
 	 * 
+	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param entity 实体
 	 * @return 返回实体
@@ -463,6 +468,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 更新一个实体,返回实体
 	 * 
+	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
 	 * @param entity 实体
@@ -481,6 +487,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 保存或更新一个实体,返回实体
 	 * 
+	 * @param <E> 实体
 	 * @param entity 实体
 	 * @return 返回实体
 	 */
@@ -497,6 +504,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 保存或更新一个实体,返回实体
 	 * 
+	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param entity 实体
 	 * @return 返回实体
@@ -514,6 +522,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 保存或更新一个实体,返回实体
 	 * 
+	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
 	 * @param entity 实体

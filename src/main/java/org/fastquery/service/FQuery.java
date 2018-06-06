@@ -49,12 +49,12 @@ public class FQuery { // NO_UCD
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Repository> T getRepository(Class<T> clazz) {
-		String name = clazz.getName() + Placeholder.SUFFIX;
+		String name = clazz.getName() + Placeholder.DB_SUF;
 		try {
 			return (T) GenerateRepositoryImpl.getInstance().getClassLoader().loadClass(name).getMethod("getInstance").invoke(null);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException
 				| ClassNotFoundException e) {
-			throw new RepositoryException(e.getMessage(), e);
+			throw new RepositoryException("获取代理实现类异常", e);
 		}
 	}
 

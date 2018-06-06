@@ -45,12 +45,12 @@ public class LoadPrperties {
 	}
 
 	/**
-	 * 装载配置并且初始化数据源,该方法的消耗成本较大.把它用在频繁调用的地方,显然是不合理的!
+	 * 装载配置并且初始化数据源,该方法消耗大,只能被调用一次
 	 * 
 	 * @param fqueryResource fquery.json 资源文件
 	 * @return set格式 fquery.json
 	 */
-	public static synchronized Set<FastQueryJson> load(Resource fqueryResource) {
+	public static Set<FastQueryJson> load(Resource fqueryResource) {
 		Set<FastQueryJson> fqProperties = PropertiesUtil.getFQueryProperties(fqueryResource.getResourceAsStream("fastquery.json"), fqueryResource);
 		String namedConfig;
 		Set<String> basePackages;
@@ -68,7 +68,7 @@ public class LoadPrperties {
 				if (FQueryProperties.findDataSource(namedConfig) == null && namedConfig != null) { // 如果名称为namedConfig的数据源不存在,才能new!
 					com.mchange.v2.c3p0.ComboPooledDataSource cpds = new com.mchange.v2.c3p0.ComboPooledDataSource(namedConfig);
 					FQueryProperties.putDataSource(namedConfig, cpds);
-					LOG.debug(String.format("创建数据源:%s,名称为:%s", cpds, namedConfig));
+					LOG.debug("创建数据源:{},名称为:{}", cpds, namedConfig);
 				}
 				break;
 
