@@ -22,6 +22,7 @@
 
 package org.fastquery.asm;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -117,6 +118,18 @@ public class AsmRest implements Opcodes {
 
 		org.objectweb.asm.commons.Method m = new org.objectweb.asm.commons.Method(method.getName(), Type.getMethodDescriptor(method));
 		GeneratorAdapter mv = new GeneratorAdapter(ACC_PUBLIC, m, null, null, cw);
+		
+		// 加注解
+		// 加上@Extends 用于记录这个方法的接口方法含有哪些注解
+		AnnotationVisitor av0 = mv.visitAnnotation("Lorg/fastquery/core/Extends;", true);
+		AnnotationVisitor av1 = av0.visitArray("value");
+		Annotation[] mas = method.getAnnotations();
+		for (Annotation annotation : mas) {
+			av1.visit(null, Type.getType(annotation.annotationType()));
+		}
+		av1.visitEnd();
+		av0.visitEnd();
+		// 加注解 end
 
 		mv.visitLdcInsn(method.getName()); // excute的第1参数
 		mv.visitLdcInsn(Type.getType(method).getDescriptor()); // excute的第2参数

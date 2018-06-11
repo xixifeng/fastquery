@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.46</version>
+    <version>1.0.47</version>
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.46'
+compile 'org.fastquery:fastquery:1.0.47'
 ```
 
 ### Apache Archive
@@ -365,7 +365,7 @@ Primarykey saveUserInfo(String name,Integer age);
 | `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),若给where传递null或"",默认按照主键修改,返回影响行数 |
 | `<E> int update(Collection<E> entities)` | 更新集合实体,成员属性如果是null,那么该属性将不会参与改运算,每个实体必须包含主键 |
 | `int delete(String tableName,String primaryKeyName,long id)` | 根据主键删除实体,返回影响行数 |
-| `int[] executeBatch(String sqlName)` | 根据指定的SQL文件名称或绝对路径,执行批量操作SQL语句,返回int[],数组中的每个数对应一条SQL语句执行后所影响的行数 |
+| `int[] executeBatch(String sqlFile)` | 根据指定的SQL文件名称或绝对路径,执行批量操作SQL语句,返回int[],数组中的每个数对应一条SQL语句执行后所影响的行数 |
 
 举例说明:  
 先准备一个实体  
@@ -376,7 +376,7 @@ public class UserInfo {
 	private Integer id;
 	private String name;
 	private Integer age;
-    // getter /setter 省略...	
+	// getter /setter 省略...	
 }
 ```
 
@@ -895,13 +895,12 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 
 ## 执行SQL文件
 ```java
-String sqlName = "update.sql";
-String output = "out.txt";
-studentDBService.executeBatch(sqlName, output);
+String sqlFile = "update.sql";
+int[] effects = studentDBService.executeBatch(sqlFile);
 ```
 
-- sqlName 基准目录下的SQL文件名称. 注意: 基准目录在fastquery.json里配置
-- output 指定执行SQL后的输出将放在哪个文件里. 注意: 会在基准目录里寻找output文件
+- sqlFile 指定基准目录下的SQL文件. 注意: 基准目录在fastquery.json里配置,sqlFile 为绝对路径也行. 
+- 返回 `int[]`类型,用于记录SQL文件被执行后所影响的行数.若,effects[x] = m 表示第x行SQL执行后影响的行数是m; effects[y] = n 表示第y行SQL执行后所影响的行数是n.
 
 ## 动态适配数据源
 ### 创建数据源
@@ -1081,7 +1080,31 @@ public interface UserInfoDBService extends QueryRepository {
 ```
 
 没错, 不用去写任何实现类, 访问 `http://<your host>/rest/userInfo/findAll?pageIndex=1&pageSize=5`, 就可以看到效果.  
-DB接口不仅能当做WEB Service,同时也是一个DB接口.   
+DB接口不仅能当做WEB Service(服务),同时也是一个DB接口.  
+
+### 配置支持HttpSign
+[HttpSign](https://github.com/xixifeng/httpsign) 是一种RESTful接口签名认证的实现.  
+
+```xml
+<dependency>
+    <groupId>org.fastquery</groupId>
+    <artifactId>httpsign</artifactId>
+    <!-- 请从https://gitee.com/xixifeng.com/httpsign 或maven中央仓库中查阅最新版本 -->
+    <version>1.0.3</version>
+</dependency>
+```
+
+用法很简单,在方法上标识`@Authorization`便可.
+
+```java
+	@org.fastquery.httpsign.Authorization
+	@Path("findById")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Query("select id,name,age from UserInfo where id = :id")
+	JSONObject findById(@QueryParam("id") @Param("id") Integer id);
+```
+ 
 当然,如果不喜欢太简单,可以把DB接口注入到JAX-RS Resource类中:
 
 ```java
@@ -1140,8 +1163,8 @@ UserInformation findUserInfoById(Integer id);
 build: maven 
 
 ## 交流
-![快来加入群【FastQuery 交流群】(群号621656696)，发现精彩内容](https://gitee.com/uploads/images/2017/0705/115519_b9f971c8_788636.png "快来加入群【FastQuery 交流群】(群号621656696)，发现精彩内容")    
-【FastQuery 交流群】(621656696)由支持者贡献,非常感谢!
+![FastQuery QQ群号:621656696](https://gitee.com/uploads/images/2017/0705/115519_b9f971c8_788636.png "FastQuery QQ群号:621656696，发现更多内容")    
+FastQuery QQ交流群号(621656696) 由支持者自由发起,非常感谢!
 
 ## 反馈问题
 https://gitee.com/xixifeng.com/fastquery/issues  
