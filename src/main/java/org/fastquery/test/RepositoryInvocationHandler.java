@@ -74,14 +74,14 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 			return;
 		}
 		Class<QueryParser> clazz = QueryParser.class;
-		LOG.debug("RepositoryInvocationHandler:当前线程:" + Thread.currentThread());
+		LOG.debug("RepositoryInvocationHandler:当前线程:{}", Thread.currentThread());
 		Method currentMethod = QueryContext.getMethod();
 		Method modifyParserMethod = clazz.getDeclaredMethod("modifyParser");
 		Method queryParserMethod = clazz.getDeclaredMethod("queryParser");
 		modifyParserMethod.setAccessible(true);
 		queryParserMethod.setAccessible(true);
-		LOG.debug("modifyParserMethod:" + modifyParserMethod);
-		LOG.info("currentMethod:" + currentMethod);
+		LOG.debug("modifyParserMethod:{}",modifyParserMethod);
+		LOG.info("currentMethod:{}",currentMethod);
 		Modifying modifying = currentMethod.getAnnotation(Modifying.class);
 		Class<?> returnType = QueryContext.getReturnType();
 		QueryByNamed queryById = currentMethod.getAnnotation(QueryByNamed.class);
@@ -93,7 +93,7 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 		sqlValueField.setAccessible(true);
 		sqlValuesField.setAccessible(true);
 		if (modifying != null) {
-			// 改操作设计多条sql语句
+			// 改操作涉及多条sql语句
 			sqlValuesField.set(rule, modifyParserMethod.invoke(null));
 		} else if (returnType == Page.class && queryById != null) {
 			sqlValuesField.set(rule, QueryParser.pageParserByNamed());

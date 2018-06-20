@@ -22,24 +22,15 @@
 
 package org.fastquery.test;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-
-import org.fastquery.dao.UserInfoDBService;
-import org.fastquery.service.FQuery;
 import org.fastquery.service.FQueryResourceImplTest;
 import org.fastquery.service.FQueryTest;
 import org.fastquery.util.BeanUtilTest;
-import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.FastQueryJSONObjectTest;
 import org.fastquery.util.TypeUtilTest;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-
-import com.alibaba.fastjson.JSONObject;
 
 /**
  * 运行所有的测试用例
@@ -51,20 +42,9 @@ import com.alibaba.fastjson.JSONObject;
 @SuiteClasses({ FQueryTest.class, StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class, UserInfoDBServiceTest3.class,
 		TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class, BeanUtilTest.class, PageTest.class, FastQueryJSONObjectTest.class,
 		FQueryResourceImplTest.class, SunnyDBServiceTest.class, SaveToIdTest.class, PlaceholderTest.class, DBTest.class, ProductDBServiceTest.class,
-		FQueryPropertiesTest.class, QueryPoolTest.class, ParamFilterTest.class, ConditionTest.class, QueryParserTest.class, DefaultMethodTest.class })
+		FQueryPropertiesTest.class, QueryPoolTest.class, ParamFilterTest.class, ConditionTest.class, QueryParserTest.class, DefaultMethodTest.class,
+		RepVersion.class })
 public class AllRuleTest {
-
-	@BeforeClass
-	public static void beforeClass() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-		FQuery.getRepository(UserInfoDBService.class);
-		Field field = FastQueryJSONObject.class.getDeclaredField("maps");
-		field.setAccessible(true);
-		@SuppressWarnings("unchecked")
-		Map<ClassLoader, JSONObject> maps = (Map<ClassLoader, JSONObject>) field.get(null);
-		JSONObject jsonObject = maps.get(Thread.currentThread().getContextClassLoader());
-		jsonObject.put("debug", true);
-	}
-
 	@Test
 	public void todo() {
 	}

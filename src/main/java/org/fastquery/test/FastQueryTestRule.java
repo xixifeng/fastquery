@@ -28,6 +28,7 @@ import org.junit.runners.model.Statement;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,6 @@ import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.filter.SkipFilter;
 import org.fastquery.struct.SQLValue;
-import org.fastquery.util.FastQueryJSONObject;
 
 /**
  * 
@@ -50,11 +50,7 @@ public class FastQueryTestRule implements TestRule {
 	private SQLValue sqlValue;
 	private List<SQLValue> sqlValues;
 
-	private boolean autoRollback = true;
-	private boolean debug;
-
-	private void proxy(Statement base, Description description)
-			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	private void proxy(Statement base, Description description) throws NoSuchFieldException, IllegalAccessException {
 		Object testTarget = getTestTarget(base);
 		LOG.debug("SkipFilter:" + description.getAnnotation(SkipFilter.class));
 		Class<?> clazz = description.getTestClass();
@@ -83,7 +79,7 @@ public class FastQueryTestRule implements TestRule {
 		}
 	}
 
-	private Object getTestTarget(Statement base) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	private Object getTestTarget(Statement base) throws NoSuchFieldException, IllegalAccessException {
 		if (base instanceof org.junit.internal.runners.statements.ExpectException) {
 			Field nextField = base.getClass().getDeclaredField("next");
 			nextField.setAccessible(true);
@@ -93,34 +89,24 @@ public class FastQueryTestRule implements TestRule {
 			Field targetField = nextBase.getClass().getDeclaredField("target");
 			targetField.setAccessible(true);
 			// 获取目标对象
-			Object target = targetField.get(nextBase);
-			return target;
+			return targetField.get(nextBase);
 		} else {
 			Field targetField = base.getClass().getDeclaredField("target");
 			targetField.setAccessible(true);
 			// 获取目标对象
-			Object target = targetField.get(base);
-			return target;
-
+			return targetField.get(base);
 		}
 	}
 
 	@Override
 	public Statement apply(Statement base, Description description) {
 
-		debug = FastQueryJSONObject.getDebug();
-
 		return new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
-				// 请特别注意: 这里的 throws Throwable junti会自行处理,不用捕获,不然断言效果出来不了!
-				if (!debug) {
-					base.evaluate();
-					return;
-				}
 				try {
 					proxy(base, description);
-					LOG.debug(description.getMethodName() + "--------------------------------------------开始执行,当前线程:" + Thread.currentThread());
+					LOG.debug("{} --------------------------------------------开始执行,当前线程: {}", description.getMethodName(), Thread.currentThread());
 					base.evaluate();
 				} catch (Throwable e) {
 					throw new RepositoryException(e);
@@ -131,19 +117,36 @@ public class FastQueryTestRule implements TestRule {
 		};
 	}
 
+	/**
+	 * 若DB操作只有一条SQL,就使用这个方法获取
+	 * 
+	 * @return
+	 */
 	public SQLValue getSQLValue() {
-		return sqlValue;
+		return getListSQLValue().get(0);
 	}
 
+	/**
+	 * 获取DB操作后所产生的SQL语句
+	 * 
+	 * @return SQL语句
+	 */
 	public List<SQLValue> getListSQLValue() {
-		return sqlValues;
+		if (sqlValue != null) {
+			List<SQLValue> ls = new ArrayList<>();
+			ls.add(sqlValue);
+			return ls;
+		} else {
+			return sqlValues;
+		}
 	}
 
-	private void after(Description description) throws Exception {
-		LOG.debug(description.getMethodName() + "--------------------------------------------已经结束,当前线程:" + Thread.currentThread());
+	private void after(Description description) throws SQLException {
+		LOG.debug("{} --------------------------------------------已经结束,当前线程:{}", description.getMethodName(), Thread.currentThread());
 		QueryContext context = QueryContextHelper.getQueryContext();
 		if (context != null) {
-			if (isAutoRollback()) {
+			Rollback rollback = description.getAnnotation(Rollback.class);
+			if (rollback == null || rollback.value()) {
 				QueryContext.getConnection().rollback();
 				LOG.info("事务已经回滚");
 			} else {
@@ -152,17 +155,5 @@ public class FastQueryTestRule implements TestRule {
 			}
 			QueryContext.forceClear();
 		}
-	}
-
-	public void setAutoRollback(boolean autoRollback) {
-		this.autoRollback = autoRollback;
-	}
-
-	public boolean isAutoRollback() {
-		return autoRollback;
-	}
-
-	public boolean isDebug() {
-		return debug;
 	}
 }

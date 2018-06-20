@@ -22,35 +22,17 @@
 
 package org.fastquery.test;
 
-import org.fastquery.dao.ConditionDBService;
-import org.fastquery.service.FQuery;
-import org.fastquery.struct.SQLValue;
-import org.junit.Rule;
-import org.junit.Test;
-
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * 
+ * 标识回滚
  * @author mei.sir@aliyun.cn
  */
-public class ConditionTest {
-
-	private ConditionDBService db = FQuery.getRepository(ConditionDBService.class);
-
-	@Rule
-	public FastQueryTestRule rule = new FastQueryTestRule();
-
-	@Test
-	public void findUserInfo() {
-		String tname = "from UserInfo";
-		String w1 = "name like ?1";
-		String w2 = "and age > ?2";
-		db.findUserInfo(w1, w2, tname);
-		SQLValue sqlValue = rule.getSQLValue();
-		String sql = sqlValue.getSql();
-		assertThat(sql, equalTo("select * from UserInfo where  name like ?  and age > ?"));
-	}
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Rollback {
+	boolean value() default true;
 }

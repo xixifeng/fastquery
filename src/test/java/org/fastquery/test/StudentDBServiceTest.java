@@ -78,19 +78,16 @@ public class StudentDBServiceTest {
 		int age = 17;
 		int seffot = studentDBService.update(no, name, age);
 		assertThat(seffot, is(1));
-		assertThat(rule.getSQLValue(), nullValue());
-		if (rule.isDebug()) {
-			List<SQLValue> sqlValues = rule.getListSQLValue();
-			assertThat(sqlValues.size(), is(1));
-			SQLValue sqlValue = sqlValues.get(0);
-			assertThat(sqlValue.getSql(), equalToIgnoringWhiteSpace("update student s set s.age=?,s.name=? where  s.no=?"));
-			assertThat(sqlValue.getSql(), equalTo("update student s set s.age=?,s.name=? where  s.no=?"));
-			List<Object> values = sqlValue.getValues();
-			assertThat(values.size(), is(3));
-			assertThat(values.get(0).getClass() == Integer.class && values.get(0).equals(age), is(true));
-			assertThat(values.get(1).getClass() == String.class && values.get(1).equals(name), is(true));
-			assertThat(values.get(2).getClass() == String.class && values.get(2).equals(no), is(true));
-		}
+		List<SQLValue> sqlValues = rule.getListSQLValue();
+		assertThat(sqlValues.size(), is(1));
+		SQLValue sqlValue = sqlValues.get(0);
+		assertThat(sqlValue.getSql(), equalToIgnoringWhiteSpace("update student s set s.age=?,s.name=? where  s.no=?"));
+		assertThat(sqlValue.getSql(), equalTo("update student s set s.age=?,s.name=? where  s.no=?"));
+		List<Object> values = sqlValue.getValues();
+		assertThat(values.size(), is(3));
+		assertThat(values.get(0).getClass() == Integer.class && values.get(0).equals(age), is(true));
+		assertThat(values.get(1).getClass() == String.class && values.get(1).equals(name), is(true));
+		assertThat(values.get(2).getClass() == String.class && values.get(2).equals(no), is(true));
 	}
 
 	// @Query("update student s set s.age=?2 where s.no=?1")

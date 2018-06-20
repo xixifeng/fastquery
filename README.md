@@ -3,7 +3,7 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.47</version>
+    <version>1.0.47</version> <!-- fastquery.version -->
 </dependency>
 ```
 
@@ -11,12 +11,6 @@
 ```xml
 compile 'org.fastquery:fastquery:1.0.47'
 ```
-
-### Apache Archive
-https://repo1.maven.org/maven2/org/fastquery/fastquery/
-
-### Current Source
-https://github.com/xixifeng/fastquery/archive/master.zip
 
 # FastQuery 数据持久层框架
 FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
@@ -382,13 +376,13 @@ public class UserInfo {
 
 保存实体,更新实体,保存或更新实体示例如下:  
 ``` java
-	UserInfo u1 = new UserInfo(36,"Jsxxv", 23);
+	UserInfo u1 = new UserInfo(36,"Dick", 23);
 	
 	// 保存实体
 	studentDBService.save(u1)
 	
 	Integer id = 36;
-	String name = "Jsxxv";
+	String name = "Dick";
 	Integer age = null;
 	UserInfo u2 = new UserInfo(id,name,age);
 	// age是null值, age就不会参与修改运算了.
@@ -402,7 +396,7 @@ public class UserInfo {
 
 ```java
 Integer id = 1;
-String name = "好哇瓦";
+String name = "可馨";
 Integer age = 3;
 UserInfo entity = new UserInfo(id,name,age);
 // 会解析成:update `UserInfo` set `id`=?, `age`=? where name = ?
@@ -710,23 +704,6 @@ delimiter ;
 ```java
 @Query("call addStudent(?1,:name,?3,?4,:dept)")
 JSONObject callProcedure(String no,@Param("name") String name,String sex,int age,@Param("dept") String dept);
-```
-
-## 处理异常
-
-捕获和处理`Repository`实例在运行期抛出的异常.   
-例如: 捕获`UserInfoDBService`中的`updateBatch`在运行期间可能抛出的异常.
-
-```java
-// 获取 Repository
-UserInfoDBService udb = FQuery.getRepository(UserInfoDBService.class);
-
-try {
-	int effect = udb.updateBatch("小不点", 6, 2);
-} catch (RepositoryException e) {
-	// Handle exceptional condition
-	// TODO ... ...
-}
 ```
 
 ## 分页
@@ -1068,7 +1045,7 @@ FastQuery支持JAX-RS注解,不需实现类,便能构建极简的RESTful.不得�
 @Path("userInfo")
 public interface UserInfoDBService extends QueryRepository {
 
-      // 查询并实现分页
+	// 查询并实现分页
 	@Path("findAll")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -1079,8 +1056,8 @@ public interface UserInfoDBService extends QueryRepository {
 }
 ```
 
-没错, 不用去写任何实现类, 访问 `http://<your host>/rest/userInfo/findAll?pageIndex=1&pageSize=5`, 就可以看到效果.  
-DB接口不仅能当做WEB Service(服务),同时也是一个DB接口.  
+没错, **不用去写任何实现类**, 访问 `http://<your host>/rest/userInfo/findAll?pageIndex=1&pageSize=5`, 就可以看到效果.  
+**DB接口不仅能当做WEB Service(服务),同时也是一个DB接口**.  
 
 ### 配置支持HttpSign
 [HttpSign](https://github.com/xixifeng/httpsign) 是一种RESTful接口签名认证的实现.  
@@ -1089,7 +1066,7 @@ DB接口不仅能当做WEB Service(服务),同时也是一个DB接口.
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>httpsign</artifactId>
-    <!-- 请从https://gitee.com/xixifeng.com/httpsign 或maven中央仓库中查阅最新版本 -->
+    <!-- 请从 https://gitee.com/xixifeng.com/httpsign 或 maven 中央仓库中查阅最新版本 -->
     <version>1.0.3</version>
 </dependency>
 ```
@@ -1097,28 +1074,21 @@ DB接口不仅能当做WEB Service(服务),同时也是一个DB接口.
 用法很简单,在方法上标识`@Authorization`便可.
 
 ```java
-	@org.fastquery.httpsign.Authorization
-	@Path("findById")
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Query("select id,name,age from UserInfo where id = :id")
-	JSONObject findById(@QueryParam("id") @Param("id") Integer id);
+@org.fastquery.httpsign.Authorization
+@Path("findById")
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+@Query("select id,name,age from UserInfo where id = :id")
+JSONObject findById(@QueryParam("id") @Param("id") Integer id);
 ```
  
 当然,如果不喜欢太简单,可以把DB接口注入到JAX-RS Resource类中:
 
 ```java
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-
 @Path("hi")
 public class Hi {
 
-	@Inject
+	@javax.inject.Inject
 	private UserInfoDBService db;
 	
 	@GET
@@ -1127,6 +1097,50 @@ public class Hi {
 	      // use db...
 	      return "hi";
 	}
+}
+```
+
+## 测试FastQuery
+FastQuery提供的测试方式能轻松解决如下问题.
+- 运行时获取SQL和它的参数值,以便开发者验证生成的SQL是否跟期望值一致.
+- 运行DB方法后自动回滚数据库事务.
+
+`FastQueryTestRule` 实现了Junit中的 `TestRule` 类,用来扩展测试用例.可以在测试方法中获取执行过的SQL语句及SQL所对应的参数值,以便做断言.加上`@Rollback`注解,可以用来控制测试方法执行完毕之后是否让数据事务回滚或提交.测试方法结束后默认自动回滚,既可以达到测试效果,又不影响数据库(可回滚到改之前状态). 如下是例子,请留意注释,细节就不再赘述了.
+
+```java
+// junit fastquery的扩展
+@org.junit.Rule
+public FastQueryTestRule rule = new FastQueryTestRule();
+
+// 获取DB接口
+private StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
+
+@Rollback(true) // 当该方法执行完毕之后自动回滚事务
+@Test
+public void update() {
+	String no = "9512101";
+	String name = "清风习习";
+	int age = 17;
+	int effect = studentDBService.update(no, name, age);
+	// 断言: 影响的行数是1
+	assertThat(effect, is(1));
+	// 获取DB操作后所产生的SQL
+	List<SQLValue> sqlValues = rule.getListSQLValue();
+	// 断言: studentDBService.update 执行后产生的SQL为一条
+	assertThat(sqlValues.size(), is(1));
+	SQLValue sqlValue = sqlValues.get(0);
+	// 断言所产生的SQL等于"update student s set s.age=?,s.name=? where  s.no=?"
+	assertThat(sqlValue.getSql(), equalTo("update student s set s.age=?,s.name=? where  s.no=?"));
+	// 获取SQL参数列表
+	List<Object> values = sqlValue.getValues();
+	// 断言:这条SQL语句中一共有3个参数
+	assertThat(values.size(), is(3));
+	// 断言: SQL的第一个参数是Integer类型,并且他的值等于age
+	assertThat(values.get(0).getClass() == Integer.class && values.get(0).equals(age), is(true));
+	// 断言: SQL的第一个参数是String类型,并且他的值等于name
+	assertThat(values.get(1).getClass() == String.class && values.get(1).equals(name), is(true));
+	// 断言: SQL的第一个参数是String类型,并且他的值等于no
+	assertThat(values.get(2).getClass() == String.class && values.get(2).equals(no), is(true));
 }
 ```
 
@@ -1168,7 +1182,7 @@ FastQuery QQ交流群号(621656696) 由支持者自由发起,非常感谢!
 
 ## 反馈问题
 https://gitee.com/xixifeng.com/fastquery/issues  
-地球人都知道,开源中国秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://gitee.com/xixifeng.com/fastquery/issues)来向我们反馈.  
+地球人都知道,FastQuery秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://gitee.com/xixifeng.com/fastquery/issues)来向我们反馈.  
 
 ## 关于作者
 @习习风 fastquery#126.com  

@@ -127,7 +127,7 @@ public class DefaultMethodTest {
 			}
 		}));
 	}
-	
+
 	// 测试 函数式什么都不干
 	@Test
 	public void findPage2() {
@@ -135,13 +135,14 @@ public class DefaultMethodTest {
 		Integer id = 500;
 		Integer age = 18;
 		try {
-			db.findPage(id, age, pageable, m -> {});	
+			db.findPage(id, age, pageable, m -> {
+			});
 		} catch (Exception e) {
 			String msg = e.getMessage();
 			assertThat(msg, containsString("query 语句必须设置正确"));
 		}
 	}
-	
+
 	// 测试给 query 设置 null
 	@Test
 	public void findPage3() {
@@ -149,13 +150,13 @@ public class DefaultMethodTest {
 		Integer id = 500;
 		Integer age = 18;
 		try {
-			db.findPage(id, age, pageable, m -> m.setQuery(null));	
+			db.findPage(id, age, pageable, m -> m.setQuery(null));
 		} catch (Exception e) {
 			String msg = e.getMessage();
 			assertThat(msg, containsString("query 语句必须设置正确"));
 		}
 	}
-	
+
 	@Test
 	public void findPage4() {
 		Pageable pageable = new PageableImpl(1, 3);
@@ -165,7 +166,7 @@ public class DefaultMethodTest {
 			db.findPage(id, age, pageable, m -> {
 				m.setQuery("select id,name,age from `userinfo`");
 				m.setCountQuery("");
-			});	
+			});
 		} catch (Exception e) {
 			String msg = e.getMessage();
 			assertThat(msg, containsString("query 语句必须设置正确"));

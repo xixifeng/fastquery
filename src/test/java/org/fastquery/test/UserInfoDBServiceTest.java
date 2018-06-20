@@ -71,28 +71,24 @@ public class UserInfoDBServiceTest {
 		UserInfo userInfo = userInfoDBService.findById(sql, id);
 		assertThat(userInfo.getId(), is(id));
 
-		if (rule.isDebug()) {
-			SQLValue sqlValue = rule.getSQLValue();
-			assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
-			List<Object> values = sqlValue.getValues();
-			assertThat(values.size(), is(1));
-			Object arg = values.get(0);
-			assertThat((arg instanceof Integer), is(true));
-			assertThat(arg, is(id));
-		}
+		SQLValue sqlValue = rule.getSQLValue();
+		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
+		List<Object> values = sqlValue.getValues();
+		assertThat(values.size(), is(1));
+		Object arg = values.get(0);
+		assertThat((arg instanceof Integer), is(true));
+		assertThat(arg, is(id));
 
 		sql = "select id,name,age from UserInfo where id = :id";
 		userInfo = userInfoDBService.findById(sql, id);
 		assertThat(userInfo.getId(), is(id));
-		if (rule.isDebug()) {
-			SQLValue sqlValue = rule.getSQLValue();
-			assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
-			List<Object> values = sqlValue.getValues();
-			assertThat(values.size(), is(1));
-			Object arg = values.get(0);
-			assertThat((arg instanceof Integer), is(true));
-			assertThat(arg, is(id));
-		}
+		sqlValue = rule.getSQLValue();
+		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
+		values = sqlValue.getValues();
+		assertThat(values.size(), is(1));
+		arg = values.get(0);
+		assertThat((arg instanceof Integer), is(true));
+		assertThat(arg, is(id));
 	}
 
 	@Test
@@ -104,15 +100,13 @@ public class UserInfoDBServiceTest {
 			assertThat(userInfo.getAge(), nullValue());
 		}
 
-		if (rule.isDebug()) {
-			SQLValue sqlValue = rule.getSQLValue();
-			assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
-			List<Object> values = sqlValue.getValues();
-			assertThat(values.size(), is(1));
-			Object arg = values.get(0);
-			assertThat((arg instanceof Integer), is(true));
-			assertThat(arg, is(id));
-		}
+		SQLValue sqlValue = rule.getSQLValue();
+		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
+		List<Object> values = sqlValue.getValues();
+		assertThat(values.size(), is(1));
+		Object arg = values.get(0);
+		assertThat((arg instanceof Integer), is(true));
+		assertThat(arg, is(id));
 	}
 
 	@Test
@@ -123,18 +117,16 @@ public class UserInfoDBServiceTest {
 		for (UserInfo userInfo : userInfos) {
 			assertThat((userInfo.getName().equals(name) || userInfo.getAge().intValue() == age), is(true));
 		}
-		if (rule.isDebug()) {
-			SQLValue sqlValue = rule.getSQLValue();
-			assertThat(sqlValue.getSql(), equalTo("select name,age from UserInfo u where u.name=? or u.age=?"));
-			List<Object> values = sqlValue.getValues();
-			assertThat(values.size(), is(2));
-			Object arg = values.get(0);
-			assertThat((arg instanceof String), is(true));
-			assertThat(arg, is(name));
-			arg = values.get(1);
-			assertThat((arg instanceof Integer), is(true));
-			assertThat(arg, is(age));
-		}
+		SQLValue sqlValue = rule.getSQLValue();
+		assertThat(sqlValue.getSql(), equalTo("select name,age from UserInfo u where u.name=? or u.age=?"));
+		List<Object> values = sqlValue.getValues();
+		assertThat(values.size(), is(2));
+		Object arg = values.get(0);
+		assertThat((arg instanceof String), is(true));
+		assertThat(arg, is(name));
+		arg = values.get(1);
+		assertThat((arg instanceof Integer), is(true));
+		assertThat(arg, is(age));
 	}
 
 	@Test
@@ -462,12 +454,10 @@ public class UserInfoDBServiceTest {
 			});
 		});
 
-		if (rule.isDebug()) {
-			SQLValue sqlValue = rule.getSQLValue();
-			assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where age is null"));
-			List<Object> objects = sqlValue.getValues();
-			assertThat(objects.isEmpty(), is(true));
-		}
+		SQLValue sqlValue = rule.getSQLValue();
+		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where age is null"));
+		List<Object> objects = sqlValue.getValues();
+		assertThat(objects.isEmpty(), is(true));
 	}
 
 }

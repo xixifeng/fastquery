@@ -96,14 +96,9 @@ public class DBTest {
 	@Test
 	public void db() {
 		db.db();
-		if (rule.isDebug()) {
-			assertThat(QueryContextHelper.getQueryContext(), notNullValue());
-			update();
-			assertThat(rule.getSQLValue(), nullValue());
-			assertThat(rule.getListSQLValue(), nullValue());
-		} else {
-			assertThat(QueryContextHelper.getQueryContext(), nullValue());
-		}
+		assertThat(QueryContextHelper.getQueryContext(), notNullValue());
+		update();
+		assertThat(rule.getListSQLValue(), nullValue());
 	}
 
 	// 测试 db 中的parserSQLFile 方法
