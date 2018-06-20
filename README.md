@@ -262,6 +262,14 @@ Student[] findAllStudent(... args ...);
 
 `@Condition(value="name = ?1",ignoreNull=false)`表示`?1`接受到的值若是`null`,该条件也参与运算,最终会翻译成`name is null`.`SQL`中的`null`无法跟比较运算符(如`=`,`<`,或者`<>`)一起运算,但允许跟`is null`,`is not null`,`<=>`操作符一起运算,故,将`name = null`想表达的意思,解释成`name is null`.  
 `@Condition(value="name != ?1",ignoreNull=false)` 若`?1`的值为`null`,最终会解释成`name is not null`.  
+若`@Condition`的值使用了`${表达式}`,`$表达式`,不管方法的参数传递了什么都不会使条件移除,因为`$`表达式(或称之为EL表达式)仅作为简单模版使用,传null,默认会替换为""(空字符串).举例:
+
+```
+@Query("select * from `userinfo` #{#where}")
+@Condition("age between $age1 and ${age2}")
+List<Map<String, Object>> between(@Param("age1") Integer age1,@Param("age2") Integer age2);	
+```
+该例中`@Condition`使用到了`$`表达式,`$age1`,`$age1`仅作为模板替换,age1为null,即便设置`ignoreNull=true`也不会影响条件的增减.**总之,`$` 表达式不会动摇条件的存在**.  
 
 当然,实现动态`SQL`,`FastQuery`还提供了另一种方案:采用`@QueryByNamed`(命名式查询),将`SQL`写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活.下面章节有详细描述.
 
@@ -336,7 +344,6 @@ Primarykey saveUserInfo(String name,Integer age);
 |`@PageIndex`|标识页索引对应哪个参数|
 |`@PageSize`|标识页行数对应哪个参数|
 |`@Condition`|标识条件单元|
-|`@I18n`|标识对哪个字段进行国际化处理|
 |`@Before`|标识函数执行前|
 |`@After`|标识函数执行后|
 |`@SkipFilter`|标识跳过拦截器|
@@ -1129,11 +1136,11 @@ public void update() {
 	// 断言: studentDBService.update 执行后产生的SQL为一条
 	assertThat(sqlValues.size(), is(1));
 	SQLValue sqlValue = sqlValues.get(0);
-	// 断言所产生的SQL等于"update student s set s.age=?,s.name=? where  s.no=?"
+	// 断言: 所产生的SQL等于"update student s set s.age=?,s.name=? where  s.no=?"
 	assertThat(sqlValue.getSql(), equalTo("update student s set s.age=?,s.name=? where  s.no=?"));
 	// 获取SQL参数列表
 	List<Object> values = sqlValue.getValues();
-	// 断言:这条SQL语句中一共有3个参数
+	// 断言: 这条SQL语句中一共有3个参数
 	assertThat(values.size(), is(3));
 	// 断言: SQL的第一个参数是Integer类型,并且他的值等于age
 	assertThat(values.get(0).getClass() == Integer.class && values.get(0).equals(age), is(true));

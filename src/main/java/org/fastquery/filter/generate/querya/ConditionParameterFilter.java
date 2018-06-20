@@ -23,8 +23,11 @@
 package org.fastquery.filter.generate.querya;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
 import org.fastquery.filter.generate.common.MethodFilter;
@@ -66,6 +69,17 @@ public class ConditionParameterFilter implements MethodFilter {
 		for (int i = 0; i < conditions.length; i++) {
 			// 截取第一个单词
 			String value = conditions[i].value();
+			Set<String> ps = TypeUtil.matchesNotrepeat(value, Placeholder.EL_REG);
+			Parameter[] parameters = method.getParameters();
+			ps.forEach(p -> {
+				for (Parameter parameter : parameters) {
+					Param param = parameter.getAnnotation(Param.class);
+					if(("${"+param.value()+"}").equals(p) || ("$"+param.value()).equals(p)) {
+						return;
+					} 
+				}
+				this.abortWith(method, p +" 没有找到匹配的参数.");
+			});
 			String word = TypeUtil.getFirstWord(value);
 			if (i == 0 && ("or".equalsIgnoreCase(word) || "and".equalsIgnoreCase(word))) {
 				this.abortWith(method, "第1个@Condition的值,左边加条件连接符\"" + word + "\"干什么,这个条件跟谁相连?去掉吧.");
