@@ -100,11 +100,42 @@ public class QueryPoolTest {
 	}
 
 	@Test
-	public void render() throws Exception {
+	public void render1() throws Exception {
 		String template = "$abc${abc}";
 		Map<String, Object> map = new HashMap<>();
 		map.put("abc", "hi");
 		String str = render(template, "render", map);
 		assertThat(str, equalTo("hihi"));
+	}
+	
+	@Test
+	public void render2() throws Exception {
+		String ok = "true";
+		String err = "false";
+		String template = "#if($state || $state == 0)"
+				+ ok
+				+ "#else "
+				+ err
+				+ " #end";
+		Map<String, Object> map = new HashMap<>();
+		map.put("state", Byte.valueOf((byte)0));
+		String str = render(template, "render", map);
+		assertThat(str, equalTo(ok));
+		
+		map.put("state", Byte.valueOf((byte)1));
+		str = render(template, "render", map);
+		assertThat(str, equalTo(ok));
+		
+		map.put("state", Byte.valueOf((byte)1));
+		str = render(template, "render", map);
+		assertThat(str, equalTo(ok));
+		
+		map.put("state", Byte.valueOf((byte)-1));
+		str = render(template, "render", map);
+		assertThat(str, equalTo(ok));
+		
+		map.put("state", null);
+		str = render(template, "render", map);
+		assertThat(str.trim(), equalTo(err));
 	}
 }

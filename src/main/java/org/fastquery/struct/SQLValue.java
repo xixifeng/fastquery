@@ -22,12 +22,16 @@
 
 package org.fastquery.struct;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
@@ -78,7 +82,35 @@ public class SQLValue {
 			}
 		}
 
-		// 3.
+		// 3. 处理参数
+		int l = values.size();
+		if(l!=0) {
+			Method method = QueryContext.getMethod();
+			Annotation[][] annotations = method.getParameterAnnotations();
+			int len = annotations.length;
+			for (int i = 0; i < len; i++) {
+				Annotation[] anns = annotations[i];
+				for (Annotation ann : anns) {
+					if (ann.annotationType() == Param.class) {
+						Param param = (Param) ann;
+						// ① 解析参数格式化
+						if(!param.format().trim().equals("") && l>i) {
+							String val = String.format(param.format(), args);
+							// val 里面可能有$表达式
+							Object o = values.get(i);
+							String replacement = o == null ? "" :  Matcher.quoteReplacement(o.toString());
+							val = val.replaceAll("\\$\\{" + param.value() + "\\}", replacement);
+							val = val.replaceAll("\\$" + param.value() + "\\b", replacement);
+							values.set(i, val);
+							// 也有可能存在冒号表达式,冒号表达式会影响主体SQL和参数值较为复杂(之前已经处理好,需要重新设计,针对冒号表达式在一处处理较为适合), 在此,`format`暂不考虑冒号表达式.
+							// format 重点在于值模版
+						}
+						// ②
+						// ③
+					}
+				}
+			}
+		}
 
 		if (!ssms.isEmpty()) {
 			this.sql = sql.replaceAll(Placeholder.SMILE, "?");

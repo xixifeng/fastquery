@@ -61,7 +61,7 @@ public class RepVersion {
 
 	private static String showInputDialog(String initialSelectionValue) {
 		String s;
-		while ("".equals((s = JOptionPane.showInputDialog("请输入发布版本号(格式1.0.46): ", initialSelectionValue))) || s == null || !Pattern.matches(REG, s)) {
+		while ("".equals((s = JOptionPane.showInputDialog("请输入发布版本号: ", initialSelectionValue))) || s == null || !Pattern.matches(REG, s)) {
 		}
 		return s;
 	}

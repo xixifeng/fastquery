@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.47</version> <!-- fastquery.version -->
+    <version>1.0.48</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.47'
+compile 'org.fastquery:fastquery:1.0.48'
 ```
 
 # FastQuery 数据持久层框架
@@ -241,7 +241,7 @@ List<String> findNames();
 ## 动态条件查询
 
 ### 采用`Annotation`实现简单动态条件  
-看到这里,可别认为`SQL`只能写在Annotation(注解)里.所有的`SQL`还允许写入到配置文件里.  
+看到这里,可别认为`SQL`只能写在Annotation(注解)里.`FastQuery`还提供了另二种方案:① 采用`@QueryByNamed`(命名式查询),将`SQL`写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活.② 通过`BuilderQuery`函数式接口构建`SQL`.下面章节有详细描述. 
 
 ```java
 @Query("select no, name, sex from Student #{#where} order by age desc")
@@ -270,8 +270,6 @@ Student[] findAllStudent(... args ...);
 List<Map<String, Object>> between(@Param("age1") Integer age1,@Param("age2") Integer age2);	
 ```
 该例中`@Condition`使用到了`$`表达式,`$age1`,`$age1`仅作为模板替换,age1为null,即便设置`ignoreNull=true`也不会影响条件的增减.**总之,`$` 表达式不会动摇条件的存在**.  
-
-当然,实现动态`SQL`,`FastQuery`还提供了另一种方案:采用`@QueryByNamed`(命名式查询),将`SQL`写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活.下面章节有详细描述.
 
 ## count
 
@@ -514,6 +512,22 @@ UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
 // orderby 若为null, 那么 ${orderby}的值,就取defaultVal的值
 JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") String orderby);
 ```
+
+### 参数格式解释器
+`@Param`中的`format`属性,可以对参数进行某种格式化,默认为`""`(空字符串),表示无格式处理. 该实现依赖于`String.format(String format, Object... args)`, 其中`args`为当前方法的参数集. 格式化语法请查阅[java.util.Formatter](https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html).  
+用法举例:  
+需求,给一个参数首位加上**%**符号
+
+```java
+@Param(value="name",format="%%%1$s%%") String name
+```
+`%` 是格式化语法的关键字, 要输出`%`本身,那么就需要连续写两个`%`来转义.  
+`format` 中支持 `$` 表达式引用参数:
+
+```java
+@Param(value="name",format="%%${name}%%") String name
+```
+可见, **通过`$`表达式引用参数值比采取百分号索引引用参数值更优越.方法的参数顺序倘若被改变,引用的索引号也要同步修改.而,`$`表达式,跟参数顺序没关系.** 同时指定`defaultVal`属性和`format`属性,那么,取`format`,舍`defaultVal`.
 
 ## 微笑表达式
 定义: **以<code>\`-</code> 作为开始,以<code>-\`</code>作为结尾,包裹着若干字符,因为<code>\`- -\`</code>酷似微笑表情,因此将这样的表达式称之为`微笑表达式`.** <br>例如: <code> \`-%${name}%-\` </code>. **\`** 反撇号的位置如下图所示:<br>
@@ -1144,9 +1158,9 @@ public void update() {
 	assertThat(values.size(), is(3));
 	// 断言: SQL的第一个参数是Integer类型,并且他的值等于age
 	assertThat(values.get(0).getClass() == Integer.class && values.get(0).equals(age), is(true));
-	// 断言: SQL的第一个参数是String类型,并且他的值等于name
+	// 断言: SQL的第二个参数是String类型,并且他的值等于name
 	assertThat(values.get(1).getClass() == String.class && values.get(1).equals(name), is(true));
-	// 断言: SQL的第一个参数是String类型,并且他的值等于no
+	// 断言: SQL的第三个参数是String类型,并且他的值等于no
 	assertThat(values.get(2).getClass() == String.class && values.get(2).equals(no), is(true));
 }
 ```

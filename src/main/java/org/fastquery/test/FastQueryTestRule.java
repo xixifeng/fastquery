@@ -52,7 +52,7 @@ public class FastQueryTestRule implements TestRule {
 
 	private void proxy(Statement base, Description description) throws NoSuchFieldException, IllegalAccessException {
 		Object testTarget = getTestTarget(base);
-		LOG.debug("SkipFilter:" + description.getAnnotation(SkipFilter.class));
+		LOG.debug("SkipFilter:{}", description.getAnnotation(SkipFilter.class));
 		Class<?> clazz = description.getTestClass();
 		List<Field> fList = new ArrayList<>();
 		Field[] fields = clazz.getDeclaredFields();
@@ -120,7 +120,7 @@ public class FastQueryTestRule implements TestRule {
 	/**
 	 * 若DB操作只有一条SQL,就使用这个方法获取
 	 * 
-	 * @return
+	 * @return SQLValue
 	 */
 	public SQLValue getSQLValue() {
 		return getListSQLValue().get(0);
@@ -129,7 +129,7 @@ public class FastQueryTestRule implements TestRule {
 	/**
 	 * 获取DB操作后所产生的SQL语句
 	 * 
-	 * @return SQL语句
+	 * @return SQLValue集
 	 */
 	public List<SQLValue> getListSQLValue() {
 		if (sqlValue != null) {

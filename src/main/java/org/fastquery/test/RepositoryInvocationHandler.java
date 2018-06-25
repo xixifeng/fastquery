@@ -80,8 +80,8 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 		Method queryParserMethod = clazz.getDeclaredMethod("queryParser");
 		modifyParserMethod.setAccessible(true);
 		queryParserMethod.setAccessible(true);
-		LOG.debug("modifyParserMethod:{}",modifyParserMethod);
-		LOG.info("currentMethod:{}",currentMethod);
+		LOG.debug("modifyParserMethod:{}", modifyParserMethod);
+		LOG.info("currentMethod:{}", currentMethod);
 		Modifying modifying = currentMethod.getAnnotation(Modifying.class);
 		Class<?> returnType = QueryContext.getReturnType();
 		QueryByNamed queryById = currentMethod.getAnnotation(QueryByNamed.class);

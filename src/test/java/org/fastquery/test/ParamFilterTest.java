@@ -36,8 +36,6 @@ import static org.hamcrest.Matchers.*;
  */
 public class ParamFilterTest {
 
-	// private static String paramFilter(Method method, Object[] args, String sql)
-	// TypeUtil 类中 paramFilter(Method method, Object[] args, String sql)
 	public static String paramFilter(Method method, Object[] args, String sql) throws Exception {
 		Method m = TypeUtil.class.getDeclaredMethod("paramFilter", Method.class, Object[].class, String.class);
 		m.setAccessible(true);
@@ -47,9 +45,13 @@ public class ParamFilterTest {
 	public void m1(@Param("name1") String name, @Param("age1") Integer age) {
 	}
 
+	private Method getMethod1() throws NoSuchMethodException {
+		return ParamFilterTest.class.getMethod("m1", String.class, Integer.class);
+	}
+
 	@Test
-	public void paramFilter1() throws Exception {
-		Method method = ParamFilterTest.class.getMethod("m1", String.class, Integer.class);
+	public void paramFilter11() throws Exception {
+		Method method = getMethod1();
 		String name = "小王子";
 		Integer age = 6;
 		Object[] args = { name, age };
@@ -78,4 +80,61 @@ public class ParamFilterTest {
 		assertThat(str, equalTo(sql));
 	}
 
+	@Test
+	public void paramFilter12() throws Exception {
+		Method method = getMethod1();
+		String name = "小王子";
+		Integer age = 6;
+		Object[] args = { name, age };
+		String sql = "";
+		String str = paramFilter(method, args, sql);
+		assertThat(str, equalTo(sql));
+
+		sql = "${name1_}";
+		str = paramFilter(method, args, sql);
+		assertThat(str, equalTo(sql));
+
+		sql = "${name1}	_";
+		str = paramFilter(method, args, sql);
+		assertThat(str, equalTo(name + "	_"));
+
+		sql = "_${name1}";
+		str = paramFilter(method, args, sql);
+		assertThat(str, equalTo("_" + name));
+
+		sql = "_${name1}${name1}";
+		str = paramFilter(method, args, sql);
+		assertThat(str, equalTo("_" + name + name));
+
+		sql = "${name123}${age12}";
+		str = paramFilter(method, args, sql);
+		assertThat(str, equalTo(sql));
+	}
+
+	@Test
+	public void paramFilter13() throws Exception {
+		Method method = getMethod1();
+		String name = "小王子";
+		Integer age = 6;
+		Object[] args = { name, age };
+		String sql = ":name1";
+		String str = paramFilter(method, args, sql);
+		assertThat(str, equalTo("?1"));
+
+		sql = ":age1";
+		str = paramFilter(method, args, sql);
+		assertThat(str, equalTo("?2"));
+
+		sql = ":age1 :name1";
+		str = paramFilter(method, args, sql);
+		assertThat(str, equalTo("?2 ?1"));
+
+		sql = ":age1:name1";
+		str = paramFilter(method, args, sql);
+		assertThat(str, equalTo("?2?1"));
+
+		sql = ":age:name";
+		str = paramFilter(method, args, sql);
+		assertThat(str, equalTo(":age:name"));
+	}
 }

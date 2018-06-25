@@ -251,7 +251,12 @@ public class TypeUtil implements Opcodes {
 			// 取出sql参数所对应的方法参数
 			Object mp = args[indexMap[i] - 1]; // 这个值有可能是null
 			if (mp == null) {
-				objs.add(mp);
+				Param param = QueryContext.getMethod().getParameters()[indexMap[i] - 1].getAnnotation(Param.class);
+				if(param!=null && !param.defaultVal().trim().equals("")) {
+					objs.add(param.defaultVal());
+				} else {
+					objs.add(mp);	
+				}
 				continue;
 			}
 			Class<?> mpClazz = mp.getClass();
@@ -467,10 +472,11 @@ public class TypeUtil implements Opcodes {
 					Param param = (Param) ann;
 					Object objx = args[i];
 					objx = BeanUtil.parseList(objx);
-					// 将 ":xx" 格式的 替换成 "?num"
-					// 替换时必须加单词分界符(\\b),举例说明: sql中同时存在":ABCD",":A",
-					// 不加单词分界符,":A"替换成"?num"后,会使":ABCD"变成":?numBCD"
-					s = s.replaceAll("\\:" + param.value() + "\\b", "?" + (i + 1));
+					// 如果参数值需要格式化(format)
+					if(!param.format().trim().equals("")) {
+						objx = String.format(param.format(), args);
+					}
+
 					// 这里的replaceAll的先后顺序很重要
 					// '{' 是正则语法的关键字,必须转义
 					if (queryByNamed == null) {
@@ -478,6 +484,11 @@ public class TypeUtil implements Opcodes {
 						s = s.replaceAll("\\$\\{" + param.value() + "\\}", replacement);
 						s = s.replaceAll("\\$" + param.value() + "\\b", replacement);
 					}
+					
+					// 将 ":xx" 格式的 替换成 "?num"
+					// 替换时必须加单词分界符(\\b),举例说明: sql中同时存在":ABCD",":A",
+					// 不加单词分界符,":A"替换成"?num"后,会使":ABCD"变成":?numBCD"
+					s = s.replaceAll("\\:" + param.value() + "\\b", "?" + (i + 1));
 				}
 			}
 		}

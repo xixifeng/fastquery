@@ -4,7 +4,7 @@
 
 	<groupId>org.fastquery</groupId>
 	<artifactId>fastquery</artifactId>
-	<version>1.0.47</version> <!-- fastquery.version -->
+	<version>1.0.48</version> <!-- fastquery.version -->
 	<packaging>jar</packaging>
 
 	<name>fastquery</name>
@@ -110,7 +110,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
-			<scope>test</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
