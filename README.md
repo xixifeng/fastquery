@@ -162,13 +162,21 @@ fastquery.json其他可选配置选项:
  **注意**:不用去实现StudentDBService接口.
 
 ```java
-   // get porxy impl
+   // 获取实现类
    StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
-   // call findAll
+   // 调用 findAll 方法
    JSONArray jsonArray = studentDBService.findAll();
-   // call find
+   // 调用 find 方法
    Student[] students = studentDBService.find(); 
 ```
+
+一个接口不实现,它的`public abstract`方法就毫无作用可言,因此,与之对应的实例对象是必须的,只不过是FastQuery内部替用户实现了,用户可通过`FQuery.getRepository`获取DB接口对应的实例.读者可能会问,这个自动生成的实例在什么时候生成? 动态生成的效率如何保持高效? 为此, 笔者做了想当多的功课:让所有DB实现类在项目初始化阶段进行,并且尽可能地对接口方法做静态分析,把有可能在运行期发生的错误尽最大努力提升到初始化阶段,生成代码前会检测SQL绑定是否合法有效、检测方法返回值是否符合常规、方法的参数是否满足模版的调用、是否正确使用分页...诸如此类问题.这些潜在问题一旦暴露,项目都启动不起来,迫使开发者必须朝正确的道路走.项目进入运行期,大量的校验就没必要写了,从而最大限度保证快速执行(至少在往这个方向不懈努力中).  
+
+只能引用接口这一条出路,这就使得用户编程起来不得不简单,因为面对的是一个高度抽线的模型,而不必去考虑细枝末节.接口可以看成是一个能解析SQL并能自动执行的模型,方法的参数或绑定的模版无不是为了实现一个目的:执行SQL,返回结果.  
+
+这种不得不面向接口的编程风格,有很多好处:耦合度趋向0,天然就是对修改封闭,对扩展开放,不管是应用层维护还是对框架新增新特性都变得特别容易.没办法不简单,不得不方便,显然是该项目所追求的目标.  
+
+不管你用不用这个项目,笔者期望,你能快速检阅一下该文档(花不了多少时间),有很多设计是众多框架所不具备的,希望你从中得到正面启发或反面启发,都会使你收益.  
 
 ## 针对本文Query的由来
 该项目开源后,有很多关注此项目的网友表示,"使用`@Query`语义不强,为何不用@SQL,@Select,@Insert,@Update...?". 采用Query的用意: SQL的全称是 Structured Query Language,本文的 Query 就是来源于此,因此,不要片面的认为Query就是select操作. 笔者认为,针对数据库操作的注解没有必要根据SQL的四种语言(DDL,DML,DCL,TCL)来定义,定义太多,只会增加复杂度,并且毫无必要.如果是改操作加上`@Modifying`注解,反之,都是"查",这样不更简洁实用吗? 
@@ -516,7 +524,7 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 ### 参数格式解释器
 `@Param`中的`format`属性,可以对参数进行某种格式化,默认为`""`(空字符串),表示无格式处理. 该实现依赖于`String.format(String format, Object... args)`, 其中`args`为当前方法的参数集. 格式化语法请查阅[java.util.Formatter](https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html).  
 用法举例:  
-需求,给一个参数首位加上**%**符号
+需求,给一个参数首位加上 `%` 符号
 
 ```java
 @Param(value="name",format="%%%1$s%%") String name

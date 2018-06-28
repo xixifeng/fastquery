@@ -44,7 +44,7 @@ import com.alibaba.fastjson.JSONObject;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FQueryBinder extends AbstractBinder {
+public class FQueryBinder extends AbstractBinder { // NO_UCD (use default)
 
 	private FqClassLoader fqClassLoader;
 

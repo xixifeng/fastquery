@@ -29,7 +29,7 @@ package org.fastquery.core;
  */
 public interface BuilderQuery {
 	/**
-	 * 对给定的参数执行此操作.
+	 * 对给定的参数进行操作. 通过MetaData可以设置这些语句query,count,where.
 	 *
 	 * @param m 元数据
 	 */

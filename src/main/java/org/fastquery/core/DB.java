@@ -75,7 +75,7 @@ public class DB {
 			info(sql, objs);
 			stat = conn.prepareStatement(sql);
 			// 设置sql参数值
-			int lenTmp = objs.size();
+			int lenTmp = objs.size(); // objs 源头上已经控制禁止为null
 			for (int i = 0; i < lenTmp; i++) {
 				stat.setObject(i + 1, objs.get(i));
 			}
