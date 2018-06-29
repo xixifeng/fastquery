@@ -24,6 +24,7 @@ package org.fastquery.test;
 
 import org.fastquery.dao2.UserInfoDBService3;
 import org.fastquery.service.FQuery;
+import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -41,6 +42,53 @@ public class UserInfoDBServiceTest3 {
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
+
+	@Test
+	public void findByRegxp1() {
+		String regxp = "[0]{0,10}123456747$";
+		userInfoDBService.findByRegxp1(regxp);
+		SQLValue sv = rule.getSQLValue();
+		assertThat(sv.getSql(), equalTo("select * from userinfo where age regexp '" + regxp + "' limit 1"));
+		assertThat(sv.getValues().isEmpty(), is(true));
+
+		regxp = "[0]{0,10}123$";
+		userInfoDBService.findByRegxp1(regxp);
+		sv = rule.getSQLValue();
+		assertThat(sv.getSql(), equalTo("select * from userinfo where age regexp '" + regxp + "' limit 1"));
+		assertThat(sv.getValues().isEmpty(), is(true));
+	}
+
+	@Test
+	public void findByRegxp2() {
+		String regxp = null;
+		userInfoDBService.findByRegxp2(regxp);
+		SQLValue sv = rule.getSQLValue();
+		assertThat(sv.getSql(), equalTo("select * from userinfo where age regexp '[0]{0,10}123456747$' limit 1"));
+		assertThat(sv.getValues().isEmpty(), is(true));
+
+		regxp = "[0]${0,10}123$";
+		userInfoDBService.findByRegxp2(regxp);
+		sv = rule.getSQLValue();
+		assertThat(sv.getSql(), equalTo("select * from userinfo where age regexp '" + regxp + "' limit 1"));
+		assertThat(sv.getValues().isEmpty(), is(true));
+	}
+
+	@Test
+	public void findByRegxp3() {
+		String regxp = null;
+		userInfoDBService.findByRegxp3(regxp);
+		SQLValue sv = rule.getSQLValue();
+		assertThat(sv.getSql(), equalTo("select * from userinfo where age regexp ? limit 1"));
+		assertThat(sv.getValues().size(), is(1));
+		assertThat(sv.getValues().get(0), is("'[0]{0,10}123456747$'"));
+
+		regxp = "[0]${0,10}123$";
+		userInfoDBService.findByRegxp3(regxp);
+		sv = rule.getSQLValue();
+		assertThat(sv.getSql(), equalTo("select * from userinfo where age regexp ? limit 1"));
+		assertThat(sv.getValues().size(), is(1));
+		assertThat(sv.getValues().get(0), is("'" + regxp + "'"));
+	}
 
 	@Test
 	public void testUpdateBatch() {

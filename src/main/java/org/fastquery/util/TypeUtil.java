@@ -474,13 +474,17 @@ public class TypeUtil implements Opcodes {
 					objx = BeanUtil.parseList(objx);
 					// 如果参数值需要格式化(format)
 					if(!param.format().trim().equals("")) {
-						objx = String.format(param.format(), args);
+						objx = String.format(param.format(), args); // 参数值可能包含有$表达式
+						String replacement = args[i] != null ? args[i].toString() : param.defaultVal();
+						replacement = Matcher.quoteReplacement(replacement);
+						objx = objx.toString().replaceAll("\\$\\{" + param.value() + "\\}", replacement).replaceAll("\\$" + param.value() + "\\b", replacement);
 					}
 
 					// 这里的replaceAll的先后顺序很重要
 					// '{' 是正则语法的关键字,必须转义
 					if (queryByNamed == null) {
-						String replacement = objx != null ? objx.toString() : Matcher.quoteReplacement(param.defaultVal());
+						String replacement = objx != null ? objx.toString() : param.defaultVal();
+						replacement = Matcher.quoteReplacement(replacement);
 						s = s.replaceAll("\\$\\{" + param.value() + "\\}", replacement);
 						s = s.replaceAll("\\$" + param.value() + "\\b", replacement);
 					}

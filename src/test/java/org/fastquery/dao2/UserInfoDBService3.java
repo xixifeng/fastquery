@@ -69,5 +69,14 @@ public interface UserInfoDBService3 extends QueryRepository {
 	
 	@Query(value="select name from UserInfo where name like ?1 limit 1")
 	int findByName5(@Param(value="name",defaultVal="%谷子%") String name);
-
+	
+	@Query("select * from userinfo where age regexp $regexp limit 1")
+	Map<String, Object> findByRegxp1(@Param(value="regexp",format="'${regexp}'") String regexp);
+	
+	@Query("select * from userinfo where age regexp $regexp limit 1")
+	Map<String, Object> findByRegxp2(@Param(value="regexp",format="'${regexp}'",defaultVal="[0]{0,10}123456747$") String regexp);
+	
+	@Query("select * from userinfo where age regexp :regexp limit 1")
+	Map<String, Object> findByRegxp3(@Param(value="regexp",format="'${regexp}'",defaultVal="[0]{0,10}123456747$") String regexp);
+	
 }
