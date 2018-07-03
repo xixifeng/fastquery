@@ -273,6 +273,8 @@ public class TypeUtil implements Opcodes {
 				if (count != 0) {
 					rps.put(i + increment, count); // 第i个"?"需要替换成count个"?"
 					increment += count - 1; // 增量个数(除开本身一个)
+				} else {
+					objs.add(null);
 				}
 			} else if (mpClazz.isArray()) {
 				// asList 是一个可变变量
@@ -282,6 +284,8 @@ public class TypeUtil implements Opcodes {
 				if (count != 0) {
 					rps.put(i + increment, count);
 					increment += count - 1;
+				} else {
+					objs.add(null);
 				}
 			} else {
 				objs.add(mp);

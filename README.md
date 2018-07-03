@@ -561,6 +561,13 @@ List<UserInfo> findByNameIn(String...names);
 List<UserInfo> findByNameListIn(List<String> names,Integer id);
 ```
 
+参数如果是一个空集合或空数组,那么`in`中的`?`所对应的值是`null`. `not in`结果集中若含有`null`,则,查询结果为`null`. `in` 结果集含有`null`不会影响正常查询.
+
+```sql
+id not in (1,2,null) -- 结果会为null
+id in(1,2,null)      -- id为1或为2的结果会被查询出来
+```
+
 ### 使用冒号表达式
 ```java
 @Query("select * from student where sex = :sex and age > :age and name in(:names)")

@@ -45,6 +45,12 @@ public interface SQLInExample extends QueryRepository {
 
 	@Query("select * from UserInfo as u where u.id in (?1)")
 	UserInfo[] findByIn(int... ids);
+	
+	@Query("select * from UserInfo as u where u.id in (?1)")
+	UserInfo[] findByIn(String... ids);
+	
+	@Query("select * from UserInfo as u where u.id in (?1)")
+	UserInfo[] findByIn(List<Integer> ids);
 
 	@Query("select * from student where sex = :sex and age > :age and name in(:names)")
 	List<Student> findByIn(@Param(value = "sex", defaultVal = "", format = "") String sex, @Param("age") Integer age,

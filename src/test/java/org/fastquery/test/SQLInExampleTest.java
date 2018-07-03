@@ -120,4 +120,40 @@ public class SQLInExampleTest {
 		});
 	}
 
+	@Test
+	public void findByIn3() {
+		int[] ids = null;
+		UserInfo[] userInfos = db.findByIn(ids);
+		for (UserInfo u : userInfos) {
+			assertThat(u.getId().intValue(), either(is(1)).or(is(2)).or(is(3)));
+		}
+	}
+	
+	@Test
+	public void findByIn4() {
+		int[] ids = {};
+		UserInfo[] userInfos = db.findByIn(ids);
+		for (UserInfo u : userInfos) {
+			assertThat(u.getId().intValue(), either(is(1)).or(is(2)).or(is(3)));
+		}
+	}
+	
+	@Test
+	public void findByIn5() {
+		List<Integer> ids = new ArrayList<>();
+		UserInfo[] userInfos = db.findByIn(ids);
+		for (UserInfo u : userInfos) {
+			assertThat(u.getId().intValue(), either(is(1)).or(is(2)).or(is(3)));
+		}
+	}
+	
+	@Test
+	public void findByIn6() {
+		String[] ids = {};
+		UserInfo[] userInfos = db.findByIn(ids);
+		for (UserInfo u : userInfos) {
+			assertThat(u.getId().intValue(), either(is(1)).or(is(2)).or(is(3)));
+		}
+	}
+
 }
