@@ -53,4 +53,14 @@ public class ConditionTest {
 		assertThat(sql, equalTo("select * from UserInfo where  name like ?  and age > ?"));
 	}
 
+	@Test
+	public void findUserInfo2() {
+		String tname = "from UserInfo";
+		String w1 = null;
+		db.findUserInfo2(w1, "name like ?1", tname);
+		SQLValue sqlValue = rule.getSQLValue();
+		String sql = sqlValue.getSql();
+		assertThat(sql, equalTo("select * from UserInfo where  name like ?"));
+	}
+
 }

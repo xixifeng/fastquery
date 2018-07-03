@@ -40,4 +40,8 @@ public interface ConditionDBService extends QueryRepository {
 	@Condition(" $nameWhere")
 	@Condition(" $ageCon")
 	List<Student> findUserInfo(@Param("nameWhere") String w1, @Param("ageCon") String w2, @Param("tname") String tname);
+
+	@Query("select * ${tname} #{#where}")
+	@Condition(value = " $nameWhere", ignoreNull = false)
+	List<Student> findUserInfo2(String w1, @Param("nameWhere") String w2, @Param("tname") String tname);
 }

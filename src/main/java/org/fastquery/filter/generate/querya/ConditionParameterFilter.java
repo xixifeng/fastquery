@@ -74,7 +74,7 @@ public class ConditionParameterFilter implements MethodFilter {
 			ps.forEach(p -> {
 				for (Parameter parameter : parameters) {
 					Param param = parameter.getAnnotation(Param.class);
-					if(("${"+param.value()+"}").equals(p) || ("$"+param.value()).equals(p)) {
+					if(param!=null && (("${"+param.value()+"}").equals(p) || ("$"+param.value()).equals(p))) {
 						return;
 					} 
 				}

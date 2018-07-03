@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.49</version> <!-- fastquery.version -->
+    <version>1.0.50</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.49'
+compile 'org.fastquery:fastquery:1.0.50'
 ```
 
 # FastQuery 数据持久层框架
@@ -179,7 +179,7 @@ fastquery.json其他可选配置选项:
 不管用不用这个项目,笔者都期望,读者能快速检阅一下该文档,有很多设计是众多同类框架所不具备的,希望读者从中得到正面启发或反面启发,哪怕一点点,都会使你收益.  
 
 ## 针对本文@Query的由来
-该项目开源后,有些习惯于繁杂编码的开发者表示,"使用`@Query`语义不强,为何不用@SQL,@Select,@Insert,@Update...?". SQL的全称是 Structured Query Language,本文的 `@Query` 就是来源于此. `@Query`只作为运行SQL的载体,要做什么事情由SQL自己决定.因此,不要片面的认为Query就是select操作. 针对数据库操作的注解没有必要根据SQL的四种语言(DDL,DML,DCL,TCL)来定义,定义太多,只会增加复杂度,并且毫无必要,如果是改操作加上`@Modifying`注解,反之,都是"查",这样不更简洁实用吗? 诸如此类:`@Insert("insert into table (name) values('Sir.Xi')")`,`@Select("select * from table")`,SQL表达能力还不够吗? 就不觉得多出`@insert`和`@Select`有画蛇添足之嫌? SQL的语义本身就很强,甚至连`@Query`和`@Modifying`都略显多余,但是毕竟SQL需要有一个载体和一个大致的分类.
+该项目开源后,有些习惯于繁杂编码的开发者表示,"*使用`@Query`语义不强,为何不用@SQL,@Select,@Insert,@Update...?*". SQL的全称是 Structured Query Language,本文的 `@Query` 就是来源于此. `@Query`只作为运行SQL的载体,要做什么事情由SQL自己决定.因此,不要片面的认为Query就是select操作. 针对数据库操作的注解没有必要根据SQL的四种语言(DDL,DML,DCL,TCL)来定义,定义太多,只会增加复杂度,并且毫无必要,如果是改操作加上`@Modifying`注解,反之,都是"查",这样不更简洁实用吗? 诸如此类:`@Insert("insert into table (name) values('Sir.Xi')")`,`@Select("select * from table")`,SQL表达能力还不够吗? 就不觉得多出`@insert`和`@Select`有画蛇添足之嫌? SQL的语义本身就很强,甚至连`@Query`和`@Modifying`都略显多余,但是毕竟SQL需要有一个载体和一个大致的分类.
 
 ## 带条件查询
 
