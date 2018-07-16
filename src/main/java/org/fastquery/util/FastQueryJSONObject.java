@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.fastquery.core.RepositoryException;
 
@@ -78,6 +79,10 @@ public class FastQueryJSONObject {
 		jsonArray.forEach(s -> strs.add(s.toString()));
 		return strs;
 	}
+	
+	public static int getSlowQueryTime() {
+		return getJsonObject().getIntValue("slowQueryTime");
+	}
 
 	static void check() {
 		// 1). queries属性要么不配置,要么配置正确
@@ -92,6 +97,12 @@ public class FastQueryJSONObject {
 			if (str.charAt(str.length() - 1) != '/') {
 				throw new RepositoryException(String.format("fastquery.json-> queries配置错误,\"%s\"的末尾必须加\"/\"", str));
 			}
+		}
+		
+		// 2). slowQueryTime
+		String slowQueryTime = getJsonObject().getString("slowQueryTime");
+		if(slowQueryTime!=null && !Pattern.matches("\\d+", slowQueryTime)) {
+			throw new RepositoryException("fastquery.json -> slowQueryTime 它的值只能是数字");
 		}
 	}
 

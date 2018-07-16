@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.50</version> <!-- fastquery.version -->
+    <version>1.0.51</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.50'
+compile 'org.fastquery:fastquery:1.0.51'
 ```
 
 # FastQuery 数据持久层框架
@@ -128,6 +128,7 @@ fastquery.json其他可选配置选项:
 | basedir | string | 无 | 基准目录,注意: 后面记得加上 "/" <br> 该目录用来放SQL文件,需要执行SQL文件时,指定其名称就够了 | "/tmp/sql/" |
 | debug | boolean | false | 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目<br>默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式 | false |
 | queries | array | [ ] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
+| slowQueryTime | int | 0 | 设置慢查询的时间值(单位:毫秒; 默认:0,表示不开启慢查询功能), 如果 `QueryRepository` 中的方法执行超过这个时间,则会警告输出日志,以便优化 | 50 |
 
 
 ## 入门例子

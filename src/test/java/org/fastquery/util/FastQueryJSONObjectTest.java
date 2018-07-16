@@ -58,5 +58,11 @@ public class FastQueryJSONObjectTest {
 			assertThat(queries.contains("tpl/"), is(true));
 		}
 	}
+	
+	@Test
+	public void getSlowQueryTime() {
+		int time = FastQueryJSONObject.getSlowQueryTime();
+		assertThat(time, is(50));
+	}
 
 }

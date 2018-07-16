@@ -55,10 +55,12 @@ public class Prepared {
 	 * @return 执行之后的值
 	 */
 	public static Object excute(String methodName, String methodDescriptor, Object[] args, Repository target) { // NO_UCD
+		long start = System.currentTimeMillis();
+		Method method = null;
 		try {
 			@SuppressWarnings("unchecked") // 是动态生成的实例,因此它的接口可以很明确就是一个
 			Class<? extends Repository> iclazz = (Class<? extends Repository>) target.getClass().getInterfaces()[0];
-			Method method = TypeUtil.getMethod(iclazz, methodName, methodDescriptor);
+			method = TypeUtil.getMethod(iclazz, methodName, methodDescriptor);
 
 			// 如果是调试模式
 			if (FastQueryJSONObject.getDebug()) {
@@ -110,6 +112,15 @@ public class Prepared {
 				QueryContext.clear();
 			} catch (SQLException e) {
 				LOG.error("数据库连接无法释放", e);
+			}
+			
+			long slowQueryTime = FastQueryJSONObject.getSlowQueryTime();
+			if (slowQueryTime > 0) {
+				long end = System.currentTimeMillis();
+				long x = end - start;
+				if (x >= slowQueryTime) {
+					LOG.warn("slowQueryTime: 执行{} 耗时: {} 毫秒", method, x);
+				}
 			}
 		}
 	}

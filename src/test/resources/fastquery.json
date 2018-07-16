@@ -94,4 +94,6 @@
  
   // 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹下.默认:允许放在classpath根目录下
   "queries": ["queries/","tpl/"] // 表示: SQL模板文件可以放在classpath/queries里 或 classpath/tpl里
+  
+  ,"slowQueryTime": 50 // 单位毫秒: 记录慢查询,超过这个时间,就打印警告日志
 }

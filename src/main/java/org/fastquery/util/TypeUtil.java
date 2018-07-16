@@ -374,7 +374,6 @@ public class TypeUtil implements Opcodes {
 		try {
 			clazz.getConstructor();
 		} catch (Exception e) {
-			LOG.debug(clazz + ": 该类没有一个默认的构造方法.");
 			return false;
 		}
 		return true;

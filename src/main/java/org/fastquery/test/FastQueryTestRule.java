@@ -41,7 +41,7 @@ import org.fastquery.filter.SkipFilter;
 import org.fastquery.struct.SQLValue;
 
 /**
- * 
+ * 测试规则
  * @author mei.sir@aliyun.cn
  */
 public class FastQueryTestRule implements TestRule {
