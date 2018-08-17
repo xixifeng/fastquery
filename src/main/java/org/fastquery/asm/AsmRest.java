@@ -40,7 +40,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
 
 /**
- * 
+ * 用于生成rest实现类
  * @author xixifeng (fastquery@126.com)
  */
 public class AsmRest implements Opcodes {

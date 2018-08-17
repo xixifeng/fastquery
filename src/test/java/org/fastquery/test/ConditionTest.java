@@ -25,6 +25,7 @@ package org.fastquery.test;
 import org.fastquery.dao.ConditionDBService;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -41,6 +42,11 @@ public class ConditionTest {
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
+	
+	@BeforeClass
+	public static void beforeClass() {
+		System.setProperty("fastquery.config.dir", "/mywork/workspace-2018/fastquery/conf");
+	}
 
 	@Test
 	public void findUserInfo() {

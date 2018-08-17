@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.51</version> <!-- fastquery.version -->
+    <version>1.0.52</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.51'
+compile 'org.fastquery:fastquery:1.0.52'
 ```
 
 # FastQuery 数据持久层框架
@@ -34,6 +34,11 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 jdk1.8+
 
 ## 配置文件
+
+### 配置文件的存放位置
+
+默认从`classpath`目录下去寻找配置文件. 配置文件的存放位置支持自定义, 如: `System.setProperty("fastquery.config.dir","/data/fastquery/configs");`, 它将会覆盖`classpath`目录里的同名配置文件.  如果项目是以jar包的形式启动,那么可以通过java命令的 `-D` 参数指定配置文件的目录, 如: `java -jar Start.jar -Dfastquery.config.dir=/data/fastquery/configs`. 
+
 ### jdbc-config.xml
 用来配置支持jdbc. **注意**:如果采用连接池,该配置文件可以不要.
 
@@ -66,7 +71,7 @@ jdk1.8+
 <c3p0-config>  
     <named-config name="xk-c3p0">  
         <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
-        <property name="jdbcUrl">jdbc:mysql://192.168.1.1:3306/xk</property>  
+        <property name="jdbcUrl">jdbc:mysql://192.168.1.1:3306/xk?useSSL=false</property>  
         <property name="user">xk</property>  
         <property name="password">abc123</property>  
         <property name="acquireIncrement">50</property>  
@@ -128,7 +133,7 @@ fastquery.json其他可选配置选项:
 | basedir | string | 无 | 基准目录,注意: 后面记得加上 "/" <br> 该目录用来放SQL文件,需要执行SQL文件时,指定其名称就够了 | "/tmp/sql/" |
 | debug | boolean | false | 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目<br>默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式 | false |
 | queries | array | [ ] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
-| slowQueryTime | int | 0 | 设置慢查询的时间值(单位:毫秒; 默认:0,表示不开启慢查询功能), 如果 `QueryRepository` 中的方法执行超过这个时间,则会警告输出日志,以便优化 | 50 |
+| slowQueryTime | int | 0 | 设置慢查询的时间值(单位:毫秒; 默认:0,表示不开启慢查询功能), 如果 `QueryRepository` 中的方法执行超过这个时间,则会警告输出那些执行慢的方法,以便优化 | 50 |
 
 
 ## 入门例子
@@ -146,6 +151,8 @@ fastquery.json其他可选配置选项:
       // 实际应用中不能省略(getter/setter占篇幅较多,为了文档经凑,因此没列举)
  } 
 ```
+
+实体属性跟数据库映射的字段必须为包转类型,否则被忽略. 在实体属性上标识`@Transient`,表示该字段不参与映射.   
 
 - DAO接口
 
@@ -175,12 +182,12 @@ fastquery.json其他可选配置选项:
 
 唯一的出路,只能引用接口,这就使得开发者编程起来不得不简单,因为面对的是一个高度抽象的模型,而不必去考虑细枝末节.接口可以看成是一个能解析SQL并能自动执行的模型,方法的参数、绑定的模版和标识的注解无不是为了实现一个目的:执行SQL,返回结果.  
 
-这种不得不面向接口的编程风格,有很多好处:耦合度趋向0,天然就是**对修改封闭,对扩展开放**,不管是应用层维护还是对框架增加新特性,这些都变得特别容易.隐藏实现,可以减少bug或者是能消灭bug,就如**解决问题,不如消灭问题**一般,解决问题的造诣远远落后于消灭问题,原因在于问题被解决后,不能证明另一个潜在问题不再出现,显然消灭问题更胜一筹.应用层只用写声明抽象方法和标识注解,试问bug从何而来?该框架最大的优良之处就是让开发者没办法去制造bug(当然,排除有心为之,令提别论),至少说很难搞出问题来.不得不简便,没法造bug,显然是该项目所追求的核心目标之一.  
+这种不得不面向接口的编程风格,有很多好处:耦合度趋向0,天然就是**对修改封闭,对扩展开放**,不管是应用层维护还是对框架增加新特性,这些都变得特别容易.隐藏实现,可以减少bug或者是能消灭bug,就如**解决问题,不如消灭问题**一般,解决问题的造诣远远落后于消灭问题,原因在于问题被解决后,不能证明另一个潜在问题不再出现,显然消灭问题更胜一筹.应用层只用写声明抽象方法和标识注解,试问bug从何而来?该框架最大的优良之处就是让开发者没办法去制造bug(当然,排除有心为之,另当别论),至少说很难搞出问题来.不得不简便,没法造bug,显然是该项目所追求的核心目标之一.  
 
 不管用不用这个项目,笔者都期望,读者能快速检阅一下该文档,有很多设计是众多同类框架所不具备的,希望读者从中得到正面启发或反面启发,哪怕一点点,都会使你收益.  
 
 ## 针对本文@Query的由来
-该项目开源后,有些习惯于繁杂编码的开发者表示,"*使用`@Query`语义不强,为何不用@SQL,@Select,@Insert,@Update...?*". SQL的全称是 Structured Query Language,本文的 `@Query` 就是来源于此. `@Query`只作为运行SQL的载体,要做什么事情由SQL自己决定.因此,不要片面的认为Query就是select操作. 针对数据库操作的注解没有必要根据SQL的四种语言(DDL,DML,DCL,TCL)来定义,定义太多,只会增加复杂度,并且毫无必要,如果是改操作加上`@Modifying`注解,反之,都是"查",这样不更简洁实用吗? 诸如此类:`@Insert("insert into table (name) values('Sir.Xi')")`,`@Select("select * from table")`,SQL表达能力还不够吗? 就不觉得多出`@insert`和`@Select`有画蛇添足之嫌? SQL的语义本身就很强,甚至连`@Query`和`@Modifying`都略显多余,但是毕竟SQL需要有一个载体和一个大致的分类.
+该项目开源后,有些习惯于繁杂编码的开发者表示,"*使用`@Query`语义不强,为何不用@SQL,@Select,@Insert,@Update...?*". SQL的全称是 Structured Query Language,本文的 `@Query` 就是来源于此. `@Query`只作为运行SQL的载体,要做什么事情由SQL自己决定.因此,不要片面的认为Query就是select操作. 针对数据库操作的注解没有必要根据SQL的四种语言(DDL,DML,DCL,TCL)来定义,定义太多,只会增加复杂度,并且毫无必要,如果是改操作加上`@Modifying`注解,反之,都是"查",这样不更简洁实用吗? 诸如此类:`@Insert("insert into table (name) values('Sir.Xi')")`,`@Select("select * from table")`,SQL表达能力还不够吗? 就不觉得多出`@insert`和`@Select`有拖泥带水之嫌? SQL的语义本身就很强,甚至连`@Query`和`@Modifying`都略显多余,但是毕竟SQL需要有一个载体和一个大致的分类.
 
 ## 带条件查询
 
@@ -362,8 +369,8 @@ Primarykey saveUserInfo(String name,Integer age);
 |:---|:---|
 | `<E> E find(Class<E> entityClass,long id)` | 根据主键查询实体 |
 | `<E> int insert(E entity)` | 插入一个实体(主键字段的值若为null,那么该字段将不参与运算),返回影响行数 |
-| `<B> int save(boolean ignoreRepeat,Collection<B> entities)` | 保存一个集合实体,是否忽略重复主键记录 |
-| `int saveArray(boolean ignoreRepeat,Object...entities)` | 保存一个可变数组实体,是否忽略重复主键记录 |
+| `<B> int save(boolean ignoreRepeat,Collection<B> entities)` | 保存一个集合实体,是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录 |
+| `int saveArray(boolean ignoreRepeat,Object...entities)` | 保存一个可变数组实体,是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录 |
 | `BigInteger saveToId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
 | `<E> E save(E entity)` | 保存实体后,返回实体 |
 | `<E> int executeUpdate(E entity)` | 更新一个实体,返回影响行数.**注意**:实体的成员属性如果是null,那么该属性将不会参与改运算 |
@@ -1219,8 +1226,9 @@ FastQuery QQ交流群号(621656696) 由支持者自由发起,非常感谢!
 
 ## 反馈问题
 https://gitee.com/xixifeng.com/fastquery/issues  
-地球人都知道,FastQuery秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://gitee.com/xixifeng.com/fastquery/issues)来向我们反馈.  
+FastQuery秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://gitee.com/xixifeng.com/fastquery/issues)来向我们反馈.  
 
-## 关于作者
-@习习风 fastquery#126.com  
-欢迎批评指正.
+## 捐助
+FastQuery 采用 Apache 许可的开源项目, 使用完全自由, 免费.  如果你从 FastQuery  收到积极的启发, 可以用捐助来表示你的谢意.
+
+

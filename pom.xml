@@ -4,7 +4,7 @@
 
 	<groupId>org.fastquery</groupId>
 	<artifactId>fastquery</artifactId>
-	<version>1.0.51</version> <!-- fastquery.version -->
+	<version>1.0.52</version> <!-- fastquery.version -->
 	<packaging>jar</packaging>
 
 	<name>fastquery</name>
@@ -22,14 +22,6 @@
 	</properties>
 
 	<dependencies>
-	
-		<dependency>
-			<groupId>org.fastquery</groupId>
-			<artifactId>httpsign</artifactId>
-			<version>1.0.3</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>com.mchange</groupId>
 			<artifactId>c3p0</artifactId>

@@ -67,8 +67,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * 保存实体集合
 	 * 
 	 * @param <B> 实体
-	 * @param ignoreRepeat 忽略重复主键
-	 * @param entities 实体集合
+	 * @param ignoreRepeat 是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录
+	 * @param entities 实体集合,若,传递null或空集合,则会返回0
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY4)
@@ -77,8 +77,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 保存可变数组实体
 	 * 
-	 * @param ignoreRepeat 忽略重复主键
-	 * @param entities 实体集合
+	 * @param ignoreRepeat 是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录
+	 * @param entities 实体集合,若,传递null或空数组,则会返回0
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY4)
@@ -88,9 +88,9 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * 保存实体集合
 	 * 
 	 * @param <B> 实体
-	 * @param ignoreRepeat 忽略重复主键
+	 * @param ignoreRepeat 是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录
 	 * @param dataSourceName 数据源名称
-	 * @param entities 实体集合
+	 * @param entities 实体集合,若,传递null或空集合,则会返回0
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY4)
@@ -99,9 +99,9 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 保存可变数组实体
 	 * 
-	 * @param ignoreRepeat 忽略重复主键
+	 * @param ignoreRepeat 是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录
 	 * @param dataSourceName 数据源名称
-	 * @param entities 实体集合
+	 * @param entities 实体集合,若,传递null或空数组,则会返回0
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY4)
@@ -113,8 +113,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	 * @param <B> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
-	 * @param entities 实体集合
-	 * @param ignoreRepeat 忽略重复主键
+	 * @param entities 实体集合,若,传递null或空集合,则会返回0
+	 * @param ignoreRepeat 是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY4)
@@ -123,10 +123,10 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 保存可变数组实体
 	 * 
-	 * @param ignoreRepeat 忽略重复主键
+	 * @param ignoreRepeat 是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
-	 * @param entities 实体集合
+	 * @param entities 实体集合,若,传递null或空数组,则会返回0
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY4)

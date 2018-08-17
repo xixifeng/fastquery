@@ -31,6 +31,7 @@ import java.io.InputStream;
 
 import org.fastquery.core.FQueryResourceImpl;
 import org.fastquery.core.Resource;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -40,6 +41,11 @@ import org.junit.Test;
 public class FQueryResourceImplTest {
 
 	private Resource resource = new FQueryResourceImpl(this.getClass().getClassLoader());
+	
+	@BeforeClass
+	public static void beforeClass() {
+		System.setProperty("fastquery.config.dir", "/mywork/workspace-2018/fastquery/conf");
+	}
 
 	@Test
 	public void testGetResourceAsStream() {
@@ -55,8 +61,13 @@ public class FQueryResourceImplTest {
 	}
 
 	@Test
-	public void testExist() {
+	public void testExist1() {
 		assertThat(resource.exist("fastquery.json"), is(true));
+	}
+	
+	@Test
+	public void testExist2() {
+		assertThat(resource.exist("c3p0-config.xml"), is(true));
 	}
 
 }

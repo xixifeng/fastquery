@@ -423,13 +423,24 @@ class QueryProcess {
 		case MethodId.QUERY4:
 			ignoreRepeat = (boolean) iargs[0];
 			Object entitiesObj = iargs[iargs.length - 1];
+			if(entitiesObj==null) {
+				return 0;
+			}
 			if (iargs.length == 4) {
 				dbName = (String) iargs[2];
 			}
 			if (entitiesObj.getClass().isArray()) {
-				sql = BeanUtil.arr2InsertSQL((Object[]) entitiesObj, dbName, ignoreRepeat);
+				Object[] arryObj = (Object[]) entitiesObj;
+				if(arryObj.length==0) {
+					return 0;
+				}
+				sql = BeanUtil.arr2InsertSQL(arryObj, dbName, ignoreRepeat);
 			} else {
-				sql = BeanUtil.toInsertSQL((Iterable<Object>) entitiesObj, dbName, ignoreRepeat);
+				Collection<Object> coll =  (Collection<Object>) entitiesObj;
+				if(coll.isEmpty()) {
+					return 0;
+				}
+				sql = BeanUtil.toInsertSQL(coll, dbName, ignoreRepeat);
 			}
 			LOG.info(sql);
 			return DB.update(sql, true);

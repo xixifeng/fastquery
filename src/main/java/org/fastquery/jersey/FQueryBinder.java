@@ -50,6 +50,7 @@ public class FQueryBinder extends AbstractBinder { // NO_UCD (use default)
 
 	private FQueryBinder(ClassLoader webClassLoader) {
 		this.fqClassLoader = new FqClassLoader(webClassLoader, this);
+		// 生成rest实现类
 		new GenerateRepositoryImpl(fqClassLoader).persistent();
 	}
 
@@ -58,6 +59,7 @@ public class FQueryBinder extends AbstractBinder { // NO_UCD (use default)
 		//
 	}
 
+	// 自定义MessageBodyWriter
 	// 用于支持 httpsign(https://github.com/xixifeng/httpsign) 所定义的数据结构
 	private static class DataStruct implements MessageBodyWriter<Object> {
 

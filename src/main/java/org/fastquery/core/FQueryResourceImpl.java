@@ -22,6 +22,9 @@
 
 package org.fastquery.core;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 /**
@@ -41,15 +44,40 @@ public class FQueryResourceImpl implements Resource {
 		if (!exist(name)) {
 			return null;
 		}
+		
+		String fcd = System.getProperty("fastquery.config.dir");
+		if(fcd != null) {
+			File file = new File(fcd,name);
+			if(file.exists()) {
+				if("c3p0-config.xml".equals(name)) {
+					System.setProperty("com.mchange.v2.c3p0.cfg.xml",file.getAbsolutePath());  
+				}
+				try {
+					return new FileInputStream(file);
+				} catch (FileNotFoundException e) {
+					throw new RepositoryException(e);
+				}
+			}
+		}
+		
 		return classLoader.getResourceAsStream(name);
 	}
 
 	@Override
 	public boolean exist(String name) {
+		
 		if (name == null || name.charAt(0) == '/') {
 			return false;
 		}
-
+		
+		String fcd = System.getProperty("fastquery.config.dir");
+		if(fcd != null) {
+			File file = new File(fcd,name);
+			if(file.exists()) {
+				return true;
+			}
+		}
+		
 		return classLoader.getResource(name) != null;
 	}
 }
