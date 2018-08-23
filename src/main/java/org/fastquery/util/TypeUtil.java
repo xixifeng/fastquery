@@ -462,7 +462,7 @@ public class TypeUtil implements Opcodes {
 	 * @param sql sql语句
 	 * @return sql
 	 */
-	private static String paramFilter(Method method, Object[] args, String sql) {
+	public static String paramFilter(Method method, Object[] args, String sql) {
 		String s = sql;
 		// 替换@Param
 		Annotation[][] annotations = method.getParameterAnnotations();
@@ -599,7 +599,7 @@ public class TypeUtil implements Opcodes {
 			Set<String> pars = TypeUtil.matchesNotrepeat(value, "\\?\\d+");
 			for (String par : pars) {
 				int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
-				if (ignoreCondition(conditions[i], args[index - 1])) {
+				if (ignoreCondition(conditions[i], args[index - 1])) { //注意:  @Condition(....?1...?2) // ?1 都能决定 ?2 该条件忽略.  "?1保留条件" && "?2 不保留条件" = 不保留
 					continue o; // 跳出最外层的当次循环,不进行条件追加
 				} else if (args[index - 1] == null) {
 					// 如果传递null 还要求参与运算.
@@ -660,7 +660,12 @@ public class TypeUtil implements Opcodes {
 		for (Query query : queries) {
 			String sql = query.value();
 			sql = paramFilter(method, args, sql);
-			sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(getWhereSQL(method, args))));
+			String sets = SetParser.process();
+			if(sets!=null) {
+				sql = sql.replaceFirst(Placeholder.SETS_REG, Matcher.quoteReplacement(sets));
+			}
+			sql = sql.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(getWhereSQL(method, args)));
+			sqls.add(sql);
 		}
 		return sqls;
 	}

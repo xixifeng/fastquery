@@ -20,52 +20,19 @@
  * 
  */
 
-package org.fastquery.bean;
+package org.fastquery.where;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 
- * @author mei.sir@aliyun.cn
+ * @author xixifeng (fastquery@126.com)
  */
-public class Product {
-	
- 	private Integer pid;
-	private Integer lid;
-	private String pname;
-	private String description;
-	
-	public Product() {
-	}
-	
-	public Product(Integer pid, Integer lid, String pname) {
-		super();
-		this.pid = pid;
-		this.lid = lid;
-		this.pname = pname;
-	}
-	
-	public Integer getPid() {
-		return pid;
-	}
-	public Integer getLid() {
-		return lid;
-	}
-	public String getPname() {
-		return pname;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setPid(Integer pid) {
-		this.pid = pid;
-	}
-	public void setLid(Integer lid) {
-		this.lid = lid;
-	}
-	public void setPname(String pname) {
-		this.pname = pname;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
+public @interface Sets { // NO_UCD (use default)
+	Set[] value() default {};
 }

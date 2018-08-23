@@ -20,52 +20,41 @@
  * 
  */
 
-package org.fastquery.bean;
+package org.fastquery.where;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 
- * @author mei.sir@aliyun.cn
+ * @author xixifeng (fastquery@126.com)
  */
-public class Product {
+@Repeatable(Sets.class)
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
+public @interface Set {
+
+	/**
+	 * set 选项
+	 * 
+	 * @return String
+	 */
+	String value();
 	
- 	private Integer pid;
-	private Integer lid;
-	private String pname;
-	private String description;
-	
-	public Product() {
-	}
-	
-	public Product(Integer pid, Integer lid, String pname) {
-		super();
-		this.pid = pid;
-		this.lid = lid;
-		this.pname = pname;
-	}
-	
-	public Integer getPid() {
-		return pid;
-	}
-	public Integer getLid() {
-		return lid;
-	}
-	public String getPname() {
-		return pname;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setPid(Integer pid) {
-		this.pid = pid;
-	}
-	public void setLid(Integer lid) {
-		this.lid = lid;
-	}
-	public void setPname(String pname) {
-		this.pname = pname;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	
+	/**
+	 * ignoreNull 为true: 表示该set选项中的参数变量如果接受到的值是null,那么该set选项将不参与运算,反之,参与运算(默认:true).
+	 * 
+	 * @return boolean
+	 */
+	boolean ignoreNull() default true;
+
+	/**
+	 * ignoreEmpty 为true: 表示该条件中的参数变量如果接受到的值是""(空字符串),那么该set选项将不参与运算,反之,参与运算(默认:true).
+	 * 
+	 * @return boolean
+	 */
+	boolean ignoreEmpty() default true;
 }

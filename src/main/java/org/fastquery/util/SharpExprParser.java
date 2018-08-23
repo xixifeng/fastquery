@@ -20,52 +20,48 @@
  * 
  */
 
-package org.fastquery.bean;
+package org.fastquery.util;
+
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 /**
- * 
+ * #{#表达式} 解析
  * @author mei.sir@aliyun.cn
  */
-public class Product {
+public final class SharpExprParser {
+
+	private SharpExprParser() {}
 	
- 	private Integer pid;
-	private Integer lid;
-	private String pname;
-	private String description;
-	
-	public Product() {
-	}
-	
-	public Product(Integer pid, Integer lid, String pname) {
-		super();
-		this.pid = pid;
-		this.lid = lid;
-		this.pname = pname;
+	public static Set<String> matchesNotrepeat(String str) {
+		Objects.requireNonNull(str);
+		
+		Set<String> sets = new HashSet<>();
+		
+		find(str, sets);
+		
+		return sets;
 	}
 	
-	public Integer getPid() {
-		return pid;
-	}
-	public Integer getLid() {
-		return lid;
-	}
-	public String getPname() {
-		return pname;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setPid(Integer pid) {
-		this.pid = pid;
-	}
-	public void setLid(Integer lid) {
-		this.lid = lid;
-	}
-	public void setPname(String pname) {
-		this.pname = pname;
-	}
-	public void setDescription(String description) {
-		this.description = description;
+	private static void find(String str, Set<String> sets) {
+		int startIndex = 0;
+		int endIndex = 0;
+		boolean loop = true;
+		while (loop) {
+			startIndex = str.indexOf("#{#",startIndex);
+			if(startIndex != -1) {
+				endIndex = str.indexOf('}', startIndex + 1);
+				if(endIndex!=-1) {
+					sets.add(str.substring(startIndex, endIndex + 1));
+					startIndex = endIndex + 1;
+				} else {
+					loop = false;
+				}
+			} else {
+				break;
+			}
+		}
 	}
 	
 }

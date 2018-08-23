@@ -27,6 +27,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import org.fastquery.core.QueryContext;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.filter.SkipFilter;
+import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
 
 /**
@@ -71,11 +73,16 @@ public class FastQueryTestRule implements TestRule {
 		}
 
 		for (Field field : fList) {
-			Repository repository = (Repository) field.get(testTarget);
-			Class<?> interfaceClazz = repository.getClass().getInterfaces()[0];
+			@SuppressWarnings("unchecked")
+			Class<? extends Repository> rc = (Class<? extends Repository>) field.getType();
+			Repository repository = FQuery.getRepository(rc);
+			if(testTarget==null && !Modifier.isStatic(field.getModifiers())) {
+				throw new ExceptionInInitializerError(description.getTestClass().getSimpleName() + "中的变量 [" + rc.getSimpleName() + " " + field.getName() + "] 需要设置成static(静态类型)");
+			}
 			// 代理repository这个对象
-			field.set(testTarget, Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { interfaceClazz },
+			field.set(testTarget, Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { rc },
 					new RepositoryInvocationHandler(repository, this, description)));
+			
 		}
 	}
 
@@ -91,7 +98,12 @@ public class FastQueryTestRule implements TestRule {
 			// 获取目标对象
 			return targetField.get(nextBase);
 		} else {
-			Field targetField = base.getClass().getDeclaredField("target");
+			Field targetField;
+			try {
+				targetField = base.getClass().getDeclaredField("target");
+			} catch (NoSuchFieldException | SecurityException e) {
+				return null;
+			}
 			targetField.setAccessible(true);
 			// 获取目标对象
 			return targetField.get(base);

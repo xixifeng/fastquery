@@ -48,6 +48,7 @@ public final class Placeholder {
 	public static final String ID = "#{#id}";
 	public static final String ID_REG = "\\#\\{\\#id\\}";
 
+	public static final String SETS_REG = "\\#\\{\\#sets\\}";
 	public static final String WHERE_REG = "\\#\\{\\#where\\}";
 
 	public static final String LIMIT = "#{#limit}";

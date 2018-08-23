@@ -20,52 +20,39 @@
  * 
  */
 
-package org.fastquery.bean;
+package org.fastquery.test;
+
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+
+import java.util.Set;
+
+import org.fastquery.util.SharpExprParser;
+import org.junit.Test;
+
 
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
-public class Product {
-	
- 	private Integer pid;
-	private Integer lid;
-	private String pname;
-	private String description;
-	
-	public Product() {
+public class SharpExprParserTest {
+
+	@Test
+	public void matchesNotrepeat1() {
+		
+		String str = "#{#a}#{#b}#{#c}#{#d}";
+		Set<String> sets = SharpExprParser.matchesNotrepeat(str);
+		assertThat(sets, hasItem("#{#a}"));
+		assertThat(sets, hasItem("#{#b}"));
+		assertThat(sets, hasItem("#{#c}"));
+		assertThat(sets, hasItem("#{#d}"));
+		assertThat(sets, not(hasItem("#{#dxg}")));
 	}
 	
-	public Product(Integer pid, Integer lid, String pname) {
-		super();
-		this.pid = pid;
-		this.lid = lid;
-		this.pname = pname;
+	@Test
+	public void matchesNotrepeat2() {
+		String str = "#{#";
+		Set<String> sets = SharpExprParser.matchesNotrepeat(str);
+		assertThat(sets, emptyIterable());
 	}
-	
-	public Integer getPid() {
-		return pid;
-	}
-	public Integer getLid() {
-		return lid;
-	}
-	public String getPname() {
-		return pname;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setPid(Integer pid) {
-		this.pid = pid;
-	}
-	public void setLid(Integer lid) {
-		this.lid = lid;
-	}
-	public void setPname(String pname) {
-		this.pname = pname;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	
 }

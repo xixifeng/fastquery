@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.52</version> <!-- fastquery.version -->
+    <version>1.0.53</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.52'
+compile 'org.fastquery:fastquery:1.0.53'
 ```
 
 # FastQuery 数据持久层框架
@@ -182,7 +182,7 @@ fastquery.json其他可选配置选项:
 
 唯一的出路,只能引用接口,这就使得开发者编程起来不得不简单,因为面对的是一个高度抽象的模型,而不必去考虑细枝末节.接口可以看成是一个能解析SQL并能自动执行的模型,方法的参数、绑定的模版和标识的注解无不是为了实现一个目的:执行SQL,返回结果.  
 
-这种不得不面向接口的编程风格,有很多好处:耦合度趋向0,天然就是**对修改封闭,对扩展开放**,不管是应用层维护还是对框架增加新特性,这些都变得特别容易.隐藏实现,可以减少bug或者是能消灭bug,就如**解决问题,不如消灭问题**一般,解决问题的造诣远远落后于消灭问题,原因在于问题被解决后,不能证明另一个潜在问题不再出现,显然消灭问题更胜一筹.应用层只用写声明抽象方法和标识注解,试问bug从何而来?该框架最大的优良之处就是让开发者没办法去制造bug(当然,排除有心为之,另当别论),至少说很难搞出问题来.不得不简便,没法造bug,显然是该项目所追求的核心目标之一.  
+这种不得不面向接口的编程风格,有很多好处:耦合度趋向0,天然就是**对修改封闭,对扩展开放**,不管是应用层维护还是对框架增加新特性,这些都变得特别容易.隐藏实现,可以减少bug或者是能消灭bug,就如**解决问题,不如消灭问题**一般,解决问题的造诣远远落后于消灭问题,原因在于问题被解决后,不能证明另一个潜在问题不再出现,显然消灭问题更胜一筹.应用层只用写声明抽象方法和标识注解,试问bug从何而来?该框架最大的优良之处就是让开发者没办法去制造bug(当然,有心为之,另当别论),至少说很难搞出问题来.不得不简便,没法造bug,显然是该项目所追求的核心目标之一.  
 
 不管用不用这个项目,笔者都期望,读者能快速检阅一下该文档,有很多设计是众多同类框架所不具备的,希望读者从中得到正面启发或反面启发,哪怕一点点,都会使你收益.  
 
@@ -286,6 +286,7 @@ Student[] findAllStudent(... args ...);
 List<Map<String, Object>> between(@Param("age1") Integer age1,@Param("age2") Integer age2);	
 ```
 该例中`@Condition`使用到了`$`表达式,`$age1`,`$age1`仅作为模板替换,age1为null,即便设置`ignoreNull=true`也不会影响条件的增减.**总之,`$` 表达式不会动摇条件的存在**.  
+单个`@Condition`针对出现多个`SQL`参数的情形,如 `@Condition("or age between ?5 and ?6")` 或 `@Condition("or age between :age1 and ::age2")` 参数 `?5`、`?6`、`:age1`、 `:age2`中的任意一个为`null`都会导致该行条件移除.
 
 ## count
 
@@ -358,6 +359,7 @@ Primarykey saveUserInfo(String name,Integer age);
 |`@PageIndex`|标识页索引对应哪个参数|
 |`@PageSize`|标识页行数对应哪个参数|
 |`@Condition`|标识条件单元|
+|`@Set`|标识设置字段单元|
 |`@Before`|标识函数执行前|
 |`@After`|标识函数执行后|
 |`@SkipFilter`|标识跳过拦截器|
@@ -470,6 +472,27 @@ end
 where `id` in (77, 88, 99)
 ```
 
+## @Set 实现动态修改不同字段
+
+往往只需要修改表的中的个别字段: A处需要修改table.x字段,B处要修改table.y字段,C处同时改x,y字段,诸如此类的需求. 设计`@Set`就是为了满足这些需求. 根据传递参数的不同动态地增减需要set的字段,让一条SQL尽可能地满足多个要求.
+
+```java
+@Modifying
+@Query("update `Course` #{#sets} where no = ?5")
+@Set("`name` = ?1") // ?1 若是 null 或是 "" , 则, 该行set移除
+@Set("`credit` = ?2")
+@Set("`semester` = ?3")
+@Set("`period` = ?4")
+int updateCourse(String name,Integer credit, Integer semester, Integer period, String no);
+```
+	
+`#{#sets}` 用于引用设置选项. `@Set(value="name = ?1" , ignoreNull=true , ignoreEmpty=true)` 中的可选配置项,顾名思义.    
+
+方法上的所有`@Set`有可能全部被移除,那么就会得到一个错误的SQL`update Course set where no = ?5`,避免此错误有两个方法: 1). 加一条不含有SQL参数的`@set`,如: `@set("name" = "name")`,它永不会被删除; 2).调用方法前对参数做校验,排除参数导致所有`@set`的可能.  
+
+单个`@Set`针对出现多个`SQL`参数的情形,如 `@Set("name = ?1","credit = ?2")` 或 `@Set("name = :name","credit = :credit")` 参数 `?1`、`?2`、`:name`、 `:credit`中的任意一个为`null`都会导致该行条件移除.
+
+ 
 ## @Transactional
 
 ```java

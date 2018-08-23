@@ -20,52 +20,29 @@
  * 
  */
 
-package org.fastquery.bean;
+package org.fastquery.dao;
+
+import org.fastquery.bean.Course;
+import org.fastquery.core.Modifying;
+import org.fastquery.core.Query;
+import org.fastquery.core.QueryRepository;
+import org.fastquery.where.Set;
 
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
-public class Product {
+public interface SetDBService extends QueryRepository {
+
+	@Modifying
+	@Query("update `Course` #{#sets} where no = ?5")
+	@Set("`name` = ?1") // ?1 若是 null 或是 "" , 则, 该行set被移除
+	@Set("`credit` = ?2")
+	@Set("`semester` = ?3")
+	@Set("`period` = ?4")
+	int updateCourse(String name,Integer credit, Integer semester, Integer period, String no);
 	
- 	private Integer pid;
-	private Integer lid;
-	private String pname;
-	private String description;
-	
-	public Product() {
-	}
-	
-	public Product(Integer pid, Integer lid, String pname) {
-		super();
-		this.pid = pid;
-		this.lid = lid;
-		this.pname = pname;
-	}
-	
-	public Integer getPid() {
-		return pid;
-	}
-	public Integer getLid() {
-		return lid;
-	}
-	public String getPname() {
-		return pname;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setPid(Integer pid) {
-		this.pid = pid;
-	}
-	public void setLid(Integer lid) {
-		this.lid = lid;
-	}
-	public void setPname(String pname) {
-		this.pname = pname;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
+	@Query("select * from Course where no = ?1")
+	Course findCourse(String no);
 	
 }

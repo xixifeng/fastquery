@@ -107,7 +107,7 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 	}
 
 	@Override
-	public Object invoke(Object proxy, Method method, Object[] args) throws RepositoryException {
+	public Object invoke(Object proxy, Method method, Object[] args) {
 		try {
 			if (method.getDeclaringClass() == Object.class) { // 如果拦截的方法是继承之Object,那么直接放行
 				return method.invoke(repository, args);

@@ -26,46 +26,43 @@ package org.fastquery.bean;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class Product {
+public class Course {
+
+	private String name;
+	private Integer credit;
+	private Integer semester;
+	private Integer period;
+	private String no;
 	
- 	private Integer pid;
-	private Integer lid;
-	private String pname;
-	private String description;
-	
-	public Product() {
+	public String getName() {
+		return name;
 	}
-	
-	public Product(Integer pid, Integer lid, String pname) {
-		super();
-		this.pid = pid;
-		this.lid = lid;
-		this.pname = pname;
+	public void setName(String name) {
+		this.name = name;
 	}
-	
-	public Integer getPid() {
-		return pid;
+	public Integer getCredit() {
+		return credit;
 	}
-	public Integer getLid() {
-		return lid;
+	public void setCredit(Integer credit) {
+		this.credit = credit;
 	}
-	public String getPname() {
-		return pname;
+	public Integer getSemester() {
+		return semester;
 	}
-	public String getDescription() {
-		return description;
+	public void setSemester(Integer semester) {
+		this.semester = semester;
 	}
-	public void setPid(Integer pid) {
-		this.pid = pid;
+	public Integer getPeriod() {
+		return period;
 	}
-	public void setLid(Integer lid) {
-		this.lid = lid;
+	public void setPeriod(Integer period) {
+		this.period = period;
 	}
-	public void setPname(String pname) {
-		this.pname = pname;
+	public String getNo() {
+		return no;
 	}
-	public void setDescription(String description) {
-		this.description = description;
+	public void setNo(String no) {
+		this.no = no;
 	}
-	
+
 }
