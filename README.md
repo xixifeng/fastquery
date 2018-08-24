@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.53</version> <!-- fastquery.version -->
+    <version>1.0.54</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.53'
+compile 'org.fastquery:fastquery:1.0.54'
 ```
 
 # FastQuery 数据持久层框架
@@ -348,6 +348,7 @@ Primarykey saveUserInfo(String name,Integer age);
 | Annotation | 作用 |
 |:---|:---|
 |`@Id`|用来标识表主键|
+|`@Table`|用来指定表名称|
 |`@Modifying`|标识改操作|
 |`@Param`|标识参数名称,便于运行期获取|
 |`@Query`|标识查询语句|
@@ -490,8 +491,9 @@ int updateCourse(String name,Integer credit, Integer semester, Integer period, S
 
 方法上的所有`@Set`有可能全部被移除,那么就会得到一个错误的SQL`update Course set where no = ?5`,避免此错误有两个方法: 1). 加一条不含有SQL参数的`@set`,如: `@set("name" = "name")`,它永不会被删除; 2).调用方法前对参数做校验,排除参数导致所有`@set`的可能.  
 
-单个`@Set`针对出现多个`SQL`参数的情形,如 `@Set("name = ?1","credit = ?2")` 或 `@Set("name = :name","credit = :credit")` 参数 `?1`、`?2`、`:name`、 `:credit`中的任意一个为`null`都会导致该行条件移除.
+单个`@Set`针对出现多个`SQL`参数的情形,如 `@Set("name = ?1","credit = ?2")` 或 `@Set("name = :name","credit = :credit")` 参数 `?1`、`?2`、`:name`、 `:credit`中的任意一个为`null`都会导致该行设置项被移除.  
 
+根据参数set不同字段,别忘了还有其他几种实现方式: a.调用内置方法`int executeUpdate(E entity)`(实体的null值不会参与运算); b.使用SQL模版,在里头做逻辑判断; c.采用`BuilderQuery`; d.采用`$表达式`. 开发者将会发现很难不能选择出适合的并且偏好的方式.
  
 ## @Transactional
 

@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.fastquery.core.Id;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.RepositoryException;
+import org.fastquery.core.Table;
 import org.fastquery.core.Transient;
 
 import com.alibaba.fastjson.JSONArray;
@@ -67,7 +68,7 @@ public final class BeanUtil {
 		int idOfSet = -1; // 用于记录主键名应该在sql中的什么位置
 
 		Class<?> clazz = bean.getClass();
-		String tableName = clazz.getSimpleName();
+		String tableName = getEntitySimpleName(clazz);
 
 		StringBuilder sqlsb = new StringBuilder("insert into ");
 		if (dbNamePrefix) {
@@ -237,11 +238,11 @@ public final class BeanUtil {
 			sb.append('`');
 			sb.append(dbName);
 			sb.append("`.`");
-			sb.append(clazz.getSimpleName());
+			sb.append(getEntitySimpleName(clazz));
 			sb.append('`');
 		} else {
 			sb.append('`');
-			sb.append(clazz.getSimpleName());
+			sb.append(getEntitySimpleName(clazz));
 			sb.append('`');
 		}
 		Field[] fields = clazz.getDeclaredFields();
@@ -513,11 +514,11 @@ public final class BeanUtil {
 			sb.append('`');
 			sb.append(dbName);
 			sb.append("`.`");
-			sb.append(clazz.getSimpleName());
+			sb.append(getEntitySimpleName(clazz));
 			sb.append('`');
 		} else {
 			sb.append('`');
-			sb.append(clazz.getSimpleName());
+			sb.append(getEntitySimpleName(clazz));
 			sb.append('`');
 		}
 
@@ -694,4 +695,13 @@ public final class BeanUtil {
 		return Long.valueOf(key.toString());
 	}
 
+	private static String getEntitySimpleName(Class<?> clazz) {
+		Table t = clazz.getAnnotation(Table.class);
+		if(t != null) {
+			return t.value();
+		} else {
+			return clazz.getSimpleName();
+		}
+	}
+	
 }
