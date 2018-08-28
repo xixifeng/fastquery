@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: fastquery
 Bundle-SymbolicName: fastquery
-Bundle-Version: 1.0.54
+Bundle-Version: 1.0.55
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: com.alibaba.fastjson,
  com.mchange.v2.c3p0,

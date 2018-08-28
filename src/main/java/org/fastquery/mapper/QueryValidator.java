@@ -105,6 +105,7 @@ public class QueryValidator {
 
 			// 3). query装载后,就不能再出现 #{#name} 表达式了
 			List<String> mts = TypeUtil.matches(query, "#\\{#\\S+\\}");
+			mts.remove(Placeholder.LIMIT); // 内置标签不参与校验 
 			if (!mts.isEmpty()) {
 				error(String.format("没有找到name=\"%s\"的part", mts.get(0).replace("{", "").replace("}", "").replace("#", "")), query);
 			}
