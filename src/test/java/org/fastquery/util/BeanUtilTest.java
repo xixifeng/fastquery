@@ -149,14 +149,23 @@ public class BeanUtilTest {
 		String str = BeanUtil.toInsertSQL(userInfos, null, false);
 		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('牵牛花','3'),('10','松''鼠','5')"));
 	}
+	
+	@Test
+	public void selectFields() {
+		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
+		String selectFields =  BeanUtil.selectFields(userInfo);
+		assertThat(selectFields, equalTo("`id`,`name`,`age`"));
+		
+		selectFields =  BeanUtil.selectFields(UserInfo.class);
+		assertThat(selectFields, equalTo("`id`,`name`,`age`"));
+	}
 
 	@Test
 	public void toSelectSQL() {
-		UserInfo userInfo = new UserInfo(33, "想向公主", 18);
+		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
 
-		String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk");
-
-		assertThat(sql, equalTo("select * from `xk`.`UserInfo` where `id` = 36"));
+		String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk",true);
+		assertThat(sql, equalTo("select `id`,`name`,`age` from `xk`.`UserInfo` where `id` = 36"));
 	}
 
 	@Test

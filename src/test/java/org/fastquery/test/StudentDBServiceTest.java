@@ -298,6 +298,7 @@ public class StudentDBServiceTest {
 		LOG.debug(JSON.toJSONString(jsonObject, true));
 		assertThat(jsonObject.getString("name"), equalTo("网五"));
 		assertThat(jsonObject.getInteger("age"), equalTo(31));
+		assertThat(jsonObject.containsKey("id"), is(false));
 	}
 
 	@Test

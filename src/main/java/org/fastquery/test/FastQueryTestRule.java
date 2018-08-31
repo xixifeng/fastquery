@@ -52,7 +52,7 @@ public class FastQueryTestRule implements TestRule {
 	private SQLValue sqlValue;
 	private List<SQLValue> sqlValues;
 
-	private void proxy(Statement base, Description description) throws NoSuchFieldException, IllegalAccessException {
+	private void proxy(Statement base, Description description) throws IllegalAccessException {
 		Object testTarget = getTestTarget(base);
 		LOG.debug("SkipFilter:{}", description.getAnnotation(SkipFilter.class));
 		Class<?> clazz = description.getTestClass();
@@ -86,28 +86,27 @@ public class FastQueryTestRule implements TestRule {
 		}
 	}
 
-	private Object getTestTarget(Statement base) throws NoSuchFieldException, IllegalAccessException {
-		if (base instanceof org.junit.internal.runners.statements.ExpectException) {
-			Field nextField = base.getClass().getDeclaredField("next");
-			nextField.setAccessible(true);
-			// 获取目标对象
-			Object nextBase = nextField.get(base);
+	private Object getTestTarget(Statement base) {
+		try {
+			if (base instanceof org.junit.internal.runners.statements.ExpectException) {
+				Field nextField = base.getClass().getDeclaredField("next");
+				nextField.setAccessible(true);
+				// 获取目标对象
+				Object nextBase = nextField.get(base);
 
-			Field targetField = nextBase.getClass().getDeclaredField("target");
-			targetField.setAccessible(true);
-			// 获取目标对象
-			return targetField.get(nextBase);
-		} else {
-			Field targetField;
-			try {
-				targetField = base.getClass().getDeclaredField("target");
-			} catch (NoSuchFieldException | SecurityException e) {
-				return null;
+				Field targetField = nextBase.getClass().getDeclaredField("target");
+				targetField.setAccessible(true);
+				// 获取目标对象
+				return targetField.get(nextBase);
+			} else {
+				Field targetField = base.getClass().getDeclaredField("target");
+				targetField.setAccessible(true);
+				// 获取目标对象
+				return targetField.get(base);
 			}
-			targetField.setAccessible(true);
-			// 获取目标对象
-			return targetField.get(base);
-		}
+		} catch (Exception e) {
+			return null;
+		} 
 	}
 
 	@Override

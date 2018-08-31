@@ -20,35 +20,33 @@
  * 
  */
 
-package org.fastquery.dao;
+package org.fastquery.test;
 
-import java.util.Map;
-
-import org.fastquery.core.Modifying;
-import org.fastquery.core.Query;
-import org.fastquery.core.QueryRepository;
+import org.fastquery.core.RepositoryException;
+import org.fastquery.dao.ProductDBService;
+import org.fastquery.service.FQuery;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
-public interface ProductDBService extends QueryRepository {
-
-	@Query("SELECT * FROM `product` limit 1;")
-	Map<String, Object> findOne();
-
-	@Modifying
-	@Query("DELETE FROM `product` WHERE `pid` = 1")
-	@Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 3, '中国', NULL)")
-	@Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 2, '伟大', NULL)")
-	@Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 1, '复兴', NULL)")
-	int inserts();
+public class TransactionalTest {
 	
-	// 测试不同表事务
-	@Modifying
-	@Query("DELETE FROM `product` WHERE `pid` = 882")
-	@Query("update UserInfo set `name` = '苹果' where id = 1")
-	@Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 1, NULL, NULL)")
-	int updates();
-
+	private ProductDBService pdbs = FQuery.getRepository(ProductDBService.class);
+	
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
+	
+	@Test
+	public void testUpdates() {
+		 // 断言: 在执行pdbs.updates()之后,将会抛出 RepositoryException 异常!
+		exception.expect(RepositoryException.class);
+		// 断言: 在执行pdbs.updates()之后,抛出的异常信息是 "Column 'pname' cannot be null"
+		exception.expectMessage("Column 'pname' cannot be null");
+		pdbs.updates();		
+	}
+	
 }

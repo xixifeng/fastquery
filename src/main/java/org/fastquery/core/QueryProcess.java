@@ -34,10 +34,10 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.handler.ModifyingHandler;
 import org.fastquery.handler.QueryHandler;
 import org.fastquery.page.NotCount;
@@ -402,8 +402,8 @@ class QueryProcess {
 				dbName = (String) iargs[1];
 				bean = iargs[2];
 			}
-			sql = BeanUtil.toSelectSQL(bean, null, dbName);
-			if (DB.exists(sql)) {
+			sql = BeanUtil.toSelectSQL(bean, null, dbName,false);
+			if (sql!=null && DB.exists(sql)) {
 				// 更新
 				return DB.update(bean, dbName, null);
 			} else {
@@ -482,18 +482,20 @@ class QueryProcess {
 				dbName = (String) iargs[3]; // 数据库名称
 			}
 
-			return DB.select(BeanUtil.toSelectSQL(clazz, i, dbName), clazz);
+			return DB.select(BeanUtil.toSelectSQL(clazz, i, dbName,true), clazz);
 
 		case MethodId.QUERY8:
-			Objects.requireNonNull(iargs[0]);
-			Objects.requireNonNull(iargs[1]);
-			String tableName = iargs[0].toString(); // 表名称
-			String name = iargs[1].toString(); // 主键名
-			long key = ((Long) iargs[2]).longValue(); // 主键值
-			if (iargs.length == 5) {
-				dbName = (String) iargs[4]; // 数据库名称
+			String tableName = (String) iargs[0]; // 表名称
+			String name = (String) iargs[1]; // 主键名
+			if(StringUtils.isEmpty(tableName) || StringUtils.isEmpty(name) || StringUtils.isEmpty(tableName.trim()) || StringUtils.isEmpty(name.trim())) {
+				return 0;
+			} else {
+				long key = ((Long) iargs[2]).longValue(); // 主键值
+				if (iargs.length == 5) {
+					dbName = (String) iargs[4]; // 数据库名称
+				}
+				return DB.update(BeanUtil.toDelete(tableName, name, key, dbName), true);
 			}
-			return DB.update(BeanUtil.toDelete(tableName, name, key, dbName), true);
 
 		default:
 			break;

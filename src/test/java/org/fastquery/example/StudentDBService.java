@@ -167,7 +167,7 @@ public interface StudentDBService extends QueryRepository {
 	@Query("insert into #{#table} (name,age) values (?1, ?2)")
 	Primarykey saveUserInfo(String name, Integer age);
 
-	@Modifying(id = "id", table = "userinfo")
+	@Modifying(id = "id", table = "userinfo",selectFields="`name`,`age`")
 	@Query("insert into #{#table} (name,age) values (?1, ?2)")
 	JSONObject saveUserInfo2(String name, Integer age);
 

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -279,14 +280,17 @@ public final class BeanUtil {
 	}
 
 	/**
-	 * 转换查询语句
+	 * 转换查询语句, 实体上必须包含主键字段 <br>
+	 * 
+	 * 注意: 如果主键值为null,则返回null,没有主键值,那么根据什么来查询呢?
 	 * 
 	 * @param bean 实体 或 class
 	 * @param key 主键值, 如果传递null,那么自动获取,获取到的为null那么报错. 指定的值优先
 	 * @param dbName 数据库名称
+	 * @param selectEntity true 查实体, 反之,查主键值
 	 * @return sql语句
 	 */
-	public static String toSelectSQL(Object bean, Object key, String dbName) {
+	public static String toSelectSQL(Object bean, Object key, String dbName,boolean selectEntity) {
 		Class<?> cls = (bean instanceof Class) ? (Class<?>) bean : bean.getClass();
 		// 表名称
 		String tableName = cls.getSimpleName();
@@ -307,6 +311,9 @@ public final class BeanUtil {
 					try {
 						field.setAccessible(true);
 						key = field.get(bean);
+						if(key==null) {
+							return null;
+						}
 					} catch (Exception e) {
 						throw new RepositoryException(e);
 					}
@@ -315,11 +322,15 @@ public final class BeanUtil {
 			}
 		}
 
-		if (keyFeild == null || key == null) {
-			throw new RepositoryException(cls + " 需要用@Id在实体上标识主键并且主键的值不能为null");
+		if (keyFeild == null) {
+			throw new RepositoryException(cls + " 需要用@Id在实体上标识主键");
 		}
 
-		return String.format("select * from %s where `%s` = %s", tableName, keyFeild, key.toString());
+		if(selectEntity) {
+			return String.format("select %s from %s where `%s` = %s",selectFields(cls),tableName, keyFeild, key.toString());
+		} else {
+			return String.format("select `%s` from %s where `%s` = %s",keyFeild,tableName, keyFeild, key.toString());
+		}
 
 	}
 
@@ -702,6 +713,37 @@ public final class BeanUtil {
 		} else {
 			return clazz.getSimpleName();
 		}
+	}
+	
+	private static List<Field> mapFields(Object bean) {
+		List<Field> list = new ArrayList<>();
+		Class<?> cls = (bean instanceof Class) ? (Class<?>) bean : bean.getClass();
+		Field[] fields = cls.getDeclaredFields();
+		for (Field field : fields) {
+			// 映射的字段必须满足: a: 不是数组 b:必须是包装类型 c: 没有标识@Transient
+			if(!field.getType().isArray() && TypeUtil.isWarrp(field.getType()) && field.getDeclaredAnnotation(Transient.class) == null) {
+				list.add(field);
+			}
+		}
+		return list;
+	}
+	
+	public static String selectFields(Object bean) {
+		Objects.requireNonNull(bean);
+		List<Field> fields = mapFields(bean);
+		StringBuilder sb = new StringBuilder(6*fields.size());
+		fields.forEach( f -> {
+			sb.append(',');
+			sb.append('`');
+			sb.append(f.getName());
+			sb.append('`');
+		});
+		int len = sb.length();
+		if(len > 0) {
+			sb.deleteCharAt(0);
+		} 
+		
+		return sb.toString();
 	}
 	
 }

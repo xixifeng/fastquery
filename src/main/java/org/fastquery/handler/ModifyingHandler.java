@@ -78,7 +78,6 @@ public final class ModifyingHandler {
 		Modifying modifying = QueryContext.getMethod().getAnnotation(Modifying.class);
 		String keyFieldName = modifying.id(); // 不可能为null
 		String tableName = modifying.table();
-		String sql;
 		List<Object> values = new ArrayList<>(1);
 		Object e;
 		if (autoIncKey != null) {
@@ -90,10 +89,19 @@ public final class ModifyingHandler {
 			}
 			e = pkey;
 		}
-		sql = "select * from " + tableName + " where " + keyFieldName + " = ?";
+		
 		values.add(e);
 		Map<String, Object> keyval = null;
-		SQLValue sqlValue = new SQLValue(sql, values);
+		
+		StringBuilder sqlBuilder = new StringBuilder();
+		sqlBuilder.append("select ");
+		sqlBuilder.append(modifying.selectFields());
+		sqlBuilder.append(" from ");
+		sqlBuilder.append(tableName);
+		sqlBuilder.append(" where ");
+		sqlBuilder.append(keyFieldName);
+		sqlBuilder.append(" = ?");
+		SQLValue sqlValue = new SQLValue(sqlBuilder.toString(), values);
 		List<Map<String, Object>> keyvals = DB.find(sqlValue);
 		if (!keyvals.isEmpty()) {
 			keyval = keyvals.get(0);

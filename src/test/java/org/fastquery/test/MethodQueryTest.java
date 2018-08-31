@@ -29,6 +29,11 @@ import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.FromDataPoints;
+import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
+import org.junit.runner.RunWith;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -41,13 +46,14 @@ import java.util.List;
  * 
  * @author xixifeng (fastquery@126.com)
  */
+@RunWith(Theories.class)
 public class MethodQueryTest {
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
 
-	private StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
-	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
+	private static StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
+	private static UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 
 	@Test
 	public void testSave() {
@@ -161,7 +167,7 @@ public class MethodQueryTest {
 	}
 
 	@Test
-	public void saveOrUpdate() {
+	public void saveOrUpdate1() {
 		Integer id = 100;
 		UserInfo userInfo = new UserInfo(id, "小蜜蜂", 5);
 
@@ -181,7 +187,14 @@ public class MethodQueryTest {
 		assertThat(u2.getAge(), equalTo(5));
 
 	}
-
+	
+	@Test
+	public void saveOrUpdate2() {
+		UserInfo userInfo = new UserInfo(null, "小蜜蜂", 5);
+		int effect = userInfoDBService.executeSaveOrUpdate(userInfo);
+		assertThat(effect, is(1));
+	}
+	
 	// 使用update时,同时自定义条件的例子
 	@Test
 	public void update4() {
@@ -304,11 +317,27 @@ public class MethodQueryTest {
 	}
 
 	@Test
-	public void delete() {
+	public void delete1() {
 		int id = 89890;
 		int effect = userInfoDBService.insert(new UserInfo(id, "植物", 17));
 		assertThat(effect, is(1));
 		effect = userInfoDBService.delete("UserInfo", "id", id);
 		assertThat(effect, is(1));
+	}
+	
+	
+	@DataPoints("emptyNull")
+	public static String[] emptyNull = {"",null};
+	
+	@Theory
+	public void delete2(@FromDataPoints("emptyNull") String tableName,@FromDataPoints("emptyNull") String primaryKeyName) {
+		int effect = userInfoDBService.delete(tableName, primaryKeyName, 1);
+		assertThat(effect, is(0));
+	}
+	
+	@Theory
+	public void delete3(@FromDataPoints("emptyNull") String tableName,@FromDataPoints("emptyNull") String primaryKeyName,@FromDataPoints("emptyNull")  String dataSourceName) {
+		int effect = userInfoDBService.delete(tableName, primaryKeyName, 1,dataSourceName);
+		assertThat(effect, is(0));
 	}
 }

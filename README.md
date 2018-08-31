@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.55</version> <!-- fastquery.version -->
+    <version>1.0.56</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.55'
+compile 'org.fastquery:fastquery:1.0.56'
 ```
 
 # FastQuery 数据持久层框架
@@ -152,7 +152,7 @@ fastquery.json其他可选配置选项:
  } 
 ```
 
-实体属性跟数据库映射的字段必须为包转类型,否则被忽略. 在实体属性上标识`@Transient`,表示该字段不参与映射.   
+**实体属性跟数据库映射的字段必须为包装类型,否则被忽略**. 在实体属性上标识`@Transient`,表示该字段不参与映射.   
 
 - DAO接口
 
@@ -321,11 +321,6 @@ boolean deleteUserinfoById(int id);
 @Modifying(table="student",id="no")
 // 注意: // 注意: student的主键是字符串,因此不会自增长,在此处需要用@Id标识哪个就是主键字段
 Student addStudent(@Id String no,String name,String sex,int age,String dept);
-	
-// 以Map格式,返回当前保存的数据
-@Modifying(id="id",table="userinfo")
-@Query("insert into #{#table} (name,age) values (?1, ?2)")
-Map<String, Object> addUserInfo(String name,Integer age);
 
 // 以JSON格式,返回当前保存的数据
 @Modifying(id="id",table="userinfo")
@@ -337,6 +332,17 @@ JSONObject saveUserInfo2(String name,Integer age);
 @Query("insert into #{#table} (name,age) values (?1, ?2)")
 Primarykey saveUserInfo(String name,Integer age);
 ```
+
+新增一条记录,返回实体,可以通过`@Modifying`中的`selectFields`配置项明确指定待查询的字段. 如:
+
+```java
+// 以Map格式,返回当前保存的数据
+@Modifying(id="id",table="userinfo",selectFields="name,age")
+@Query("insert into #{#table} (name,age) values (?1, ?2)")
+Map<String, Object> addUserInfo(String name,Integer age);
+```
+
+其中,`selectFields` 默认是 **<code>\*</code>**,字段与字段之间请用英文逗号隔开,待查询的字段名称跟`SQL`的保留关键字有可能存在冲突的话,那么,请用反引号(**<code>\`</code>**)包裹.  
 
 **注意**:
 - 改操作返回int类型:表示影响的行数,没有找到可以修改的,那么影响行数为0,并不能视为改失败了
@@ -378,8 +384,8 @@ Primarykey saveUserInfo(String name,Integer age);
 | `<E> E save(E entity)` | 保存实体后,返回实体 |
 | `<E> int executeUpdate(E entity)` | 更新一个实体,返回影响行数.**注意**:实体的成员属性如果是null,那么该属性将不会参与改运算 |
 | `<E> E update(E entity)` | 更新一个实体,返回被更新的实体 |
-| `<E> int executeSaveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含主键值),返回影响行数 |
-| `<E> E saveOrUpdate(E entity)` | 不存在就保存,反之更新,返回被更新的实体或返回已存储的实体 |
+| `<E> int executeSaveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含主键字段,主键值若是null,直接存),返回影响行数 |
+| `<E> E saveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含主键字段,主键值若是null,直接存),返回被更新的实体或返回已存储的实体 |
 | `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),若给where传递null或"",默认按照主键修改,返回影响行数 |
 | `<E> int update(Collection<E> entities)` | 更新集合实体,成员属性如果是null,那么该属性将不会参与改运算,每个实体必须包含主键 |
 | `int delete(String tableName,String primaryKeyName,long id)` | 根据主键删除实体,返回影响行数 |
@@ -398,22 +404,23 @@ public class UserInfo {
 }
 ```
 
-保存实体,更新实体,保存或更新实体示例如下:  
+保存实体,更新实体,保存或更新实体示例如下:
+
 ``` java
-	UserInfo u1 = new UserInfo(36,"Dick", 23);
-	
-	// 保存实体
-	studentDBService.save(u1)
-	
-	Integer id = 36;
-	String name = "Dick";
-	Integer age = null;
-	UserInfo u2 = new UserInfo(id,name,age);
-	// age是null值, age就不会参与修改运算了.
-	studentDBService.update(u2); // 更新语句为: update UserInfo set name = ? where id = ?
-	
-	// 保存或更新实体
-	studentDBService.saveOrUpdate(u1);
+UserInfo u1 = new UserInfo(36,"Dick", 23);
+
+// 保存实体
+studentDBService.save(u1)
+
+Integer id = 36;
+String name = "Dick";
+Integer age = null;
+UserInfo u2 = new UserInfo(id,name,age);
+// age是null值, age就不会参与修改运算了.
+studentDBService.update(u2); // 更新语句为: update UserInfo set name = ? where id = ?
+
+// 保存或更新实体
+studentDBService.saveOrUpdate(u1);
 ```
 
 使用update时,同时自定义条件的例子:
@@ -1254,6 +1261,6 @@ https://gitee.com/xixifeng.com/fastquery/issues
 FastQuery秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://gitee.com/xixifeng.com/fastquery/issues)来向我们反馈.  
 
 ## 捐助
-FastQuery 采用 Apache 许可的开源项目, 使用完全自由, 免费.  如果你从 FastQuery  收到积极的启发, 可以用捐助来表示你的谢意.
+FastQuery 采用 Apache 许可的开源项目, 使用完全自由, 免费.  如果 FastQuery  对你有帮助, 可以用捐助来表示谢意.
 
 

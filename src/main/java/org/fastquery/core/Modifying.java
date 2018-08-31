@@ -51,4 +51,11 @@ public @interface Modifying {
 	 * @return String
 	 */
 	String table() default "";
+	
+	/**
+	 * 改操作若返回实体,selectFields 用来明确指定查询相应表的哪几个字段,默认是 "*",字段与字段之间请用英文逗号隔开 <br> 
+	 * 注意: 如果待查询的字段名称有可能跟SQL的保留关键字冲突,那么,请用反引号(`)包裹.
+	 * @return String
+	 */
+	String selectFields() default "*";
 }

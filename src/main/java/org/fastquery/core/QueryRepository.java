@@ -355,8 +355,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 根据主键删除实体
 	 * 
-	 * @param tableName 表名称
-	 * @param primaryKeyName 主键名称
+	 * @param tableName 表名称,若传递null或空字符串,则,立马返回0
+	 * @param primaryKeyName 主键名称,若传递null或空字符串,则,立马返回0
 	 * @param id 主键值
 	 * @return 影响行数
 	 */
@@ -366,8 +366,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 根据主键删除实体
 	 * 
-	 * @param tableName 表名称
-	 * @param primaryKeyName 主键名称
+	 * @param tableName 表名称,若传递null或空字符串,则,立马返回0
+	 * @param primaryKeyName 主键名称,若传递null或空字符串,则,立马返回0
 	 * @param id 主键值
 	 * @param dataSourceName 数据源名称
 	 * @return 影响行数
@@ -378,8 +378,8 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 根据主键删除实体
 	 * 
-	 * @param tableName 表名称
-	 * @param primaryKeyName 主键名称
+	 * @param tableName 表名称,若传递null或空字符串,则,立马返回0
+	 * @param primaryKeyName 主键名称,若传递null或空字符串,则,立马返回0
 	 * @param id 主键值
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
@@ -485,8 +485,9 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	}
 
 	/**
-	 * 保存或更新一个实体,返回实体
-	 * 
+	 * 保存或更新一个实体,返回实体 <br>
+	 * 前提条件:这个实体必须包含主键字段,主键值若是null,直接存 <br>
+	 * 另见: {@link #executeSaveOrUpdate(Object)}  返回影响行数(int类型)
 	 * @param <E> 实体
 	 * @param entity 实体
 	 * @return 返回实体
@@ -502,8 +503,9 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	}
 
 	/**
-	 * 保存或更新一个实体,返回实体
-	 * 
+	 * 保存或更新一个实体,返回实体<br>
+	 * 前提条件:这个实体必须包含主键字段,主键值若是null,直接存 <br>
+	 * 另见: {@link #executeSaveOrUpdate(String, Object)}  返回影响行数(int类型)
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param entity 实体
@@ -520,8 +522,9 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	}
 
 	/**
-	 * 保存或更新一个实体,返回实体
-	 * 
+	 * 保存或更新一个实体,返回实体<br>
+	 * 前提条件:这个实体必须包含主键字段,主键值若是null,直接存 <br>
+	 * 另见: {@link #executeSaveOrUpdate(String, String, Object)}  返回影响行数(int类型)
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
