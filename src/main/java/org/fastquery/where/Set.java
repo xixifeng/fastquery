@@ -57,4 +57,10 @@ public @interface Set {
 	 * @return boolean
 	 */
 	boolean ignoreEmpty() default true;
+	
+	/**
+	 * 通过指定一个Judge子类来决定是否忽略该条件
+	 * @return 继承于Judge类的Class
+	 */
+	Class<? extends Judge> ignore() default DefaultJudge.class;
 }

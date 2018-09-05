@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class RepVersion {
+public class RepVersion extends FastQueryTest  {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RepVersion.class);
 

@@ -119,7 +119,6 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 			after();
 			return result;
 		} catch (Throwable e) {
-			e.printStackTrace();
 			throw new RepositoryException(e);
 		}
 

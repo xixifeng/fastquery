@@ -20,7 +20,7 @@
  * 
  */
 
-package org.fastquery.util;
+package org.fastquery.test;
 
 import java.io.File;
 import java.io.IOException;

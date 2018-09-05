@@ -20,7 +20,7 @@
  * 
  */
 
-package org.fastquery.service;
+package org.fastquery.test;
 
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -31,7 +31,6 @@ import java.io.InputStream;
 
 import org.fastquery.core.FQueryResourceImpl;
 import org.fastquery.core.Resource;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -41,11 +40,6 @@ import org.junit.Test;
 public class FQueryResourceImplTest {
 
 	private Resource resource = new FQueryResourceImpl(this.getClass().getClassLoader());
-	
-	@BeforeClass
-	public static void beforeClass() {
-		System.setProperty("fastquery.config.dir", "/mywork/workspace-2018/fastquery/conf");
-	}
 
 	@Test
 	public void testGetResourceAsStream() {

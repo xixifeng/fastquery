@@ -22,52 +22,48 @@
 
 package org.fastquery.test;
 
-import java.math.BigInteger;
-
-import org.fastquery.bean.Visitor;
-import org.fastquery.example.VisitorDBServcie;
+import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.service.FQuery;
-import org.junit.Rule;
+import org.fastquery.util.FastQueryJSONObject;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.hamcrest.Matchers.*;
+
 import static org.junit.Assert.assertThat;
+
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
 
 /**
  * 
- * @author mei.sir@aliyun.cn
- * @date 2017年9月25日
+ * @author xixifeng (fastquery@126.com)
  */
-public class SaveToIdTest extends FastQueryTest  {
+public class FastQueryJSONObjectTest extends FastQueryTest {
 
-	private VisitorDBServcie vdbs = FQuery.getRepository(VisitorDBServcie.class);
-
-	@Rule
-	public FastQueryTestRule rule = new FastQueryTestRule();
+	@BeforeClass
+	public static void before() {
+		FQuery.getRepository(UserInfoDBService.class);
+	}
 
 	@Test
-	public void saveToId1() {
-		Long punitId = 173L;
-		String vname = "OTU\\";
-		String idCard = "&";
-		String mobile = "\\";
-		String email = "<";
-		Byte gender = (byte) 0;
-		String toAddr = "";
-		String remark = "来访";
-		Long lastDate = 1506233249L;
-		Long createDate = 1506233208L;
-		String iden = "J6X1HH15ExIkvqSNSHXa";
-		Integer dId = 1;
-
-		Visitor v = new Visitor(punitId, vname, idCard, mobile, email, gender, toAddr, remark, lastDate, iden, dId);
-		v.setCreateDate(createDate);
-
-		BigInteger bigInteger = vdbs.saveToId(v);
-		assertThat(bigInteger.longValue(), greaterThanOrEqualTo(1l));
-
-		int effect = vdbs.deleteByIden(iden);
-
-		assertThat(effect, is(1));
-
+	public void testGetBasedir() {
+		String basedir = FastQueryJSONObject.getBasedir();
+		assertThat(basedir, equalTo(System.getProperty("user.dir") + "/src/test/resources/testFiles/"));
 	}
+
+	@Test
+	public void testGetQueries() {
+		List<String> queries = FastQueryJSONObject.getQueries();
+		if (!queries.isEmpty()) {
+			assertThat(queries.contains("queries/"), is(true));
+			assertThat(queries.contains("tpl/"), is(true));
+		}
+	}
+	
+	@Test
+	public void getSlowQueryTime() {
+		int time = FastQueryJSONObject.getSlowQueryTime();
+		assertThat(time, is(50));
+	}
+
 }

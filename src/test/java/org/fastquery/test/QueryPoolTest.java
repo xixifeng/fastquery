@@ -34,6 +34,8 @@ import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.mapper.QueryMapper;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.service.FQuery;
+import org.fastquery.util.QueryContextUtil;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -44,7 +46,7 @@ import static org.junit.Assert.assertThat;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class QueryPoolTest {
+public class QueryPoolTest extends FastQueryTest  {
 
 	static Resource resource;
 
@@ -52,6 +54,9 @@ public class QueryPoolTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
+		
+		QueryContextUtil.getThreadLocal().set(QueryContextUtil.getQueryContext());
+		
 		resource = new Resource() {
 			@Override
 			public InputStream getResourceAsStream(String name) {
@@ -67,6 +72,11 @@ public class QueryPoolTest {
 				return true;
 			}
 		};
+	}
+	
+	@AfterClass
+	public static void afterClass() throws Exception {
+		QueryContextUtil.getThreadLocal().remove();
 	}
 
 	@SuppressWarnings("unchecked")

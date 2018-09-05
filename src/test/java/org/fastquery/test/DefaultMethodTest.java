@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class DefaultMethodTest {
+public class DefaultMethodTest extends FastQueryTest {
 
 	private DefaultDBService db = FQuery.getRepository(DefaultDBService.class);
 

@@ -252,7 +252,12 @@ class PropertiesUtil {
 		}
 
 		fqs = new HashSet<>();
-		JSONObject json = JSONObject.parseObject(fqueryJson);
+		JSONObject json;
+		try {
+			json = JSONObject.parseObject(fqueryJson);
+		} catch (Exception e) {
+			throw new RepositoryException("fastquery.json 语法错误: " + e.getMessage());
+		}
 		FastQueryJSONObject.setJsonObject(json);
 		FastQueryJSONObject.check();
 		FastQueryJson[] fqProperties = JSON.toJavaObject(json.getJSONArray("scope"), FastQueryJson[].class);

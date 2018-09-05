@@ -34,6 +34,7 @@
             "org.fastquery.example",              // 包地址
             "org.fastquery.dao.UserInfoDBService",// 完整类名称
             "org.fastquery.dao.QueryByNamedDBExample",
+            "org.fastquery.dao.QueryByNamedDBExtend",
             "org.fastquery.dao.SQLInExample",
             "org.fastquery.dao.ProcedureExample",
             "org.fastquery.dao.ProductDBService",
@@ -88,7 +89,7 @@
  ],
  
   // 基准目录,注意: 后面记得加上 "/"
- "basedir" : "/mywork/myosgi/osgi_workspace/fastquery/tmp/",
+ "basedir" : "/mywork/workspace-2018/fastquery/src/test/resources/testFiles/",
  
   // 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目,默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式
   "debug" : false,

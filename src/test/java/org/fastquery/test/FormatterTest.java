@@ -35,7 +35,7 @@ import org.junit.Test;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class FormatterTest {
+public class FormatterTest extends FastQueryTest {
 	
 	private UserInfoDBService3 db = FQuery.getRepository(UserInfoDBService3.class);
 	

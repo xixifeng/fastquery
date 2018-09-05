@@ -34,13 +34,14 @@ import static org.junit.Assert.fail;
  */
 public class QueryContextHelper {
 
+	private QueryContextHelper(){}
+	
 	public static QueryContext getQueryContext() {
 		try {
 			Method getQueryContextMethod = QueryContext.class.getDeclaredMethod("getQueryContext");
 			getQueryContextMethod.setAccessible(true);
 			return (QueryContext) getQueryContextMethod.invoke(null);
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail(e.getMessage());
 		}
 		return null;

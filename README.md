@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.56</version> <!-- fastquery.version -->
+    <version>1.0.57</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.56'
+compile 'org.fastquery:fastquery:1.0.57'
 ```
 
 # FastQuery 数据持久层框架
@@ -31,7 +31,7 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 12. 支持批量更新集合实体(根据主键,批量更新不同字段,不同内容).
 
 ## 运行环境要求
-jdk1.8+
+JRE 8+
 
 ## 配置文件
 
@@ -132,7 +132,7 @@ fastquery.json其他可选配置选项:
 |:-----:|:-----:|:-----:|:-----|:-----|
 | basedir | string | 无 | 基准目录,注意: 后面记得加上 "/" <br> 该目录用来放SQL文件,需要执行SQL文件时,指定其名称就够了 | "/tmp/sql/" |
 | debug | boolean | false | 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目<br>默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式 | false |
-| queries | array | [ ] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
+| queries | array | [ ] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:配置文件的位置不一定基于classpath目录,也可以通过`"fastquery.config.dir"`另行指定,上文已经提及到.每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
 | slowQueryTime | int | 0 | 设置慢查询的时间值(单位:毫秒; 默认:0,表示不开启慢查询功能), 如果 `QueryRepository` 中的方法执行超过这个时间,则会警告输出那些执行慢的方法,以便优化 | 50 |
 
 
@@ -257,7 +257,7 @@ List<String> findNames();
 ## 动态条件查询
 
 ### 采用`Annotation`实现简单动态条件  
-看到这里,可别认为`SQL`只能写在Annotation(注解)里.`FastQuery`还提供了另二种方案:① 采用`@QueryByNamed`(命名式查询),将`SQL`写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活.② 通过`BuilderQuery`函数式接口构建`SQL`.下面章节有详细描述. 
+看到这里,可别认为`SQL`只能写在Annotation(注解)里.`FastQuery`还提供了另二种方案: ① 采用`@QueryByNamed`(命名式查询),将`SQL`写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活. ② 通过`BuilderQuery`函数式接口构建`SQL`.下面章节有详细描述. 
 
 ```java
 @Query("select no, name, sex from Student #{#where} order by age desc")
@@ -278,6 +278,36 @@ Student[] findAllStudent(... args ...);
 
 `@Condition(value="name = ?1",ignoreNull=false)`表示`?1`接受到的值若是`null`,该条件也参与运算,最终会翻译成`name is null`.`SQL`中的`null`无法跟比较运算符(如`=`,`<`,或者`<>`)一起运算,但允许跟`is null`,`is not null`,`<=>`操作符一起运算,故,将`name = null`想表达的意思,解释成`name is null`.  
 `@Condition(value="name != ?1",ignoreNull=false)` 若`?1`的值为`null`,最终会解释成`name is not null`.  
+
+决定一个条件是否参与运算,有时候需要根据多个不同的参数进行某种计算来决定. 那么就需要使用`@Condition`中的`ignore`选项,指定一个类,它叫`Judge`,是一个裁判员,条件是否去除的决定权可以理所当然委托给自定义的`Judge`类来处理.   
+举例: 若:年龄大于18及姓名不为空且包含"Rex".则,剔除条件`and name like :name`.
+
+定制一个决定条件存活的类,需要遵循一些约定: 继承`org.fastquery.where.Judge`,当完成这一步,就会提示开发者必须实现ignore方法, 否则,不能举足前行. 这样的设计可以减少犯错的可能. 当ignore方法最终返回`true`时,则,删除相对应的条件;当最后返回`false`时,则,保留条件.
+
+```java
+public class LikeNameJudge extends Judge {
+	@Override
+	public boolean ignore() {
+		// 获取方法中名称为"age"的参数值
+		int age = this.getParameter("age", int.class);
+		// 获取方法中名称为"name"的参数值
+		String name = this.getParameter("name", String.class);
+		return age > 18 && name!=null && name.contains("Rex");
+	}
+}
+```
+在`LikeNameJudge`的`this`范围内可以获得当前DB方法的所有实参.这些参数都有资格决定条件的命运.   
+指定 `LikeNameJudge`:
+
+```java
+@Query("select id,name,age from `userinfo` #{#where}")
+@Condition("age > :age")
+@Condition(value="and name like :name",ignore=LikeNameJudge.class)
+Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable pageable);
+```
+
+其中,`ignore`选项默认指定`DefaultJudge`,它是一个无所事事的裁判员,当它是空气好了.
+
 若`@Condition`的值使用了`${表达式}`,`$表达式`,不管方法的参数传递了什么都不会使条件移除,因为`$`表达式(或称之为EL表达式)仅作为简单模版使用,传null,默认会替换为""(空字符串).举例:
 
 ```
@@ -500,6 +530,33 @@ int updateCourse(String name,Integer credit, Integer semester, Integer period, S
 
 单个`@Set`针对出现多个`SQL`参数的情形,如 `@Set("name = ?1","credit = ?2")` 或 `@Set("name = :name","credit = :credit")` 参数 `?1`、`?2`、`:name`、 `:credit`中的任意一个为`null`都会导致该行设置项被移除.  
 
+决定一个Set项是否参与运算,可以根据多个参数进行某种计算来决定,自定义一个Judge类,作为这种计算的载体.  
+举例: 若: name值的前缀是"*计算*" 并且 credit的值大于2, 则,删除`name = :name`这条设置项.  
+NameJudge 类:
+
+```java
+public class NameJudge extends Judge {
+	@Override
+	public boolean ignore() {
+		// 获取方法中名称为"name"的参数值
+		String name = this.getParameter("name", String.class);
+		// 获取方法中名称为"credit"的参数值
+		Integer credit = this.getParameter("credit", Integer.class);
+		return name.startsWith("计算") && credit!=null && credit.intValue() > 2;
+	}
+}
+```
+设置项绑定 NameJudge: 
+
+```java
+@Modifying
+@Query("update `Course` #{#sets} where no = ?3")
+@Set(value="`name` = :name",ignore=NameJudge.class)
+@Set("`credit` = :credit")
+int updateCourse(@Param("name") String name,@Param("credit") Integer credit,String no);
+```
+关于修改`name`的那个设置项, 有三种可能使它作废: ① name的值是null; ② name的值是""; ③ NameJudge类的ignore方法返回了`true`.
+
 根据参数动态增减set不同字段,除了用`@Set`实现之外,别忘了还有其他几种解决办法: a.调用内置方法`int executeUpdate(E entity)`,实体的字段若是`null`值,那么,该字段将不会参与set运算; b.使用SQL模版,在里头做逻辑判断; c.采用`BuilderQuery`; d.采用`$表达式`. 开发者将会发现很难不能选择出适合的解决方式.
  
 ## @Transactional
@@ -686,7 +743,7 @@ public interface QueryByNamedDBExample extends QueryRepository {
 }
 ```
 
-允许多个方法绑定同一个模板id.当然,采用`@QueryByNamed`同样适应于改操作,例如:
+当然,采用`@QueryByNamed`同样适应于改操作,例如:
 
 ```java
 @Modifying
@@ -712,9 +769,55 @@ public List<Student> findSomeStudent();
 
 等效于 `@QueryByNamed("findSomeStudent")`  
 
-`@QueryByNamed` 中的render属性,表示是否启用模板引擎对配置文件进行渲染,默认是true表示开启. 如果`<query>`节点中没有使用到任何模板语法,仅用于存储目的,那么建议设置为false.  
+`@QueryByNamed` 中的`render`属性,表示是否启用模板引擎对配置文件进行渲染,默认是`true`表示开启. 如果`<query>`节点中没有使用到任何模板语法,仅用于存储目的,那么建议设置为`false`.  
 
-**注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,可用于在模板中做逻辑判断,而`:name`用于标记参数位,SQL解析器会将其翻译成`?`号.
+**注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,可用于在模板中做逻辑判断,而`:name`用于标记参数位,SQL解析器会将其翻译成`?`号.  
+
+允许多个方法绑定同一个模板id. 在模板中使用`${_method}`可以引用到当前方法的`java.lang.reflect.Method`对象.  
+例: 根据当前方法名称的不同取不同的`SQL`语句
+
+```java
+public interface QueryByNamedDBExtend extends QueryRepository {
+	@QueryByNamed(render = false)
+	JSONArray findUAll();
+	
+	// 两个方法指定同一个模板id值
+	@QueryByNamed("findSome")
+	JSONArray findLittle();
+	@QueryByNamed("findSome")
+	JSONArray findSome();
+}
+```
+
+org.fastquery.dao.QueryByNamedDBExtend.queries.xml 模板文件的内容: 
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml> 
+<queries>
+	<!-- 定义全局 parts -->
+	<parts>
+		<part name="feids">id,name,age</part>
+	</parts>
+	<query id="findUAll">
+		<value>select #{#feids} from UserInfo limit 3</value>
+	</query>
+
+	<query id="findSome">
+		<![CDATA[
+		## 如果当前方法的名称等于 "findLittle"
+		#if( ${_method.getName()} == "findLittle" )
+		    ## 查3条  
+			select #{#feids} from UserInfo limit 3
+		#else 
+		   select `no`, `name` from Student limit 5
+		#end  
+		]]>
+	</query>	
+</queries>
+```
+
+其中 `${_method.getName()}` 可简写成 `${_method.name}`. 在`Velocity`里调用对象或方法,不是本人的重点,点到为止.
 
 ## BuilderQuery
 上面介绍了`SQL`不仅可以绑定在`@Query`里, 也可以写到`XML`里. 还有另一种方式,**通过函数式构建SQL语句**.  

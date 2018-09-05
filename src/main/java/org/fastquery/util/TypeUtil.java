@@ -537,7 +537,7 @@ public class TypeUtil implements Opcodes {
 	 */
 	private static boolean ignoreCondition(Condition condition, Object arg) {
 
-		String[] allows = condition.allow();
+		String[] allows = condition.allowRule();
 
 		if (allows.length != 0) { // 表明,允许的范围并不是全部,而是有所限定
 			if (arg == null) { // 范围有明确指定,还传递null,那么必然忽略
@@ -570,15 +570,21 @@ public class TypeUtil implements Opcodes {
 			return true;
 		}
 
-		String[] ignores = condition.ignore();
+		String[] ignores = condition.ignoreRule();
 		for (String ignore : ignores) {
 			if (Pattern.matches(ignore, arg.toString())) {
 				return true;
 			}
 		}
-
-		return false;
-
+		
+		try {
+			return condition.ignore().newInstance().ignore();
+		} catch (InstantiationException | IllegalAccessException e) {
+			// 这个异常其实永远也发生不了,该异常已经通过静态分析,提升到初始化阶段了
+			
+			LOG.error("{} 必须有一个不带参数且用public修饰的构造方法.反之,作废",condition.ignore());
+			return false;
+		}
 	}
 
 	/**

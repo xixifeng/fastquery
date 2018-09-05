@@ -34,7 +34,7 @@ import org.junit.Test;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class QueryParserTest {
+public class QueryParserTest extends FastQueryTest  {
 
 	private static String calcCountStatement(String sql, String countField) throws Exception {
 		Class<QueryParser> clazz = QueryParser.class;

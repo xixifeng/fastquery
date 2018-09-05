@@ -52,8 +52,8 @@ import static org.hamcrest.Matchers.*;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class QueryByNamedDBExampleTest {
-
+public class QueryByNamedDBExampleTest extends FastQueryTest {
+	
 	private static final Logger LOG = LoggerFactory.getLogger(QueryByNamedDBExampleTest.class);
 
 	@Rule

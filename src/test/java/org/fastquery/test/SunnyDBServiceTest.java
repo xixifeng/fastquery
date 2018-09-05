@@ -41,7 +41,7 @@ import org.junit.Test;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class SunnyDBServiceTest {
+public class SunnyDBServiceTest extends FastQueryTest  {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SunnyDBServiceTest.class);
 

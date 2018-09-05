@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.*;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class ParamFilterTest {
+public class ParamFilterTest extends FastQueryTest  {
 
 	public static String paramFilter(Method method, Object[] args, String sql) throws Exception {
 		Method m = TypeUtil.class.getDeclaredMethod("paramFilter", Method.class, Object[].class, String.class);

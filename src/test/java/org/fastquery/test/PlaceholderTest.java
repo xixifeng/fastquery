@@ -40,7 +40,7 @@ import org.junit.Test;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class PlaceholderTest {
+public class PlaceholderTest extends FastQueryTest  {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PlaceholderTest.class);
 
@@ -147,15 +147,16 @@ public class PlaceholderTest {
 	public void EL_OR_COLON() {
 		String str = "jklgjw ,gwlljlgw `- :name_ :info- $name_ $ok.ax -` and ${abc_} conm ${mark} orfkljgw xg ${a} lgwiouo$_iwk$ jhlkgikw $abc}";
 		List<String> strs = TypeUtil.matches(str, Placeholder.EL_OR_COLON);
-		assertThat(strs.size(), is(8));
+		assertThat(strs.size(), is(9));
 		assertThat(strs.get(0), equalTo(":name"));
 		assertThat(strs.get(1), equalTo(":info"));
-		assertThat(strs.get(2), equalTo("$name"));
-		assertThat(strs.get(3), equalTo("$ok"));
-		assertThat(strs.get(4), equalTo("${abc"));
+		assertThat(strs.get(2), equalTo("$name_"));
+		assertThat(strs.get(3), equalTo("$ok.ax"));
+		assertThat(strs.get(4), equalTo("${abc_}"));
 		assertThat(strs.get(5), equalTo("${mark}"));
 		assertThat(strs.get(6), equalTo("${a}"));
-		assertThat(strs.get(7), equalTo("$abc}"));
+		assertThat(strs.get(7), equalTo("$_iwk"));
+		assertThat(strs.get(8), equalTo("$abc}"));
 	}
 
 }

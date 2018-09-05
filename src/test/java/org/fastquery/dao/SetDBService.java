@@ -24,8 +24,10 @@ package org.fastquery.dao;
 
 import org.fastquery.bean.Course;
 import org.fastquery.core.Modifying;
+import org.fastquery.core.Param;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
+import org.fastquery.where.Judge;
 import org.fastquery.where.Set;
 
 /**
@@ -45,4 +47,21 @@ public interface SetDBService extends QueryRepository {
 	@Query("select * from Course where no = ?1")
 	Course findCourse(String no);
 	
+	public static class NameJudge extends Judge {
+		@Override
+		public boolean ignore() {
+			// 获取方法中名称为"name"的参数值
+			String name = this.getParameter("name", String.class);
+			// 获取方法中名称为"credit"的参数值
+			Integer credit = this.getParameter("credit", Integer.class);
+			return name.startsWith("计算") && credit!=null && credit.intValue() > 2;
+		}
+		
+	}
+	
+	@Modifying
+	@Query("update `Course` #{#sets} where no = ?3")
+	@Set(value="`name` = :name",ignore=NameJudge.class)
+	@Set("`credit` = :credit")
+	int updateCourse(@Param("name") String name,@Param("credit") Integer credit,String no);
 }

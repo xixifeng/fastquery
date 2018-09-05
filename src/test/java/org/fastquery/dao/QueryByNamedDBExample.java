@@ -76,7 +76,7 @@ public interface QueryByNamedDBExample extends QueryRepository {
 	@QueryByNamed("findUserInfo")
 	List<UserInfo> findUserInfo2(@Param("id") Integer id, @Param("age") Integer age);
 
-	@QueryByNamed
+	@QueryByNamed("findCon")
 	List<UserInfo> findCon1(@Param("id") Integer id, @Param("age") Integer age);
 
 	@QueryByNamed

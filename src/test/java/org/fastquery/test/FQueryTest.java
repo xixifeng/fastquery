@@ -20,7 +20,7 @@
  * 
  */
 
-package org.fastquery.service;
+package org.fastquery.test;
 
 import static org.junit.Assert.assertThat;
 
@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.*;
 
 import org.fastquery.bean.PManager;
 import org.fastquery.example.StudentDBService;
+import org.fastquery.service.FQuery;
 import org.fastquery.util.TypeUtil;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -42,7 +43,7 @@ import org.junit.Test;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FQueryTest {
+public class FQueryTest extends FastQueryTest  {
 
 	@Test
 	public void testGetRepository() {

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml> 
+<queries>
+
+	<!-- 定义全局 parts -->
+	<parts>
+		<part name="feids">id,name,age</part>
+	</parts>
+	
+	<query id="findUAll">
+		<value>select #{#feids} from UserInfo limit 3</value>
+	</query>
+
+	<query id="findSome">
+		<![CDATA[
+		## 如果当前方法的名称等于 "findLittle"
+		#if( ${_method.getName()} == "findLittle" )
+		    ## 查3条  
+			select #{#feids} from UserInfo limit 3
+		#else 
+		   select `no`, `name` from Student limit 5
+		#end  
+		]]>
+	</query>	
+	
+	
+</queries>
+
+
+
+
+
+

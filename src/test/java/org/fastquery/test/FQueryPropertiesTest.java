@@ -44,7 +44,7 @@ import static org.junit.Assert.assertThat;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class FQueryPropertiesTest {
+public class FQueryPropertiesTest extends FastQueryTest  {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FQueryPropertiesTest.class);
 
@@ -82,7 +82,7 @@ public class FQueryPropertiesTest {
 		maps.forEach((k, v) -> {
 			LOG.debug(k + ":" + v);
 		});
-		assertThat(maps.size(), is(14));
+		assertThat(maps.size(), is(15));
 	}
 
 	@Test

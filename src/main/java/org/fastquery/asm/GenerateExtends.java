@@ -49,6 +49,7 @@ import org.fastquery.filter.generate.querya.MethodAnnotationFilter;
 import org.fastquery.filter.generate.querya.ModifyingDependencyFilter;
 import org.fastquery.filter.generate.querya.MuestionFilter;
 import org.fastquery.filter.generate.querya.OutFilter;
+import org.fastquery.filter.generate.querya.SetFilter;
 import org.fastquery.filter.generate.querya.SourceFilter;
 import org.fastquery.filter.generate.queryn.QueriesFileFilter;
 import org.fastquery.filter.generate.queryn.TplPageFilter;
@@ -129,6 +130,8 @@ class GenerateExtends {
 				queryFilterChain.addFilter(new OutFilter());
 				queryFilterChain.addFilter(new MarkFilter());
 				queryFilterChain.addFilter(new MuestionFilter());
+				queryFilterChain.addFilter(new SetFilter());
+				
 
 				// filter/modifying
 				if (modifying != null && querys.length > 0) {

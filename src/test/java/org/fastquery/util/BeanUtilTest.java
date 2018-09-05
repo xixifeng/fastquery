@@ -31,6 +31,7 @@ import static org.junit.Assert.assertThat;
 
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
+import org.fastquery.util.BeanUtil;
 import org.junit.Test;
 
 /**

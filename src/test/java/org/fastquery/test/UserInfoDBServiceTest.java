@@ -55,7 +55,7 @@ import static org.hamcrest.Matchers.*;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class UserInfoDBServiceTest {
+public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserInfoDBServiceTest.class);
 

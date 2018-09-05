@@ -42,7 +42,7 @@ import static org.hamcrest.Matchers.*;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class SQLInExampleTest {
+public class SQLInExampleTest extends FastQueryTest  {
 
 	private SQLInExample db = FQuery.getRepository(SQLInExample.class);
 

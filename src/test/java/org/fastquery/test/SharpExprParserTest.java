@@ -35,7 +35,7 @@ import org.junit.Test;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class SharpExprParserTest {
+public class SharpExprParserTest extends FastQueryTest  {
 
 	@Test
 	public void matchesNotrepeat1() {

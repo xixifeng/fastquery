@@ -42,6 +42,7 @@ import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Repository;
 import org.fastquery.filter.BeforeFilter;
+import org.fastquery.test.JarListClass;
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
 import org.objectweb.asm.Opcodes;

@@ -46,7 +46,7 @@ import java.util.stream.Stream;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class DBTest {
+public class DBTest extends FastQueryTest {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DBTest.class);
 
@@ -113,7 +113,7 @@ public class DBTest {
 
 	@Test
 	public void parserSQLFile() throws Exception {
-		String name = "/mywork/myosgi/osgi_workspace/fastquery/tmp/update.sql";
+		String name = System.getProperty("user.dir") + "/src/test/resources/testFiles" + "/update.sql";
 		Stream<String> stream = parserSQLFile(name);
 		List<String> list = stream.collect(Collectors.toList());
 		assertThat(list.get(0), equalTo("DELETE FROM `product` WHERE `pid` = 1 and `lid` = 2; "));

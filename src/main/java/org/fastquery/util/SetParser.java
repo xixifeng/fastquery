@@ -27,12 +27,16 @@ import java.lang.reflect.Method;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.where.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
 public final class SetParser {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(SetParser.class);
 	
 	private SetParser() {
 	}
@@ -84,7 +88,15 @@ public final class SetParser {
 		} else if("".equals(arg.toString())) {
 			return set.ignoreEmpty();
 		} else {
-			return false;
+			try {
+				return set.ignore().newInstance().ignore();
+			} catch (InstantiationException | IllegalAccessException e) {
+				
+				// 这个异常其实永远也发生不了,该异常已经通过静态分析,提升到初始化阶段了
+				
+				LOG.error("{} 必须有一个不带参数且用public修饰的构造方法.反之,作废",set.ignore());
+				return false;
+			}
 		}
 	}
 }

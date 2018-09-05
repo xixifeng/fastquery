@@ -22,6 +22,7 @@
 
 package org.fastquery.filter.generate.queryn;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
@@ -38,28 +39,51 @@ public class QueriesFileFilter implements MethodFilter {
 
 	@Override
 	public Method doFilter(Method method) {
-
-		// osgi不支持 QueriesFileFilter.class.getClassLoader().getResource 这种写法!
+		
+		String suffix = ".queries.xml";
+		
 		String className = method.getDeclaringClass().getName();
+		String fcd = System.getProperty("fastquery.config.dir");
+		
+		if(!exits(className, fcd,suffix)) {
+			StringBuilder sb = getErrorMsg(suffix, className, fcd);
+			this.abortWith(method, sb.toString());
+		}
+		
+		return method;
+	}
+
+
+	private StringBuilder getErrorMsg(String suffix, String className, String fcd) {
+		StringBuilder sb = new StringBuilder("这个方法标识了注解@QueryByNamed,而没有找到文件:");
+		sb.append(className);
+		sb.append(suffix);
+		sb.append("该文件可以放入claspath环境目录下");
+		
+		if(fcd != null && !"".equals(fcd)) {
+			sb.append(",据发现 \"fastquery.config.dir\" 指定了目录 ");
+			sb.append(fcd);
+			sb.append(" 因此,也可以放入到这里面来");
+		}
+		return sb;
+	}
+
+	private boolean exits(String className,String fcd,String suffix) {
 
 		List<String> pers = FastQueryJSONObject.getQueries();
 		pers.add("");
 
-		boolean exits = false;
 		for (String per : pers) {
-			String perxml = new StringBuilder().append(per).append(className).append(".queries.xml").toString();
-			URL url = QueriesFileFilter.class.getClassLoader().getResource(perxml);
-			if (url != null) {
-				exits = true;
-				break;
+			String perxml = new StringBuilder().append(per).append(className).append(suffix).toString();
+			URL url = QueriesFileFilter.class.getClassLoader().getResource(perxml); // osgi不支持 QueriesFileFilter.class.getClassLoader().getResource 这种写法!
+			boolean urlExits = url != null;
+			if(urlExits || (fcd != null && !"".equals(fcd) && new File(fcd, per + className + ".queries.xml").exists())) {
+				return true;
 			}
 		}
+		
+		return false;
 
-		if (!exits) {
-			this.abortWith(method, "这个方法标识了注解@QueryByNamed,而没有找到文件:" + new StringBuilder().append(className).append(".queries.xml").toString());
-		}
-
-		return method;
 	}
 
 }

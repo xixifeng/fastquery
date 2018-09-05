@@ -25,10 +25,14 @@ package org.fastquery.dao;
 import java.util.List;
 
 import org.fastquery.bean.Student;
+import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
+import org.fastquery.page.Page;
+import org.fastquery.page.Pageable;
 import org.fastquery.where.Condition;
+import org.fastquery.where.Judge;
 
 /**
  * 
@@ -44,4 +48,20 @@ public interface ConditionDBService extends QueryRepository {
 	@Query("select * ${tname} #{#where}")
 	@Condition(value = " $nameWhere", ignoreNull = false)
 	List<Student> findUserInfo2(String w1, @Param("nameWhere") String w2, @Param("tname") String tname);
+	
+	public static class LikeNameJudge extends Judge {
+		@Override
+		public boolean ignore() {
+			// 获取方法中名称为"age"的参数值
+			int age = this.getParameter("age", int.class);
+			// 获取方法中名称为"name"的参数值
+			String name = this.getParameter("name", String.class);
+
+			return age > 18 && name!=null && name.contains("Rex");
+		}
+	}
+	@Query("select id,name,age from `userinfo` #{#where}")
+	@Condition("age > :age")
+	@Condition(value="and name like :name",ignore=LikeNameJudge.class)
+	Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable pageable);
 }

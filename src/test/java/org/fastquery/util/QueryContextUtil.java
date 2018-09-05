@@ -22,47 +22,29 @@
 
 package org.fastquery.util;
 
-import org.fastquery.dao.UserInfoDBService;
-import org.fastquery.service.FQuery;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 
-import static org.junit.Assert.assertThat;
-
-import java.util.List;
-
-import static org.hamcrest.Matchers.*;
+import org.fastquery.core.QueryContext;
 
 /**
- * 
- * @author xixifeng (fastquery@126.com)
+ * 仅为测试服务
+ * @author mei.sir@aliyun.cn
  */
-public class FastQueryJSONObjectTest {
+public class QueryContextUtil {
 
-	@BeforeClass
-	public static void before() {
-		FQuery.getRepository(UserInfoDBService.class);
-	}
-
-	@Test
-	public void testGetBasedir() {
-		String basedir = FastQueryJSONObject.getBasedir();
-		assertThat(basedir, equalTo("/mywork/myosgi/osgi_workspace/fastquery/tmp/"));
-	}
-
-	@Test
-	public void testGetQueries() {
-		List<String> queries = FastQueryJSONObject.getQueries();
-		if (!queries.isEmpty()) {
-			assertThat(queries.contains("queries/"), is(true));
-			assertThat(queries.contains("tpl/"), is(true));
-		}
+	public static QueryContext getQueryContext() throws Exception {
+		Class<QueryContext> clazz = QueryContext.class;
+		Constructor<QueryContext> constructor = clazz.getDeclaredConstructor();
+		constructor.setAccessible(true);
+		return constructor.newInstance();
 	}
 	
-	@Test
-	public void getSlowQueryTime() {
-		int time = FastQueryJSONObject.getSlowQueryTime();
-		assertThat(time, is(50));
+	@SuppressWarnings("unchecked")
+	public static ThreadLocal<QueryContext> getThreadLocal() throws Exception {
+		Class<QueryContext> clazz = QueryContext.class;
+		Field field = clazz.getDeclaredField("threadLocal");
+		field.setAccessible(true);
+		return (ThreadLocal<QueryContext>) field.get(null);
 	}
-
 }

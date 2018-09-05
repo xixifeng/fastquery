@@ -20,20 +20,36 @@
  * 
  */
 
-package org.fastquery.test;
+package org.fastquery.filter.generate.querya;
 
-import org.objectweb.asm.util.ASMifier;
+import java.lang.reflect.Method;
+
+import org.fastquery.filter.generate.common.MethodFilter;
+import org.fastquery.where.Judge;
+import org.fastquery.where.Set;
 
 /**
- * 
+ * Set注解校验
+ *  
  * @author mei.sir@aliyun.cn
  */
-public class TestASMifier extends FastQueryTest  {
+public class SetFilter implements MethodFilter {
 
-	public static void main(String[] args) throws Exception {
-		// "Hi.class" 对应的字节码通过ASM工具怎样一步一步生成出来呢? 通过调用ASMifier.main, 可以得到通过ASM工具生成bytes的详细源码.
-		// 解释太绕了, 运行一下便知
-		ASMifier.main(
-				new String[] { "/mywork/myosgi/osgi_workspace/fastquery/target/test-classes/org/fastquery/bean/StudentDBServiceProxyImpl.class" });
+	@Override
+	public Method doFilter(Method method) {
+		
+		// 1). @Set#ignore() 指定的class 必须有一个不带参数且public的构造方法
+		Set[] sets = method.getAnnotationsByType(Set.class);
+		for (Set set : sets) {
+				Class<? extends Judge> judge = set.ignore();
+				try {
+					judge.newInstance();
+				} catch (InstantiationException | IllegalAccessException e) {
+					this.abortWith(method, set.ignore() + " 必须有一个不带参数并且用public修饰的构造方法");
+				}
+		}
+		
+		return method;
 	}
+
 }

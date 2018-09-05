@@ -47,7 +47,7 @@ import java.util.List;
  * @author xixifeng (fastquery@126.com)
  */
 @RunWith(Theories.class)
-public class MethodQueryTest {
+public class MethodQueryTest extends FastQueryTest {
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
@@ -138,7 +138,7 @@ public class MethodQueryTest {
 
 	@Test
 	public void executeBatch2() {
-		int[] ints = studentDBService.executeBatch("/mywork/myosgi/osgi_workspace/fastquery/tmp/update.sql");
+		int[] ints = studentDBService.executeBatch(System.getProperty("user.dir") + "/src/test/resources/testFiles" + "/update.sql");
 		assertThat(ints.length, is(10));
 	}
 

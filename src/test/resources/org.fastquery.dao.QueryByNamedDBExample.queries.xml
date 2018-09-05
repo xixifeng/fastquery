@@ -104,7 +104,7 @@
 		select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`
 	</query>
 
-	<query id="findCon1">
+	<query id="findCon">
 		<value>select * from UserInfo #{#condition1}</value>
 		
 		<parts>

@@ -51,7 +51,7 @@ import static org.junit.Assert.*;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class SyntaxTest {
+public class SyntaxTest extends FastQueryTest  {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SyntaxTest.class);
 

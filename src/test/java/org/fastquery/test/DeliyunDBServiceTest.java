@@ -38,7 +38,7 @@ import org.junit.Test;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class DeliyunDBServiceTest {
+public class DeliyunDBServiceTest extends FastQueryTest {
 
 	private DeliyunDBService db = FQuery.getRepository(DeliyunDBService.class);
 	

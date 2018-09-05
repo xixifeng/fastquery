@@ -23,9 +23,9 @@
 package org.fastquery.test;
 
 import org.fastquery.dao.ConditionDBService;
+import org.fastquery.page.PageableImpl;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -36,18 +36,13 @@ import static org.hamcrest.Matchers.*;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class ConditionTest {
+public class ConditionTest extends FastQueryTest {
 
 	private ConditionDBService db = FQuery.getRepository(ConditionDBService.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
 	
-	@BeforeClass
-	public static void beforeClass() {
-		System.setProperty("fastquery.config.dir", "/mywork/workspace-2018/fastquery/conf");
-	}
-
 	@Test
 	public void findUserInfo() {
 		String tname = "from UserInfo";
@@ -69,4 +64,12 @@ public class ConditionTest {
 		assertThat(sql, equalTo("select * from UserInfo where  name like ?"));
 	}
 
+	@Test
+	public void find() {
+		int age = 19;
+		String name = "Rex-Boos";
+		db.find(age, name, new PageableImpl(1, 5));
+		String sql = rule.getSQLValue().getSql();
+		assertThat(sql, equalTo("select id,name,age from `userinfo` where age > ? limit 0,5"));
+	}
 }

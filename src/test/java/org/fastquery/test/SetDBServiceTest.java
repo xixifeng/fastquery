@@ -33,6 +33,7 @@ import org.fastquery.dao.SetDBService;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.experimental.theories.DataPoint;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.FromDataPoints;
@@ -47,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * @author mei.sir@aliyun.cn
  */
 @RunWith(Theories.class)
-public class SetDBServiceTest {
+public class SetDBServiceTest extends FastQueryTest  {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SetDBServiceTest.class);
 	
@@ -115,6 +116,16 @@ public class SetDBServiceTest {
 			
 			
 		}
+	}
+	
+	@Test
+	public void updateCourse2() {
+		String name = "计算机算法";
+		Integer credit = 4;
+		String no = "c08";
+		int effect = db.updateCourse(name, credit, no);
+		assertThat(effect, is(1));
+		assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `credit` = ?  where no = ?"));
 	}
 	
 }

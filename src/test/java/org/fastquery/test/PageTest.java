@@ -42,7 +42,7 @@ import static org.hamcrest.Matchers.*;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageTest {
+public class PageTest extends FastQueryTest  {
 
 	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 

@@ -22,18 +22,43 @@
 
 package org.fastquery.test;
 
-import org.objectweb.asm.util.ASMifier;
+import static org.junit.Assert.assertThat;
+
+import static org.hamcrest.Matchers.*;
+
+import org.fastquery.dao.QueryByNamedDBExtend;
+import org.fastquery.service.FQuery;
+import org.fastquery.struct.SQLValue;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
-public class TestASMifier extends FastQueryTest  {
-
-	public static void main(String[] args) throws Exception {
-		// "Hi.class" 对应的字节码通过ASM工具怎样一步一步生成出来呢? 通过调用ASMifier.main, 可以得到通过ASM工具生成bytes的详细源码.
-		// 解释太绕了, 运行一下便知
-		ASMifier.main(
-				new String[] { "/mywork/myosgi/osgi_workspace/fastquery/target/test-classes/org/fastquery/bean/StudentDBServiceProxyImpl.class" });
+public class QueryByNamedDBExtendTest extends FastQueryTest {
+	
+	private QueryByNamedDBExtend db = FQuery.getRepository(QueryByNamedDBExtend.class);
+	
+	@Rule
+	public FastQueryTestRule rule = new FastQueryTestRule();
+	
+	@Test
+	public void findUAll() {
+		assertThat(db.findUAll().size(), is(3));
+	}
+	
+	@Test
+	public void findLittle() {
+		assertThat(db.findLittle().size(), is(3));
+		SQLValue sqlValue = rule.getSQLValue();
+		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo limit 3"));
+	}
+	
+	@Test
+	public void findSome() {
+		assertThat(db.findSome().size(), is(5));
+		SQLValue sqlValue = rule.getSQLValue();
+		assertThat(sqlValue.getSql(), equalTo("select `no`, `name` from Student limit 5"));
 	}
 }

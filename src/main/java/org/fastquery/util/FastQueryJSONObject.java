@@ -99,7 +99,15 @@ public class FastQueryJSONObject {
 			}
 		}
 		
-		// 2). slowQueryTime
+		// 2). debug
+		if(getJsonObject().containsKey("debug")) {
+			Object debug = getJsonObject().get("debug");
+			if(!(debug instanceof Boolean)) {
+				throw new RepositoryException("fastquery.json -> debug 它的值只能是true或false,也可以不用配置,要配,请配置正确");
+			}
+		}
+		
+		// 3). slowQueryTime
 		String slowQueryTime = getJsonObject().getString("slowQueryTime");
 		if(slowQueryTime!=null && !Pattern.matches("\\d+", slowQueryTime)) {
 			throw new RepositoryException("fastquery.json -> slowQueryTime 它的值只能是数字");

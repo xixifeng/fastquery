@@ -282,7 +282,10 @@ public class QueryPool {
 		// 不用判断map是否为空,这个方法没有公开,在作用域
 		VelocityContext context = new VelocityContext();
 		// 往上下文设置值
-		map.forEach((k, v) -> context.put(k, v));
+		map.forEach(context::put);
+		
+		// 把当前repository的Method放入模板上下文里
+		context.put("_method", QueryContext.getMethod());
 
 		// 输出流
 		StringWriter writer = new StringWriter();

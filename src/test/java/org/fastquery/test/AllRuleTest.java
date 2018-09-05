@@ -22,10 +22,7 @@
 
 package org.fastquery.test;
 
-import org.fastquery.service.FQueryResourceImplTest;
-import org.fastquery.service.FQueryTest;
 import org.fastquery.util.BeanUtilTest;
-import org.fastquery.util.FastQueryJSONObjectTest;
 import org.fastquery.util.TypeUtilTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,8 +40,10 @@ import org.junit.runners.Suite.SuiteClasses;
 		TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class, BeanUtilTest.class, PageTest.class, FastQueryJSONObjectTest.class,
 		FQueryResourceImplTest.class, SunnyDBServiceTest.class, SaveToIdTest.class, PlaceholderTest.class, DBTest.class, ProductDBServiceTest.class,
 		FQueryPropertiesTest.class, QueryPoolTest.class, ParamFilterTest.class, ConditionTest.class, QueryParserTest.class, DefaultMethodTest.class,
-		RepVersion.class,FormatterTest.class,SetDBServiceTest.class,SetDBServiceTest2.class,SharpExprParserTest.class,DeliyunDBServiceTest.class,TransactionalTest.class})
+		RepVersion.class, FormatterTest.class, SetDBServiceTest.class, SetDBServiceTest2.class, SharpExprParserTest.class, DeliyunDBServiceTest.class,
+		TransactionalTest.class,QueryByNamedDBExtendTest.class})
 public class AllRuleTest {
+	
 	@Test
 	public void todo() {
 	}

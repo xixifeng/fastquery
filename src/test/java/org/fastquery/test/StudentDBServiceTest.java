@@ -51,7 +51,7 @@ import com.alibaba.fastjson.JSONObject;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class StudentDBServiceTest {
+public class StudentDBServiceTest extends FastQueryTest  {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudentDBServiceTest.class);
 

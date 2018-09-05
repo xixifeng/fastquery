@@ -46,19 +46,19 @@ public @interface Condition {
 
 	/**
 	 * 默认:允许传递所有的值,都不会使当前条件忽略. <br>
-	 * 当前条件所包含的变量值跟allow所指定的正则表达式逐个进行匹配,如果其中一个能匹配上就追加这个条件. <br>
-	 * 注意: 先 allow(允许) 后 ignore(忽略)
+	 * 当前条件所包含的变量值跟allowRule所指定的正则表达式逐个进行匹配,如果其中一个能匹配上就追加这个条件. <br>
+	 * 注意: 先 allowRule(允许) 后 ignoreRule(忽略)
 	 * 
 	 * @return String
 	 */
-	String[] allow() default {};
+	String[] allowRule() default {};
 
 	/**
-	 * 当前条件所包含的变量值跟ignore所指定的正则表达式逐个进行匹配,如果其中一个能匹配上就忽略该条件
+	 * 当前条件所包含的变量值跟ignoreRule所指定的正则表达式逐个进行匹配,如果其中一个能匹配上就忽略该条件
 	 * 
 	 * @return String
 	 */
-	String[] ignore() default {};
+	String[] ignoreRule() default {};
 
 	/**
 	 * ignoreNull 为true: 表示该条件中的参数变量如果接受到的值是null,那么该行条件将不参与运算,反之,参与运算(默认:true).
@@ -73,4 +73,10 @@ public @interface Condition {
 	 * @return boolean
 	 */
 	boolean ignoreEmpty() default true;
+	
+	/**
+	 * 通过指定一个Judge子类来决定是否忽略该条件
+	 * @return 继承于Judge类的Class
+	 */
+	Class<? extends Judge> ignore() default DefaultJudge.class;
 }
