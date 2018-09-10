@@ -4,7 +4,7 @@
 
 	<groupId>org.fastquery</groupId>
 	<artifactId>fastquery</artifactId>
-	<version>1.0.57</version> <!-- fastquery.version -->
+	<version>1.0.58</version> <!-- fastquery.version -->
 	<packaging>jar</packaging>
 
 	<name>fastquery</name>
@@ -32,6 +32,12 @@
 			<groupId>org.ow2.asm</groupId>
 			<artifactId>asm-all</artifactId>
 			<version>5.2</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.javassist</groupId>
+		    <artifactId>javassist</artifactId>
+		    <version>3.23.1-GA</version>
 		</dependency>
 
 		<dependency>

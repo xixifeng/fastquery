@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.57</version> <!-- fastquery.version -->
+    <version>1.0.58</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.57'
+compile 'org.fastquery:fastquery:1.0.58'
 ```
 
 # FastQuery 数据持久层框架
@@ -279,10 +279,22 @@ Student[] findAllStudent(... args ...);
 `@Condition(value="name = ?1",ignoreNull=false)`表示`?1`接受到的值若是`null`,该条件也参与运算,最终会翻译成`name is null`.`SQL`中的`null`无法跟比较运算符(如`=`,`<`,或者`<>`)一起运算,但允许跟`is null`,`is not null`,`<=>`操作符一起运算,故,将`name = null`想表达的意思,解释成`name is null`.  
 `@Condition(value="name != ?1",ignoreNull=false)` 若`?1`的值为`null`,最终会解释成`name is not null`.  
 
-决定一个条件是否参与运算,有时候需要根据多个不同的参数进行某种计算来决定. 那么就需要使用`@Condition`中的`ignore`选项,指定一个类,它叫`Judge`,是一个裁判员,条件是否去除的决定权可以理所当然委托给自定义的`Judge`类来处理.   
-举例: 若:年龄大于18及姓名不为空且包含"Rex".则,剔除条件`and name like :name`.
+### 通过JAVA脚本控制条件增减
+`@Condition`中的`script`属性可以绑定一个JAVA脚本,根据脚本运行后的布尔结果,来决定是否保留条件项.脚本运行后的结果如果是`true`,那么就删除该条件项,反之,保留条件项,默认脚本是`false`,表示保留该条件项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
+举例:
 
-定制一个决定条件存活的类,需要遵循一些约定: 继承`org.fastquery.where.Judge`,当完成这一步,就会提示开发者必须实现ignore方法, 否则,不能举足前行. 这样的设计可以减少犯错的可能. 当ignore方法最终返回`true`时,则,删除相对应的条件;当最后返回`false`时,则,保留条件.
+```java
+@Query("select id,name,age from `userinfo` #{#where}")
+@Condition("age > :age")
+@Condition(value="and name like :name",script=":age > 18 && :name!=null && :name.contains(\"Rex\")")
+Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable pageable);
+```
+其中, `:age`引用的是`@Param("age")int age`的实参值.`:name`是`@Param("name")String name`的实参值.这个脚本要表达的意思不言而喻. 不过脚本的解析能力还不能自动**拆箱**(unboxing),需要调用拆箱方法,在这里age变量如果是`Integer`类型,要想如上脚本能正确编译,必须这么做: `":age.intValue() > 18 && :name!=null && :name.contains(\"Rex\")"`, 请留意住`:age.intValue()`. 其他包装类型`Short`, `Long`, `Byte`, `Boolean`, `Character`, `Float`, `Double` 以此类推.  
+
+### 自定义类控制条件增减
+决定一个条件是否参与运算,有时候需要根据多个不同的参数进行某种计算来决定. 那么就需要使用`@Condition`中的`ignore`选项,指定一个类,它叫`Judge`,是一个裁判员,条件是否去除的决定权可以理所当然地委托给自定义的`Judge`类来处理.   
+举例: 若:年龄大于18及姓名不为空且包含"Rex".则,剔除条件`and name like :name`.  
+定制一个决定条件存活的类,需要遵循一些约定: 继承`org.fastquery.where.Judge`,当完成这一步,IDE就会提示开发者必须实现ignore方法, 否则,不能举足前行. 这样的设计可以减少犯错的可能. 当ignore方法最终返回`true`时,则,删除相对应的条件;当最后返回`false`时,则,保留条件.
 
 ```java
 public class LikeNameJudge extends Judge {
@@ -296,7 +308,7 @@ public class LikeNameJudge extends Judge {
 	}
 }
 ```
-在`LikeNameJudge`的`this`范围内可以获得当前DB方法的所有实参.这些参数都有资格决定条件的命运.   
+在`LikeNameJudge`的`this`范围内可以获得当前DB方法的所有实参.这些参数都有资格决定条件的存亡.   
 指定 `LikeNameJudge`:
 
 ```java
@@ -530,6 +542,20 @@ int updateCourse(String name,Integer credit, Integer semester, Integer period, S
 
 单个`@Set`针对出现多个`SQL`参数的情形,如 `@Set("name = ?1","credit = ?2")` 或 `@Set("name = :name","credit = :credit")` 参数 `?1`、`?2`、`:name`、 `:credit`中的任意一个为`null`都会导致该行设置项被移除.  
 
+### 通过JAVA脚本控制条件增减
+`@Set`中的`script`属性可以绑定一个JAVA脚本,根据脚本运行后的布尔结果,来决定是否保留设置项.脚本运行后的结果如果是`true`,那么就删除该设置项,反之,保留设置项,默认脚本是`false`,表示保留该设置项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
+举例:
+
+```java
+@Modifying
+@Query("update `Course` #{#sets} where no = ?3")
+@Set(value="`name` = :name",script=":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2")
+@Set("`credit` = :credit")
+int updateCourse(@Param("name") String name,@Param("credit") Integer credit,String no);
+```
+其中, `:credit`引用的是`@Param("credit") Integer credit`的实参值.`:name`是`@Param("name")String name`的实参值.这个脚本要表达的意思不言而喻. 不过脚本的解析能力还不能自动**拆箱**(unboxing),需要调用拆箱方法,请留意住`:credit!=null && :credit.intValue() > 2`. 若写成`:credit > 2`是编译不了的. 其他包装类型`Short`, `Long`, `Byte`, `Boolean`, `Character`, `Float`, `Double` 以此类推.  
+
+### 自定义类控制设置项增减
 决定一个Set项是否参与运算,可以根据多个参数进行某种计算来决定,自定义一个Judge类,作为这种计算的载体.  
 举例: 若: name值的前缀是"*计算*" 并且 credit的值大于2, 则,删除`name = :name`这条设置项.  
 NameJudge 类:
@@ -824,7 +850,6 @@ org.fastquery.dao.QueryByNamedDBExtend.queries.xml 模板文件的内容:
 用法举例:
 
 ```java
-@Query
 public interface DefaultDBService extends QueryRepository {
    // 分页, 查询语句 和 count语句 通过 builderQuery 构建出来
    @Query
@@ -931,7 +956,7 @@ JSONObject callProcedure(String no,@Param("name") String name,String sex,int age
 ### 注意: 
 - `#{#limit}`是分页模板的内置零件,表示分页区间. `#{#limit}`默认是放在尾部,在符合`SQL`语法的前提下也可以把它放在`SQL`语句中的其他地方
 - 动态条件部分若用`<where>`元素进行包裹,会自动处理好条件连接符问题(避免出现where紧接`or`或`and`)
-- `<value>`和`<countQuery>`节点引用的零件中已经包含`<where>`元素,那么该节点中禁止出现where字符串
+- `<value>`和`<countQuery>`节点引用的零件若包含`<where>`元素,零件解析成字符串后会自动加上*"where"*,请不要在引入切口处重复追加*"where"*字符串
 
 DB接口:
 
@@ -980,7 +1005,7 @@ Page<Map<String,Object>> findSome(Integer age,Integer id,@PageIndex int pageInde
 
 
 ### 使用分页     
-`Page`是分页的抽象,通过它可以获取分页中的各种属性,并且开发者不用去实现.
+`Page`是分页的抽象,通过它可以获取分页中的各种属性,并且不用开发者去实现.
 
 ```java
 int p = 1;    // 指定访问的是第几页(不是从0开始计数)

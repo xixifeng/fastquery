@@ -79,4 +79,12 @@ public @interface Condition {
 	 * @return 继承于Judge类的Class
 	 */
 	Class<? extends Judge> ignore() default DefaultJudge.class;
+	
+	/**
+	 * 通过运行java代码脚本,来决定是否保留条件项.脚本运行后的结果如果是true,那么就忽略该条件项,反之,保留条件项,默认脚本是"false",表示保留该条件项. <br>
+	 *  注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
+	 *  
+	 * @return 代码脚本
+	 */
+	String script() default "false";
 }

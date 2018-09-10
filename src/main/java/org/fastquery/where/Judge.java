@@ -23,6 +23,7 @@
 package org.fastquery.where;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 import org.fastquery.core.Param;
@@ -50,15 +51,20 @@ public abstract class Judge {
 		Objects.requireNonNull(name);
 		Objects.requireNonNull(clazz);
 		
+		// "@Param(\""+name+"\")标记在"+t.getName()+"类型的参数上,而调用者要求将其值转换成" + clazz.getName()+"类型,"+t.getName()+" cannot be cast to " + clazz.getName()
+		// ClassCastException 在此捕获不到已经验证
+		return (T) getParameter(name);
+	}
+	
+	protected Object getParameter(String name) {
+		Objects.requireNonNull(name);
 		int paramIndex = getParamIndex(name);
 		if(paramIndex != -1) {
-			// "@Param(\""+name+"\")标记在"+t.getName()+"类型的参数上,而调用者要求将其值转换成" + clazz.getName()+"类型,"+t.getName()+" cannot be cast to " + clazz.getName()
-			// ClassCastException 在此捕获不到已经验证
-			return (T) QueryContext.getArgs()[paramIndex];
+			return QueryContext.getArgs()[paramIndex];
 		} else {
 			throw new RepositoryException("从发生方法中没有找到@Param(\""+name+"\")");
 		}
-	}	
+	}
 	
 	// 没有找到返回-1
 	private static int getParamIndex(String paramName) {
@@ -76,5 +82,22 @@ public abstract class Judge {
 			}
 		}
 		return -1;
+	}
+
+	public static Class<?> getParamType(String paramName,Method method) {
+		Annotation[][] annotations = method.getParameterAnnotations();
+		int len = annotations.length;
+		for (int i = 0; i < len; i++) {
+			Annotation[] anns = annotations[i];
+			for (Annotation ann : anns) {
+				if (ann.annotationType() == Param.class) {
+					Param param = (Param) ann;
+					if(param.value().equals(paramName)) {
+						return method.getParameterTypes()[i];
+					}
+				}
+			}
+		}
+		throw new RepositoryException("根据@Param(\"" + paramName+"\") 没有找到对应的参数");
 	}
 }

@@ -64,4 +64,23 @@ public interface SetDBService extends QueryRepository {
 	@Set(value="`name` = :name",ignore=NameJudge.class)
 	@Set("`credit` = :credit")
 	int updateCourse(@Param("name") String name,@Param("credit") Integer credit,String no);
+	
+	// script 表达式
+	
+	@Modifying
+	@Query("update `Course` #{#sets} where no = ?3")
+	@Set(value="`name` = :name",script=":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2")
+	@Set("`credit` = :credit")
+	int updateCourse2(@Param("name") String name,@Param("credit") Integer credit,String no);
 }
+
+
+
+
+
+
+
+
+
+
+

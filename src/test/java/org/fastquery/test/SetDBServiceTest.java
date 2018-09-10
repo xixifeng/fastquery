@@ -128,4 +128,14 @@ public class SetDBServiceTest extends FastQueryTest  {
 		assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `credit` = ?  where no = ?"));
 	}
 	
+	@Test
+	public void updateCourse3() {
+		String name = "计算机算法";
+		Integer credit = 4;
+		String no = "c08";
+		int effect = db.updateCourse2(name, credit, no);
+		assertThat(effect, is(1));
+		assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `credit` = ?  where no = ?"));
+	}
+	
 }

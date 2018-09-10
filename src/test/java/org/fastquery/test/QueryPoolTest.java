@@ -55,7 +55,7 @@ public class QueryPoolTest extends FastQueryTest  {
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		
-		QueryContextUtil.getThreadLocal().set(QueryContextUtil.getQueryContext());
+		QueryContextUtil.startQueryContext();
 		
 		resource = new Resource() {
 			@Override
@@ -76,7 +76,7 @@ public class QueryPoolTest extends FastQueryTest  {
 	
 	@AfterClass
 	public static void afterClass() throws Exception {
-		QueryContextUtil.getThreadLocal().remove();
+		QueryContextUtil.clearQueryContext();
 	}
 
 	@SuppressWarnings("unchecked")

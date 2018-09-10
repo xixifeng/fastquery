@@ -24,6 +24,7 @@ package org.fastquery.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import org.fastquery.core.QueryContext;
 
@@ -33,7 +34,7 @@ import org.fastquery.core.QueryContext;
  */
 public class QueryContextUtil {
 
-	public static QueryContext getQueryContext() throws Exception {
+	private static QueryContext getQueryContext() throws Exception {
 		Class<QueryContext> clazz = QueryContext.class;
 		Constructor<QueryContext> constructor = clazz.getDeclaredConstructor();
 		constructor.setAccessible(true);
@@ -41,10 +42,32 @@ public class QueryContextUtil {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static ThreadLocal<QueryContext> getThreadLocal() throws Exception {
+	private static ThreadLocal<QueryContext> getThreadLocal() throws Exception {
 		Class<QueryContext> clazz = QueryContext.class;
 		Field field = clazz.getDeclaredField("threadLocal");
 		field.setAccessible(true);
 		return (ThreadLocal<QueryContext>) field.get(null);
+	}
+	
+	public static void setCurrentMethod(Method method) throws Exception {
+		QueryContext queryContext = getThreadLocal().get();
+		Field mf = QueryContext.class.getDeclaredField("method");
+		mf.setAccessible(true);
+		mf.set(queryContext, method);
+	}
+	
+	public static void setCurrentArgs(Object...args) throws Exception {
+		QueryContext queryContext = getThreadLocal().get();
+		Field af = QueryContext.class.getDeclaredField("args");
+		af.setAccessible(true);
+		af.set(queryContext, args);
+	}
+	
+	public static void startQueryContext() throws Exception {
+		getThreadLocal().set(getQueryContext());
+	}
+	
+	public static void clearQueryContext() throws Exception {
+		getThreadLocal().remove();
 	}
 }

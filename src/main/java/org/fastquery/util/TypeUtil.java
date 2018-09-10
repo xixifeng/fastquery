@@ -54,6 +54,7 @@ import org.fastquery.page.PageIndex;
 import org.fastquery.page.PageSize;
 import org.fastquery.struct.ParamMap;
 import org.fastquery.where.Condition;
+import org.fastquery.where.Script2Class;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
@@ -529,62 +530,92 @@ public class TypeUtil implements Opcodes {
 		return s;
 	}
 
-	/**
-	 * 裁决是否忽略指定的条件,返回true表示要把这个条件忽略掉
-	 * 
-	 * @param condition 条件
-	 * @return y:true/n:false
-	 */
-	private static boolean ignoreCondition(Condition condition, Object arg) {
+	private static boolean getFactor1(Condition condition, Object arg) {
+		return (arg == null) && condition.ignoreNull();
+	}
 
+	private static boolean getFactor2(Condition condition, Object arg) {
+		return arg!=null && "".equals(arg.toString()) && condition.ignoreEmpty();
+	}
+
+	private static boolean getFactor3(Condition condition, int index) {
+		return (!condition.script().equals("false")) && Script2Class.getJudge(index).ignore();
+	}
+
+	private static boolean getFactor4(Condition condition) {
+		try {
+			return condition.ignore().newInstance().ignore();
+		} catch (InstantiationException | IllegalAccessException e1) {
+			// 这个异常其实永远也发生不了,该异常已经通过静态分析,提升到初始化阶段了
+			
+			LOG.error("{} 必须有一个不带参数且用public修饰的构造方法.反之,作废",condition.ignore());
+			return false;
+		}
+	}
+	
+	private static boolean getFactor5(Condition condition, Object arg) {
+		
 		String[] allows = condition.allowRule();
 
 		if (allows.length != 0) { // 表明,允许的范围并不是全部,而是有所限定
 			if (arg == null) { // 范围有明确指定,还传递null,那么必然忽略
 				return true;
 			}
-			// 判断传递的值是否是允许的
-			boolean a = false;
+
 			for (String allow : allows) {
 				// 因为注解的特性 allows的集合中的成员永远不可能出现null
-				if (Pattern.matches(allow, arg.toString())) {
-					a = true;
-					break;
+				if (!Pattern.matches(allow, arg.toString())) { // 不在允许范围立即忽略
+					return true;
 				}
 			}
-			// 判断传递的值是否是允许的 End
-			if (!a) { // 传递的值不在允许范围之内,那么必然忽略条件
-				return true;
-			}
-		}
-
-		if (condition.ignoreNull() && arg == null) { // 允许null就忽略条件,正好arg==null
-			return true;
-		}
-
-		if (arg == null) { // arg == null 而且 ignoreNull是false,那么表明arg即使是null也不忽略
-			return false;
-		}
-
-		if (condition.ignoreEmpty() && "".equals(arg.toString())) {
-			return true;
-		}
-
-		String[] ignores = condition.ignoreRule();
-		for (String ignore : ignores) {
-			if (Pattern.matches(ignore, arg.toString())) {
-				return true;
-			}
-		}
+		} 
 		
-		try {
-			return condition.ignore().newInstance().ignore();
-		} catch (InstantiationException | IllegalAccessException e) {
-			// 这个异常其实永远也发生不了,该异常已经通过静态分析,提升到初始化阶段了
-			
-			LOG.error("{} 必须有一个不带参数且用public修饰的构造方法.反之,作废",condition.ignore());
-			return false;
+		return false;
+	}
+	
+	private static boolean getFactor6(Condition condition, Object arg) {
+		if(arg!=null) {
+			String[] ignores = condition.ignoreRule();
+			for (String ignore : ignores) {
+				if (Pattern.matches(ignore, arg.toString())) {
+					return true;
+				}
+			}
 		}
+
+		return false;
+	}
+	
+	/**
+	 * 裁决是否忽略指定的条件,返回true表示要把这个条件忽略掉
+	 * 
+	 * @param condition 条件
+	 * @return y:true/n:false
+	 */
+	private static boolean ignoreCondition(Condition condition, Object arg,int index) {
+
+		// 忽略因子列表,任何一个都可以导致忽略
+		// 这些因子不拿出来定义是有意义的, 多个 || 第一个true,后面的方法就不执行了
+		// 像 || && 这种运算, 多长都不嫌丑
+		
+		// 针对该按例不用写成这样
+		/**
+		 * <pre>
+		boolean factor1 = getFactor1(condition, arg);
+		boolean factor2 = getFactor2(condition, arg);
+		boolean factor3 = getFactor3(condition, index);
+		boolean factor4 = getFactor4(condition);
+		boolean factor5 = getFactor5(condition, arg);
+		boolean factor6 = getFactor6(condition, arg);
+		
+		return factor1 || factor2 || factor3 || factor4 || factor5 || factor6;
+		
+		缺点: factor1 是 true 后面的factor2,factor3.. 等于是白白浪费计算时间
+		
+		</pre>
+		*/
+		
+		return getFactor1(condition, arg) || getFactor2(condition, arg) || getFactor3(condition, index) || getFactor4(condition) || getFactor5(condition, arg) || getFactor6(condition, arg);
 	}
 
 	/**
@@ -605,7 +636,7 @@ public class TypeUtil implements Opcodes {
 			Set<String> pars = TypeUtil.matchesNotrepeat(value, "\\?\\d+");
 			for (String par : pars) {
 				int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
-				if (ignoreCondition(conditions[i], args[index - 1])) { //注意:  @Condition(....?1...?2) // ?1 都能决定 ?2 该条件忽略.  "?1保留条件" && "?2 不保留条件" = 不保留
+				if (ignoreCondition(conditions[i], args[index - 1],i)) { //注意:  @Condition(....?1...?2) // ?1 都能决定 ?2 该条件忽略.  "?1保留条件" && "?2 不保留条件" = 不保留
 					continue o; // 跳出最外层的当次循环,不进行条件追加
 				} else if (args[index - 1] == null) {
 					// 如果传递null 还要求参与运算.

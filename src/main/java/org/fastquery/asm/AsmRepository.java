@@ -34,6 +34,7 @@ import org.fastquery.core.Prepared;
 import org.fastquery.core.Repository;
 import org.fastquery.mapper.QueryValidator;
 import org.fastquery.util.TypeUtil;
+import org.fastquery.where.Script2Class;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
@@ -61,6 +62,9 @@ public class AsmRepository implements Opcodes {
 	public static synchronized byte[] generateBytes(Class<? extends Repository> repositoryClazz) {
 		// 安全检测
 		GenerateExtends.safeCheck(repositoryClazz);
+		
+		// 生成Judge
+		Script2Class.generate(repositoryClazz);
 
 		// internal Name 格式: org/fastquery/core/QueryRepository
 		String internalName = Type.getInternalName(repositoryClazz);
