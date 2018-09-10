@@ -543,17 +543,19 @@ int updateCourse(String name,Integer credit, Integer semester, Integer period, S
 单个`@Set`针对出现多个`SQL`参数的情形,如 `@Set("name = ?1","credit = ?2")` 或 `@Set("name = :name","credit = :credit")` 参数 `?1`、`?2`、`:name`、 `:credit`中的任意一个为`null`都会导致该行设置项被移除.  
 
 ### 通过JAVA脚本控制条件增减
-`@Set`中的`script`属性可以绑定一个JAVA脚本,根据脚本运行后的布尔结果,来决定是否保留设置项.脚本运行后的结果如果是`true`,那么就删除该设置项,反之,保留设置项,默认脚本是`false`,表示保留该设置项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
+`@Set`中的`script`属性可以绑定一个JAVA脚本(非JS),根据脚本运行后的布尔结果,来决定是否保留设置项.脚本运行后的结果如果是`true`,那么就删除该设置项,反之,保留设置项,默认脚本是`false`,表示保留该设置项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
 举例:
 
 ```java
 @Modifying
 @Query("update `Course` #{#sets} where no = ?3")
-@Set(value="`name` = :name",script=":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2")
+@Set(value="`name` = :name",
+     script=":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2")
 @Set("`credit` = :credit")
 int updateCourse(@Param("name") String name,@Param("credit") Integer credit,String no);
 ```
 其中, `:credit`引用的是`@Param("credit") Integer credit`的实参值.`:name`是`@Param("name")String name`的实参值.这个脚本要表达的意思不言而喻. 不过脚本的解析能力还不能自动**拆箱**(unboxing),需要调用拆箱方法,请留意住`:credit!=null && :credit.intValue() > 2`. 若写成`:credit > 2`是编译不了的. 其他包装类型`Short`, `Long`, `Byte`, `Boolean`, `Character`, `Float`, `Double` 以此类推.  
+脚本的编译工作在项目初始化阶段完成,因此不存在性能问题.建议不要把脚本写得太长,那样会破坏可读性.
 
 ### 自定义类控制设置项增减
 决定一个Set项是否参与运算,可以根据多个参数进行某种计算来决定,自定义一个Judge类,作为这种计算的载体.  
