@@ -40,9 +40,9 @@ import org.fastquery.where.Judge;
  */
 public interface ConditionDBService extends QueryRepository {
 
-	@Query("select * ${tname} #{#where}")
-	@Condition(" $nameWhere")
-	@Condition(" $ageCon")
+	@Query("select * ${tname} #{#where} limit 3")
+	@Condition(value=" $nameWhere",script=":nameWhere==null")
+	@Condition(value=" $ageCon",script=":ageCon==null")
 	List<Student> findUserInfo(@Param("nameWhere") String w1, @Param("ageCon") String w2, @Param("tname") String tname);
 
 	@Query("select * ${tname} #{#where}")

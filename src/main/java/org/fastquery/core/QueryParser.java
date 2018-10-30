@@ -283,7 +283,7 @@ public class QueryParser {
 		int[] ints = TypeUtil.getSQLParameter(sql);
 		// sql 中的"?"号调整
 		// sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
-		ParamMap paramMap = TypeUtil.getParamMap(ints, QueryContext.getArgs());
+		ParamMap paramMap = TypeUtil.getParamMap(ints);
 		Map<Integer, Integer> rpates = paramMap.getRps();
 		List<Object> objs = paramMap.getObjs();
 

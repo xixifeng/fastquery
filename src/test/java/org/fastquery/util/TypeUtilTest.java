@@ -107,6 +107,18 @@ public class TypeUtilTest implements Opcodes {
 		assertThat(strs[1], equalTo("shortValue"));
 		assertThat(strs[2], equalTo("()S"));
 		assertThat(strs[3], equalTo(IRETURN));
+		
+		strs = TypeUtil.getTypeInfo(null);
+		assertThat(strs[0], nullValue());
+		assertThat(strs[1], nullValue());
+		assertThat(strs[2], nullValue());
+		assertThat(strs[3], nullValue());
+		
+		strs = TypeUtil.getTypeInfo("");
+		assertThat(strs[0], nullValue());
+		assertThat(strs[1], nullValue());
+		assertThat(strs[2], nullValue());
+		assertThat(strs[3], nullValue());
 
 	}
 

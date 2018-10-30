@@ -359,7 +359,7 @@ class QueryProcess {
 				}
 			} else {
 				bean = iargs[0];
-				sql = BeanUtil.toInsertSQL(bean, false);
+				sql = BeanUtil.toInsertSQL(bean);
 				LOG.info(sql);
 				Object keyObj = DB.update(sql, false);
 				if (keyObj == null) {
@@ -377,7 +377,7 @@ class QueryProcess {
 				return DB.update(sql, true);
 			} else {
 				bean = iargs[0];
-				sql = BeanUtil.toInsertSQL(bean, false);
+				sql = BeanUtil.toInsertSQL(bean);
 				LOG.info(sql);
 				return DB.update(sql, true);
 			}
@@ -408,7 +408,7 @@ class QueryProcess {
 				return DB.update(bean, dbName, null);
 			} else {
 				// 保存
-				return DB.update((iargs.length == 3) ? BeanUtil.toInsertSQL(iargs[1].toString(), bean) : BeanUtil.toInsertSQL(bean, false), true);
+				return DB.update((iargs.length == 3) ? BeanUtil.toInsertSQL(iargs[1].toString(), bean) : BeanUtil.toInsertSQL(bean), true);
 			}
 		case MethodId.QUERY3:
 			if (iargs.length == 2) {

@@ -61,78 +61,16 @@ public final class BeanUtil {
 	 * 将1个bean 转换成 insert sql语句, 注意: 主键值为null,将不参与运算.
 	 * 
 	 * @param bean 实体
-	 * @param dbNamePrefix 是否显示数据库名称前缀(暂用表达式)
 	 * @return insert 语句
 	 */
-	public static String toInsertSQL(Object bean, boolean dbNamePrefix) {
-
-		int idOfSet = -1; // 用于记录主键名应该在sql中的什么位置
-
-		Class<?> clazz = bean.getClass();
-		String tableName = getEntitySimpleName(clazz);
-
-		StringBuilder sqlsb = new StringBuilder("insert into ");
-		if (dbNamePrefix) {
-			sqlsb.append("`${dbpre}`.");
-		}
-		sqlsb.append("`");
-		sqlsb.append(tableName);
-		sqlsb.append("`");
-		sqlsb.append("(");
-		Field[] fields = clazz.getDeclaredFields();
-		for (Field field : fields) {
-			if (field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null) {
-				continue;
-			}
-			// 如果是主键,记录一下应该插入的位置
-			if (field.getAnnotation(Id.class) != null) {
-				idOfSet = sqlsb.length();
-			} else {
-				sqlsb.append("`");
-				sqlsb.append(field.getName());
-				sqlsb.append("`");
-			}
-			sqlsb.append(',');
-		}
-		sqlsb.deleteCharAt(sqlsb.length() - 1);
-		sqlsb.append(") values");
-		try {
-			sqlsb.append('(');
-			for (Field field : fields) {
-				if (field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null) {
-					continue;
-				}
-				field.setAccessible(true);
-				Object val = field.get(bean);
-				if (field.getAnnotation(Id.class) != null) {
-					if (val != null) {
-						sqlsb.insert(idOfSet, new StringBuilder().append("`").append(field.getName()).append("`"));
-						sqlsb.append("'" + escapeSql(val.toString()) + "',");
-					} else {
-						if (sqlsb.charAt(idOfSet) == ',') {
-							sqlsb.deleteCharAt(idOfSet);
-						}
-					}
-				} else {
-					if (val != null) {
-						sqlsb.append("'" + escapeSql(val.toString()) + "',");
-					} else {
-						sqlsb.append(val);
-						sqlsb.append(',');
-					}
-				}
-			}
-			sqlsb.deleteCharAt(sqlsb.length() - 1);
-			sqlsb.append("),");
-		} catch (Exception e) {
-			throw new RepositoryException(e);
-		}
-		sqlsb.deleteCharAt(sqlsb.length() - 1);
-		return sqlsb.toString();
+	public static String toInsertSQL(Object bean) {
+		String values = toValue(bean.getClass().getDeclaredFields(), bean,true);
+		return bean2InsertSQL(bean, null, values, false);
 	}
 
 	public static String toInsertSQL(String dbName, Object bean) {
-		return toInsertSQL(bean, true).replace("${dbpre}", dbName);
+		String values = toValue(bean.getClass().getDeclaredFields(), bean,true);
+		return bean2InsertSQL(bean, dbName, values, false);
 	}
 
 	static <B> String toFields(Field[] fields, B bean) {
@@ -145,7 +83,11 @@ public final class BeanUtil {
 			try {
 				field.setAccessible(true);
 				if (field.getAnnotation(Id.class) == null || field.get(bean) != null) {
-					sb.append("`");
+					// 接纳的值:
+					// 1. 不是主键的字段 
+					// 或
+					// 2. 不为null的字段
+					sb.append('`');
 					sb.append(field.getName());
 					sb.append("`,");
 				}
@@ -166,8 +108,11 @@ public final class BeanUtil {
 	 * @param bean 实体
 	 * @return sql value部分
 	 */
-	static <B> String toValue(Field[] fields, B bean) {
+	static <B> String toValue(Field[] fields, B bean,boolean containMark) {
 		StringBuilder sb = new StringBuilder();
+		if(containMark) {
+			sb.append("values");
+		}
 		sb.append('(');
 		for (Field field : fields) {
 			if (field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null) {
@@ -181,7 +126,7 @@ public final class BeanUtil {
 				throw new RepositoryException(e);
 			}
 			if (val != null) {
-				sb.append("'");
+				sb.append('\'');
 				sb.append(escapeSql(val.toString()));
 				sb.append("',");
 			} else if (field.getAnnotation(Id.class) == null) {
@@ -205,7 +150,7 @@ public final class BeanUtil {
 		StringBuilder sbValues = new StringBuilder();
 		sbValues.append("values");
 		for (B b : beans) {
-			sbValues.append(toValue(fields, b));
+			sbValues.append(toValue(fields, b,false));
 			sbValues.append(',');
 		}
 		sbValues.deleteCharAt(sbValues.length() - 1);
@@ -233,6 +178,17 @@ public final class BeanUtil {
 		B bean = iterator.next();
 		@SuppressWarnings("unchecked")
 		Class<B> clazz = (Class<B>) bean.getClass();
+		
+		// values 部分
+		String values = toValues(clazz.getDeclaredFields(), beans);
+		
+		return bean2InsertSQL(bean, dbName, values, ignoreRepeat);
+
+	}
+	
+	private static String bean2InsertSQL(Object bean, String dbName, String values,boolean ignoreRepeat) {
+		// 集合中的第一个bean
+		Class<?> clazz = bean.getClass();
 		// 确立表名称
 		StringBuilder sb = new StringBuilder();
 		if (dbName != null) {
@@ -254,9 +210,6 @@ public final class BeanUtil {
 		// 表字段
 		String fs = toFields(fields, bean);
 
-		// values 部分
-		String values = toValues(fields, beans);
-
 		// insert into 语句
 		String insertStr;
 		if (ignoreRepeat) {
@@ -266,10 +219,10 @@ public final class BeanUtil {
 		}
 		StringBuilder insertsql = new StringBuilder();
 		insertsql.append(insertStr);
-		insertsql.append(" ");
+		insertsql.append(' ');
 		insertsql.append(tableName);
 		insertsql.append(fs);
-		insertsql.append(" ");
+		insertsql.append(' ');
 		insertsql.append(values);
 		return insertsql.toString();
 	}
@@ -279,6 +232,36 @@ public final class BeanUtil {
 		return toInsertSQL(list, dbName, ignoreRepeat);
 	}
 
+	// 或取主键的名称 和 主键的值
+	private static Object[] getKeyAndVal(Object bean,Field[] files,Object val) {
+		
+		Object[] objs = new Object[2];
+		objs[1] = val;
+		
+		// 获取主键的名称
+		for (Field field : files) {
+			if (field.getAnnotation(Id.class) != null) {
+				objs[0] = field.getName();
+				if (val == null) {
+					// 顺便取主键的值
+					try {
+						field.setAccessible(true);
+						objs[1] = field.get(bean);
+					} catch (Exception e) {
+						throw new RepositoryException(e);
+					}
+				}
+				break;
+			}
+		}
+
+		if (objs[0] == null) {
+			throw new RepositoryException(bean + " 需要用@Id在实体上标识主键");
+		}
+		
+		return objs;
+	}
+	
 	/**
 	 * 转换查询语句, 实体上必须包含主键字段 <br>
 	 * 
@@ -292,46 +275,30 @@ public final class BeanUtil {
 	 */
 	public static String toSelectSQL(Object bean, Object key, String dbName,boolean selectEntity) {
 		Class<?> cls = (bean instanceof Class) ? (Class<?>) bean : bean.getClass();
-		// 表名称
+		Object[] objs = getKeyAndVal(bean, cls.getDeclaredFields(), key);
+		key = objs[1];
+		if(key==null) {
+			return null;
+		} else {
+			String keyFeild = objs[0].toString();
+			// 表名称
+			String tableName = getTableName(dbName, cls);		
+			if(selectEntity) {
+				return String.format("select %s from %s where `%s` = %s",selectFields(cls),tableName, keyFeild, key.toString());
+			} else {
+				return String.format("select `%s` from %s where `%s` = %s",keyFeild,tableName, keyFeild, key.toString());
+			}	
+		}
+	}
+
+	private static String getTableName(String dbName, Class<?> cls) {
 		String tableName = cls.getSimpleName();
 		if (dbName != null) {
 			tableName = new StringBuilder().append('`').append(dbName).append("`.`").append(tableName).append('`').toString();
 		} else {
 			tableName = '`' + tableName + '`';
 		}
-		String keyFeild = null;
-
-		// 获取主键的名称
-		Field[] files = cls.getDeclaredFields();
-		for (Field field : files) {
-			if (field.getAnnotation(Id.class) != null) {
-				keyFeild = field.getName();
-				if (key == null) {
-					// 顺便取主键的值
-					try {
-						field.setAccessible(true);
-						key = field.get(bean);
-						if(key==null) {
-							return null;
-						}
-					} catch (Exception e) {
-						throw new RepositoryException(e);
-					}
-				}
-				break;
-			}
-		}
-
-		if (keyFeild == null) {
-			throw new RepositoryException(cls + " 需要用@Id在实体上标识主键");
-		}
-
-		if(selectEntity) {
-			return String.format("select %s from %s where `%s` = %s",selectFields(cls),tableName, keyFeild, key.toString());
-		} else {
-			return String.format("select `%s` from %s where `%s` = %s",keyFeild,tableName, keyFeild, key.toString());
-		}
-
+		return tableName;
 	}
 
 	/**
@@ -344,35 +311,17 @@ public final class BeanUtil {
 	 * @return 更新语句信息
 	 */
 	public static Object[] toUpdateSQL(Object bean, String dbName, boolean toSQL) {
-		Object key = null;
 		Object[] updateinfo = new Object[3];
 		List<Object> args = new ArrayList<>();
 		Class<?> cls = bean.getClass();
 		// 表名称
-		String tableName = cls.getSimpleName();
-		if (dbName != null) {
-			tableName = new StringBuilder().append('`').append(dbName).append("`.`").append(tableName).append('`').toString();
-		} else {
-			tableName = '`' + tableName + '`';
-		}
+		String tableName = getTableName(dbName, cls);
 
+		Object key = null;
 		String keyFeild = null;
-		// 获取主键的名称
-		Field[] files = cls.getDeclaredFields();
-
-		for (Field field : files) {
-			if (field.getAnnotation(Id.class) != null) {
-				keyFeild = field.getName();
-				// 顺便取主键的值
-				try {
-					field.setAccessible(true);
-					key = field.get(bean);
-				} catch (Exception e) {
-					throw new RepositoryException(e);
-				}
-				break;
-			}
-		}
+		Object[] objs = getKeyAndVal(bean, cls.getDeclaredFields(), null);
+		keyFeild = (String) objs[0];
+		key = objs[1];
 
 		if (keyFeild == null || key == null) {
 			throw new RepositoryException(cls + " 必须有@Id标识,并且主键不能为null");
@@ -649,15 +598,33 @@ public final class BeanUtil {
 	static Object parseList(Object obj) {
 		if (obj == null) {
 			return null;
-		}
-		Class<?> cls = obj.getClass();
-		if (cls.isArray() || !TypeUtil.isWarrp(cls) || obj instanceof Iterable) {
-			String strs = JSONArray.toJSONString(obj);
-			return strs.substring(1, strs.length() - 1);
+		} else {
+			Class<?> cls = obj.getClass();
+			if (cls.isArray() || !TypeUtil.isWarrp(cls) || obj instanceof Iterable) {
+				String strs = JSONArray.toJSONString(obj);
+				return strs.substring(1, strs.length() - 1);
+			}	
 		}
 		return obj;
 	}
 
+	@SuppressWarnings("unchecked")
+	private static <S> S newBeanVarNull(Class<S> clazz,Object bean) {
+		Field[] fields = clazz.getDeclaredFields();
+		try {
+			if(bean==null) {
+				bean = clazz.newInstance();
+			}
+			for (Field field : fields) {
+				field.setAccessible(true);
+				field.set(bean, null);
+			}
+		} catch (Exception e) {
+			throw new RepositoryException(e);
+		}
+		return (S) bean;
+	}
+	
 	/**
 	 * 创建一个bean实例,成员变量的值全部都为null <br>
 	 * 注意:这个bean的成员变量必须都是包装类型
@@ -667,19 +634,11 @@ public final class BeanUtil {
 	 * @return 实体
 	 */
 	public static <S> S newBeanVarNull(Class<S> beanClass) {
-		// new 一个新bean
-		S ns;
-		Field[] fields = beanClass.getDeclaredFields();
-		try {
-			ns = beanClass.newInstance();
-			for (Field field : fields) {
-				field.setAccessible(true);
-				field.set(ns, null);
-			}
-		} catch (Exception e) {
-			throw new RepositoryException(e);
-		}
-		return ns;
+		return newBeanVarNull(beanClass, null);
+	}
+	
+	public static void newBeanVarNull(Object bean) {
+		newBeanVarNull(bean.getClass(), bean);
 	}
 
 	public static long toId(Object entity) {

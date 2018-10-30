@@ -22,12 +22,14 @@
 
 package org.fastquery.where;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryContext;
@@ -110,22 +112,32 @@ public class Script2Class {
 		return judges.get(makeClassName(QueryContext.getMethod(),index));
 	}
 	
+	/**
+	 * 生成脚本源码, 编译, 实例化
+	 * @param clazz Repository 类
+	 */
 	public static void generate(Class<?> clazz) {
 		Method[] methods = clazz.getMethods();
 		for (Method method : methods) {
-			Set[] sets = method.getAnnotationsByType(Set.class);
-			for (int i = 0; i < sets.length; i++) {
-				String script = sets[i].script();
-				if(!script.equals("false")) {
-					gr(method, i, script);
-				}
-			}
-			Condition[] conditions = method.getAnnotationsByType(Condition.class);
-			for (int i = 0; i < conditions.length; i++) {
-				String script = conditions[i].script();
-				if(!script.equals("false")) {
-					gr(method, i, script);
-				}
+			pickScript(method, Set.class, Set::script);
+			pickScript(method, Condition.class, Condition::script);
+		}
+	}
+
+	/**
+	 * 摘取Script
+	 * @param T 注解类型
+	 * @param method 方法
+	 * @param clazz 脚本的所属注解类
+	 * @param sf 函数式表达式: 接受T,返回String.
+	 */
+	private static <T extends Annotation> void pickScript(Method method,Class<T> clazz,Function<T,String> sf) {
+		T[] ts = method.getAnnotationsByType(clazz);
+		int len = ts.length;
+		for (int i = 0; i < len; i++) {
+			String script = sf.apply(ts[i]);
+			if(!script.equals("false")) {
+				gr(method, i, script);
 			}
 		}
 	}

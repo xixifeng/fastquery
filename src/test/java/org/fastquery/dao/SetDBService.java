@@ -44,6 +44,14 @@ public interface SetDBService extends QueryRepository {
 	@Set("`period` = ?4")
 	int updateCourse(String name,Integer credit, Integer semester, Integer period, String no);
 	
+	@Modifying
+	@Query("update `Course` #{#sets} where no = ?5")
+	@Set(value="$name",script=":name == null")
+	@Set("`credit` = ?2")
+	@Set("`semester` = ?3")
+	@Set("`period` = ?4")
+	int updateCourse2(@Param("name") String name,Integer credit, Integer semester, Integer period, String no);
+	
 	@Query("select * from Course where no = ?1")
 	Course findCourse(String no);
 	

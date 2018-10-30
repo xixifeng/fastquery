@@ -44,14 +44,14 @@ public class ConditionTest extends FastQueryTest {
 	public FastQueryTestRule rule = new FastQueryTestRule();
 	
 	@Test
-	public void findUserInfo() {
+	public void findUserInfo1() {
 		String tname = "from UserInfo";
 		String w1 = "name like ?1";
 		String w2 = "and age > ?2";
 		db.findUserInfo(w1, w2, tname);
 		SQLValue sqlValue = rule.getSQLValue();
 		String sql = sqlValue.getSql();
-		assertThat(sql, equalTo("select * from UserInfo where  name like ?  and age > ?"));
+		assertThat(sql, equalTo("select * from UserInfo where  name like ?  and age > ? limit 3"));
 	}
 
 	@Test
@@ -62,6 +62,17 @@ public class ConditionTest extends FastQueryTest {
 		SQLValue sqlValue = rule.getSQLValue();
 		String sql = sqlValue.getSql();
 		assertThat(sql, equalTo("select * from UserInfo where  name like ?"));
+	}
+	
+	@Test
+	public void findUserInfo3() {
+		String tname = "from UserInfo";
+		String w1 = null;
+		String w2 = null;
+		db.findUserInfo(w1, w2, tname);
+		SQLValue sqlValue = rule.getSQLValue();
+		String sql = sqlValue.getSql();
+		assertThat(sql, equalTo("select * from UserInfo  limit 3"));
 	}
 
 	@Test

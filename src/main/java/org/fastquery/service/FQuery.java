@@ -81,4 +81,12 @@ public class FQuery { // NO_UCD
 	public static <S> S reset(Class<S> beanClass) {
 		return BeanUtil.newBeanVarNull(beanClass);
 	}
+	
+	/**
+	 * 将传递的对象中的成员变量设置为null
+	 * @param bean 待修改的对象
+	 */
+	public static void reset(Object bean) {
+		BeanUtil.newBeanVarNull(bean);
+	}
 }

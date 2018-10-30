@@ -33,7 +33,7 @@ public class UserInfo {
 
 	@Id
 	private Integer id;
-	private String name;
+	private String name="";
 	private Integer age;
 
 	public UserInfo() {

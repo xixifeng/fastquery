@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.58</version> <!-- fastquery.version -->
+    <version>1.0.59</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.58'
+compile 'org.fastquery:fastquery:1.0.59'
 ```
 
 # FastQuery 数据持久层框架
@@ -137,6 +137,7 @@ fastquery.json其他可选配置选项:
 
 
 ## 入门例子
+当看到一个例子时,切勿断章取义,多看一眼,往往会有意想不到的结果.  
 - 准备一个实体
 
 ```java
@@ -148,7 +149,6 @@ fastquery.json其他可选配置选项:
       private Integer age;
       private String dept;
       // getter / setter 省略... 
-      // 实际应用中不能省略(getter/setter占篇幅较多,为了文档经凑,因此没列举)
  } 
 ```
 
@@ -197,22 +197,22 @@ fastquery.json其他可选配置选项:
 //       ?N 表示对应当前方法的第N个参数
 	
 // 查询返回数组格式
-@Query("select no,name,sex,age,dept from student s where s.sex=?2 and s.age > ?1")
-Student[] find(Integer age,String sex);
+@Query("select no,name,sex,age,dept from student s where s.sex=:sex and s.age > ?1")
+Student[] find(Integer age,@Param("sex")String sex);
  	
 // 查询返回JSON格式
-@Query("select no, name, sex from student s where s.sex=?1 and s.age > ?2")
-JSONArray find(String sex,Integer age);
+@Query("select no, name, sex from student s where s.sex=:sex and s.age > ?2")
+JSONArray find(@Param("sex")String sex,Integer age);
 	
 // 查询返回List Map
-@Query("select no, name, sex from student s where s.sex=?1 and s.age > ?2")
-List<Map<String, Object>> findBy(String sex,Integer age);
+@Query("select no, name, sex from student s where s.sex=?1 and s.age > :age")
+List<Map<String, Object>> findBy(String sex,@Param("age")Integer age);
 
 // 查询返回List 实体
 @Query("select id,name,age from `userinfo` as u where u.id>?1")
-List<UserInfo> findSome(Integer id);
+List<UserInfo> findSome(@Param("id")Integer id);
 ```
-
+参数较多时不建议使用问号(?)引用参数,因为它跟方法的参数顺序有关,不便维护,可以使用冒号(:)表达式,跟顺序无关, ":name" 表示引用标记有@Param("name")的那个参数.  
 若返回`List<Map<String, String>>`或`Map<String, String>`,表示把查询出的字段值(value)包装成字符串.   
 
 **注意**: 在没有查询到数据的情况下,如果返回值是集合类型或`JSON`类型或者是数组类型,返回具体的值不会是`null`,而是一个空对象(empty object)集合或空对象`JSON`或者是长度为0的数组.   
@@ -280,7 +280,7 @@ Student[] findAllStudent(... args ...);
 `@Condition(value="name != ?1",ignoreNull=false)` 若`?1`的值为`null`,最终会解释成`name is not null`.  
 
 ### 通过JAVA脚本控制条件增减
-`@Condition`中的`script`属性可以绑定一个JAVA脚本,根据脚本运行后的布尔结果,来决定是否保留条件项.脚本运行后的结果如果是`true`,那么就删除该条件项,反之,保留条件项,默认脚本是`false`,表示保留该条件项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
+`@Condition`中的`script`属性可以绑定一个JAVA脚本(不是JS),根据脚本运行后的布尔结果,来决定是否保留条件项.脚本运行后的结果如果是`true`,那么就删除该条件项,反之,保留条件项,默认脚本是`false`,表示保留该条件项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
 举例:
 
 ```java
@@ -328,7 +328,7 @@ Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable page
 List<Map<String, Object>> between(@Param("age1") Integer age1,@Param("age2") Integer age2);	
 ```
 该例中`@Condition`使用到了`$`表达式,`$age1`,`$age1`仅作为模板替换,age1为null,即便设置`ignoreNull=true`也不会影响条件的增减.**总之,`$` 表达式不会动摇条件的存在**.  
-单个`@Condition`针对出现多个`SQL`参数的情形,如 `@Condition("or age between ?5 and ?6")` 或 `@Condition("or age between :age1 and ::age2")` 参数 `?5`、`?6`、`:age1`、 `:age2`中的任意一个为`null`都会导致该行条件移除.
+单个`@Condition`针对出现多个`SQL`参数的情形,如 `@Condition("or age between ?5 and ?6")` 或 `@Condition("or age between :age1 and :age2")` 参数 `?5`、`?6`、`:age1`、 `:age2`中的任意一个为`null`都会导致该行条件移除.
 
 ## count
 
@@ -845,7 +845,7 @@ org.fastquery.dao.QueryByNamedDBExtend.queries.xml 模板文件的内容:
 </queries>
 ```
 
-其中 `${_method.getName()}` 可简写成 `${_method.name}`. 在`Velocity`里调用对象或方法,不是本人的重点,点到为止.
+其中 `${_method.getName()}` 可简写成 `${_method.name}`. 在`Velocity`里调用对象或方法,不是本文的重点,点到为止.
 
 ## BuilderQuery
 上面介绍了`SQL`不仅可以绑定在`@Query`里, 也可以写到`XML`里. 还有另一种方式,**通过函数式构建SQL语句**.  
@@ -1203,7 +1203,7 @@ public class MyBeforeFilter3 extends BeforeFilter<DataAcquireDbService> {
 举例:
 
 ```java
-@SkipFilter // 标识该方法将不受“自定义Filter”的约束
+@SkipFilter // 标识该方法将不受"自定义Filter"的约束
 @Query("select no from `course` limit 1")
 String findOneCourse();
 ```

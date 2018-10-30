@@ -94,52 +94,44 @@ public class TypeUtil implements Opcodes {
 			strs[1] = "intValue"; // 用于解包的方法
 			strs[2] = "()I"; // 默认构造方法
 			strs[3] = IRETURN; // 返回类型
-			return strs;
 		} else if ("Z".equals(d)) {
 			strs[0] = "java/lang/Boolean";
 			strs[1] = "booleanValue";
 			strs[2] = "()Z";
 			strs[3] = IRETURN;
-			return strs;
 		} else if ("B".equals(d)) {
 			strs[0] = "java/lang/Byte";
 			strs[1] = "byteValue";
 			strs[2] = "()B";
 			strs[3] = IRETURN;
-			return strs;
 		} else if ("C".equals(d)) {
 			strs[0] = "java/lang/Character";
 			strs[1] = "charValue";
 			strs[2] = "()C";
 			strs[3] = IRETURN;
-			return strs;
 		} else if ("S".equals(d)) {
 			strs[0] = "java/lang/Short";
 			strs[1] = "shortValue";
 			strs[2] = "()S";
 			strs[3] = IRETURN;
-			return strs;
 		} else if ("D".equals(d)) {
 			strs[0] = "java/lang/Double";
 			strs[1] = "doubleValue";
 			strs[2] = "()D";
 			strs[3] = DRETURN;
-			return strs;
 		} else if ("F".equals(d)) {
 			strs[0] = "java/lang/Float";
 			strs[1] = "floatValue";
 			strs[2] = "()F";
 			strs[3] = FRETURN;
-			return strs;
 		} else if ("J".equals(d)) {
 			strs[0] = "java/lang/Long";
 			strs[1] = "longValue";
 			strs[2] = "()J";
 			strs[3] = LRETURN;
-			return strs;
-		} else {
-			return null;
 		}
+		
+		return strs;
 	}
 
 	/**
@@ -218,14 +210,13 @@ public class TypeUtil implements Opcodes {
 	}
 
 	/**
-	 * 为描述方便: 假设返回的值是 arrs
 	 * 
-	 * arrs[0]: 返回sql中的"?"需要变化的地方.例如:若返回Map&lt;Integer, Integer&gt; -&gt; {1=3,5=2} <br>
+	 * ParamMap.rps: 返回sql中的"?"需要变化的地方.例如:若返回Map&lt;Integer, Integer&gt; -&gt; {1=3,5=2} <br>
 	 * 表示sql中的第1个(从0开始计数)"?"号,应该调整3个"?"号,问号彼此用","号隔开 <br>
 	 * 完成上次替换之后的新sql中的第5个(从0开始计数)"?"号,应该调整2个"?"号,问号彼此用","号隔开 <br>
 	 * 强调: 完成上次替换之后的新sql,这句话要理解! <br>
 	 * 
-	 * arrs[1]: 返回sql参数的值.例如: 若返回List-&gt;{1,3.3,"aa"} <br>
+	 * ParamMap.objs: 返回sql参数的值.例如: 若返回List-&gt;{1,3.3,"aa"} <br>
 	 * 表示: sql中的第1个参数的值对应1 <br>
 	 * 表示: sql中的第2个参数的值对应3.3 <br>
 	 * 表示: sql中的第3个参数的值对应"aa" <br>
@@ -240,56 +231,41 @@ public class TypeUtil implements Opcodes {
 	 * 
 	 *        请特别注意: sql参数与方法参数的对应,并不代表就是值的对应. <br>
 	 * 
-	 * @param args 方法参数的具体值,如: args[0] 表示第一个方法参数的值
 	 * 
 	 * @return sql处理信号集
 	 */
-	public static ParamMap getParamMap(int[] indexMap, Object[] args) {
+	public static ParamMap getParamMap(int[] indexMap) {
 		Map<Integer, Integer> rps = new HashMap<>();
 		List<Object> objs = new ArrayList<>();
 		int increment = 0;
 		for (int i = 0; i < indexMap.length; i++) {
+			int paramIndex = indexMap[i] - 1;
 			// 取出sql参数所对应的方法参数
-			Object mp = args[indexMap[i] - 1]; // 这个值有可能是null
+			Object mp = QueryContext.getArgs()[paramIndex]; // 这个值有可能是null
 			if (mp == null) {
-				Param param = QueryContext.getMethod().getParameters()[indexMap[i] - 1].getAnnotation(Param.class);
-				if(param!=null && !param.defaultVal().trim().equals("")) {
-					objs.add(param.defaultVal());
-				} else {
-					objs.add(mp);	
-				}
-				continue;
-			}
-			Class<?> mpClazz = mp.getClass();
-			int count;
-			if (mp instanceof Iterable) {
-				@SuppressWarnings("unchecked")
-				Iterable<Object> iterable = (Iterable<Object>) mp;
-				Iterator<Object> iterator = iterable.iterator();
-				count = 0;
-				while (iterator.hasNext()) {
-					++count;
-					objs.add(iterator.next());
-				}
-				if (count != 0) {
-					rps.put(i + increment, count); // 第i个"?"需要替换成count个"?"
-					increment += count - 1; // 增量个数(除开本身一个)
-				} else {
-					objs.add(null);
-				}
-			} else if (mpClazz.isArray()) {
-				// asList 是一个可变变量
-				List<Object> arrs = toList(mp);
-				arrs.forEach(objs::add);
-				count = arrs.size();
-				if (count != 0) {
-					rps.put(i + increment, count);
-					increment += count - 1;
-				} else {
-					objs.add(null);
-				}
+				objs.add(getParamDefVal(paramIndex, mp));
 			} else {
-				objs.add(mp);
+				Class<?> mpClazz = mp.getClass();
+				int count;
+				if (mp instanceof Iterable) {
+					@SuppressWarnings("unchecked")
+					Iterable<Object> iterable = (Iterable<Object>) mp;
+					Iterator<Object> iterator = iterable.iterator();
+					count = 0;
+					while (iterator.hasNext()) {
+						++count;
+						objs.add(iterator.next());
+					}
+					increment = exted(rps, objs, increment, i, count);
+				} else if (mpClazz.isArray()) {
+					// asList 是一个可变变量
+					List<Object> arrs = toList(mp);
+					arrs.forEach(objs::add);
+					count = arrs.size();
+					increment = exted(rps, objs, increment, i, count);
+				} else {
+					objs.add(mp);
+				}
 			}
 		}
 
@@ -297,6 +273,28 @@ public class TypeUtil implements Opcodes {
 
 	}
 
+	// 做两件事
+	// 1. 如果SQL中的第i个参数是个集合并且这个集合为空,那么就给这个SQL参数的真实值设置为null
+	// 2. 用于记录,第i个"?"需要替换成count个"?" 
+	private static int exted(Map<Integer, Integer> rps, List<Object> objs, int increment, int i, int count) {
+		if (count == 0) {
+			objs.add(null);
+		} else {
+			rps.put(i + increment, count); // 这个put用于记录,第i个"?"需要替换成count个"?"
+			increment += count - 1; // 增量个数(除开本身一个)
+		}
+		return increment;
+	}
+	
+	private static Object getParamDefVal(int paramIndex,Object mp) {
+		Param param = QueryContext.getMethod().getParameters()[paramIndex].getAnnotation(Param.class);
+		if(param!=null && !param.defaultVal().trim().equals("")) {
+			return param.defaultVal();
+		} else {
+			return mp;	
+		}
+	}
+	
 	static String overChar(int overlap) {
 		if (overlap < 1) {
 			return "";
@@ -455,6 +453,15 @@ public class TypeUtil implements Opcodes {
 		return findAnnotationIndex(Id.class, parameters);
 	}
 
+	private static String getReplacement(Object obj,String defVal) {
+		return Matcher.quoteReplacement(obj != null ? obj.toString() : defVal);
+	}
+	
+	// 将 str中的 ${tagName} 和 $tagName 统统替换成 replacement
+	private static String replaceAllEL(String str,String tagName,String replacement) {
+		return str.replaceAll("\\$\\{" + tagName + "\\}", replacement).replaceAll("\\$" + tagName + "\\b", replacement);
+	}
+	
 	/**
 	 * 处理 @Param 模板参数
 	 * 
@@ -479,18 +486,15 @@ public class TypeUtil implements Opcodes {
 					// 如果参数值需要格式化(format)
 					if(!param.format().trim().equals("")) {
 						objx = String.format(param.format(), args); // 参数值可能包含有$表达式
-						String replacement = args[i] != null ? args[i].toString() : param.defaultVal();
-						replacement = Matcher.quoteReplacement(replacement);
-						objx = objx.toString().replaceAll("\\$\\{" + param.value() + "\\}", replacement).replaceAll("\\$" + param.value() + "\\b", replacement);
+						String replacement = getReplacement(args[i], param.defaultVal());
+						objx = replaceAllEL(objx.toString(), param.value(), replacement);
 					}
 
 					// 这里的replaceAll的先后顺序很重要
 					// '{' 是正则语法的关键字,必须转义
 					if (queryByNamed == null) {
-						String replacement = objx != null ? objx.toString() : param.defaultVal();
-						replacement = Matcher.quoteReplacement(replacement);
-						s = s.replaceAll("\\$\\{" + param.value() + "\\}", replacement);
-						s = s.replaceAll("\\$" + param.value() + "\\b", replacement);
+						String replacement = getReplacement(objx, param.defaultVal());
+						s = replaceAllEL(s, param.value(), replacement);
 					}
 					
 					// 将 ":xx" 格式的 替换成 "?num"
@@ -587,16 +591,16 @@ public class TypeUtil implements Opcodes {
 	}
 	
 	/**
-	 * 裁决是否忽略指定的条件,返回true表示要把这个条件忽略掉
-	 * 
+	 * 裁决是否忽略指定的条件
 	 * @param condition 条件
-	 * @return y:true/n:false
+	 * @param value Condition.value处理之后的条件值
+	 * @param conditionPosition 条件在方法上的位置索引
+	 * @return null表示忽略这个条件,反之返回这个条件的值
 	 */
-	private static boolean ignoreCondition(Condition condition, Object arg,int index) {
+	private static String ignoreCondition(Condition condition, String value, int conditionPosition) {
 
 		// 忽略因子列表,任何一个都可以导致忽略
 		// 这些因子不拿出来定义是有意义的, 多个 || 第一个true,后面的方法就不执行了
-		// 像 || && 这种运算, 多长都不嫌丑
 		
 		// 针对该按例不用写成这样
 		/**
@@ -614,8 +618,22 @@ public class TypeUtil implements Opcodes {
 		
 		</pre>
 		*/
+		Set<String> pars = TypeUtil.matchesNotrepeat(value, "\\?\\d+");
+		for (String par : pars) {
+			int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
+			Object arg = QueryContext.getArgs()[index - 1];
+			if (getFactor1(condition, arg) || getFactor2(condition, arg) || getFactor5(condition, arg) || getFactor6(condition, arg)) {
+				return null;
+			} else if(arg == null) { // 当前?num 处是null也要保留条件,那么就要考略null跟一些运算符不能运算的问题(纠正它)
+				value = extReplaceAll(value, index);
+			}
+		}
 		
-		return getFactor1(condition, arg) || getFactor2(condition, arg) || getFactor3(condition, index) || getFactor4(condition) || getFactor5(condition, arg) || getFactor6(condition, arg);
+		if(getFactor3(condition, conditionPosition) || getFactor4(condition)) {
+			return null;
+		}
+		
+		return value;
 	}
 
 	/**
@@ -627,45 +645,47 @@ public class TypeUtil implements Opcodes {
 	 */
 	private static String getWhereSQL(Method method, Object[] args) {
 		StringBuilder sb = new StringBuilder();
+		
 		// 追加条件
 		Condition[] conditions = method.getAnnotationsByType(Condition.class);
-		o: for (int i = 0; i < conditions.length; i++) {
+		for (int i = 0; i < conditions.length; i++) {
 			String value = conditions[i].value();
 			value = paramFilter(method, args, value);
-			// value 属性中包含的参数,必须去重
-			Set<String> pars = TypeUtil.matchesNotrepeat(value, "\\?\\d+");
-			for (String par : pars) {
-				int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
-				if (ignoreCondition(conditions[i], args[index - 1],i)) { //注意:  @Condition(....?1...?2) // ?1 都能决定 ?2 该条件忽略.  "?1保留条件" && "?2 不保留条件" = 不保留
-					continue o; // 跳出最外层的当次循环,不进行条件追加
-				} else if (args[index - 1] == null) {
-					// 如果传递null 还要求参与运算.
-					// sql中null无法跟比较运算符(如 =, <, 或者 <>),一起运算,必须使用 is null 和 is not null 操作符.
-					value = value.replaceAll("\\s+", " "); // 把多个空白换成一个空格
-					value = value.replaceAll("=\\?", "= ?"); // 将"=?" 替换成 "= ?"
-					value = value.replaceAll(" = \\?" + index, " is null");
-					value = value.replaceAll(" <> \\?" + index, " is not null");
-					value = value.replaceAll(" != \\?" + index, " is not null");
+			value = ignoreCondition(conditions[i], value, i);
+			if(value != null) {
+				int sblen = sb.length();
+				// sb的长度是0 或者 最后一个字符就是不是空格
+				if (sblen == 0 || sb.charAt(sblen - 1) != ' ') {
+					sb.append(' ');
+					sblen += 1;
 				}
-			}
-
-			int sblen = sb.length();
-			// sb的长度是0 或者 最后一个字符就是空格
-			if (sblen == 0 || (sblen >= 1 && sb.charAt(sblen - 1) != ' ')) {
-				sb.append(' ');
-			}
-			if (sb.length() == 1 && i != 0) { // 条件成立,表示这个SQL条件的前面还不存在条件,// 那么第一个条件的链接符,必须去掉.
-												// (where后面不能直接跟运算符号)
-				sb.append(removePart(value));
-			} else {
-				sb.append(value);
+				if (sblen == 1 && i != 0) { // 条件成立,表示这个SQL条件的前面还不存在条件,// 那么第一个条件的链接符,必须去掉.
+													// (where后面不能直接跟运算符号)
+					sb.append(removePart(value));
+				} else {
+					sb.append(value);
+				}
+				
 			}
 		}
 		// 追加条件 End
-		if (!"".equals(sb.toString())) { // 特别注意: 此处不能写成 !sb.equals("")
+		
+		if (!"".equals(sb.toString())) {
 			sb.insert(0, "where");
 		}
+		
 		return sb.toString();
+	}
+
+	private static String extReplaceAll(String value, int index) {
+		// 如果传递null 还要求参与运算.
+		// sql中null无法跟比较运算符(如 =, <, 或者 <>),一起运算,必须使用 is null 和 is not null 操作符.
+		value = value.replaceAll("\\s+", " "); // 把多个空白换成一个空格
+		value = value.replaceAll("=\\?", "= ?"); // 将"=?" 替换成 "= ?"
+		value = value.replaceAll(" = \\?" + index, " is null");
+		value = value.replaceAll(" <> \\?" + index, " is not null");
+		value = value.replaceAll(" != \\?" + index, " is not null");
+		return value;
 	}
 
 	/**
@@ -835,7 +855,9 @@ public class TypeUtil implements Opcodes {
 	public static String parWhere(String str) { // 不可能传递null进来
 
 		// <where> 不存在大小写问题,因为在初始化阶段已经严格要求<where>,</where> 只能是小写
-		String[] wheres = StringUtils.substringsBetween(str, "<where>", "</where>");
+		final String openWhere = "<where>";
+		final String closeWhere = "</where>";
+		String[] wheres = StringUtils.substringsBetween(str, openWhere, closeWhere);
 		if (wheres == null) {
 			return str;
 		}
@@ -854,9 +876,9 @@ public class TypeUtil implements Opcodes {
 
 			// 注意: 这里用quote是因为 sorce 很可能会包含有正则符号
 			if ("".equals(where)) {
-				s = s.replaceFirst(Pattern.quote("<where>" + sorce + "</where>"), "");
+				s = s.replaceFirst(Pattern.quote(openWhere + sorce + closeWhere), "");
 			} else {
-				s = s.replaceFirst(Pattern.quote("<where>" + sorce + "</where>"), Matcher.quoteReplacement("where " + where));
+				s = s.replaceFirst(Pattern.quote(openWhere + sorce + closeWhere), Matcher.quoteReplacement("where " + where));
 			}
 		}
 		return s;
