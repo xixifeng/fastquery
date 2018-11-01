@@ -86,8 +86,9 @@ public class FastQueryJson {
 		if (dataSourceName == null) {
 			if (other.dataSourceName != null)
 				return false;
-		} else if (!dataSourceName.equals(other.dataSourceName))
-			return false;
+		} else if (!dataSourceName.equals(other.dataSourceName)) {
+			return false;	
+		}
 		return true;
 	}
 }

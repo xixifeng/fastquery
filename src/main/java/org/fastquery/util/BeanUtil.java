@@ -292,7 +292,7 @@ public final class BeanUtil {
 	}
 
 	private static String getTableName(String dbName, Class<?> cls) {
-		String tableName = cls.getSimpleName();
+		String tableName = getEntitySimpleName(cls);
 		if (dbName != null) {
 			tableName = new StringBuilder().append('`').append(dbName).append("`.`").append(tableName).append('`').toString();
 		} else {
@@ -447,6 +447,15 @@ public final class BeanUtil {
 
 	}
 
+	private static Field getKey(Class<?> clazz,Field[] fields) {
+		for (Field field : fields) {
+			if (field.getAnnotation(Id.class) != null) {
+				return field;
+			}
+		}
+		throw new RepositoryException(clazz + " 必须有@Id标识,并且主键不能为null");
+	}
+	
 	/**
 	 * 将一个集合转换称批量update语句
 	 * 
@@ -469,94 +478,59 @@ public final class BeanUtil {
 
 		// 表名称
 		// 确立表名称
-		StringBuilder sb = new StringBuilder();
-		if (dbName != null) {
-			sb.append('`');
-			sb.append(dbName);
-			sb.append("`.`");
-			sb.append(getEntitySimpleName(clazz));
-			sb.append('`');
-		} else {
-			sb.append('`');
-			sb.append(getEntitySimpleName(clazz));
-			sb.append('`');
-		}
-
 		// 1. 表名称
-		String tableName = sb.toString();
+		String tableName = getTableName(dbName, clazz);
 
 		// 2. 找出主键的名称
-		String primaryKey = null;
-		Field key = null;
 		Field[] fields = clazz.getDeclaredFields();
-		for (Field field : fields) {
-			if (field.getAnnotation(Id.class) != null) {
-				primaryKey = field.getName();
-				key = field;
-				key.setAccessible(true);
-				break;
-			}
-		}
-		if (primaryKey == null) {
-			throw new RepositoryException(clazz + " 必须有@Id标识,并且主键不能为null");
-		}
-
+		Field key = getKey(clazz, fields);
+		key.setAccessible(true);
+		
 		// 3.
 		boolean addIds = true;
 		StringBuilder ids = new StringBuilder();
 		StringBuilder sets = new StringBuilder();
 		for (Field field : fields) {
-			if (field == key || field.getType().isArray() || !TypeUtil.isWarrp(field.getType())
-					|| field.getDeclaredAnnotation(Transient.class) != null) {
-				continue;
+			if (field != key && TypeUtil.isWarrp(field.getType()) && field.getDeclaredAnnotation(Transient.class) == null) {
+				field.setAccessible(true);
+
+				String fieldName = field.getName();
+				sets.append('`');
+				sets.append(fieldName);
+				sets.append("` = case ");
+				sets.append('`');
+				sets.append(key.getName());
+				sets.append("` ");
+				for (B b : beans) {
+					Object keyVal = getFieldVal(key, b);
+					if (keyVal == null) {
+						throw new RepositoryException("主键的值不能为null");
+					}
+					if (addIds) {
+						ids.append(keyVal);
+						ids.append(',');
+					}
+					Object fieldVal = getFieldVal(field, b);
+					sets.append("when ");
+					sets.append(keyVal);
+					sets.append(" then ");
+					if (fieldVal != null) {
+						sets.append('\'');
+						sets.append(fieldVal);
+						sets.append("' ");
+					} else {
+						sets.append('`');
+						sets.append(fieldName);
+						sets.append("` ");
+					}
+				}
+				addIds = false;
+				sets.append("else `");
+				sets.append(fieldName);
+				sets.append("` end,");
 			}
 
-			field.setAccessible(true);
-
-			String fieldName = field.getName();
-			sets.append('`');
-			sets.append(fieldName);
-			sets.append("` = case ");
-			sets.append('`');
-			sets.append(primaryKey);
-			sets.append("` ");
-			for (B b : beans) {
-				Object keyVal;
-				try {
-					keyVal = key.get(b);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new RepositoryException("无法获取主键的值", e);
-				}
-				if (keyVal == null) {
-					throw new RepositoryException("主键的值不能为null");
-				}
-				if (addIds) {
-					ids.append(keyVal);
-					ids.append(',');
-				}
-				Object fieldVal;
-				try {
-					fieldVal = field.get(b);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new RepositoryException("无法获取字段的值", e);
-				}
-				sets.append("when ");
-				sets.append(keyVal);
-				sets.append(" then ");
-				if (fieldVal != null) {
-					sets.append('\'');
-					sets.append(fieldVal);
-					sets.append("\' ");
-				} else {
-					sets.append('`');
-					sets.append(fieldName);
-					sets.append("` ");
-				}
-			}
-			addIds = false;
-			sets.append("else `");
-			sets.append(fieldName);
-			sets.append("` end,");
+			
 		}
 
 		sets.deleteCharAt(sets.length() - 1);
@@ -569,11 +543,21 @@ public final class BeanUtil {
 		sql.append(sets);
 		sql.append(" where ");
 		sql.append('`');
-		sql.append(primaryKey);
+		sql.append(key.getName());
 		sql.append("` in(");
 		sql.append(ids);
 		sql.append(')');
 		return sql.toString();
+	}
+
+	private static Object getFieldVal(Field key, Object obj) {
+		Object keyVal;
+		try {
+			keyVal = key.get(obj);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			throw new RepositoryException(key + "无法获取值", e);
+		}
+		return keyVal;
 	}
 
 	public static String toDelete(String tableName, String keyName, long keyVal, String dbName) {

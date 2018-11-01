@@ -22,8 +22,12 @@
 
 package org.fastquery.util;
 
+import java.io.InputStream;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+
+import javax.sql.DataSource;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -72,6 +76,19 @@ public class LoadPrperties {
 				}
 				break;
 
+			case "druid":
+				if (FQueryProperties.findDataSource(namedConfig) == null && namedConfig != null) { // 如果名称为namedConfig的数据源不存在,才能new!
+					DataSource druidDS;
+					try {
+						druidDS = com.alibaba.druid.pool.DruidDataSourceFactory.createDataSource(getDruidProperties());
+					} catch (Exception e) {
+						throw new ExceptionInInitializerError(e);
+					}
+					FQueryProperties.putDataSource(namedConfig, druidDS);
+					LOG.debug("创建数据源:{},名称为:{}", druidDS, namedConfig);
+				}
+				break;
+				
 			case "jdbc":
 				jdbcConfig = jdbcConfigs.get(namedConfig);
 
@@ -117,4 +134,14 @@ public class LoadPrperties {
 		return fqProperties;
 	}
 
+	private static Properties getDruidProperties() {
+		Properties properties = new Properties();
+	    // 使用ClassLoader加载properties配置文件生成对应的输入流
+		try(InputStream in = PropertiesUtil.class.getClassLoader().getResourceAsStream("druid.properties")) {
+		    properties.load(in);
+		} catch (Exception e) {
+			throw new ExceptionInInitializerError(e);
+		}
+		return properties;
+	}
 }

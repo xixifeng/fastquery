@@ -302,6 +302,8 @@ class PropertiesUtil {
 					throw new RepositoryException("fastquery.json 配置文件中, 指定了数据源为" + dataSourceName + ",而在c3p0-config.xml中,找不到对该数据源的配置.");
 				}
 				break;
+			case "druid":
+				break;
 			case "jdbc":
 				// 校验是否存在 jdbc-config.xml 文件
 				if (!fqueryResource.exist("jdbc-config.xml")) {

@@ -28,7 +28,7 @@
   "scope":[
     // config目前支持的可选值有"jdbc","c3p0"
     {
-        "config": "c3p0",            // 表示由c3p0负责提供数据源
+        "config": "druid",            // 表示由c3p0负责提供数据源
         "dataSourceName": "xk-c3p0", // 数据源的名称
         "basePackages": [            // 该数据源的作用范围
             "org.fastquery.example",              // 包地址

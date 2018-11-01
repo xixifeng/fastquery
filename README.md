@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.59</version> <!-- fastquery.version -->
+    <version>1.0.60</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.59'
+compile 'org.fastquery:fastquery:1.0.60'
 ```
 
 # FastQuery 数据持久层框架
@@ -92,7 +92,7 @@ JRE 8+
 // 配置必须遵循标准的json语法.
 {
   "scope":[
-		    // config目前支持的可选值有"jdbc","c3p0"
+		    // config目前支持的可选值有"jdbc","c3p0","druid"
 		    {
 		        "config": "c3p0",            // 表示由c3p0负责提供数据源
 		        "dataSourceName": "xk-c3p0", // 数据源的名称
