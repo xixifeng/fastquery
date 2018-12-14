@@ -39,6 +39,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class FastQueryJSONObject {
 
+	private static final String DEBUG = "debug";
 	private static Map<ClassLoader, JSONObject> maps = new HashMap<>();
 
 	private FastQueryJSONObject() {
@@ -67,7 +68,7 @@ public class FastQueryJSONObject {
 	}
 
 	public static boolean getDebug() {
-		return (boolean) getJsonObject().getOrDefault("debug", false);
+		return (boolean) getJsonObject().getOrDefault(DEBUG, false);
 	}
 
 	public static List<String> getQueries() {
@@ -100,8 +101,8 @@ public class FastQueryJSONObject {
 		}
 		
 		// 2). debug
-		if(getJsonObject().containsKey("debug")) {
-			Object debug = getJsonObject().get("debug");
+		if(getJsonObject().containsKey(DEBUG)) {
+			Object debug = getJsonObject().get(DEBUG);
 			if(!(debug instanceof Boolean)) {
 				throw new RepositoryException("fastquery.json -> debug 它的值只能是true或false,也可以不用配置,要配,请配置正确");
 			}

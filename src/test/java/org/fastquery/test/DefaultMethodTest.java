@@ -172,4 +172,16 @@ public class DefaultMethodTest extends FastQueryTest {
 			assertThat(msg, containsString("query 语句必须设置正确"));
 		}
 	}
+	
+	@Test
+	public void sqlFun() {
+		String str = db.sqlFun("select hex(255)");
+		assertThat(str, equalTo("FF"));
+		
+		str = db.sqlFun("select concat('A1','B2','C3')");
+		assertThat(str, equalTo("A1B2C3"));
+		
+		str = db.sqlFun("select concat_ws('-','A1','B2','C3')");
+		assertThat(str, equalTo("A1-B2-C3"));
+	}
 }

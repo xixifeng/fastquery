@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.60</version> <!-- fastquery.version -->
+    <version>1.0.61.enforce</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.60'
+compile 'org.fastquery:fastquery:1.0.61.enforce'
 ```
 
 # FastQuery 数据持久层框架
@@ -80,7 +80,9 @@ JRE 8+
         <property name="maxPoolSize">1000</property>
         <property name="maxStatements">0</property>  
         <property name="maxStatementsPerConnection">5</property>     
-    </named-config> 
+    </named-config>
+     <!-- 可以配置多个named-config节点,多个数据源 -->
+    <named-config name="name-x"> ... ... </named-config>
 </c3p0-config>
 ```
 
@@ -135,6 +137,15 @@ fastquery.json其他可选配置选项:
 | queries | array | [ ] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:配置文件的位置不一定基于classpath目录,也可以通过`"fastquery.config.dir"`另行指定,上文已经提及到.每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
 | slowQueryTime | int | 0 | 设置慢查询的时间值(单位:毫秒; 默认:0,表示不开启慢查询功能), 如果 `QueryRepository` 中的方法执行超过这个时间,则会警告输出那些执行慢的方法,以便优化 | 50 |
 
+数据源的初始化是从"fastquery.json"开始的,根据从里面读到"dataSourceName"的值,取相应的配置,继而完成数据源的创建.如,创建一个名为"rex-db"的数据源:
+
+```js   
+{
+    "config": "c3p0",           
+    "dataSourceName": "rex-db"
+}
+```
+在这里,"basePackages"不是必须的,该数据源可以当做是一个服务,供没有明确指定数据源的Repository使用.
 
 ## 入门例子
 当看到一个例子时,切勿断章取义,多看一眼,往往会有意想不到的结果.  
@@ -292,7 +303,7 @@ Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable page
 其中, `:age`引用的是`@Param("age")int age`的实参值.`:name`是`@Param("name")String name`的实参值.这个脚本要表达的意思不言而喻. 不过脚本的解析能力还不能自动**拆箱**(unboxing),需要调用拆箱方法,在这里age变量如果是`Integer`类型,要想如上脚本能正确编译,必须这么做: `":age.intValue() > 18 && :name!=null && :name.contains(\"Rex\")"`, 请留意住`:age.intValue()`. 其他包装类型`Short`, `Long`, `Byte`, `Boolean`, `Character`, `Float`, `Double` 以此类推.  
 
 ### 自定义类控制条件增减
-决定一个条件是否参与运算,有时候需要根据多个不同的参数进行某种计算来决定. 那么就需要使用`@Condition`中的`ignore`选项,指定一个类,它叫`Judge`,是一个裁判员,条件是否去除的决定权可以理所当然地委托给自定义的`Judge`类来处理.   
+决定一个条件是否参与运算,有时候需要根据多个不同的参数进行某种计算来决定, 并且这种计算逻辑用JAVA脚本(非JS)难以表达或者不太乐意让JAVA脚本登场. 那么就使用`@Condition`中的`ignore`选项,指定一个类,它叫`Judge`,是一个裁判员,条件是否去除的决定权可以理所当然地委托给自定义的`Judge`类来处理.   
 举例: 若:年龄大于18及姓名不为空且包含"Rex".则,剔除条件`and name like :name`.  
 定制一个决定条件存活的类,需要遵循一些约定: 继承`org.fastquery.where.Judge`,当完成这一步,IDE就会提示开发者必须实现ignore方法, 否则,不能举足前行. 这样的设计可以减少犯错的可能. 当ignore方法最终返回`true`时,则,删除相对应的条件;当最后返回`false`时,则,保留条件.
 
@@ -558,7 +569,7 @@ int updateCourse(@Param("name") String name,@Param("credit") Integer credit,Stri
 脚本的编译工作在项目初始化阶段完成,因此不存在性能问题.建议不要把脚本写得太长,那样会破坏可读性.
 
 ### 自定义类控制设置项增减
-决定一个Set项是否参与运算,可以根据多个参数进行某种计算来决定,自定义一个Judge类,作为这种计算的载体.  
+决定一个Set项是否参与运算,可以根据多个参数进行某种计算来决定,`@Set`允许关联一个自定义的`Judge`类,作为这种计算的载体.  
 举例: 若: name值的前缀是"*计算*" 并且 credit的值大于2, 则,删除`name = :name`这条设置项.  
 NameJudge 类:
 

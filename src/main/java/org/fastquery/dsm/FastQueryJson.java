@@ -22,6 +22,7 @@
 
 package org.fastquery.dsm;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -33,7 +34,7 @@ public class FastQueryJson {
 
 	private String config;
 	private String dataSourceName; // 重写它hashCode和equals,用它来标识唯一标识.
-	private Set<String> basePackages;
+	private Set<String> basePackages = new HashSet<>();
 
 	public String getConfig() {
 		return config;

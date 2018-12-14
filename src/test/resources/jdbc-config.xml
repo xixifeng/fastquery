@@ -6,7 +6,7 @@
 	<!-- 
 	<named-config name="xk_db">
 		<property name="driverClass">com.mysql.cj.jdbc.Driver</property>
-		<property name="url">jdbc:mysql://192.168.1.1:3306/xk?user=xk&amp;password=abc123</property>
+		<property name="url">jdbc:mysql://192.168.1.1:3305/xk?user=xk&amp;password=abc123</property>
 	</named-config> 
 	-->
 
@@ -16,7 +16,7 @@
 		<property name="databaseName">xk3</property>                      <!-- 数据库的名称 -->
 		<property name="user">xk3</property>                              <!-- 数据库用户名称 -->
 		<property name="password">abc3</property>                         <!-- 数据库用户的密码 -->
-		<property name="portNumber">3306</property>                       <!-- 端口 -->
+		<property name="portNumber">3305</property>                       <!-- 端口 -->
 		<property name="serverName">192.168.8.10</property>               <!-- 数据库主机地址 -->
 	</named-config>
 
@@ -28,6 +28,11 @@
 
 	<named-config name="s2">
 		<property name="databaseName">s2</property>
+		<property name="driverClass">com.mysql.cj.jdbc.Driver</property>
+	</named-config>
+	
+	<named-config name="s3">
+		<property name="databaseName">s3</property>
 		<property name="driverClass">com.mysql.cj.jdbc.Driver</property>
 	</named-config>
 

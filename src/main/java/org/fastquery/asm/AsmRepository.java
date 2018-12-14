@@ -48,6 +48,9 @@ import org.objectweb.asm.commons.GeneratorAdapter;
  */
 public class AsmRepository implements Opcodes {
 
+	private static final String INIT = "<init>";
+	private static final String INSTANCE = "instance";
+	private static final String JAVA_LANG_OBJECT = "java/lang/Object";
 	private static final Logger LOG = LoggerFactory.getLogger(AsmRepository.class);
 
 	private AsmRepository() {
@@ -77,20 +80,20 @@ public class AsmRepository implements Opcodes {
 
 		// 生成类
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-		cw.visit(V1_1, ACC_PUBLIC, proxyName, null, "java/lang/Object", interfaces);
+		cw.visit(V1_1, ACC_PUBLIC, proxyName, null, JAVA_LANG_OBJECT, interfaces);
 
 		// 单例
 		String repositoryDescriptor = Type.getDescriptor(repositoryClazz);
 		// 生成的私有静态方法,用于存储实例对象
-		FieldVisitor fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, "instance", repositoryDescriptor, null, null);
+		FieldVisitor fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, INSTANCE, repositoryDescriptor, null, null);
 		fv.visitEnd();
 
 		org.objectweb.asm.MethodVisitor mv;
 		// 生成私有的不带参的构造方法
-		mv = cw.visitMethod(ACC_PRIVATE, "<init>", "()V", null, null);
+		mv = cw.visitMethod(ACC_PRIVATE, INIT, "()V", null, null);
 		mv.visitCode();
 		mv.visitVarInsn(ALOAD, 0);
-		mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+		mv.visitMethodInsn(INVOKESPECIAL, JAVA_LANG_OBJECT, INIT, "()V", false);
 		mv.visitInsn(RETURN);
 		mv.visitMaxs(1, 1);
 		mv.visitEnd();
@@ -98,16 +101,16 @@ public class AsmRepository implements Opcodes {
 		// 生成获取实例方法
 		mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "getInstance", "()" + repositoryDescriptor, null, null);
 		mv.visitCode();
-		mv.visitFieldInsn(GETSTATIC, proxyName, "instance", repositoryDescriptor);
+		mv.visitFieldInsn(GETSTATIC, proxyName, INSTANCE, repositoryDescriptor);
 		Label l0 = new Label();
 		mv.visitJumpInsn(IFNONNULL, l0);
 		mv.visitTypeInsn(NEW, proxyName);
 		mv.visitInsn(DUP);
-		mv.visitMethodInsn(INVOKESPECIAL, proxyName, "<init>", "()V", false);
-		mv.visitFieldInsn(PUTSTATIC, proxyName, "instance", repositoryDescriptor);
+		mv.visitMethodInsn(INVOKESPECIAL, proxyName, INIT, "()V", false);
+		mv.visitFieldInsn(PUTSTATIC, proxyName, INSTANCE, repositoryDescriptor);
 		mv.visitLabel(l0);
 		mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-		mv.visitFieldInsn(GETSTATIC, proxyName, "instance", repositoryDescriptor);
+		mv.visitFieldInsn(GETSTATIC, proxyName, INSTANCE, repositoryDescriptor);
 		mv.visitInsn(ARETURN);
 		mv.visitMaxs(2, 0);
 		mv.visitEnd();
@@ -117,7 +120,7 @@ public class AsmRepository implements Opcodes {
 		Method[] methods = repositoryClazz.getMethods();
 		for (Method method : methods) {
 			if (Modifier.isAbstract(method.getModifiers())) { // 只针对 abstract 方法
-				cw = generateMethod(cw, method, Prepared.class);
+				generateMethod(cw, method, Prepared.class);
 			}
 		}
 		cw.visitEnd();
@@ -192,7 +195,7 @@ public class AsmRepository implements Opcodes {
 		} else {
 			mv.visitIntInsn(BIPUSH, size);
 		}
-		mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
+		mv.visitTypeInsn(ANEWARRAY, JAVA_LANG_OBJECT);
 
 		int nextIndex = 1; // 指定下一次?LOAD应该的使用的索引
 		for (int i = 0; i < size; i++) {

@@ -92,18 +92,18 @@ public class FQueryPropertiesTest extends FastQueryTest  {
 		maps.forEach((k, v) -> {
 			LOG.debug(k + ":" + v);
 		});
-		assertThat(maps.size(), either(is(5)).or(is(6)));
+		assertThat(maps.size(), either(is(6)).or(is(7)));
 		Set<String> keys = maps.keySet();
-		assertThat(keys, hasItems("sunnydb", "xk-c3p0", "xk3", "s1", "s2"));
+		assertThat(keys, hasItems("sunnydb", "xkdb", "xk3", "s1", "s2"));
 	}
 
 	@Test
 	public void findDataSourceName() {
 		String sourceName = FQueryProperties.findDataSourceName("org.fastquery.example");
-		assertThat(sourceName, equalTo("xk-c3p0"));
+		assertThat(sourceName, equalTo("xkdb"));
 
 		sourceName = FQueryProperties.findDataSourceName("org.fastquery.dao.UserInfoDBService");
-		assertThat(sourceName, equalTo("xk-c3p0"));
+		assertThat(sourceName, equalTo("xkdb"));
 
 		sourceName = FQueryProperties.findDataSourceName("org.fastquery.dao.SunnyDBService");
 		assertThat(sourceName, equalTo("sunnydb"));

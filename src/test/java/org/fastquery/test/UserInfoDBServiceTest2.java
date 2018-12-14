@@ -54,7 +54,7 @@ public class UserInfoDBServiceTest2 extends FastQueryTest  {
 		// 连接池配置
 		Properties properties = new Properties();
 		properties.setProperty("driverClass", "com.mysql.cj.jdbc.Driver");
-		properties.setProperty("jdbcUrl", "jdbc:mysql://192.168.8.10:3306/xk1");
+		properties.setProperty("jdbcUrl", "jdbc:mysql://192.168.8.10:3305/xk1");
 		properties.setProperty("user", "xk1");
 		properties.setProperty("password", "abc1");
 
@@ -67,7 +67,7 @@ public class UserInfoDBServiceTest2 extends FastQueryTest  {
 		int age = 1000;
 		// 数据库中age没有大于1千的记录
 		// 断言: 查询返回的值应该是一个空对象,不是null.
-		Map<String, Object> map = userInfoDBService.findOne(age, "xk-c3p0");
+		Map<String, Object> map = userInfoDBService.findOne(age, "xkdb");
 		assertThat(map, notNullValue());
 		assertThat(map.isEmpty(), is(true));
 	}

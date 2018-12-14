@@ -48,7 +48,7 @@ public class RepVersion extends FastQueryTest  {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RepVersion.class);
 
-	private static final String REG = "\\d+\\.\\d+\\.\\d+";
+	private static final String REG = "\\d+\\.\\d+\\.\\d+(\\.enforce)*";
 
 	@SuppressWarnings("unused")
 	private static void exec(String path, String target) throws IOException, InterruptedException {

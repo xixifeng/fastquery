@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<!-- 
+配置说明:
+# doc
+# https://www.cnblogs.com/lmaplet/p/6170105.html
+# https://github.com/alibaba/druid/wiki/DruidDataSource%E9%85%8D%E7%BD%AE
+ -->
+<beans>
+	 <bean name="xkdb1" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
+	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/xk" />
+	     <property name="username" value="xk" />
+	     <property name="password" value="abc123" />
+	
+	     <property name="filters" value="stat" />
+	
+	     <property name="maxActive" value="20" />
+	     <property name="initialSize" value="1" />
+	     <property name="maxWait" value="60000" />
+	     <property name="minIdle" value="1" />
+	
+	     <property name="timeBetweenEvictionRunsMillis" value="60000" />
+	     <property name="minEvictableIdleTimeMillis" value="300000" />
+	
+	     <property name="testWhileIdle" value="true" />
+	     <property name="testOnBorrow" value="false" />
+	     <property name="testOnReturn" value="false" />
+	
+	     <property name="poolPreparedStatements" value="true" />
+	     <property name="maxOpenPreparedStatements" value="20" />
+	 </bean>
+	 
+	  <bean name="xkdb2" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
+	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/xk" />
+	     <property name="username" value="xk" />
+	     <property name="password" value="abc123" />
+	 </bean>
+ </beans>
+ 
+ 

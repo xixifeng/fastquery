@@ -22,20 +22,16 @@
 
 package org.fastquery.util;
 
-import java.io.InputStream;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
 import org.fastquery.dsm.FastQueryJson;
 import org.fastquery.dsm.FQueryProperties;
-import org.fastquery.dsm.JdbcConfig;
 
 /**
  * 
@@ -55,12 +51,9 @@ public class LoadPrperties {
 	 * @return set格式 fquery.json
 	 */
 	public static Set<FastQueryJson> load(Resource fqueryResource) {
-		Set<FastQueryJson> fqProperties = PropertiesUtil.getFQueryProperties(fqueryResource.getResourceAsStream("fastquery.json"), fqueryResource);
+		Set<FastQueryJson> fqProperties = PropertiesUtil.getFQueryProperties(fqueryResource);
 		String namedConfig;
 		Set<String> basePackages;
-		Map<String, JdbcConfig> jdbcConfigs = PropertiesUtil.getJdbcConfigs(fqueryResource.getResourceAsStream("jdbc-config.xml"));
-		JdbcConfig jdbcConfig;
-		String url;
 		String config;
 
 		for (FastQueryJson fQueryPropertie : fqProperties) {
@@ -80,7 +73,7 @@ public class LoadPrperties {
 				if (FQueryProperties.findDataSource(namedConfig) == null && namedConfig != null) { // 如果名称为namedConfig的数据源不存在,才能new!
 					DataSource druidDS;
 					try {
-						druidDS = com.alibaba.druid.pool.DruidDataSourceFactory.createDataSource(getDruidProperties());
+						druidDS = com.alibaba.druid.pool.DruidDataSourceFactory.createDataSource(XMLParse.toMap(fqueryResource, "druid.xml", namedConfig,"bean"));
 					} catch (Exception e) {
 						throw new ExceptionInInitializerError(e);
 					}
@@ -90,27 +83,33 @@ public class LoadPrperties {
 				break;
 				
 			case "jdbc":
-				jdbcConfig = jdbcConfigs.get(namedConfig);
-
-				if (jdbcConfig == null) {
-					throw new RepositoryException("配置错误!!!");
-				}
-
+				
+				Map<Object, Object> map = XMLParse.toMap(fqueryResource, "jdbc-config.xml", namedConfig,"named-config");
+				
 				// 根据不同的jdbc的驱动,选择不同的数据源实现
-				switch (jdbcConfig.getDriverClass()) {
+				switch ( (String) map.get("driverClass")) {
 				case "com.mysql.cj.jdbc.Driver":
 					if (FQueryProperties.findDataSource(namedConfig) == null) { // 如果名称为namedConfig的数据源不存在,才能new!
+						String databaseName = (String) map.get("databaseName");
+						String password = (String) map.get("password");
+						String portNumber = (String) map.get("portNumber");
+						String serverName = (String) map.get("serverName");
+						String user = (String) map.get("user");
+						String url = (String) map.get("url");
+
 						com.mysql.cj.jdbc.MysqlDataSource cpd = new com.mysql.cj.jdbc.MysqlDataSource();
-						cpd.setDatabaseName(jdbcConfig.getDatabaseName());
-						cpd.setPassword(jdbcConfig.getPassword());
-						cpd.setPortNumber(jdbcConfig.getPortNumber());
-						cpd.setServerName(jdbcConfig.getServerName());
-						cpd.setUser(jdbcConfig.getUser());
-						url = jdbcConfig.getUrl();
+						cpd.setDatabaseName(databaseName);
+						cpd.setPassword(password);
+						if (portNumber != null) {
+							cpd.setPortNumber(Integer.parseInt(portNumber));
+						}
+						cpd.setServerName(serverName);
+						cpd.setUser(user);
 						if (url != null) {
 							cpd.setUrl(url);
 						}
 						FQueryProperties.putDataSource(namedConfig, cpd);
+
 					}
 					break;
 
@@ -133,15 +132,5 @@ public class LoadPrperties {
 
 		return fqProperties;
 	}
-
-	private static Properties getDruidProperties() {
-		Properties properties = new Properties();
-	    // 使用ClassLoader加载properties配置文件生成对应的输入流
-		try(InputStream in = PropertiesUtil.class.getClassLoader().getResourceAsStream("druid.properties")) {
-		    properties.load(in);
-		} catch (Exception e) {
-			throw new ExceptionInInitializerError(e);
-		}
-		return properties;
-	}
+	
 }

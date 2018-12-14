@@ -161,7 +161,7 @@ public class QueryPool {
 
 					// countQuery 单独存储起来 (className + "." + id)可以确保唯一值,
 					putCountQuery(className + "." + id, countQuery); // 该方法接受到null值后,会视而不见
-					LOG.debug(String.format("id=%s , template=%s", id, template));
+					LOG.debug("id={} , template={}", id, template);
 					QueryMapper queryMapper = new QueryMapper(id, template);
 					// 边解析,边做合法校验
 					legalCheck(queryMappers, queryMapper, postion);
@@ -404,19 +404,11 @@ public class QueryPool {
 		}
 	}
 
-	/**
-	 * 根据className 获取它对应的QueryMapper集合,如果没有的话new一个QueryMapper集合存储起来,然后返回这个空集合,供外界修改
-	 * 
-	 * @param className
-	 * @return
-	 */
+	// 根据className 获取它对应的QueryMapper集合,如果没有的话new一个QueryMapper集合存储起来,然后返回这个空集合,供外界修改
 	private static Set<QueryMapper> getQueryMappers(String className) {
-		Set<QueryMapper> queryMappers = mapQueryMapper.get(className);
-		if (queryMappers == null) {
-			queryMappers = new HashSet<>();
-			mapQueryMapper.put(className, queryMappers);
-		}
-		return queryMappers;
+		// 根据className(K) 从 mapQueryMapper(Map) 中取V,V不为null直接返回.如果V是null,那么就根据k创建一个V存入mapQueryMapper中[k -> new HashSet<>()],并返回新V.
+		// 这个函数封装得有点高级,看看源码就清楚了
+		return mapQueryMapper.computeIfAbsent(className, k -> new HashSet<>());
 	}
 
 	static Map<String, Set<QueryMapper>> getMapQueryMapper() {

@@ -35,6 +35,7 @@ import org.fastquery.mapper.QueryMapper;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.service.FQuery;
 import org.fastquery.util.QueryContextUtil;
+import org.fastquery.util.XMLParse;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -148,4 +149,77 @@ public class QueryPoolTest extends FastQueryTest  {
 		str = render(template, "render", map);
 		assertThat(str.trim(), equalTo(err));
 	}
+	
+	@Test
+	public void druidXml() {
+		Map<Object, Object> map = XMLParse.toMap(resource, "druid.xml", "xkdb","bean");
+		Set<Object> keys = map.keySet();
+		int len = keys.size();
+		assertThat(len, is(16));
+		assertThat(map.get("url"), equalTo("jdbc:mysql://192.168.8.10:3305/xk"));
+		assertThat(map.get("username"), equalTo("xk"));
+		assertThat(map.get("password"), equalTo("abc123"));
+		assertThat(map.get("filters"), equalTo("stat"));
+		assertThat(map.get("maxActive"), equalTo("20"));
+		assertThat(map.get("initialSize"), equalTo("10"));
+		assertThat(map.get("maxWait"), equalTo("60000"));
+		assertThat(map.get("minIdle"), equalTo("1"));
+		assertThat(map.get("timeBetweenEvictionRunsMillis"), equalTo("60000"));
+		assertThat(map.get("minEvictableIdleTimeMillis"), equalTo("300000"));
+		assertThat(map.get("testWhileIdle"), equalTo("true"));
+		assertThat(map.get("testOnBorrow"), equalTo("false"));
+		assertThat(map.get("testOnReturn"), equalTo("false"));
+		assertThat(map.get("poolPreparedStatements"), equalTo("true"));
+		assertThat(map.get("maxOpenPreparedStatements"), equalTo("20"));
+		assertThat(map.get("asyncInit"), equalTo("true"));
+	}
+	
+	@Test
+	public void druidXml1() {
+				
+		Map<Object, Object> map = XMLParse.toMap(resource, "druid.xml", "xkdb1","bean");
+		Set<Object> keys = map.keySet();
+		int len = keys.size();
+		assertThat(len, is(15));
+		assertThat(map.get("url"), equalTo("jdbc:mysql://192.168.8.10:3305/xk"));
+		assertThat(map.get("username"), equalTo("xk"));
+		assertThat(map.get("password"), equalTo("abc123"));
+		assertThat(map.get("filters"), equalTo("stat"));
+		assertThat(map.get("maxActive"), equalTo("20"));
+		assertThat(map.get("initialSize"), equalTo("1"));
+		assertThat(map.get("maxWait"), equalTo("60000"));
+		assertThat(map.get("minIdle"), equalTo("1"));
+		assertThat(map.get("timeBetweenEvictionRunsMillis"), equalTo("60000"));
+		assertThat(map.get("minEvictableIdleTimeMillis"), equalTo("300000"));
+		assertThat(map.get("testWhileIdle"), equalTo("true"));
+		assertThat(map.get("testOnBorrow"), equalTo("false"));
+		assertThat(map.get("testOnReturn"), equalTo("false"));
+		assertThat(map.get("poolPreparedStatements"), equalTo("true"));
+		assertThat(map.get("maxOpenPreparedStatements"), equalTo("20"));
+	}
+	
+	@Test
+	public void druidXml2() {
+		Map<Object, Object> map = XMLParse.toMap(resource, "druid.xml", "xkdb2","bean");
+		Set<Object> keys = map.keySet();
+		int len = keys.size();
+		assertThat(len, is(3));
+		assertThat(map.get("url"), equalTo("jdbc:mysql://192.168.8.10:3305/xk"));
+		assertThat(map.get("username"), equalTo("xk"));
+		assertThat(map.get("password"), equalTo("abc123"));
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

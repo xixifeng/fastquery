@@ -38,5 +38,8 @@ import org.fastquery.page.Pageable;
 public interface DefaultDBService extends QueryRepository {
 
 	@Query
-	public Page<Map<String, Object>> findPage(@Param("id") Integer id, @Param("age") Integer age, Pageable pageable, BuilderQuery builderQuery);
+	Page<Map<String, Object>> findPage(@Param("id") Integer id, @Param("age") Integer age, Pageable pageable, BuilderQuery builderQuery);
+	
+	@Query("$s")
+	String sqlFun(@Param("s") String sql);
 }
