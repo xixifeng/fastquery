@@ -86,6 +86,37 @@ JRE 8+
 </c3p0-config>
 ```
 
+### druid.xml
+用于配置支持druid连接池,详细配置请参照 https://github.com/alibaba/druid
+
+```xml
+<beans>
+	 <bean name="xkdb1" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
+	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/xk" />
+	     <property name="username" value="xk" />
+	     <property name="password" value="abc123" />
+	     <property name="filters" value="stat" />
+	     <property name="maxActive" value="20" />
+	     <property name="initialSize" value="1" />
+	     <property name="maxWait" value="60000" />
+	     <property name="minIdle" value="1" />
+	     <property name="timeBetweenEvictionRunsMillis" value="60000" />
+	     <property name="minEvictableIdleTimeMillis" value="300000" />
+	     <property name="testWhileIdle" value="true" />
+	     <property name="testOnBorrow" value="false" />
+	     <property name="testOnReturn" value="false" />
+	     <property name="poolPreparedStatements" value="true" />
+	     <property name="maxOpenPreparedStatements" value="20" />
+	 </bean>
+	 <!-- 再配置一个数据源 --> 
+	 <bean name="xkdb2" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
+	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/xk" />
+	     <property name="username" value="xk" />
+	     <property name="password" value="abc123" />
+	 </bean>
+</beans>
+```
+
 ### fastquery.json
 配置数据源的作用范围
 
@@ -846,7 +877,7 @@ org.fastquery.dao.QueryByNamedDBExtend.queries.xml 模板文件的内容:
 		<![CDATA[
 		## 如果当前方法的名称等于 "findLittle"
 		#if( ${_method.getName()} == "findLittle" )
-		    ## 查3条  
+			## 查3条  
 			select #{#feids} from UserInfo limit 3
 		#else 
 		   select `no`, `name` from Student limit 5

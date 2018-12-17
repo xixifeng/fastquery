@@ -37,13 +37,13 @@
 		<dependency>
 		    <groupId>org.javassist</groupId>
 		    <artifactId>javassist</artifactId>
-		    <version>3.23.1-GA</version>
+		    <version>3.24.0-GA</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
-			<version>1.2.51</version>
+			<version>1.2.54</version>
 		</dependency>
 
 		<dependency>
