@@ -30,6 +30,7 @@ public final class QueryContext {
 
 	private Method method; // 当前method
 	private boolean supporTx; // 是否需要事务支持
+	private boolean outTx;    // 标识是否是外围事务
 	private boolean requirePk;// 改操作的返回值是否依赖主键
 	private Class<?> returnType; // 返回类型
 	private Connection connection; // 当前连接
@@ -52,7 +53,7 @@ public final class QueryContext {
 	}
 
 	static void start(Class<? extends Repository> iclass, Method method, Object[] args) throws SQLException {
-		if (threadLocal.get() != null && !debug) {
+		if (threadLocal.get() != null && !debug && !getQueryContext().outTx) {
 			clear();
 			throw new SQLException("QueryContext 没有正确释放");
 		}
@@ -134,7 +135,7 @@ public final class QueryContext {
 	}
 
 	static void clear() throws SQLException {
-		if (!debug) {
+		if (!debug && !getQueryContext().outTx) {
 			try {
 				QueryContext context = getQueryContext();
 				lang = null;
@@ -217,7 +218,7 @@ public final class QueryContext {
 	 * @throws SQLException 异常
 	 */
 	static void setAutoCommit(boolean autoCommit) throws SQLException {
-		if (!debug && getQueryContext().supporTx) {
+		if (!debug && !getQueryContext().outTx && getQueryContext().supporTx) {
 			getQueryContext().connection.setAutoCommit(autoCommit);
 		}
 	}
@@ -228,7 +229,7 @@ public final class QueryContext {
 	 * @throws SQLException 异常
 	 */
 	static void commit() throws SQLException {
-		if (!debug && getQueryContext().supporTx) {
+		if (!debug && !getQueryContext().outTx && getQueryContext().supporTx) {
 			getQueryContext().connection.commit();
 		}
 	}
@@ -239,8 +240,33 @@ public final class QueryContext {
 	 * @throws SQLException 异常
 	 */
 	static void rollback() throws SQLException {
-		if (!debug && getQueryContext().supporTx) {
+		if (!debug && !getQueryContext().outTx && getQueryContext().supporTx) {
 			getQueryContext().connection.rollback();
+		}
+	}
+	
+	static void setAutoCommit2(boolean autoCommit) throws SQLException {
+		getQueryContext().outTx = true;
+		if (!debug && getQueryContext().supporTx) {
+			getQueryContext().connection.setAutoCommit(autoCommit);
+		}
+	}
+	static void commit2() throws SQLException {
+		try {
+			if (!debug && getQueryContext().supporTx) {
+				getQueryContext().connection.commit();
+			}
+		} finally {
+			getQueryContext().outTx = false;
+		}
+	}
+	static void rollback2() throws SQLException {
+		try {
+			if (!debug && getQueryContext().supporTx) {
+				getQueryContext().connection.rollback();
+			}	
+		} finally {
+			getQueryContext().outTx = false;
 		}
 	}
 

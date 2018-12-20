@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.61.enforce</version> <!-- fastquery.version -->
+    <version>1.0.62</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.61.enforce'
+compile 'org.fastquery:fastquery:1.0.62'
 ```
 
 # FastQuery 数据持久层框架
@@ -91,7 +91,8 @@ JRE 8+
 
 ```xml
 <beans>
-	 <bean name="xkdb1" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
+	 <bean name="xkdb1" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" 
+                                        init-method="init" destroy-method="close"> 
 	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/xk" />
 	     <property name="username" value="xk" />
 	     <property name="password" value="abc123" />
@@ -109,7 +110,8 @@ JRE 8+
 	     <property name="maxOpenPreparedStatements" value="20" />
 	 </bean>
 	 <!-- 再配置一个数据源 --> 
-	 <bean name="xkdb2" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
+	 <bean name="xkdb2" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" 
+                                        init-method="init" destroy-method="close"> 
 	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/xk" />
 	     <property name="username" value="xk" />
 	     <property name="password" value="abc123" />
@@ -629,7 +631,9 @@ int updateCourse(@Param("name") String name,@Param("credit") Integer credit,Stri
 
 根据参数动态增减set不同字段,除了用`@Set`实现之外,别忘了还有其他几种解决办法: a.调用内置方法`int executeUpdate(E entity)`,实体的字段若是`null`值,那么,该字段将不会参与set运算; b.使用SQL模版,在里头做逻辑判断; c.采用`BuilderQuery`; d.采用`$表达式`. 开发者将会发现很难不能选择出适合的解决方式.
  
-## @Transactional
+## 事务
+
+### 用`@Transactional`实现简单事务
 
 ```java
 // 将三条改操作纳入到一个事务中.
@@ -646,6 +650,22 @@ int updateBatch(String name,Integer age,Integer id);
 //    举例说明: 若有个事务T,它里面有3条改操作,分别叫U1,U2,U3. T成功提交后,U1,U2,U3所影响的数据行数分别为N1,N2,N3.
 //    则: 返回值为: new int[]{N1,N2,N3}
 ```
+
+### 事务函数接口
+在`QueryRepository`中提供了一个内置事务函数`tx`.
+
+```java
+int effect = userInfoDBService.tx(() -> {
+	// 把需要纳入到一个事务内的改操作放入到这里来
+	// update1
+	// to do...
+	// update2
+	// return 影响行数;
+});
+```
+
+以上表达式,`()->{}`中的`{}`里的所有操作是原子性的,要么统统成功，要么全部失败回滚.
+
 
 ## @Param参数模板
 

@@ -24,6 +24,7 @@ package org.fastquery.core;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import org.fastquery.util.BeanUtil;
 
@@ -540,4 +541,11 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 		long id = BeanUtil.toId(entity);
 		return (E) find(entity.getClass(), id, dataSourceName, dbName);
 	}
+	
+	/**
+	 * 事务函数
+	 * @param fun 函数式子
+	 * @return 若fun函数式返回的结果是null,则,返回-1
+	 */
+	int tx(Supplier<Integer> fun);
 }

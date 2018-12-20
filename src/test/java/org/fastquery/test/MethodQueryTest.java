@@ -341,3 +341,25 @@ public class MethodQueryTest extends FastQueryTest {
 		assertThat(effect, is(0));
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

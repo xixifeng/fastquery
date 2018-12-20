@@ -34,6 +34,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -504,7 +505,25 @@ class QueryProcess {
 	}
 
 	Object methodQuery() {
-		// 有待扩展
-		return null;
+		if(QueryContext.getMethod().getName().equals("tx")) {
+			try {
+				QueryContext.setAutoCommit2(false);
+				Object obj = ((Supplier<?>) (QueryContext.getArgs()[0])).get();
+				if(obj==null) {
+					obj = -1;
+				}
+				QueryContext.commit2();
+				return obj;
+			} catch (Exception e) {
+				try {
+					QueryContext.rollback2();
+				} catch (SQLException e1) {
+					throw new RepositoryException(e1.getMessage(), e1);
+				}
+				throw new RepositoryException(e);
+			}	
+		} else {
+			return null;	
+		}
 	}
 }

@@ -22,6 +22,9 @@
 
 package org.fastquery.bean;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.fastquery.core.Id;
 
 /**
@@ -49,7 +52,10 @@ public class PManager {
 	private String hxRoomId; // 环信聊天房间Id（用于对讲广播）
 	private Long createUid = 0L;// 默认:0 创建人UID
 	private Long lastUpdateUid;// 默认:0 最后修改人UID --云平台
-
+	
+	private int[] ins = new int[] {};
+	private List<String> lists = new ArrayList<>();
+	
 	public PManager() {
 	}
 
@@ -198,5 +204,20 @@ public class PManager {
 
 	public void setLastUpdateUid(Long lastUpdateUid) {
 		this.lastUpdateUid = lastUpdateUid;
+	}
+
+	public int[] getIns() {
+		return ins;
+	}
+
+	public void setIns(int[] ins) {
+		this.ins = ins;
+	}
+
+	public List<String> getLists() {
+		return lists;
+	}
+	public void setLists(List<String> lists) {
+		this.lists = lists;
 	}
 }

@@ -53,7 +53,9 @@ public final class BeanUtil {
 	}
 
 	private static String escapeSql(String str) {
+		// 第一步将 "'" 替换成 "''"
 		String s = StringUtils.replace(str, "'", "''");
+		// 第二步将 "\\" 替换成 "\\\\"
 		return StringUtils.replace(s, "\\", "\\\\");
 	}
 
@@ -73,11 +75,16 @@ public final class BeanUtil {
 		return bean2InsertSQL(bean, dbName, values, false);
 	}
 
+	// 忽略条件: 如果不是包装类型或者字段上标识有Transient
+	private static boolean allowField(Field field) {
+		return TypeUtil.isWarrp(field.getType()) && field.getDeclaredAnnotation(Transient.class) == null;
+	}
+	
 	static <B> String toFields(Field[] fields, B bean) {
 		StringBuilder sb = new StringBuilder();
 		sb.append('(');
 		for (Field field : fields) {
-			if (field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null) {
+			if (!allowField(field)) {
 				continue;
 			}
 			try {
@@ -115,7 +122,7 @@ public final class BeanUtil {
 		}
 		sb.append('(');
 		for (Field field : fields) {
-			if (field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null) {
+			if (!allowField(field)) {
 				continue;
 			}
 			Object val = null;
@@ -335,7 +342,7 @@ public final class BeanUtil {
 		try {
 			Field[] fields = cls.getDeclaredFields();
 			for (Field field : fields) {
-				if (field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null) {
+				if (!allowField(field)) {
 					continue;
 				}
 				field.setAccessible(true);
@@ -404,7 +411,7 @@ public final class BeanUtil {
 		try {
 			Field[] fields = cls.getDeclaredFields();
 			for (Field field : fields) {
-				if (field.getType().isArray() || !TypeUtil.isWarrp(field.getType()) || field.getDeclaredAnnotation(Transient.class) != null) {
+				if (!allowField(field)) {
 					continue;
 				}
 				field.setAccessible(true);
@@ -491,7 +498,7 @@ public final class BeanUtil {
 		StringBuilder ids = new StringBuilder();
 		StringBuilder sets = new StringBuilder();
 		for (Field field : fields) {
-			if (field != key && TypeUtil.isWarrp(field.getType()) && field.getDeclaredAnnotation(Transient.class) == null) {
+			if (field != key && allowField(field)) {
 				field.setAccessible(true);
 
 				String fieldName = field.getName();
@@ -584,7 +591,7 @@ public final class BeanUtil {
 			return null;
 		} else {
 			Class<?> cls = obj.getClass();
-			if (cls.isArray() || !TypeUtil.isWarrp(cls) || obj instanceof Iterable) {
+			if (cls.isArray() || obj instanceof Iterable) {
 				String strs = JSONArray.toJSONString(obj);
 				return strs.substring(1, strs.length() - 1);
 			}	
@@ -663,8 +670,7 @@ public final class BeanUtil {
 		Class<?> cls = (bean instanceof Class) ? (Class<?>) bean : bean.getClass();
 		Field[] fields = cls.getDeclaredFields();
 		for (Field field : fields) {
-			// 映射的字段必须满足: a: 不是数组 b:必须是包装类型 c: 没有标识@Transient
-			if(!field.getType().isArray() && TypeUtil.isWarrp(field.getType()) && field.getDeclaredAnnotation(Transient.class) == null) {
+			if(allowField(field)) {
 				list.add(field);
 			}
 		}

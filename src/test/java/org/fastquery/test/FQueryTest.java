@@ -76,7 +76,7 @@ public class FQueryTest extends FastQueryTest  {
 		clazz = (Class<PManager>) tempPmanager.getClass();
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
-			if (field.getType().isArray() || !TypeUtil.isWarrp(field.getType())) {
+			if (!TypeUtil.isWarrp(field.getType())) {
 				continue;
 			}
 
