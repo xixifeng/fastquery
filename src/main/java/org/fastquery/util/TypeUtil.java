@@ -470,7 +470,7 @@ public class TypeUtil implements Opcodes {
 	 * @param sql sql语句
 	 * @return sql
 	 */
-	public static String paramFilter(Method method, Object[] args, String sql) {
+	static String paramFilter(Method method, Object[] args, String sql) {
 		String s = sql;
 		// 替换@Param
 		Annotation[][] annotations = method.getParameterAnnotations();

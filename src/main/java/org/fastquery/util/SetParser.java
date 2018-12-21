@@ -35,14 +35,14 @@ import org.slf4j.LoggerFactory;
  * 
  * @author mei.sir@aliyun.cn
  */
-public final class SetParser {
+final class SetParser {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(SetParser.class);
 	
 	private SetParser() {
 	}
 	
-	public static String process() {
+	static String process() {
 		Method method = QueryContext.getMethod();
 		Set[] sets = method.getAnnotationsByType(Set.class);
 		int len = sets.length;

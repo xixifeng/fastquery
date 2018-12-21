@@ -54,7 +54,7 @@ public class XMLParse {
 		R appley(M m,E e);
 	}
 	
-	public static boolean exists(Resource resource, String resourceName, String dataSourceName,String tagName) {
+	static boolean exists(Resource resource, String resourceName, String dataSourceName,String tagName) {
 		return toWho(resource, resourceName, dataSourceName,tagName, (map,ele) -> (map!=null && !map.isEmpty()) || ele != null);
 	}
 	

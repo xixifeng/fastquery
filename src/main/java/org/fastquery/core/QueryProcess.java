@@ -511,16 +511,21 @@ class QueryProcess {
 				Object obj = ((Supplier<?>) (QueryContext.getArgs()[0])).get();
 				if(obj==null) {
 					obj = -1;
+					LOG.info("tx中的函数式返回了null,导致tx中的所有操作回滚");
+					QueryContext.rollback2();
+				} else {
+					QueryContext.commit2();
 				}
-				QueryContext.commit2();
 				return obj;
 			} catch (Exception e) {
 				try {
 					QueryContext.rollback2();
 				} catch (SQLException e1) {
-					throw new RepositoryException(e1.getMessage(), e1);
+					LOG.warn("执行回滚异常",e1);
+					return -1;
 				}
-				throw new RepositoryException(e);
+				LOG.warn("tx方法被迫回滚",e);
+				return -1;
 			}	
 		} else {
 			return null;	

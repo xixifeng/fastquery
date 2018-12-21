@@ -34,7 +34,7 @@ import org.fastquery.core.RepositoryException;
  * 
  * @author mei.sir@aliyun.cn
  */
-public abstract class Judge {
+public abstract class Judge { // NO_UCD
 	
 	public abstract boolean ignore();
 

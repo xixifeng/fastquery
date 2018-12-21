@@ -26,7 +26,7 @@ package org.fastquery.where;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class DefaultJudge extends Judge {
+public class DefaultJudge extends Judge { // NO_UCD
 
 	@Override
 	public boolean ignore() {

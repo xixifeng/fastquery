@@ -33,7 +33,7 @@ import org.fastquery.util.BeanUtil;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public interface QueryRepository extends Repository { // NO_UCD (test only)
+public interface QueryRepository extends Repository { // NO_UCD
 	/**
 	 * 保存一个实体,然后将主键值返回(不适用于联合主键).注意:永不返回null,没有找到主键返回-1
 	 * 
@@ -545,7 +545,7 @@ public interface QueryRepository extends Repository { // NO_UCD (test only)
 	/**
 	 * 事务函数
 	 * @param fun 函数式子
-	 * @return 若fun函数式返回的结果是null,则,返回-1
+	 * @return fun函数体中有任何没被捕获的异常或fun函数体返回null,就会导致fun里面的全部操作回滚,被回滚后的tx最后会返回-1,除此之外,tx的返回值等于fun的返回值.
 	 */
 	int tx(Supplier<Integer> fun);
 }

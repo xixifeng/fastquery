@@ -47,21 +47,29 @@ public class TxTest extends FastQueryTest {
 		assertThat(effect, equalTo(0));
 	}
 	
+	private int u1(Integer id, String name, Integer age) {
+		UserInfo userInfo = new UserInfo(id, name, age);
+		int effect = studentDBService.executeSaveOrUpdate(userInfo);
+		assertThat(effect, is(1));
+		UserInfo u1 = userInfoDBService.findById(id);
+		assertThat(u1.getId(),equalTo(id));
+		assertThat(u1.getName(),equalTo(name));
+		assertThat(u1.getAge(),equalTo(age));
+		return effect;
+	}
+	
 	@Test(expected = RepositoryException.class)
 	public void updateTx2() {
 		int id = 100;
 		String name = "hikey";
 		int age = 13;
+		
 		try {
-			userInfoDBService.tx(()->{
-				UserInfo userInfo = new UserInfo(id, name, age);
-				int effect = studentDBService.executeSaveOrUpdate(userInfo);
-				assertThat(effect, is(1));
-				UserInfo u1 = userInfoDBService.findById(id);
-				assertThat(u1.getId(),equalTo(id));
-				assertThat(u1.getName(),equalTo(name));
-				assertThat(u1.getAge(),equalTo(age));
-				throw new RepositoryException("Du...du...");
+			userInfoDBService.tx(()-> {
+				u1(id, name, age);
+				u1(id, name, age);
+				u1(id, name, age);
+				throw new RepositoryException("Do...Do...");
 			});
 		} finally {
 			UserInfo u1 = userInfoDBService.findById(id);

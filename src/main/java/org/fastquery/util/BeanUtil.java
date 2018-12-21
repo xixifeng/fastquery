@@ -677,7 +677,7 @@ public final class BeanUtil {
 		return list;
 	}
 	
-	public static String selectFields(Object bean) {
+	static String selectFields(Object bean) {
 		Objects.requireNonNull(bean);
 		List<Field> fields = mapFields(bean);
 		StringBuilder sb = new StringBuilder(6*fields.size());
