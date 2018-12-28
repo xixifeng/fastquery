@@ -84,26 +84,24 @@ public final class BeanUtil {
 		StringBuilder sb = new StringBuilder();
 		sb.append('(');
 		for (Field field : fields) {
-			if (!allowField(field)) {
-				continue;
-			}
-			try {
-				field.setAccessible(true);
-				if (field.getAnnotation(Id.class) == null || field.get(bean) != null) {
-					// 接纳的值:
-					// 1. 不是主键的字段 
-					// 或
-					// 2. 不为null的字段
-					sb.append('`');
-					sb.append(field.getName());
-					sb.append("`,");
+			if (allowField(field)) {
+				try {
+					field.setAccessible(true);
+					if (field.getAnnotation(Id.class) == null || field.get(bean) != null) {
+						// 接纳的值:
+						// 1. 不是主键的字段 
+						// 或
+						// 2. 不为null的字段
+						sb.append('`');
+						sb.append(field.getName());
+						sb.append("`,");
+					}
+				} catch (IllegalAccessException | IllegalArgumentException e) {
+					throw new RepositoryException(e);
 				}
-			} catch (IllegalAccessException | IllegalArgumentException e) {
-				throw new RepositoryException(e);
 			}
 		}
-		sb.deleteCharAt(sb.length() - 1);
-		sb.append(')');
+		sb.setCharAt(sb.length() - 1, ')');
 		return sb.toString();
 	}
 
@@ -122,26 +120,24 @@ public final class BeanUtil {
 		}
 		sb.append('(');
 		for (Field field : fields) {
-			if (!allowField(field)) {
-				continue;
-			}
-			Object val = null;
-			try {
-				field.setAccessible(true);
-				val = field.get(bean);
-			} catch (IllegalAccessException | IllegalArgumentException e) {
-				throw new RepositoryException(e);
-			}
-			if (val != null) {
-				sb.append('\'');
-				sb.append(escapeSql(val.toString()));
-				sb.append("',");
-			} else if (field.getAnnotation(Id.class) == null) {
-				sb.append("null,");
+			if (allowField(field)) {
+				Object val = null;
+				try {
+					field.setAccessible(true);
+					val = field.get(bean);
+				} catch (IllegalAccessException | IllegalArgumentException e) {
+					throw new RepositoryException(e);
+				}
+				if (val != null) {
+					sb.append('\'');
+					sb.append(escapeSql(val.toString()));
+					sb.append("',");
+				} else if (field.getAnnotation(Id.class) == null) {
+					sb.append("null,");
+				}
 			}
 		}
-		sb.deleteCharAt(sb.length() - 1);
-		sb.append(')');
+		sb.setCharAt(sb.length() - 1, ')');
 		return sb.toString();
 	}
 
@@ -174,46 +170,31 @@ public final class BeanUtil {
 	 * @return 插入语句
 	 */
 	public static <B> String toInsertSQL(Iterable<B> beans, String dbName, boolean ignoreRepeat) {
-		if (beans == null)
+		if (beans == null) {
 			return null;
-
-		Iterator<B> iterator = beans.iterator();
-		if (!iterator.hasNext()) {
-			return null;
+		} else {
+			Iterator<B> iterator = beans.iterator();
+			if (!iterator.hasNext()) {
+				return null;
+			} else {
+				// 集合中的第一个bean
+				B bean = iterator.next();
+				@SuppressWarnings("unchecked")
+				Class<B> clazz = (Class<B>) bean.getClass();
+				
+				// values 部分
+				String values = toValues(clazz.getDeclaredFields(), beans);
+				
+				return bean2InsertSQL(bean, dbName, values, ignoreRepeat);		
+			}
 		}
-		// 集合中的第一个bean
-		B bean = iterator.next();
-		@SuppressWarnings("unchecked")
-		Class<B> clazz = (Class<B>) bean.getClass();
-		
-		// values 部分
-		String values = toValues(clazz.getDeclaredFields(), beans);
-		
-		return bean2InsertSQL(bean, dbName, values, ignoreRepeat);
-
 	}
 	
 	private static String bean2InsertSQL(Object bean, String dbName, String values,boolean ignoreRepeat) {
 		// 集合中的第一个bean
 		Class<?> clazz = bean.getClass();
-		// 确立表名称
-		StringBuilder sb = new StringBuilder();
-		if (dbName != null) {
-			sb.append('`');
-			sb.append(dbName);
-			sb.append("`.`");
-			sb.append(getEntitySimpleName(clazz));
-			sb.append('`');
-		} else {
-			sb.append('`');
-			sb.append(getEntitySimpleName(clazz));
-			sb.append('`');
-		}
+		String tableName = getTableName(dbName, clazz);
 		Field[] fields = clazz.getDeclaredFields();
-
-		// 表名称
-		String tableName = sb.toString();
-
 		// 表字段
 		String fs = toFields(fields, bean);
 
@@ -299,17 +280,16 @@ public final class BeanUtil {
 	}
 
 	private static String getTableName(String dbName, Class<?> cls) {
-		String tableName = getEntitySimpleName(cls);
+		String tableName = StringUtils.wrap(getEntitySimpleName(cls), '`');
 		if (dbName != null) {
-			tableName = new StringBuilder().append('`').append(dbName).append("`.`").append(tableName).append('`').toString();
+			return new StringBuilder().append('`').append(dbName).append("`.").append(tableName).toString();
 		} else {
-			tableName = '`' + tableName + '`';
+			return tableName;	
 		}
-		return tableName;
 	}
 
 	/**
-	 * 如果这个bean已经包含主键的值,就已bean的主键值为准 <br>
+	 * 如果这个bean已经包含主键的值,就以bean的主键值为准 <br>
 	 * [0]: 更新语句, [1]:参数值集合类型:List&lt;Object&gt; [2](是否存在第3个值取决于toSQL是否设置true): 根据主键查的sql语句
 	 * 
 	 * @param bean 待更新的实体
@@ -318,14 +298,13 @@ public final class BeanUtil {
 	 * @return 更新语句信息
 	 */
 	public static Object[] toUpdateSQL(Object bean, String dbName, boolean toSQL) {
-		Object[] updateinfo = new Object[3];
 		List<Object> args = new ArrayList<>();
 		Class<?> cls = bean.getClass();
 		// 表名称
 		String tableName = getTableName(dbName, cls);
 
-		Object key = null;
-		String keyFeild = null;
+		String keyFeild;
+		Object key;
 		Object[] objs = getKeyAndVal(bean, cls.getDeclaredFields(), null);
 		keyFeild = (String) objs[0];
 		key = objs[1];
@@ -342,44 +321,43 @@ public final class BeanUtil {
 		try {
 			Field[] fields = cls.getDeclaredFields();
 			for (Field field : fields) {
-				if (!allowField(field)) {
-					continue;
-				}
-				field.setAccessible(true);
-				Object val = field.get(bean);
-				Id id = field.getAnnotation(Id.class);
-				if (val != null && id == null) {
-					args.add(val);
+				if (allowField(field)) {
+					field.setAccessible(true);
+					Object val = field.get(bean);
+					Id id = field.getAnnotation(Id.class);
+					if (val != null && id == null) {
+						args.add(val);
+						sb.append(" `");
+						sb.append(field.getName());
+						sb.append('`');
+						sb.append("=?,");
 
-					sb.append(" `");
-					sb.append(field.getName());
-					sb.append('`');
-					sb.append("=?,");
-
+					}
 				}
 			}
+			
 			if (sb.length() == len) {
 				LOG.warn("传递的实体,没有什么可以修改,{}", bean);
 				return null;
-			}
-			// 去掉sb最后的一个字符
-			sb.deleteCharAt(sb.length() - 1);
-			sb.append(" where ");
-			sb.append('`');
-			sb.append(keyFeild);
-			sb.append("`=?");
-			args.add(key);
-			updateinfo[0] = sb.toString();
-			updateinfo[1] = args;
-			if (toSQL) {
-				updateinfo[2] = String.format("select * from %s where `%s` = %s", tableName, keyFeild, key.toString());
+			} else {
+				// 去掉sb最后的一个字符
+				sb.deleteCharAt(sb.length() - 1);
+				sb.append(" where ");
+				sb.append('`');
+				sb.append(keyFeild);
+				sb.append("`=?");
+				args.add(key);
+				Object[] updateinfo = new Object[3];
+				updateinfo[0] = sb.toString();
+				updateinfo[1] = args;
+				if (toSQL) {
+					updateinfo[2] = String.format("select * from %s where `%s` = %s", tableName, keyFeild, key.toString());
+				}
+				return updateinfo;
 			}
 		} catch (Exception e) {
 			throw new RepositoryException(e);
 		}
-
-		return updateinfo;
-
 	}
 
 	/**
@@ -392,16 +370,10 @@ public final class BeanUtil {
 	 */
 	public static Object[] toUpdateSQL(Object bean, String dbName, String where) {
 		List<String> wps = TypeUtil.matches(where, Placeholder.COLON_REG);
-		Object[] updateinfo = new Object[2];
 		List<Object> args = new ArrayList<>();
 		Class<?> cls = bean.getClass();
 		// 表名称
-		String tableName = cls.getSimpleName();
-		if (dbName != null) {
-			tableName = new StringBuilder().append('`').append(dbName).append("`.`").append(tableName).append('`').toString();
-		} else {
-			tableName = '`' + tableName + '`';
-		}
+		String tableName = getTableName(dbName, cls);
 
 		// update UserInfo set name=?,age=? where id=?4
 		StringBuilder sb = new StringBuilder("update ");
@@ -411,47 +383,46 @@ public final class BeanUtil {
 		try {
 			Field[] fields = cls.getDeclaredFields();
 			for (Field field : fields) {
-				if (!allowField(field)) {
-					continue;
-				}
-				field.setAccessible(true);
-				Object val = field.get(bean);
-				if (val != null && !wps.contains(":" + field.getName())) {
-					args.add(val);
-					sb.append(" `");
-					sb.append(field.getName());
-					sb.append('`');
-					sb.append("=?,");
+				if (allowField(field)) {
+					field.setAccessible(true);
+					Object val = field.get(bean);
+					if (val != null && !wps.contains(":" + field.getName())) {
+						args.add(val);
+						sb.append(" `");
+						sb.append(field.getName());
+						sb.append('`');
+						sb.append("=?,");
 
+					}
 				}
 			}
 			if (sb.length() == len) {
 				LOG.warn("传递的实体,没有什么可修改,{}", bean);
 				return null;
-			}
-			// where的后面部分 和 追加sql参数
-			String whef = where.replaceAll(Placeholder.COLON_REG, "?");
-			for (String wp : wps) {
-				Object val = new PropertyDescriptor(wp.replace(":", ""), cls).getReadMethod().invoke(bean);
-				if (val == null) {
-					throw new RepositoryException("条件的值不能为null");
+			} else {
+				// where的后面部分 和 追加sql参数
+				String whef = where.replaceAll(Placeholder.COLON_REG, "?");
+				for (String wp : wps) {
+					Object val = new PropertyDescriptor(wp.replace(":", ""), cls).getReadMethod().invoke(bean);
+					if (val == null) {
+						throw new RepositoryException("条件的值不能为null");
+					}
+					args.add(val);
 				}
-				args.add(val);
-			}
-			// // where的后面部分 和 追加sql参数 End
+				// // where的后面部分 和 追加sql参数 End
 
-			// 去掉sb最后的一个字符
-			sb.deleteCharAt(sb.length() - 1);
-			sb.append(" where ");
-			sb.append(whef);
-			updateinfo[0] = sb.toString();
-			updateinfo[1] = args;
+				// 去掉sb最后的一个字符
+				sb.deleteCharAt(sb.length() - 1);
+				sb.append(" where ");
+				sb.append(whef);
+				Object[] updateinfo = new Object[2];
+				updateinfo[0] = sb.toString();
+				updateinfo[1] = args;	
+				return updateinfo;
+			}
 		} catch (Exception e) {
 			throw new RepositoryException(e);
 		}
-
-		return updateinfo;
-
 	}
 
 	private static Field getKey(Class<?> clazz,Field[] fields) {
@@ -651,9 +622,9 @@ public final class BeanUtil {
 
 		if (key == null) {
 			throw new RepositoryException(cls + " 必须有@Id标识,并且主键不能为null");
+		} else {
+			return Long.valueOf(key.toString());
 		}
-
-		return Long.valueOf(key.toString());
 	}
 
 	private static String getEntitySimpleName(Class<?> clazz) {
@@ -682,15 +653,14 @@ public final class BeanUtil {
 		List<Field> fields = mapFields(bean);
 		StringBuilder sb = new StringBuilder(6*fields.size());
 		fields.forEach( f -> {
-			sb.append(',');
-			sb.append('`');
+			sb.append(",`");
 			sb.append(f.getName());
 			sb.append('`');
 		});
 		int len = sb.length();
 		if(len > 0) {
 			sb.deleteCharAt(0);
-		} 
+		}
 		
 		return sb.toString();
 	}

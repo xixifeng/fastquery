@@ -79,14 +79,22 @@ class Allocation {
 			for (int j = 0; j < partNodes.getLength(); j++) {
 				Node partNode = partNodes.item(j);
 				short nodeType = partNode.getNodeType();
-				if (nodeType == Document.ELEMENT_NODE && "parts".equals(partNode.getNodeName())) {
-					eachParts(xmlName, (Element) partNode);
-				}
-				if (nodeType == Document.ELEMENT_NODE && "value".equals(partNode.getNodeName())) {
-					doValue(xmlName, element);
-				}
-				if (nodeType == Document.ELEMENT_NODE && "countQuery".equals(partNode.getNodeName())) {
-					doCountQuery(xmlName, element);
+				final short elementNode = Document.ELEMENT_NODE;
+				final String partNodeName = partNode.getNodeName();
+				if (nodeType == elementNode) {
+					switch (partNodeName) {
+					case "parts":
+						eachParts(xmlName, (Element) partNode);
+						break;
+					case "value":
+						doValue(xmlName, element);
+						break;
+					case "countQuery":
+						doCountQuery(xmlName, element);
+						break;
+					default:
+						break;
+					}
 				}
 			}
 		}

@@ -23,6 +23,8 @@
 package org.fastquery.test;
 
 import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
@@ -86,7 +88,7 @@ public class FQueryPropertiesTest extends FastQueryTest  {
 	}
 
 	@Test
-	public void testGetDataSources() {
+	public void testGetDataSources() throws SQLException {
 
 		Map<String, DataSource> maps = getDataSources();
 		maps.forEach((k, v) -> {
@@ -95,6 +97,20 @@ public class FQueryPropertiesTest extends FastQueryTest  {
 		assertThat(maps.size(), either(is(6)).or(is(7)));
 		Set<String> keys = maps.keySet();
 		assertThat(keys, hasItems("sunnydb", "xkdb", "xk3", "s1", "s2"));
+		
+		DataSource d1 =  maps.get("xkdb");
+		DataSource d2 =  maps.get("xkdb");
+		assertThat(d1, notNullValue());
+		assertThat(d1==d2, is(true));
+		
+		Connection con1 = d1.getConnection();
+		Connection con2 = con1;
+		assertThat(con1 == con2, is(true));
+		Connection con3 = con2;
+		con1.close();
+		assertThat(con1.isClosed(), is(true));
+		assertThat(con2.isClosed(), is(true));
+		assertThat(con3.isClosed(), is(true));
 	}
 
 	@Test

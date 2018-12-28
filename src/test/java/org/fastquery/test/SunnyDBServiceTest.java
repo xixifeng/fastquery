@@ -52,7 +52,7 @@ public class SunnyDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void save() {
-		String number = "852000XXXXX";
+		String number = "852000XXXXY";
 		Card card = new Card();
 		card.setNumber(number);
 		int c = sunnyDBService.insert(card);

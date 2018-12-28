@@ -65,9 +65,8 @@ final class SetParser {
 			if("set ".equals(sb.toString())) {
 				throw new RepositoryException("@Set 修改选项全部被忽略了,这是不允许的");
 			} else {
-				// 去掉最后一个逗号
-				sb.deleteCharAt(sb.length()-1);
-				sb.append(' ');
+				// 将最后一个字符替换成 ' '
+				sb.setCharAt(sb.length() - 1, ' ');
 				return sb.toString();
 			}
 		}

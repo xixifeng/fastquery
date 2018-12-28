@@ -507,9 +507,9 @@ class QueryProcess {
 	Object methodQuery() {
 		if(QueryContext.getMethod().getName().equals("tx")) {
 			try {
-				QueryContext.setAutoCommit2(false);
+				QueryContext.disableAutoCommit2();
 				Object obj = ((Supplier<?>) (QueryContext.getArgs()[0])).get();
-				if(obj==null) {
+				if(obj==null || obj.equals(-1)) {
 					obj = -1;
 					LOG.info("tx中的函数式返回了null,导致tx中的所有操作回滚");
 					QueryContext.rollback2();

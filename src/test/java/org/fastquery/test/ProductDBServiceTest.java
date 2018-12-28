@@ -69,8 +69,8 @@ public class ProductDBServiceTest extends FastQueryTest  {
 	public void save2() {
 		List<Product> products = new ArrayList<>();
 		
-		Product p1 = new Product(5, 2, "几何");
-		Product p2 = new Product(5, 2, "物理");
+		Product p1 = new Product(6, 2, "几何");
+		Product p2 = new Product(6, 2, "物理");
 		
 		products.add(p1);
 		products.add(p2);

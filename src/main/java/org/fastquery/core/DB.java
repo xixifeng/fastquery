@@ -102,7 +102,7 @@ public class DB {
 		List<RespUpdate> rus = null;
 		Connection conn = QueryContext.getConnection(); // 由QueryContext自动关闭
 		try {
-			QueryContext.setAutoCommit(false); // 关闭自动提交
+			QueryContext.disableAutoCommit(); // 关闭自动提交
 			rus = modify(sqlValues, hasPK, conn);
 			QueryContext.commit(); // 提交事务
 		} catch (Exception e) {
@@ -175,7 +175,7 @@ public class DB {
 		try {
 			conn = QueryContext.getConnection();
 			QueryContext.addSqls(sql);
-			QueryContext.setAutoCommit(false);
+			QueryContext.disableAutoCommit();
 			if (isEffect) {
 				stat = conn.prepareStatement(sql); // 不需要返回主键
 			} else {
@@ -224,7 +224,7 @@ public class DB {
 		int count = args.size();
 		try {
 			conn = QueryContext.getConnection();
-			QueryContext.setAutoCommit(false);
+			QueryContext.disableAutoCommit();
 			QueryContext.addSqls(sql);
 			info(sql, args);
 			stat = conn.prepareStatement(sql);
@@ -318,7 +318,7 @@ public class DB {
 		Statement stat = null;
 		Stream<String> stream = parserSQLFile(sqlFile);
 		try {
-			QueryContext.setAutoCommit(false);
+			QueryContext.disableAutoCommit();
 			final Statement st = conn.createStatement();
 			stat = st;
 			stream.forEach(s -> consumer.accept(st, s));

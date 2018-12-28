@@ -46,7 +46,7 @@ public class SaveToIdTest extends FastQueryTest  {
 
 	@Test
 	public void saveToId1() {
-		Long punitId = 173L;
+		Long punitId = 174L;
 		String vname = "OTU\\";
 		String idCard = "&";
 		String mobile = "\\";
@@ -56,7 +56,7 @@ public class SaveToIdTest extends FastQueryTest  {
 		String remark = "来访";
 		Long lastDate = 1506233249L;
 		Long createDate = 1506233208L;
-		String iden = "J6X1HH15ExIkvqSNSHXa";
+		String iden = "J6X1HH15ExIkvqSNSHXb";
 		Integer dId = 1;
 
 		Visitor v = new Visitor(punitId, vname, idCard, mobile, email, gender, toAddr, remark, lastDate, iden, dId);

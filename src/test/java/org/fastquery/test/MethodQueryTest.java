@@ -318,7 +318,7 @@ public class MethodQueryTest extends FastQueryTest {
 
 	@Test
 	public void delete1() {
-		int id = 89890;
+		int id = 8999;
 		int effect = userInfoDBService.insert(new UserInfo(id, "植物", 17));
 		assertThat(effect, is(1));
 		effect = userInfoDBService.delete("UserInfo", "id", id);

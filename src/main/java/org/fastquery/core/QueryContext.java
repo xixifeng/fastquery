@@ -40,6 +40,10 @@ public final class QueryContext {
 	private List<String> sqls = new ArrayList<>(); // 当前method所执行的SQL集合
 	private MetaData metaData; // 当前上下文元数据
 	private boolean builderQuery;
+	
+	private DataSource ds;
+	private DataSource txds;
+	private Connection txConn;
 
 	private static String lang = "zh_CN"; // 语言编码
 	// 作用于调式
@@ -53,10 +57,6 @@ public final class QueryContext {
 	}
 
 	static void start(Class<? extends Repository> iclass, Method method, Object[] args) throws SQLException {
-		if (threadLocal.get() != null && !debug && !getQueryContext().outTx) {
-			clear();
-			throw new SQLException("QueryContext 没有正确释放");
-		}
 		if (threadLocal.get() == null) {
 			threadLocal.set(new QueryContext());
 		}
@@ -66,13 +66,27 @@ public final class QueryContext {
 		context.args = args;
 
 		context.sourceName = findSource(method.getParameters(), args);
-		if (context.connection == null || context.connection.isClosed()) { // 不加这行,测试StudentDBServiceTest会卡顿
-			context.connection = getDataSource(context.sourceName, iclass.getName()).getConnection();
-			if (debug) {
-				getQueryContext().connection.setAutoCommit(false);
+		context.ds = getDataSource(context.sourceName, iclass.getName());
+		if(context.outTx) {
+			if(context.ds == context.txds) {
+				context.connection = context.txConn;
+			} else {
+				if (context.connection == null || context.connection.isClosed()) { // 不加这行,测试StudentDBServiceTest会卡顿
+					context.connection = context.ds.getConnection();
+					if (debug) {
+						getQueryContext().connection.setAutoCommit(false);
+					}
+				}
+			}
+		} else {
+			if (context.connection == null || context.connection.isClosed()) { // 不加这行,测试StudentDBServiceTest会卡顿
+				context.connection = context.ds.getConnection();
+				if (debug) {
+					getQueryContext().connection.setAutoCommit(false);
+				}
 			}
 		}
-
+		
 		Transactional t = context.method.getAnnotation(Transactional.class);
 		context.supporTx = t == null || !t.propagation().equals(Propagation.NOT_SUPPORTED);
 
@@ -135,9 +149,16 @@ public final class QueryContext {
 	}
 
 	static void clear() throws SQLException {
-		if (!debug && !getQueryContext().outTx) {
+		if (!debug) {
 			try {
 				QueryContext context = getQueryContext();
+				if(context.outTx) { // 事务范围内需要关闭非tx数据源的连接
+					if(context.ds != context.txds) {
+						context.connection.close();
+					}
+				} else {
+					context.connection.close();
+				}
 				lang = null;
 				if (context.metaData != null) {
 					context.metaData.clear();
@@ -150,11 +171,8 @@ public final class QueryContext {
 				context.sourceName = null;
 				context.iclass = null;
 				context.args = null;
-				if (context.connection != null) {
-					context.connection.close();
-				}
 			} catch (Exception e) {
-				LOG.warn(e.getMessage(), e);
+				LOG.error(e.getMessage(), e);
 				throw new SQLException(e);
 			} finally {
 				threadLocal.remove();
@@ -214,12 +232,19 @@ public final class QueryContext {
 	/**
 	 * 关闭事务自动提交
 	 * 
-	 * @param autoCommit false:不自动提交;true:自动提交
 	 * @throws SQLException 异常
 	 */
-	static void setAutoCommit(boolean autoCommit) throws SQLException {
-		if (!debug && !getQueryContext().outTx && getQueryContext().supporTx) {
-			getQueryContext().connection.setAutoCommit(autoCommit);
+	static void disableAutoCommit() throws SQLException {
+		if (!debug) {
+			if(!getQueryContext().outTx) {
+				if(getQueryContext().supporTx) {
+					getQueryContext().connection.setAutoCommit(false);	
+				}
+			} else {
+				if(getQueryContext().ds != getQueryContext().txds) {
+					getQueryContext().connection.setAutoCommit(false);	
+				}
+			}
 		}
 	}
 
@@ -229,8 +254,16 @@ public final class QueryContext {
 	 * @throws SQLException 异常
 	 */
 	static void commit() throws SQLException {
-		if (!debug && !getQueryContext().outTx && getQueryContext().supporTx) {
-			getQueryContext().connection.commit();
+		if (!debug) {
+			if(!getQueryContext().outTx) {
+				if(getQueryContext().supporTx) {
+					getQueryContext().connection.commit();
+				}
+			} else {
+				if(getQueryContext().ds != getQueryContext().txds) {
+					getQueryContext().connection.commit();
+				}
+			}
 		}
 	}
 
@@ -240,33 +273,47 @@ public final class QueryContext {
 	 * @throws SQLException 异常
 	 */
 	static void rollback() throws SQLException {
-		if (!debug && !getQueryContext().outTx && getQueryContext().supporTx) {
-			getQueryContext().connection.rollback();
+		if (!debug) {
+			if(!getQueryContext().outTx) {
+				if(getQueryContext().supporTx) {
+					getQueryContext().connection.rollback();
+				}
+			} else {
+				if(getQueryContext().ds != getQueryContext().txds) {
+					getQueryContext().connection.rollback();
+				}
+			}
 		}
 	}
 	
-	static void setAutoCommit2(boolean autoCommit) throws SQLException {
+	static void disableAutoCommit2() throws SQLException {
 		getQueryContext().outTx = true;
-		if (!debug && getQueryContext().supporTx) {
-			getQueryContext().connection.setAutoCommit(autoCommit);
+		getQueryContext().txds = getQueryContext().ds;
+		getQueryContext().txConn = getQueryContext().connection;
+		if (!debug) {
+			getQueryContext().txConn.setAutoCommit(false);
 		}
 	}
+
 	static void commit2() throws SQLException {
-		try {
-			if (!debug && getQueryContext().supporTx) {
+		if (!debug) {
+			try {
+				getQueryContext().connection = getQueryContext().txConn;
 				getQueryContext().connection.commit();
+			} finally {
+				getQueryContext().outTx = false;
 			}
-		} finally {
-			getQueryContext().outTx = false;
 		}
 	}
+
 	static void rollback2() throws SQLException {
-		try {
-			if (!debug && getQueryContext().supporTx) {
+		if (!debug) {
+			try {
+				getQueryContext().connection = getQueryContext().txConn;
 				getQueryContext().connection.rollback();
-			}	
-		} finally {
-			getQueryContext().outTx = false;
+			} finally {
+				getQueryContext().outTx = false;
+			}
 		}
 	}
 

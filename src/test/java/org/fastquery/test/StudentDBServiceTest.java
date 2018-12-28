@@ -429,7 +429,7 @@ public class StudentDBServiceTest extends FastQueryTest  {
 	@Test
 	public void callProcedure() {
 
-		String no = "008003";
+		String no = "0063659";
 		int effect = studentDBService.deleteByNo(no);
 
 		assertThat(effect, equalTo(1));

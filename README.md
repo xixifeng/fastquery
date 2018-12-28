@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.63</version> <!-- fastquery.version -->
+    <version>1.0.64</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.63'
+compile 'org.fastquery:fastquery:1.0.64'
 ```
 
 # FastQuery 数据持久层框架
@@ -665,7 +665,7 @@ int effect = userInfoDBService.tx(() -> {
 });
 ```
 
-以上`Lambda`表达式,`()->{}`中的`{}`里的所有操作是原子性的,要么统统成功，要么全部失败回滚.在`{}`里抛出异常或`return null`都会导致`{}`全体回滚.`Lambda`表达式对**值**封闭,对**变量**开放(Lambda expressions close over values,not variables),正因为这个特性,不能在`{}`中修改外界的值,但是可以给外界的对象设置值. 
+以上`Lambda`表达式,`()->{}`中的`{}`里的所有操作是原子性的,要么统统成功，要么全部失败回滚.在`{}`里抛出异常或`return null`或返回-1,都会导致`{}`全体回滚并返回-1.`Lambda`表达式对**值**封闭,对**变量**开放(Lambda expressions close over values,not variables),正因为这个特性,不能在`{}`中修改外界的值,但是可以给外界的对象设置值. 
 
 ```java
 ... ...
@@ -676,7 +676,7 @@ tx(() -> {
      map.put(K, V); // 这是允许的(Legal, open over variables)
 });
 ```
-因此,要想把`{}`中处理的数据拿出来使用,将其设置给一个外界的对象就行了.
+因此,要想把`{}`中处理的数据拿出来使用,将其设置给一个外界的对象就行了. `tx`方法被回滚后会返回-1.
 
 ## @Param参数模板
 
