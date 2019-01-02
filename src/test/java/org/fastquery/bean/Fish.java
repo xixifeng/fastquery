@@ -20,72 +20,48 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.bean;
+
+import org.fastquery.core.Id;
 
 /**
  * 
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
  */
-class MethodId {
+public class Fish extends Named{
 
-	/**
-	 * -1
-	 */
-	static final byte QUERY = -1;
-
-	/**
-	 * 0X00
-	 */
-	static final byte QUERY0 = 0X00;
-
-	/**
-	 * 0X01
-	 */
-	static final byte QUERY1 = 0X01;
-
-	/**
-	 * 0X02
-	 */
-	static final byte QUERY2 = 0X02;
-
-	/**
-	 * 0X03
-	 */
-	static final byte QUERY3 = 0X03;
-
-	/**
-	 * 0X04
-	 */
-	static final byte QUERY4 = 0X04;
-
-	/**
-	 * 0X05
-	 */
-	static final byte QUERY5 = 0X05;
-
-	/**
-	 * 0X06
-	 */
-	static final byte QUERY6 = 0X06;
-
-	/**
-	 * 0X07
-	 */
-	static final byte QUERY7 = 0X07;
-
-	/**
-	 * 0X08
-	 */
-	static final byte QUERY8 = 0X08;
+	 @Id
+	 private Integer id;
+	 private Integer num;
 	
-	/**
-	 * 0X09
-	 */
-	static final byte QUERY9 = 0X09;
-
-	/**
-	 * 默认私有构造方法
-	 */
-	private MethodId() {
+	 public Fish() {
+	 }
+	
+	public Fish(Integer id, String name, Integer num) {
+		super(name);
+		this.id = id;
+		this.num = num;
 	}
+
+	public Fish(String name, Integer num) {
+		this.num = num;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getNum() {
+		return num;
+	}
+
+	public void setNum(Integer num) {
+		this.num = num;
+	} 
+	
+	
 }

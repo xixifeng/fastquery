@@ -37,6 +37,13 @@
 	     <property name="username" value="xk" />
 	     <property name="password" value="abc123" />
 	 </bean>
+	 
+	<bean name="aa" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" 
+                  init-method="init" destroy-method="close">
+	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/aa" />
+	     <property name="username" value="aa" />
+	     <property name="password" value="aa123456" />
+	 </bean>
  </beans>
  
  

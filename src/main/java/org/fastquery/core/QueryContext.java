@@ -30,7 +30,6 @@ public final class QueryContext {
 
 	private Method method; // 当前method
 	private boolean supporTx; // 是否需要事务支持
-	private boolean outTx;    // 标识是否是外围事务
 	private boolean requirePk;// 改操作的返回值是否依赖主键
 	private Class<?> returnType; // 返回类型
 	private Connection connection; // 当前连接
@@ -40,11 +39,7 @@ public final class QueryContext {
 	private List<String> sqls = new ArrayList<>(); // 当前method所执行的SQL集合
 	private MetaData metaData; // 当前上下文元数据
 	private boolean builderQuery;
-	
-	private DataSource ds;
-	private DataSource txds;
-	private Connection txConn;
-
+		
 	private static String lang = "zh_CN"; // 语言编码
 	// 作用于调式
 	private static boolean debug;
@@ -57,36 +52,37 @@ public final class QueryContext {
 	}
 
 	static void start(Class<? extends Repository> iclass, Method method, Object[] args) throws SQLException {
+		QueryContext context = getQueryContext();
+		if (context != null && !debug) {
+			if(context.connection != null && !context.connection.isClosed()) { // 不等于null并且没有关闭
+				throw new SQLException("QueryContext的连接没有正确释放");	
+			} else {
+				clear();	
+			}
+		}
+		
 		if (threadLocal.get() == null) {
 			threadLocal.set(new QueryContext());
+			context = threadLocal.get();
 		}
-		QueryContext context = getQueryContext();
 		context.iclass = iclass;
 		context.method = method;
 		context.args = args;
 
 		context.sourceName = findSource(method.getParameters(), args);
-		context.ds = getDataSource(context.sourceName, iclass.getName());
-		if(context.outTx) {
-			if(context.ds == context.txds) {
-				context.connection = context.txConn;
-			} else {
-				if (context.connection == null || context.connection.isClosed()) { // 不加这行,测试StudentDBServiceTest会卡顿
-					context.connection = context.ds.getConnection();
+		if (context.connection == null || context.connection.isClosed()) { // 不加这行,测试StudentDBServiceTest会卡顿
+			DataSource ds = getDataSource(context.sourceName, iclass.getName());
+			Id id = method.getAnnotation(Id.class);
+			if(TxContext.enabled()) {
+				context.connection = TxContext.getTxContext().addConn(ds);
+			} else if(id == null || id.value() != MethodId.QUERY9) { // 非tx(),注意:并代表tx函数体里的方法
+					context.connection = ds.getConnection();
 					if (debug) {
 						getQueryContext().connection.setAutoCommit(false);
-					}
-				}
-			}
-		} else {
-			if (context.connection == null || context.connection.isClosed()) { // 不加这行,测试StudentDBServiceTest会卡顿
-				context.connection = context.ds.getConnection();
-				if (debug) {
-					getQueryContext().connection.setAutoCommit(false);
-				}
+					}		
 			}
 		}
-		
+
 		Transactional t = context.method.getAnnotation(Transactional.class);
 		context.supporTx = t == null || !t.propagation().equals(Propagation.NOT_SUPPORTED);
 
@@ -136,7 +132,7 @@ public final class QueryContext {
 		QueryContext.lang = lang;
 	}
 
-	public static Connection getConnection() {
+	public static Connection getConn() {
 		return getQueryContext().connection;
 	}
 
@@ -149,16 +145,9 @@ public final class QueryContext {
 	}
 
 	static void clear() throws SQLException {
-		if (!debug) {
+		QueryContext context = getQueryContext();
+		if (!debug && context != null) {
 			try {
-				QueryContext context = getQueryContext();
-				if(context.outTx) { // 事务范围内需要关闭非tx数据源的连接
-					if(context.ds != context.txds) {
-						context.connection.close();
-					}
-				} else {
-					context.connection.close();
-				}
 				lang = null;
 				if (context.metaData != null) {
 					context.metaData.clear();
@@ -171,8 +160,11 @@ public final class QueryContext {
 				context.sourceName = null;
 				context.iclass = null;
 				context.args = null;
+				if (context.connection != null && !TxContext.enabled()) {
+					context.connection.close();
+				}
 			} catch (Exception e) {
-				LOG.error(e.getMessage(), e);
+				LOG.warn(e.getMessage(), e);
 				throw new SQLException(e);
 			} finally {
 				threadLocal.remove();
@@ -235,16 +227,8 @@ public final class QueryContext {
 	 * @throws SQLException 异常
 	 */
 	static void disableAutoCommit() throws SQLException {
-		if (!debug) {
-			if(!getQueryContext().outTx) {
-				if(getQueryContext().supporTx) {
-					getQueryContext().connection.setAutoCommit(false);	
-				}
-			} else {
-				if(getQueryContext().ds != getQueryContext().txds) {
-					getQueryContext().connection.setAutoCommit(false);	
-				}
-			}
+		if (!debug && getQueryContext().supporTx && !TxContext.enabled()) {
+			getQueryContext().connection.setAutoCommit(false);
 		}
 	}
 
@@ -254,16 +238,8 @@ public final class QueryContext {
 	 * @throws SQLException 异常
 	 */
 	static void commit() throws SQLException {
-		if (!debug) {
-			if(!getQueryContext().outTx) {
-				if(getQueryContext().supporTx) {
-					getQueryContext().connection.commit();
-				}
-			} else {
-				if(getQueryContext().ds != getQueryContext().txds) {
-					getQueryContext().connection.commit();
-				}
-			}
+		if (!debug && getQueryContext().supporTx && !TxContext.enabled()) {
+			getQueryContext().connection.commit();
 		}
 	}
 
@@ -273,47 +249,8 @@ public final class QueryContext {
 	 * @throws SQLException 异常
 	 */
 	static void rollback() throws SQLException {
-		if (!debug) {
-			if(!getQueryContext().outTx) {
-				if(getQueryContext().supporTx) {
-					getQueryContext().connection.rollback();
-				}
-			} else {
-				if(getQueryContext().ds != getQueryContext().txds) {
-					getQueryContext().connection.rollback();
-				}
-			}
-		}
-	}
-	
-	static void disableAutoCommit2() throws SQLException {
-		getQueryContext().outTx = true;
-		getQueryContext().txds = getQueryContext().ds;
-		getQueryContext().txConn = getQueryContext().connection;
-		if (!debug) {
-			getQueryContext().txConn.setAutoCommit(false);
-		}
-	}
-
-	static void commit2() throws SQLException {
-		if (!debug) {
-			try {
-				getQueryContext().connection = getQueryContext().txConn;
-				getQueryContext().connection.commit();
-			} finally {
-				getQueryContext().outTx = false;
-			}
-		}
-	}
-
-	static void rollback2() throws SQLException {
-		if (!debug) {
-			try {
-				getQueryContext().connection = getQueryContext().txConn;
-				getQueryContext().connection.rollback();
-			} finally {
-				getQueryContext().outTx = false;
-			}
+		if (!debug && getQueryContext().supporTx && !TxContext.enabled()) {
+			getQueryContext().connection.rollback();
 		}
 	}
 
@@ -347,3 +284,4 @@ public final class QueryContext {
 		return getQueryContext().metaData.getCountField();
 	}
 }
+

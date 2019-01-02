@@ -330,7 +330,7 @@ class QueryProcess {
 		Parameter[] parameters = method.getParameters();
 		for (int i = 0; i < parameters.length; i++) {
 			if (parameters[i].getParameterizedType() instanceof TypeVariable) { // 这个类型是变量类型吗?
-				Field[] fields = iargs[i].getClass().getDeclaredFields();
+				Field[] fields = BeanUtil.getFields(iargs[i].getClass());
 				for (Field field : fields) {
 					if (Type.getType(field.getType()).getSort() != Type.OBJECT) {
 						throw new RepositoryException(String.format("%s这个实体的成员变量%s %s %s不允许是基本类型", iargs[i].getClass().getName(),
@@ -497,38 +497,38 @@ class QueryProcess {
 				}
 				return DB.update(BeanUtil.toDelete(tableName, name, key, dbName), true);
 			}
-
+			
+		case MethodId.QUERY9:
+			return tx();
+			
 		default:
 			break;
 		}
 		return null;
 	}
+	
+	private Object tx() {
+		try {
+			TxContext.start();
+			Object obj = ((Supplier<?>) (QueryContext.getArgs()[0])).get();
+			if (obj == null || obj.equals(-1)) {
+				LOG.info("tx中的函数式返回了null或-1,导致tx中的所有操作回滚");
+				TxContext.getTxContext().rollback();
+				return -1;
+			} else {
+				TxContext.getTxContext().commit();
+				return obj;
+			}
+		} catch (Exception e) {
+			TxContext.getTxContext().rollback();
+			LOG.warn("tx方法被迫回滚", e);
+			return -1;
+		} finally {
+			TxContext.end();
+		}
+	}
 
 	Object methodQuery() {
-		if(QueryContext.getMethod().getName().equals("tx")) {
-			try {
-				QueryContext.disableAutoCommit2();
-				Object obj = ((Supplier<?>) (QueryContext.getArgs()[0])).get();
-				if(obj==null || obj.equals(-1)) {
-					obj = -1;
-					LOG.info("tx中的函数式返回了null,导致tx中的所有操作回滚");
-					QueryContext.rollback2();
-				} else {
-					QueryContext.commit2();
-				}
-				return obj;
-			} catch (Exception e) {
-				try {
-					QueryContext.rollback2();
-				} catch (SQLException e1) {
-					LOG.warn("执行回滚异常",e1);
-					return -1;
-				}
-				LOG.warn("tx方法被迫回滚",e);
-				return -1;
-			}	
-		} else {
-			return null;	
-		}
+		return null;
 	}
 }

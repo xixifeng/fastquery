@@ -35,5 +35,14 @@
 		<property name="databaseName">s3</property>
 		<property name="driverClass">com.mysql.cj.jdbc.Driver</property>
 	</named-config>
-
+	
+	<named-config name="cc">
+		<property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
+		<property name="databaseName">cc</property>                      
+		<property name="user">cc</property>                              
+		<property name="password">cc123456</property>                         
+		<property name="portNumber">3307</property>                      
+		<property name="serverName">192.168.8.10</property>              
+	</named-config>
+	
 </jdbc-config>

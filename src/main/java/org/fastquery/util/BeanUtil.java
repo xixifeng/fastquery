@@ -66,12 +66,12 @@ public final class BeanUtil {
 	 * @return insert 语句
 	 */
 	public static String toInsertSQL(Object bean) {
-		String values = toValue(bean.getClass().getDeclaredFields(), bean,true);
+		String values = toValue(getFields(bean.getClass()), bean,true);
 		return bean2InsertSQL(bean, null, values, false);
 	}
 
 	public static String toInsertSQL(String dbName, Object bean) {
-		String values = toValue(bean.getClass().getDeclaredFields(), bean,true);
+		String values = toValue(getFields(bean.getClass()), bean,true);
 		return bean2InsertSQL(bean, dbName, values, false);
 	}
 
@@ -183,7 +183,7 @@ public final class BeanUtil {
 				Class<B> clazz = (Class<B>) bean.getClass();
 				
 				// values 部分
-				String values = toValues(clazz.getDeclaredFields(), beans);
+				String values = toValues(getFields(clazz), beans);
 				
 				return bean2InsertSQL(bean, dbName, values, ignoreRepeat);		
 			}
@@ -194,7 +194,7 @@ public final class BeanUtil {
 		// 集合中的第一个bean
 		Class<?> clazz = bean.getClass();
 		String tableName = getTableName(dbName, clazz);
-		Field[] fields = clazz.getDeclaredFields();
+		Field[] fields = getFields(clazz);
 		// 表字段
 		String fs = toFields(fields, bean);
 
@@ -263,7 +263,7 @@ public final class BeanUtil {
 	 */
 	public static String toSelectSQL(Object bean, Object key, String dbName,boolean selectEntity) {
 		Class<?> cls = (bean instanceof Class) ? (Class<?>) bean : bean.getClass();
-		Object[] objs = getKeyAndVal(bean, cls.getDeclaredFields(), key);
+		Object[] objs = getKeyAndVal(bean, getFields(cls), key);
 		key = objs[1];
 		if(key==null) {
 			return null;
@@ -277,6 +277,23 @@ public final class BeanUtil {
 				return String.format("select `%s` from %s where `%s` = %s",keyFeild,tableName, keyFeild, key.toString());
 			}	
 		}
+	}
+
+	public static Field[] getFields(Class<?> cls) {
+		Field[] selfFields = cls.getDeclaredFields();
+		Field[] superFields = cls.getSuperclass().getDeclaredFields();
+		
+		int l1 = selfFields.length;
+		int l2 = superFields.length;
+		
+		Field[] nf = new Field[l1 + l2];
+		for (int i = 0; i < l1; i++) {
+			nf[i] = selfFields[i];
+		}
+		for (int i = 0; i < l2; i++) {
+			nf[l1+i] = superFields[i];
+		}
+		return nf;
 	}
 
 	private static String getTableName(String dbName, Class<?> cls) {
@@ -305,7 +322,7 @@ public final class BeanUtil {
 
 		String keyFeild;
 		Object key;
-		Object[] objs = getKeyAndVal(bean, cls.getDeclaredFields(), null);
+		Object[] objs = getKeyAndVal(bean, getFields(cls), null);
 		keyFeild = (String) objs[0];
 		key = objs[1];
 
@@ -319,7 +336,7 @@ public final class BeanUtil {
 		sb.append(" set");
 		int len = sb.length();
 		try {
-			Field[] fields = cls.getDeclaredFields();
+			Field[] fields = getFields(cls);
 			for (Field field : fields) {
 				if (allowField(field)) {
 					field.setAccessible(true);
@@ -381,7 +398,7 @@ public final class BeanUtil {
 		sb.append(" set");
 		int len = sb.length();
 		try {
-			Field[] fields = cls.getDeclaredFields();
+			Field[] fields = getFields(cls);
 			for (Field field : fields) {
 				if (allowField(field)) {
 					field.setAccessible(true);
@@ -460,7 +477,7 @@ public final class BeanUtil {
 		String tableName = getTableName(dbName, clazz);
 
 		// 2. 找出主键的名称
-		Field[] fields = clazz.getDeclaredFields();
+		Field[] fields = getFields(clazz);
 		Field key = getKey(clazz, fields);
 		key.setAccessible(true);
 		
@@ -572,7 +589,7 @@ public final class BeanUtil {
 
 	@SuppressWarnings("unchecked")
 	private static <S> S newBeanVarNull(Class<S> clazz,Object bean) {
-		Field[] fields = clazz.getDeclaredFields();
+		Field[] fields = getFields(clazz);
 		try {
 			if(bean==null) {
 				bean = clazz.newInstance();
@@ -606,7 +623,7 @@ public final class BeanUtil {
 	public static long toId(Object entity) {
 		Class<?> cls = entity.getClass();
 		Object key = null;
-		Field[] files = cls.getDeclaredFields();
+		Field[] files = getFields(cls);
 
 		for (Field field : files) {
 			if (field.getAnnotation(Id.class) != null) {
@@ -639,7 +656,7 @@ public final class BeanUtil {
 	private static List<Field> mapFields(Object bean) {
 		List<Field> list = new ArrayList<>();
 		Class<?> cls = (bean instanceof Class) ? (Class<?>) bean : bean.getClass();
-		Field[] fields = cls.getDeclaredFields();
+		Field[] fields = getFields(cls);
 		for (Field field : fields) {
 			if(allowField(field)) {
 				list.add(field);

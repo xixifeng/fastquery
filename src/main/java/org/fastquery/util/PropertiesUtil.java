@@ -138,16 +138,28 @@ class PropertiesUtil {
 
 	//校验 fastquery.json
 	private static void check(List<String> dataSourceNames, List<String> bpNames) {
+		// 1. dataSourceNames 不能重复
 		for (int i = 0; i < dataSourceNames.size(); i++) {
 			if (Collections.frequency(dataSourceNames, dataSourceNames.get(i)) > 1) {
 				throw new RepositoryException("fastquery.json 配置文件中 \"dataSourceName\"=\"" + dataSourceNames.get(i) + "\" 不能重复出现.");
 			}
 		}
+		
+		// 2. bpNames 不能重复
 		for (int j = 0; j < bpNames.size(); j++) {
 			if (Collections.frequency(bpNames, bpNames.get(j)) > 1) {
 				throw new RepositoryException("fastquery.json 配置文件中, basePackages中的元素\"" + bpNames.get(j) + "\"不能重复出现.");
 			}
 		}
+		
+		// 3. 不能出现诸如: org.fastquery.db(包地址) 又配置了它的子类org.fastquery.db.AA
+		bpNames.forEach(b1 -> bpNames.forEach(b2 -> {
+			if (b2.startsWith(b1 + '.')) {
+				throw new RepositoryException("basePackages配置错误: " + b1 + " 已经包含了" + b2 + " 两者只能选一");
+			}
+		}));
+		
+		// x. ...
 	}
 
 	private static JSONObject getFQJSON(Resource fqueryResource) {

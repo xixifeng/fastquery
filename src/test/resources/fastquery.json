@@ -27,7 +27,7 @@
 
   "scope":[
     {
-        "config": "c3p0",           // 可选: c3p0,druid
+        "config": "c3p0",           // 可选: c3p0,druid,jdbc
         "dataSourceName": "xkdb",    // 数据源的名称
         "basePackages": [            // 该数据源的作用范围
             "org.fastquery.example",              // 包地址
@@ -96,6 +96,28 @@
         "config": "jdbc",           
         "dataSourceName": "s3"
     }
+    
+    ,
+    {
+        "config": "druid",            
+        "dataSourceName": "aa", 
+        "basePackages": [ "org.fastquery.db2.AA"]
+    }
+    
+     ,
+    {
+        "config": "c3p0",            
+        "dataSourceName": "bb", 
+        "basePackages": [ "org.fastquery.db2.BB"]
+    }
+    
+    ,
+    {
+        "config": "jdbc",            
+        "dataSourceName": "cc", 
+        "basePackages": [ "org.fastquery.db2.CC"]
+    }
+    
  ],
  
   // 基准目录,注意: 后面记得加上 "/"

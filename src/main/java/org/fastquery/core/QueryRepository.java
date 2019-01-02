@@ -547,13 +547,6 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @param fun 函数式子
 	 * @return fun函数体中有任何没被捕获的异常或fun函数体返回null或返回-1,就会导致fun里面的全部操作回滚,被回滚后的tx最后会返回-1,除此之外,tx的返回值等于fun的返回值.
 	 */
+	@Id(MethodId.QUERY9)
 	int tx(Supplier<Integer> fun);
-	
-	/**
-	 * 事务函数
-	 * @param fun 函数式子
-	 * @param dataSourceName 数据源名称
-	 * @return fun函数体中有任何没被捕获的异常或fun函数体返回null或返回-1,就会导致fun里面的全部操作回滚,被回滚后的tx最后会返回-1,除此之外,tx的返回值等于fun的返回值.
-	 */
-	int tx(Supplier<Integer> fun,@Source String dataSourceName);
 }

@@ -29,6 +29,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
+import org.fastquery.bean.Fish;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.util.BeanUtil;
@@ -351,4 +352,24 @@ public class BeanUtilTest {
 		assertThat(u2.getName(), nullValue());
 		assertThat(u2.getAge(), nullValue());
 	}
+	
+	private static Field getField(String name) {
+		Field[] fields = BeanUtil.getFields(Fish.class);
+		for (Field field : fields) {
+			if(field.getName().equals(name)) {
+				return field;
+			}
+		}
+		return null;
+	}
+	@Test
+	public void feild() throws Exception {
+		Field[] fields = BeanUtil.getFields(Fish.class);
+		assertThat(fields.length, is(3));
+		assertThat(getField("id"), notNullValue());
+		assertThat(getField("name"), notNullValue());
+		assertThat(getField("num"), notNullValue());		
+	}
+	
+	
 }

@@ -67,7 +67,7 @@ public class DB {
 		String sql = sqlValue.getSql();
 		List<Object> objs = sqlValue.getValues();
 		List<Map<String, Object>> keyvals = null;
-		Connection conn = QueryContext.getConnection();
+		Connection conn = QueryContext.getConn();
 		PreparedStatement stat = null;
 		ResultSet rs = null;
 		try {
@@ -100,7 +100,7 @@ public class DB {
 	 */
 	public static List<RespUpdate> modify(List<SQLValue> sqlValues, boolean hasPK) {
 		List<RespUpdate> rus = null;
-		Connection conn = QueryContext.getConnection(); // 由QueryContext自动关闭
+		Connection conn = QueryContext.getConn(); // 由QueryContext自动关闭
 		try {
 			QueryContext.disableAutoCommit(); // 关闭自动提交
 			rus = modify(sqlValues, hasPK, conn);
@@ -173,7 +173,7 @@ public class DB {
 		ResultSet rs = null;
 		Object key = null;
 		try {
-			conn = QueryContext.getConnection();
+			conn = QueryContext.getConn();
 			QueryContext.addSqls(sql);
 			QueryContext.disableAutoCommit();
 			if (isEffect) {
@@ -223,7 +223,7 @@ public class DB {
 		List<Object> args = (List<Object>) updateInfo[1];
 		int count = args.size();
 		try {
-			conn = QueryContext.getConnection();
+			conn = QueryContext.getConn();
 			QueryContext.disableAutoCommit();
 			QueryContext.addSqls(sql);
 			info(sql, args);
@@ -255,7 +255,7 @@ public class DB {
 		Statement stat = null;
 		ResultSet rs = null;
 		try {
-			conn = QueryContext.getConnection();
+			conn = QueryContext.getConn();
 			stat = conn.createStatement();
 			LOG.info(sql);
 			QueryContext.addSqls(sql);
@@ -277,7 +277,7 @@ public class DB {
 		Statement stat = null;
 		ResultSet rs = null;
 		try {
-			conn = QueryContext.getConnection();
+			conn = QueryContext.getConn();
 			stat = conn.createStatement();
 			QueryContext.addSqls(sql);
 			rs = stat.executeQuery(sql);
@@ -314,7 +314,7 @@ public class DB {
 	}
 
 	static int[] executeBatch(String sqlFile, BiConsumer<Statement, String> consumer) {
-		Connection conn = QueryContext.getConnection();
+		Connection conn = QueryContext.getConn();
 		Statement stat = null;
 		Stream<String> stream = parserSQLFile(sqlFile);
 		try {

@@ -41,6 +41,7 @@ import org.fastquery.core.RepositoryException;
 import org.fastquery.filter.SkipFilter;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
+import org.fastquery.util.BeanUtil;
 
 /**
  * 测试规则
@@ -57,7 +58,7 @@ public class FastQueryTestRule implements TestRule {
 		LOG.debug("SkipFilter:{}", description.getAnnotation(SkipFilter.class));
 		Class<?> clazz = description.getTestClass();
 		List<Field> fList = new ArrayList<>();
-		Field[] fields = clazz.getDeclaredFields();
+		Field[] fields = BeanUtil.getFields(clazz);
 		for (Field field : fields) {
 			if (Repository.class.isAssignableFrom(field.getType())) {
 				field.setAccessible(true);
@@ -158,10 +159,10 @@ public class FastQueryTestRule implements TestRule {
 		if (context != null) {
 			Rollback rollback = description.getAnnotation(Rollback.class);
 			if (rollback == null || rollback.value()) {
-				QueryContext.getConnection().rollback();
+				QueryContext.getConn().rollback();
 				LOG.info("事务已经回滚");
 			} else {
-				QueryContext.getConnection().commit();
+				QueryContext.getConn().commit();
 				LOG.info("事务已经提交");
 			}
 			QueryContext.forceClear();

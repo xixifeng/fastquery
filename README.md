@@ -3,13 +3,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.64</version> <!-- fastquery.version -->
+    <version>1.0.65</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.64'
+compile 'org.fastquery:fastquery:1.0.65'
 ```
 
 # FastQuery 数据持久层框架
@@ -653,7 +653,7 @@ int updateBatch(String name,Integer age,Integer id);
 ```
 
 ### 事务函数式接口
-在`QueryRepository`中提供了一个内置事务函数`tx`.
+在`QueryRepository`中提供了一个内置事务函数`tx`.支持多个数据源加入到同一个事务里.
 
 ```java
 int effect = userInfoDBService.tx(() -> {

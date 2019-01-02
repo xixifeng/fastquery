@@ -87,7 +87,7 @@ public class Prepared {
 
 			return object;
 		} catch (Exception e) {
-
+			LOG.error("执行出错: " + methodName, e);
 			StringBuilder sb = new StringBuilder();
 			String msg = e.getMessage();
 			if (msg != null) {
@@ -104,7 +104,7 @@ public class Prepared {
 				sb.append(sql);
 				sb.append('\n');
 			});
-			LOG.error(sb.toString(), e);
+			LOG.error(sb.toString());
 			throw new RepositoryException(e);
 		} finally {
 			// QueryContext 生命终止
