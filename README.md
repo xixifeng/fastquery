@@ -260,7 +260,7 @@ List<UserInfo> findSome(@Param("id")Integer id);
 若返回`List<Map<String, String>>`或`Map<String, String>`,表示把查询出的字段值(value)包装成字符串.   
 
 **注意**: 在没有查询到数据的情况下,如果返回值是集合类型或`JSON`类型或者是数组类型,返回具体的值不会是`null`,而是一个空对象(empty object)集合或空对象`JSON`或者是长度为0的数组.   
-使用空对象来代替返回`null`,它与有意义的对象一样,并且能避免`NullPointerException`,阻止`null`肆意传播,可以减少运行期错误.反对者一般都从性能的角度来考虑,认为`new`一个空对象替代`null`,会增加系统的开销.可是,&lt;&lt;Effective Java&gt;&gt;的作者**Josh Bloch**说,在这个级别上担心性能问题是不明智的,除非有分析表明,返回空对象来替代返回null正是造成性能问题的源头.      
+使用空对象来代替返回`null`,它与有意义的对象一样,并且能避免`NullPointerException`,阻止`null`肆意传播,可以减少运行期错误.反对者一般都从性能的角度来考虑,认为`new`一个空对象替代`null`,会增加系统的开销.可是,&lt;&lt;Effective Java&gt;&gt;的作者**Josh Bloch**说,在这个级别上担心性能问题是不明智的,除非有分析表明,返回空对象来替代返回null正是造成性能问题的源头.细心的人可能已经发现JDK新版本的API都在努力避免返回null.  
 举例说明: 
 
 ```java
@@ -476,7 +476,7 @@ Map<String, Object> addUserInfo(String name,Integer age);
 | `<E> int update(Collection<E> entities)` | 更新集合实体,成员属性如果是null,那么该属性将不会参与改运算,每个实体必须包含主键 |
 | `int delete(String tableName,String primaryKeyName,long id)` | 根据主键删除实体,返回影响行数 |
 | `int[] executeBatch(String sqlFile)` | 根据指定的SQL文件名称或绝对路径,执行批量操作SQL语句,返回int[],数组中的每个数对应一条SQL语句执行后所影响的行数 |
-| `int tx(Supplier<Integer> fun)` | 事务函数.fun的返回值等于tx的返回值.fun返回null或向上抛异常,tx会被回滚,并返回-1 |
+| `int tx(Supplier<Integer> fun)` | 事务函数.fun的返回值等于tx的返回值.fun返回null,-1或向上抛异常,tx会被回滚,并返回-1 |
 
 举例说明:  
 先准备一个实体  
