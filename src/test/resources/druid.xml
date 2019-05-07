@@ -7,7 +7,7 @@
 # https://github.com/alibaba/druid/wiki/DruidDataSource%E9%85%8D%E7%BD%AE
  -->
 <beans>
-	 <bean name="xkdb1" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" 
+	 <bean name="xkdb1" id="xkdb1" class="com.alibaba.druid.pool.DruidDataSource" 
                   init-method="init" destroy-method="close">
 	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/xk" />
 	     <property name="username" value="xk" />
@@ -31,14 +31,14 @@
 	     <property name="maxOpenPreparedStatements" value="20" />
 	 </bean>
 	 
-	  <bean name="xkdb2" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" 
+	  <bean name="xkdb2" id="xkdb2" class="com.alibaba.druid.pool.DruidDataSource" 
                   init-method="init" destroy-method="close">
 	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/xk" />
 	     <property name="username" value="xk" />
 	     <property name="password" value="abc123" />
 	 </bean>
 	 
-	<bean name="aa" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" 
+	<bean name="aa" id="aa" class="com.alibaba.druid.pool.DruidDataSource" 
                   init-method="init" destroy-method="close">
 	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/aa" />
 	     <property name="username" value="aa" />

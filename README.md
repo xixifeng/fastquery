@@ -6,13 +6,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.66</version> <!-- fastquery.version -->
+    <version>1.0.67</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.66'
+compile 'org.fastquery:fastquery:1.0.67'
 ```
 
 # FastQuery 数据持久层框架
@@ -90,7 +90,7 @@ JRE 8+
 ```
 
 ### druid.xml
-用于配置支持druid连接池,详细配置请参照 https://github.com/alibaba/druid
+用于配置支持Druid连接池,详细配置请参照 https://github.com/alibaba/druid
 
 ```xml
 <beans>
@@ -121,6 +121,34 @@ JRE 8+
 	 </bean>
 </beans>
 ```
+
+### hikari.xml
+用于配置支持HikariCP连接池,详细配置选项请参照 https://github.com/brettwooldridge/HikariCP  
+连接MySQL,为了得到更好的性能,推荐配置
+
+```xml
+<beans>
+	<bean name="xkdb2">
+		<property name="jdbcUrl" value="jdbc:mysql://192.168.1.1:3306/xk" />
+		<property name="dataSource.user" value="xk" />
+		<property name="dataSource.password" value="abc123" />
+		<property name="dataSource.cachePrepStmts" value="true" />
+		<property name="dataSource.prepStmtCacheSize" value="250" />
+		<property name="dataSource.prepStmtCacheSqlLimit" value="2048" />
+		<property name="dataSource.useServerPrepStmts" value="true" />
+		<property name="dataSource.useLocalSessionState" value="true" />
+		<property name="dataSource.rewriteBatchedStatements" value="false" />
+		<property name="dataSource.cacheResultSetMetadata" value="true" />
+		<property name="dataSource.cacheServerConfiguration" value="true" />
+		<property name="dataSource.elideSetAutoCommits" value="true" />
+		<property name="dataSource.maintainTimeStats" value="false" />
+	</bean>
+	<!-- 可以配置多个bean节点,提供多个数据源 -->
+    <bean name="name-x"> ... ... </bean>
+</beans>
+```
+
+支持多连接池共存,如,同时让Druid,HikariCP工作,并配置多个数据源.
 
 ### fastquery.json
 配置数据源的作用范围
@@ -263,7 +291,7 @@ List<UserInfo> findSome(@Param("id")Integer id);
 若返回`List<Map<String, String>>`或`Map<String, String>`,表示把查询出的字段值(value)包装成字符串.   
 
 **注意**: 在没有查询到数据的情况下,如果返回值是集合类型或`JSON`类型或者是数组类型,返回具体的值不会是`null`,而是一个空对象(empty object)集合或空对象`JSON`或者是长度为0的数组.   
-使用空对象来代替返回`null`,它与有意义的对象一样,并且能避免`NullPointerException`,阻止`null`肆意传播,可以减少运行期错误.反对者一般都从性能的角度来考虑,认为`new`一个空对象替代`null`,会增加系统的开销.可是,&lt;&lt;Effective Java&gt;&gt;的作者**Josh Bloch**说,在这个级别上担心性能问题是不明智的,除非有分析表明,返回空对象来替代返回null正是造成性能问题的源头.细心的人可能已经发现JDK新版本的API都在努力避免返回null.  
+使用空对象来代替返回`null`,它与有意义的对象一样,并且能避免`NullPointerException`,阻止`null`肆意传播,可以减少运行期错误.反对者一般都从性能的角度来考虑,认为`new`一个空对象替代`null`,会增加系统的开销.可是,&lt;&lt;Effective Java&gt;&gt;的作者**Josh Bloch**说,在这个级别上担心性能问题是不明智的,除非有分析表明,返回空对象来替代返回`null`正是造成性能问题的源头.细心的人可能已经发现JDK新版本的API都在努力避免返回null.  
 举例说明: 
 
 ```java
@@ -341,7 +369,7 @@ Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable page
 ### 自定义类控制条件增减
 决定一个条件是否参与运算,有时候需要根据多个不同的参数进行某种计算来决定, 并且这种计算逻辑用JAVA脚本(非JS)难以表达或者不太乐意让JAVA脚本登场. 那么就使用`@Condition`中的`ignore`选项,指定一个类,它叫`Judge`,是一个裁判员,条件是否去除的决定权可以理所当然地委托给自定义的`Judge`类来处理.   
 举例: 若:年龄大于18及姓名不为空且包含"Rex".则,剔除条件`and name like :name`.  
-定制一个决定条件存活的类,需要遵循一些约定: 继承`org.fastquery.where.Judge`,当完成这一步,IDE就会提示开发者必须实现ignore方法, 否则,不能举足前行. 这样的设计可以减少犯错的可能. 当ignore方法最终返回`true`时,则,删除相对应的条件;当最后返回`false`时,则,保留条件.
+定制一个决定条件存活的类,需要遵循一些约定: 继承`org.fastquery.where.Judge`,当完成这一步,IDE就会提示开发者必须实现ignore方法, 否则,不能举足前行. 这样的设计可以减少犯错的可能. 当`ignore`方法最终返回`true`时,则,删除相对应的条件;当最后返回`false`时,则,保留条件.
 
 ```java
 public class LikeNameJudge extends Judge {

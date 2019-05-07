@@ -23,6 +23,7 @@
 package org.fastquery.util;
 
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -63,7 +64,7 @@ public class LoadPrperties {
 			switch (config) {
 			case "c3p0":
 				if (FQueryProperties.findDataSource(namedConfig) == null && namedConfig != null) { // 如果名称为namedConfig的数据源不存在,才能new!
-					com.mchange.v2.c3p0.ComboPooledDataSource cpds = new com.mchange.v2.c3p0.ComboPooledDataSource(namedConfig);
+					DataSource cpds = new com.mchange.v2.c3p0.ComboPooledDataSource(namedConfig);
 					FQueryProperties.putDataSource(namedConfig, cpds);
 					LOG.debug("创建数据源:{},名称为:{}", cpds, namedConfig);
 				}
@@ -81,6 +82,17 @@ public class LoadPrperties {
 					LOG.debug("创建数据源:{},名称为:{}", druidDS, namedConfig);
 				}
 				break;
+				
+			case "hikari":
+				if (FQueryProperties.findDataSource(namedConfig) == null && namedConfig != null) {
+					Map<Object, Object> hikariMap = XMLParse.toMap(fqueryResource, "hikari.xml", namedConfig,"bean");
+					Properties props = new Properties();
+					hikariMap.forEach((k,v) -> props.setProperty(k.toString(), v.toString()));
+					DataSource hikarids = new com.zaxxer.hikari.HikariDataSource(new com.zaxxer.hikari.HikariConfig(props));
+					FQueryProperties.putDataSource(namedConfig, hikarids);
+					LOG.debug("创建数据源:{},名称为:{}", hikarids, namedConfig);
+				}
+			break;
 				
 			case "jdbc":
 				

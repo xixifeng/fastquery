@@ -67,7 +67,7 @@ public class UserInfoDBServiceTest2 extends FastQueryTest  {
 		int age = 1000;
 		// 数据库中age没有大于1千的记录
 		// 断言: 查询返回的值应该是一个空对象,不是null.
-		Map<String, Object> map = userInfoDBService.findOne(age, "xkdb");
+		Map<String, Object> map = userInfoDBService.findOne(age, "xkdb2");
 		assertThat(map, notNullValue());
 		assertThat(map.isEmpty(), is(true));
 	}

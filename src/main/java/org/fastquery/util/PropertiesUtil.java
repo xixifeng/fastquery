@@ -102,6 +102,8 @@ class PropertiesUtil {
 				break;
 			case "druid":
 				break;
+			case "hikari":
+				break;
 			case "jdbc":
 				// 校验是否存在 jdbc-config.xml 文件
 				if (!fqueryResource.exist("jdbc-config.xml")) {
