@@ -32,7 +32,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +44,6 @@ import org.slf4j.Logger;
 import org.fastquery.struct.RespUpdate;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.util.BeanUtil;
-import org.fastquery.where.I18n;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -371,15 +369,7 @@ public class DB {
 	 * @throws SQLException SQL异常
 	 */
 	private static List<Map<String, Object>> rs2Map(ResultSet rs, Method method) throws SQLException {
-
-		List<String> feildNames = null;
-		if (method != null) {
-			I18n i18n = method.getAnnotation(I18n.class);
-			if (i18n != null) {
-				feildNames = Arrays.asList(i18n.value());
-			}
-		}
-
+		
 		List<Map<String, Object>> keyvals = new ArrayList<>();
 		Map<String, Object> keyval;
 		// 获取列信息
@@ -397,27 +387,11 @@ public class DB {
 				// key = resultSetMetaData.getColumnName(i); // 获取列名称
 				key = resultSetMetaData.getColumnLabel(i); // 获取列别名,若没有别名那么就获取本身名称(getColumnName)
 				obj = rs.getObject(i);
-				if (feildNames != null && feildNames.contains(key)) {
-					obj = i18n(obj);
-				}
 				keyval.put(key, obj);
 			}
 			keyvals.add(keyval);
 		}
 		return keyvals;
-	}
-
-	private static Object i18n(Object obj) {
-		try {
-			JSONObject json = (JSONObject) JSON.parse(obj.toString());
-			String lang = QueryContext.getLang();
-			if (json.containsKey(lang)) { // 这个过程中有可能set,因此QueryContext.getQueryContext().getLang()
-				return json.get(QueryContext.getLang());
-			}
-			return "i18n error";
-		} catch (Exception e) {
-			return obj;
-		}
 	}
 
 	/**

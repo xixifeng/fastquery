@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.fastquery.bean.Student;
 import org.fastquery.core.Primarykey;
-import org.fastquery.core.QueryContext;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.filter.SkipFilter;
@@ -124,15 +123,9 @@ public class StudentDBServiceTest extends FastQueryTest  {
 	@SkipFilter
 	@Test
 	public void findOne2() {
-		QueryContext.setLang("en");
 		JSONObject student = studentDBService.findOne("9921103");
-		assertThat(student.get("name"), equalTo("Lily"));
 		assertThat(student.get("dept"), equalTo("Chinese"));
-
-		QueryContext.setLang("zh");
-		student = studentDBService.findOne("9921103");
 		assertThat(student.get("name"), equalTo("丽丽"));
-		assertThat(student.get("dept"), equalTo("语文"));
 	}
 
 	@Test

@@ -27,6 +27,7 @@ package org.fastquery.core;
  * 
  * @author mei.sir@aliyun.cn
  */
+@FunctionalInterface
 public interface BuilderQuery {
 	/**
 	 * 对给定的参数进行操作. 通过MetaData可以设置这些语句query,count,where.

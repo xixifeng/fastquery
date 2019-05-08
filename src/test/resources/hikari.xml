@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<!-- 配置说明: 
+# https://github.com/brettwooldridge/HikariCP
+# https://www.tpyyes.com/a/javaweb/2018/0707/663.html
+ -->
+<beans>
+
+	<bean name="xkdb2">
+		<property name="jdbcUrl" value="jdbc:mysql://192.168.8.10:3305/xk" />
+		<property name="dataSource.user" value="xk" />
+		<property name="dataSource.password" value="abc123" />
+
+		<property name="dataSource.cachePrepStmts" value="true" />
+		<property name="dataSource.prepStmtCacheSize" value="250" />
+		<property name="dataSource.prepStmtCacheSqlLimit" value="2048" />
+		<property name="dataSource.useServerPrepStmts" value="true" />
+		<property name="dataSource.useLocalSessionState" value="true" />
+		<!-- 重写SQL批量处理吗 -->
+		<property name="dataSource.rewriteBatchedStatements" value="false" />
+		<property name="dataSource.cacheResultSetMetadata" value="true" />
+		<property name="dataSource.cacheServerConfiguration" value="true" />
+		<property name="dataSource.elideSetAutoCommits" value="true" />
+		<property name="dataSource.maintainTimeStats" value="false" />
+		
+ 
+		<!-- 连接只读数据库时配置为true， 保证安全 -->  
+		<property name="readOnly" value="false" />  
+		
+		<!-- 默认: 30000毫秒(30秒) 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQLException -->  
+		<property name="connectionTimeout" value="30000" />  
+		
+		<!-- 默认: 600000毫秒(10分钟) 一个连接idle状态的最大时长（毫秒），超时则被释放（retired） -->  
+		<property name="idleTimeout" value="600000" />  
+		
+		<!-- 默认: 1800000毫秒(30 分钟) 一个连接的生命时长, 超时而且没被使用则被释放(retired), 建议设置比数据库超时时长少30秒, 参考MySQL wait_timeout参数(show variables like '%timeout%';) -->  
+		<property name="maxLifetime" value="1800000" />  
+		
+		<!-- 此属性控制HikariCP尝试在池中维护的最小空闲连接数。如果空闲连接低于此值并且池中的总连接数小于maximumPoolSize，则HikariCP将尽最大努力快速有效地添加其他连接。但是，为了获得最高性能和对峰值需求的响应，我们建议不要设置此值，而是允许HikariCP充当固定大小的连接池。 默认值：与maximumPoolSize相同 -->
+		<property name="minimumIdle" value="5" />
+		
+		<!-- 默认: 10 连接池中允许的最大连接数。推荐的公式：((core_count * 2) + effective_spindle_count)  effective_spindle_count,就是磁盘列阵中的硬盘数-->  
+		<property name="maximumPoolSize" value="10" />
+   
+	</bean>
+	
+	
+
+</beans>
+ 
+ 

@@ -40,7 +40,6 @@ public final class QueryContext {
 	private MetaData metaData; // 当前上下文元数据
 	private boolean builderQuery;
 		
-	private static String lang = "zh_CN"; // 语言编码
 	// 作用于调式
 	private static boolean debug;
 
@@ -120,17 +119,10 @@ public final class QueryContext {
 		}
 	}
 
-	public static String getLang() { // NO_UCD
-		return lang;
-	}
-
 	public static Method getMethod() {
 		return getQueryContext().method;
 	}
 
-	public static void setLang(String lang) { // NO_UCD
-		QueryContext.lang = lang;
-	}
 
 	public static Connection getConn() {
 		return getQueryContext().connection;
@@ -148,7 +140,6 @@ public final class QueryContext {
 		QueryContext context = getQueryContext();
 		if (!debug && context != null) {
 			try {
-				lang = null;
 				if (context.metaData != null) {
 					context.metaData.clear();
 					context.metaData = null;

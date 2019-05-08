@@ -41,7 +41,6 @@ import org.fastquery.filter.MyBeforeFilter1;
 import org.fastquery.filter.MyBeforeFilter2;
 import org.fastquery.filter.SkipFilter;
 import org.fastquery.where.Condition;
-import org.fastquery.where.I18n;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -80,12 +79,10 @@ public interface StudentDBService extends QueryRepository {
 	@Query("select * from student")
 	Student[] find();
 
-	@I18n({ "name", "dept" })
 	@Query("select * from student s where s.no=?1")
 	JSONObject findOne(String no);
 
 	@Modifying
-	@I18n({ "name", "dept" })
 	@Query("update Student set name = :name, dept = :dept where no = :no")
 	int updateNameAndDept(@Param("name") String name, @Param("dept") String dept, @Param("no") String no);
 
