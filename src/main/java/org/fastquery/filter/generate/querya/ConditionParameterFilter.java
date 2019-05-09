@@ -48,9 +48,9 @@ public class ConditionParameterFilter implements MethodFilter {
 		// 1). @Query中的value值,有且只能出现一次#{#where} (允许不出现). 换言之,出现"#{#where}"的个数不能大于1
 		// 2). 如果有条件注解,那么@Query中的value值,必须有#where
 		// 3). 第1个@Condition不能包含有条件连接符("and" 或 "or")
-		// 4). 条件运算符如果是Operator.IN,那么r()的值必须符合正则: "(?4,?5,?6)"
-		// 5). 条件运算符如果是Operator.BETWEEN,那么r()的值必须符合正则: "?8 and ?9"
-		// 6). 条件运算符如果不是Operator.BETWEEN又不是Operator.BETWEEN,那么r()的值必须符合正则: "?8"
+		//4). if$ 和 ignoreScript 不能共存
+		// 5). 
+		// 6). 
 		Query[] queries = method.getAnnotationsByType(Query.class);
 		if (queries.length == 0) {
 			return method;
@@ -90,9 +90,14 @@ public class ConditionParameterFilter implements MethodFilter {
 					this.abortWith(method, "第" + (i + 1) + "个@Condition的值\"" + value + "\",缺少条件连接符,如果上一个条件存在,用什么跟它相连?");
 				}
 			}
+			
+			// > 4)
+			if(!"true".equals(conditions[i].if$()) && !"false".equals(conditions[i].ignoreScript())) {
+				this.abortWith(method, "第"+(i+1)+"个@Condition中的if$属性和ignoreScript属性不能同时被自定义");
+			}
 
 		}
-
+		
 		return method;
 	}
 }

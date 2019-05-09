@@ -92,4 +92,40 @@ public class ConditionTest extends FastQueryTest {
 		String sql = rule.getSQLValue().getSql();
 		assertThat(sql, equalTo("select id,name,age from `userinfo` where age > ? limit 0,5"));
 	}
+	
+	@Test
+	public void find3$1() {
+		int age = 19;
+		String name = "Rex-Boos";
+		db.find3(age, name, new PageableImpl(1, 5));
+		String sql = rule.getSQLValue().getSql();
+		assertThat(sql, equalTo("select id,name,age from `userinfo` where age > ? and name like ? limit 0,5"));
+	}
+	
+	@Test
+	public void find3$2() {
+		int age = 19;
+		String name = "Boos";
+		db.find3(age, name, new PageableImpl(1, 5));
+		String sql = rule.getSQLValue().getSql();
+		assertThat(sql, equalTo("select id,name,age from `userinfo` where age > ? limit 0,5"));
+	}
+	
+	@Test
+	public void find4$1() {
+		int age = 19;
+		String name = "Rex-Boos";
+		db.find4(age, name, new PageableImpl(1, 5));
+		String sql = rule.getSQLValue().getSql();
+		assertThat(sql, equalTo("select id,name,age from `userinfo` where age > ? and name like ? limit 0,5"));
+	}
+	
+	@Test
+	public void find4$2() {
+		int age = 19;
+		String name = "Boos";
+		db.find4(age, name, new PageableImpl(1, 5));
+		String sql = rule.getSQLValue().getSql();
+		assertThat(sql, equalTo("select id,name,age from `userinfo` where age > ? and name = ? limit 0,5"));
+	}
 }

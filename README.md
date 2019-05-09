@@ -6,13 +6,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.67</version> <!-- fastquery.version -->
+    <version>1.0.68</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.67'
+compile 'org.fastquery:fastquery:1.0.68'
 ```
 
 # FastQuery 数据持久层框架
@@ -355,16 +355,27 @@ Student[] findAllStudent(... args ...);
 `@Condition(value="name != ?1",ignoreNull=false)` 若`?1`的值为`null`,最终会解释成`name is not null`.  
 
 ### 通过JAVA脚本控制条件增减
-`@Condition`中的`script`属性可以绑定一个JAVA脚本(不是JS),根据脚本运行后的布尔结果,来决定是否保留条件项.脚本运行后的结果如果是`true`,那么就删除该条件项,反之,保留条件项,默认脚本是`false`,表示保留该条件项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
+`@Condition`中的`ignoreScript`属性可以绑定一个JAVA脚本(不是JS),根据脚本运行后的布尔结果,来决定是否保留条件项.脚本运行后的结果如果是`true`,那么就删除该条件项,反之,保留条件项,默认脚本是`false`,表示保留该条件项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
 举例:
 
 ```java
 @Query("select id,name,age from `userinfo` #{#where}")
 @Condition("age > :age")
-@Condition(value="and name like :name",script=":age > 18 && :name!=null && :name.contains(\"Rex\")")
+@Condition(value="and name like :name",ignoreScript=":age > 18 && :name!=null && :name.contains(\"Rex\")")
 Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable pageable);
 ```
 其中, `:age`引用的是`@Param("age")int age`的实参值.`:name`是`@Param("name")String name`的实参值.这个脚本要表达的意思不言而喻. 不过脚本的解析能力还不能自动**拆箱**(unboxing),需要调用拆箱方法,在这里age变量如果是`Integer`类型,要想如上脚本能正确编译,必须这么做: `":age.intValue() > 18 && :name!=null && :name.contains(\"Rex\")"`, 请留意住`:age.intValue()`. 其他包装类型`Short`, `Long`, `Byte`, `Boolean`, `Character`, `Float`, `Double` 以此类推.  
+
+### @Condition 中的 if...else
+条件是否保留可以通过`if`条件来确定,`if`绑定的JAVA脚本运行后的结果若为`true`就保留该`Condition`,反之就取`else`的捆绑值,`else`如果没有值或者是空值,表示移除该`Condition`.  
+举例:
+
+```java
+@Query("select id,name,age from `userinfo` #{#where}")
+@Condition(value="age > :age",if$=":age < 18", else$="name = :name")
+Page<UserInfo> findPage(@Param("age")int age,@Param("name")String name,Pageable pageable);
+```
+如果`age`的实参值小于18,则,保留该`Condition`,否则,该`Condition`的值变为`name = :name`.当然,`else`不是必须的,如果`if`运算为假,直接删除该行`SQL`条件.
 
 ### 自定义类控制条件增减
 决定一个条件是否参与运算,有时候需要根据多个不同的参数进行某种计算来决定, 并且这种计算逻辑用JAVA脚本(非JS)难以表达或者不太乐意让JAVA脚本登场. 那么就使用`@Condition`中的`ignore`选项,指定一个类,它叫`Judge`,是一个裁判员,条件是否去除的决定权可以理所当然地委托给自定义的`Judge`类来处理.   
@@ -397,7 +408,7 @@ Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable page
 
 若`@Condition`的值使用了`${表达式}`,`$表达式`,不管方法的参数传递了什么都不会使条件移除,因为`$`表达式(或称之为EL表达式)仅作为简单模版使用,传null,默认会替换为""(空字符串).举例:
 
-```
+```java
 @Query("select * from `userinfo` #{#where}")
 @Condition("age between $age1 and ${age2}")
 List<Map<String, Object>> between(@Param("age1") Integer age1,@Param("age2") Integer age2);	
@@ -614,19 +625,31 @@ int updateCourse(String name,Integer credit, Integer semester, Integer period, S
 	
 `#{#sets}` 用于引用设置选项. `@Set(value="name = ?1" , ignoreNull=true , ignoreEmpty=true)` 中的可选配置项,顾名思义.    
 
-方法上的所有`@Set`有可能全部被移除,那么就会得到一个错误的SQL`update Course set where no = ?5`,避免此错误有两个方法: 1). 加一条不含有SQL参数的`@set`,如: `@set("name" = "name")`,它永远不会被删除,并且不会对原有数据造成任何影响; 2).调用方法前对参数做校验,以排除因为参数导致全部`@set`被丢弃的可能.  
+方法上的所有`@Set`有可能全部被移除,那么就会得到一个错误的SQL`update Course set where no = ?5`,避免此错误有两个方法: 1). 加一条不含有SQL参数的`@set`,如: `@set("name = name")`,它永远不会被删除,并且不会对原有数据造成任何影响; 2).调用方法前对参数做校验,以排除因为参数导致全部`@set`被丢弃的可能.  
 
 单个`@Set`针对出现多个`SQL`参数的情形,如 `@Set("name = ?1","credit = ?2")` 或 `@Set("name = :name","credit = :credit")` 参数 `?1`、`?2`、`:name`、 `:credit`中的任意一个为`null`都会导致该行设置项被移除.  
 
-### 通过JAVA脚本控制条件增减
-`@Set`中的`script`属性可以绑定一个JAVA脚本(非JS),根据脚本运行后的布尔结果,来决定是否保留设置项.脚本运行后的结果如果是`true`,那么就删除该设置项,反之,保留设置项,默认脚本是`false`,表示保留该设置项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
+### @Set 中的 if...else
+这个`SQL`设置项是否保留,可以通过`if`...`else`...来确定.`if`的表达式用`=`号与之绑定.`if`成立,则,保留当前设置项,反之,就取`else`所指定的值.当然,`else`在语法上不是必须的,若不写`else`,`if`条件不成立,则,直接被删除当前`@Set`.  
+举例:
+
+```java
+@Modifying
+@Query("update `User` #{#sets} where id = ?3")
+@Set(value="`name` = :name",if$="!:name.contains(\"root\")",else$="`name` = name")
+int updateUser(@Param("name") String name,int id);
+```
+其中,如果`name`的值不包含"root",就保留`"name = :name"`这个设置选项,否则,设置选项为`name = name`(表示`name`的值保持原样).
+
+### 通过JAVA脚本控制设置项增减
+`@Set`中的`ignoreScript`属性可以绑定一个JAVA脚本(非JS),根据脚本运行后的布尔结果,来决定是否保留设置项.脚本运行后的结果如果是`true`,那么就删除该设置项,反之,保留设置项,默认脚本是`false`,表示保留该设置项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
 举例:
 
 ```java
 @Modifying
 @Query("update `Course` #{#sets} where no = ?3")
 @Set(value="`name` = :name",
-     script=":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2")
+     ignoreScript=":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2")
 @Set("`credit` = :credit")
 int updateCourse(@Param("name") String name,@Param("credit") Integer credit,String no);
 ```

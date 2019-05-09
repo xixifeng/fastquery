@@ -43,7 +43,7 @@ import org.junit.Test;
 public class Script2ClassTest {
 	
 	@Set("AA")
-	@Set(value="BB",script=":age.intValue() >18 && :name!=null && :name.contains(\"Rex\")")
+	@Set(value="BB",ignoreScript=":age.intValue() >18 && :name!=null && :name.contains(\"Rex\")")
 	@Set("CC")
 	public void todo(@Param("age")Integer age,@Param("name")String name) {
 	}

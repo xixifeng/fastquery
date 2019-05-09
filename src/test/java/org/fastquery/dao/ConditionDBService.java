@@ -41,8 +41,8 @@ import org.fastquery.where.Judge;
 public interface ConditionDBService extends QueryRepository {
 
 	@Query("select * ${tname} #{#where} limit 3")
-	@Condition(value=" $nameWhere",script=":nameWhere==null")
-	@Condition(value=" $ageCon",script=":ageCon==null")
+	@Condition(value=" $nameWhere",ignoreScript=":nameWhere==null")
+	@Condition(value=" $ageCon",ignoreScript=":ageCon==null")
 	List<Student> findUserInfo(@Param("nameWhere") String w1, @Param("ageCon") String w2, @Param("tname") String tname);
 
 	@Query("select * ${tname} #{#where}")
@@ -67,6 +67,18 @@ public interface ConditionDBService extends QueryRepository {
 	
 	@Query("select id,name,age from `userinfo` #{#where}")
 	@Condition("age > :age")
-	@Condition(value="and name like :name",script=":age > 18 && :name!=null && :name.contains(\"Rex\")")
+	@Condition(value="and name like :name",ignoreScript=":age > 18 && :name!=null && :name.contains(\"Rex\")")
 	Page<UserInfo> find2(@Param("age")int age,@Param("name")String name,Pageable pageable);
+	
+	
+	@Query("select id,name,age from `userinfo` #{#where}")
+	@Condition("age > :age")
+	@Condition(value="and name like :name",if$=":age > 18 && :name!=null && :name.contains(\"Rex\")")
+	Page<UserInfo> find3(@Param("age")int age,@Param("name")String name,Pageable pageable);
+	
+	
+	@Query("select id,name,age from `userinfo` #{#where}")
+	@Condition("age > :age")
+	@Condition(value="and name like :name",if$=":age > 18 && :name!=null && :name.contains(\"Rex\")", else$="and name = :name")
+	Page<UserInfo> find4(@Param("age")int age,@Param("name")String name,Pageable pageable);	
 }

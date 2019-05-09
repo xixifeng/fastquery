@@ -56,6 +56,19 @@ final class SetParser {
 				String value = set.value();
 				value = TypeUtil.paramFilter(method, args, value);
 				if(!ignoreSet(set, value, i)) {
+					
+					// if$ , else$ 解析
+					if(!"true".equals(set.if$()) && !Script2Class.getJudge(i).ignore()) {
+						String elseValue = set.else$();
+						if(!"".equals(elseValue)) {
+							elseValue = TypeUtil.paramFilter(QueryContext.getMethod(), QueryContext.getArgs(), elseValue);
+							sb.append(elseValue);
+							sb.append(",");
+						} 
+					   continue;
+					} 
+					// end
+										
 					sb.append(value);
 					sb.append(",");
 				}
@@ -105,7 +118,7 @@ final class SetParser {
 	}
 
 	private static boolean getFactor3(Set set, int index) {
-		return (!set.script().equals("false")) && Script2Class.getJudge(index).ignore();
+		return (!set.ignoreScript().equals("false")) && Script2Class.getJudge(index).ignore();
 	}
 
 	private static boolean getFactor4(Set set) {

@@ -86,5 +86,19 @@ public @interface Condition {
 	 *  
 	 * @return 代码脚本
 	 */
-	String script() default "false";
+	String ignoreScript() default "false";
+	
+	/**
+	 * 通过运行java代码脚本,来决定是否保留条件项.if条件成立,就保留该Condition,反之,就采取else的值(得到else的值如果是"",表示忽略该Condition) <br>
+	 * 
+	 * @return 代码脚本
+	 */
+	String if$() default "true";
+	
+	/**
+	 * if条件不成立的情况下就取else的值,若取到else的值的为"",表示忽略该Condition <br>
+	 * 
+	 * @return 在if条件不成立后的可选值
+	 */
+	String else$() default "";
 }

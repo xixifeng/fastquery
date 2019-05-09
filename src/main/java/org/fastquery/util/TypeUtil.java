@@ -543,7 +543,7 @@ public class TypeUtil implements Opcodes {
 	}
 
 	private static boolean getFactor3(Condition condition, int index) {
-		return (!condition.script().equals("false")) && Script2Class.getJudge(index).ignore();
+		return (!condition.ignoreScript().equals("false")) && Script2Class.getJudge(index).ignore();
 	}
 
 	private static boolean getFactor4(Condition condition) {
@@ -632,6 +632,24 @@ public class TypeUtil implements Opcodes {
 		if(getFactor3(condition, conditionPosition) || getFactor4(condition)) {
 			return null;
 		}
+		
+		// if$ , else$ 解析
+		if(!"true".equals(condition.if$()) && !Script2Class.getJudge(conditionPosition).ignore()) {
+			String elseValue = condition.else$();
+			if("".equals(elseValue)) {
+				return null;
+			} else {
+				elseValue = paramFilter(QueryContext.getMethod(), QueryContext.getArgs(), elseValue);
+				pars = TypeUtil.matchesNotrepeat(elseValue, "\\?\\d+");
+				for (String par : pars) {
+					int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
+					if(QueryContext.getArgs()[index - 1] == null) { // ?num 对应的实参是null,要附加处理下
+						elseValue = extReplaceAll(elseValue, index);	
+					}
+				}
+				return elseValue;
+			}
+		} 
 		
 		return value;
 	}

@@ -75,7 +75,7 @@ public class SetDBServiceTest extends FastQueryTest  {
 	
 	// 有81种组合,此方法也会被调用这么多次
 	@Theory
-	public void testUpdateCourse1(@FromDataPoints("names")String name,@FromDataPoints("credits")Integer credit, @FromDataPoints("semesters")Integer semester, @FromDataPoints("periods")Integer period, @FromDataPoints("no")String no) {
+	public void testUpdateCourse1$1(@FromDataPoints("names")String name,@FromDataPoints("credits")Integer credit, @FromDataPoints("semesters")Integer semester, @FromDataPoints("periods")Integer period, @FromDataPoints("no")String no) {
 		LOG.info("当前参数 name={}, credit={}, semester={}, period={}, no={} ",name, credit, semester, period, no);		
 		if((name == null || "".equals(name)) && credit == null && semester == null && period == null) {
 			// 这种情形 已在SetDBServiceTest2中测试
@@ -119,7 +119,7 @@ public class SetDBServiceTest extends FastQueryTest  {
 	}
 	
 	@Test
-	public void updateCourse2() {
+	public void updateCourse1$2() {
 		String name = "计算机算法";
 		Integer credit = 4;
 		String no = "c08";
@@ -129,7 +129,7 @@ public class SetDBServiceTest extends FastQueryTest  {
 	}
 	
 	@Test
-	public void updateCourse3() {
+	public void updateCourse2$1() {
 		String name = "计算机算法";
 		Integer credit = 4;
 		String no = "c08";
@@ -139,13 +139,53 @@ public class SetDBServiceTest extends FastQueryTest  {
 	}
 	
 	@Test
-	public void updateCourse4() {
+	public void updateCourse2$2() {
 		String name = null;
 		Integer credit = 4;
 		String no = "c08";
 		int effect = db.updateCourse2(name, credit, 9, 5, no);
 		assertThat(effect, is(1));
 		assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `credit` = ?,`semester` = ?,`period` = ?  where no = ?"));
+	}
+	
+	@Test
+	public void updateCourse3$1() {
+		String name = "计算机算法";
+		Integer credit = 4;
+		String no = "c08";
+		int effect = db.updateCourse3(name, credit, no);
+		assertThat(effect, is(1));
+		assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `name` = ?,`credit` = ?  where no = ?"));
+	}
+	
+	@Test
+	public void updateCourse3$2() {
+		String name = "编程技术";
+		Integer credit = 4;
+		String no = "c08";
+		int effect = db.updateCourse3(name, credit, no);
+		assertThat(effect, is(1));
+		assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `credit` = ?  where no = ?"));
+	}
+
+	@Test
+	public void updateCourse4$1() {
+		String name = "计算机算法";
+		Integer credit = 4;
+		String no = "c08";
+		int effect = db.updateCourse4(name, credit, no);
+		assertThat(effect, is(1));
+		assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `name` = ?,`credit` = ?  where no = ?"));
+	}
+	
+	@Test
+	public void updateCourse4$2() {
+		String name = "编程技术";
+		Integer credit = 4;
+		String no = "c08";
+		int effect = db.updateCourse4(name, credit, no);
+		assertThat(effect, is(1));
+		assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `name` = name,`credit` = ?  where no = ?"));
 	}
 	
 }
