@@ -23,7 +23,7 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 1. 遵循非侵入式原则,设计优雅或简单,极易上手
 2. 在项目初始化阶段采用ASM生成好字节码,因此支持编译前预处理,可最大限度减少运行期的错误,显著提升程序的强壮性
 3. 支持安全查询,防止SQL注入
-4. 支持与主流数据库连接池框架集成,如集成c3p0,dbcp等等
+4. 支持与主流数据库连接池框架集成
 5. 支持 `@Query` 查询,使用 `@Condition`,可实现动态 `where` 条件查询
 6. 支持查询结果集以JSON类型返回
 7. 拥有非常优雅的`Page`(分页)设计
@@ -257,7 +257,7 @@ fastquery.json其他可选配置选项:
 
 唯一的出路,只能引用接口,这就使得开发者编程起来不得不简单,因为面对的是一个高度抽象的模型,而不必去考虑细枝末节.接口可以看成是一个能解析SQL并能自动执行的模型,方法的参数、绑定的模版和标识的注解无不是为了实现一个目的:执行SQL,返回结果.  
 
-这种不得不面向接口的编程风格,有很多好处:耦合度趋向0,天然就是**对修改封闭,对扩展开放**,不管是应用层维护还是对框架增加新特性,这些都变得特别容易.隐藏实现,可以减少bug或者是能消灭bug,就如**解决问题,不如消灭问题**一般,解决问题的造诣远远落后于消灭问题,原因在于问题被解决后,不能证明另一个潜在问题在解决代码中不再出现,显然消灭问题更胜一筹.应用层只用写声明抽象方法和标识注解,试问bug从何而来?该框架最大的优良之处就是让开发者没办法去制造bug(当然,有心为之,另当别论),至少说很难搞出问题来.不得不简便,没法造bug,显然是该项目所追求的核心目标之一.  
+这种不得不面向接口的编程风格,有很多好处:耦合度趋向0,天然就是**对修改封闭,对扩展开放**,不管是应用层维护还是对框架增加新特性,这些都变得特别容易.隐藏实现,可以减少bug或者是能消灭bug,就如**解决问题,不如消灭问题**一般,解决问题的造诣远远落后于消灭问题,原因在于问题被解决后,不能证明另一个潜在问题在解决代码中不再出现,显然消灭问题更胜一筹.应用层只用写声明抽象方法和标识注解,试问bug从何而来?该框架最大的优良之处就是让开发者没办法去制造bug,至少说很难搞出问题来.不得不简便,没法造bug,显然是该项目所追求的核心目标之一.  
 
 不管用不用这个项目,笔者都期望,读者至少能快速检阅一下该文档,有很多设计是众多同类框架所不具备的,希望读者从中得到正面启发或反面启发,哪怕一点点,都会使你收益.  
 
@@ -413,7 +413,7 @@ Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable page
 @Condition("age between $age1 and ${age2}")
 List<Map<String, Object>> between(@Param("age1") Integer age1,@Param("age2") Integer age2);	
 ```
-该例中`@Condition`使用到了`$`表达式,`$age1`,`$age1`仅作为模板替换,age1为null,即便设置`ignoreNull=true`也不会影响条件的增减.**总之,`$` 表达式不会动摇条件的存在**.  
+该例中`@Condition`使用到了`$`表达式,`$age1`,`${age2}`仅作为模板替换,age1为null,即便设置`ignoreNull=true`也不会影响条件的增减.**总之,`$` 表达式不会动摇条件的存在**.  
 单个`@Condition`针对出现多个`SQL`参数的情形,如 `@Condition("or age between ?5 and ?6")` 或 `@Condition("or age between :age1 and :age2")` 参数 `?5`、`?6`、`:age1`、 `:age2`中的任意一个为`null`都会导致该行条件移除.
 
 ## count
@@ -629,18 +629,6 @@ int updateCourse(String name,Integer credit, Integer semester, Integer period, S
 
 单个`@Set`针对出现多个`SQL`参数的情形,如 `@Set("name = ?1","credit = ?2")` 或 `@Set("name = :name","credit = :credit")` 参数 `?1`、`?2`、`:name`、 `:credit`中的任意一个为`null`都会导致该行设置项被移除.  
 
-### @Set 中的 if...else
-这个`SQL`设置项是否保留,可以通过`if`...`else`...来确定.`if`的表达式用`=`号与之绑定.`if`成立,则,保留当前设置项,反之,就取`else`所指定的值.当然,`else`在语法上不是必须的,若不写`else`,`if`条件不成立,则,直接被删除当前`@Set`.  
-举例:
-
-```java
-@Modifying
-@Query("update `User` #{#sets} where id = ?3")
-@Set(value="`name` = :name",if$="!:name.contains(\"root\")",else$="`name` = name")
-int updateUser(@Param("name") String name,int id);
-```
-其中,如果`name`的值不包含"root",就保留`"name = :name"`这个设置选项,否则,设置选项为`name = name`(表示`name`的值保持原样).
-
 ### 通过JAVA脚本控制设置项增减
 `@Set`中的`ignoreScript`属性可以绑定一个JAVA脚本(非JS),根据脚本运行后的布尔结果,来决定是否保留设置项.脚本运行后的结果如果是`true`,那么就删除该设置项,反之,保留设置项,默认脚本是`false`,表示保留该设置项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
 举例:
@@ -653,8 +641,20 @@ int updateUser(@Param("name") String name,int id);
 @Set("`credit` = :credit")
 int updateCourse(@Param("name") String name,@Param("credit") Integer credit,String no);
 ```
-其中, `:credit`引用的是`@Param("credit") Integer credit`的实参值.`:name`是`@Param("name")String name`的实参值.这个脚本要表达的意思不言而喻. 不过脚本的解析能力还不能自动**拆箱**(unboxing),需要调用拆箱方法,请留意住`:credit!=null && :credit.intValue() > 2`. 若写成`:credit > 2`是编译不了的. 其他包装类型`Short`, `Long`, `Byte`, `Boolean`, `Character`, `Float`, `Double` 以此类推.  
+其中, `:credit`引用的是`@Param("credit") Integer credit`的实参值.`:name`是`@Param("name")String name`的实参值.这个脚本要表达的意思不言而喻. 不过脚本的解析能力还不能自动**拆箱**(unboxing),需要调用拆箱方法,请留意住`:credit.intValue() > 2`. 若写成`:credit > 2`是编译不了的. 其他包装类型`Short`, `Long`, `Byte`, `Boolean`, `Character`, `Float`, `Double` 以此类推.  
 脚本的编译工作在项目初始化阶段完成,因此不存在性能问题.建议不要把脚本写得太长,那样会破坏可读性.
+
+### @Set 中的 if...else
+这个`SQL`设置项是否保留,可以通过`if`...`else`...来确定.`if`的表达式用`=`号与之绑定.`if`成立,则,保留当前设置项,反之,就取`else`所指定的值.当然,`else`在语法上不是必须的,若不写`else`,`if`条件不成立,则,直接删除当前`@Set`.  
+举例:
+
+```java
+@Modifying
+@Query("update `User` #{#sets} where id = ?3")
+@Set(value="`name` = :name",if$="!:name.contains(\"root\")",else$="`name` = name")
+int updateUser(@Param("name") String name,int id);
+```
+其中,如果`name`的值不包含"root",就保留`"name = :name"`这个设置选项,否则,设置选项为`name = name`(表示`name`的值保持原样).
 
 ### 自定义类控制设置项增减
 决定一个Set项是否参与运算,可以根据多个参数进行某种计算来决定,`@Set`允许关联一个自定义的`Judge`类,作为这种计算的载体.  
@@ -797,8 +797,24 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 ```java
 db.findLikeName(name + "%");
 ```
-这种写法不好,需要手动拼接模糊搜索关键字.  
+这种写法不好,实参和模糊关键字`%`被融在一起了.实参是程序语言特性,而`%`是`SQL`特性,把`%`放在`@Query`里或`SQL`模板里更为适合.  
 现在有`微笑表达式`了,在模板中,可以配置name实参的模板.假设模板中通过<code>\`-:name%-\`</code>引用这个实参,那么<code>\`-:name%-\`</code>将会作为这个实参的模板. name的值为"张",实际上传递的是"张%".   
+举例:
+
+```java
+@Query("select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`")
+```
+
+或
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<queries>
+	<query id="findUserInfo">
+		select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`
+	</query>
+</queries>
+```
 
 2.采用`微笑表达式`的片段,会过滤敏感关键字,严格防止SQL注入. 建议将其用在`$表达式`/`${表达式}`上,因为 **$表达式的存在仅仅是为了开发者方便构建SQL**,使用不当很危险,加上`微笑表达式`可以防止由于开发者的疏忽而引发的SQL注入问题.**注意**: 冒号表达式,如`:name`最终会解释成SQL占位符`?`号,因此不存在注入问题,不必使用`微笑表达式`来预防.
 
@@ -1085,7 +1101,7 @@ JSONObject callProcedure(String no,@Param("name")String name,String sex,int age,
 ### 注意: 
 - `#{#limit}`是分页模板的内置零件,表示分页区间. `#{#limit}`默认是放在尾部,在符合`SQL`语法的前提下也可以把它放在`SQL`语句中的其他地方
 - 动态条件部分若用`<where>`元素进行包裹,会自动处理好条件连接符问题(避免出现where紧接`or`或`and`)
-- `<value>`和`<countQuery>`节点引用的零件若包含`<where>`元素,零件解析成字符串后会自动加上*"where"*,请不要在引入切口处重复追加*"where"*字符串
+- `<value>`和`<countQuery>`节点引用的零件若包含`<where>`元素,零件解析成字符串后会自动加上 *"where"* ,请不要在引入切口处重复追加 *"where"* 字符串
 
 DB接口:
 
