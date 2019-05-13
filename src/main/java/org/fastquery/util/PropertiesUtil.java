@@ -86,43 +86,7 @@ class PropertiesUtil {
 				}
 				bpNames.add(basePackage); // 把所有的basePackage收集在一个集合里,方便校验是否有重复
 			}
-
-			switch (config) {
-			case "c3p0":
-				// 校验是否存在 c3p0-config.xml 文件
-				if (!fqueryResource.exist("c3p0-config.xml")) {
-					throw new RepositoryException("fastquery.json 配置文件中, config设置了c3p0,因此依赖c3p0-config.xml配置文件,可是没有找到.");
-				}
-				
-				// 校验指定的数据源名称是否正确
-				if(dataSourceName!=null && !XMLParse.exists(fqueryResource, "c3p0-config.xml", dataSourceName,"named-config")) {
-					throw new RepositoryException("fastquery.json 配置文件中, 指定了数据源为" + dataSourceName + ",而在c3p0-config.xml中,找不到对该数据源的配置.");
-				}
-				
-				break;
-			case "druid":
-				break;
-			case "hikari":
-				break;
-			case "jdbc":
-				// 校验是否存在 jdbc-config.xml 文件
-				if (!fqueryResource.exist("jdbc-config.xml")) {
-					throw new RepositoryException("fastquery.json 配置文件中, config设置了jdbc,因此依赖jdbc-config.xml配置文件,可是没有找到.");
-				}
-				// getJdbcConfigs 里面有对流进行关闭
-				if(dataSourceName!=null && !XMLParse.exists(fqueryResource, "jdbc-config.xml", dataSourceName,"named-config")) {
-					throw new RepositoryException("fastquery.json 配置文件中, 指定了数据源为" + dataSourceName + ",而在jdbc-config.xml中,找不到对该数据源的配置.");
-				}
-				// 校验指定的数据源名称是否正确
-				break;
-			default:
-				throw new RepositoryException("fastquery.json 配置文件中, config设置了" + config + ",不支持该属性值");
-			}
-
-			// 校验数据源的名称是否配置正确
-
-			// 检验 end
-
+			
 			// 收集数据 用做校验
 			if (dataSourceName != null) {
 				dataSourceNames.add(dataSourceName);

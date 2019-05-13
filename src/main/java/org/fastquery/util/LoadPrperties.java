@@ -23,13 +23,13 @@
 package org.fastquery.util;
 
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.fastquery.core.ConnectionPoolProvider;
 import org.fastquery.core.Resource;
 import org.fastquery.dsm.FastQueryJson;
 import org.fastquery.dsm.FQueryProperties;
@@ -56,92 +56,36 @@ public class LoadPrperties {
 		String namedConfig;
 		Set<String> basePackages;
 		String config;
-
+		
+		Map<String, String> poolMap = XMLParse.toMap(fqueryResource, "pools.xml", "providers", "pools");
+		
 		for (FastQueryJson fQueryPropertie : fqProperties) {
 			config = fQueryPropertie.getConfig(); // 获取fastquery.json 中的config属性
 			namedConfig = fQueryPropertie.getDataSourceName();
-
-			switch (config) {
-			case "c3p0":
-				if (FQueryProperties.findDataSource(namedConfig) == null && namedConfig != null) { // 如果名称为namedConfig的数据源不存在,才能new!
-					DataSource cpds = new com.mchange.v2.c3p0.ComboPooledDataSource(namedConfig);
-					FQueryProperties.putDataSource(namedConfig, cpds);
-					LOG.debug("创建数据源:{},名称为:{}", cpds, namedConfig);
+			
+			String provider = poolMap.get(config);
+			
+			if(provider==null) {
+				throw new ExceptionInInitializerError("根据" + config + "没有找到数据源提供者");
+			} else if(FQueryProperties.findDataSource(namedConfig) == null && namedConfig != null) {
+				ConnectionPoolProvider poolProvider;
+				try {
+					Class<?> providerClazz = Class.forName(provider);
+					poolProvider = (ConnectionPoolProvider) providerClazz.newInstance();
+				} catch (Exception e) {
+					throw new ExceptionInInitializerError(provider + "初始化失败");
 				}
-				break;
-
-			case "druid":
-				if (FQueryProperties.findDataSource(namedConfig) == null && namedConfig != null) { // 如果名称为namedConfig的数据源不存在,才能new!
-					DataSource druidDS;
-					try {
-						druidDS = com.alibaba.druid.pool.DruidDataSourceFactory.createDataSource(XMLParse.toMap(fqueryResource, "druid.xml", namedConfig,"bean"));
-					} catch (Exception e) {
-						throw new ExceptionInInitializerError(e);
-					}
-					FQueryProperties.putDataSource(namedConfig, druidDS);
-					LOG.debug("创建数据源:{},名称为:{}", druidDS, namedConfig);
-				}
-				break;
-				
-			case "hikari":
-				if (FQueryProperties.findDataSource(namedConfig) == null && namedConfig != null) {
-					Map<Object, Object> hikariMap = XMLParse.toMap(fqueryResource, "hikari.xml", namedConfig,"bean");
-					Properties props = new Properties();
-					hikariMap.forEach((k,v) -> props.setProperty(k.toString(), v.toString()));
-					DataSource hikarids = new com.zaxxer.hikari.HikariDataSource(new com.zaxxer.hikari.HikariConfig(props));
-					FQueryProperties.putDataSource(namedConfig, hikarids);
-					LOG.debug("创建数据源:{},名称为:{}", hikarids, namedConfig);
-				}
-			break;
-				
-			case "jdbc":
-				
-				Map<Object, Object> map = XMLParse.toMap(fqueryResource, "jdbc-config.xml", namedConfig,"named-config");
-				
-				// 根据不同的jdbc的驱动,选择不同的数据源实现
-				switch ( (String) map.get("driverClass")) {
-				case "com.mysql.cj.jdbc.Driver":
-					if (FQueryProperties.findDataSource(namedConfig) == null) { // 如果名称为namedConfig的数据源不存在,才能new!
-						String databaseName = (String) map.get("databaseName");
-						String password = (String) map.get("password");
-						String portNumber = (String) map.get("portNumber");
-						String serverName = (String) map.get("serverName");
-						String user = (String) map.get("user");
-						String url = (String) map.get("url");
-
-						com.mysql.cj.jdbc.MysqlDataSource cpd = new com.mysql.cj.jdbc.MysqlDataSource();
-						cpd.setDatabaseName(databaseName);
-						cpd.setPassword(password);
-						if (portNumber != null) {
-							cpd.setPortNumber(Integer.parseInt(portNumber));
-						}
-						cpd.setServerName(serverName);
-						cpd.setUser(user);
-						if (url != null) {
-							cpd.setUrl(url);
-						}
-						FQueryProperties.putDataSource(namedConfig, cpd);
-
-					}
-					break;
-
-				default:
-					break;
-				}
-				// 根据不同的jdbc的驱动,选择不同的数据源实现 End
-
-				break;
-
-			default:
-				break;
+				DataSource dataSource = poolProvider.getDataSource(fqueryResource, namedConfig);
+				FQueryProperties.putDataSource(namedConfig, dataSource);
+				LOG.debug("创建数据源:{},名称为:{}", dataSource, namedConfig);
 			}
-
+			
 			basePackages = fQueryPropertie.getBasePackages();
 			for (String basePackage : basePackages) {
 				FQueryProperties.putDataSourceIndex(basePackage, namedConfig);
 			}
 		}
-
+		
 		return fqProperties;
 	}
 	

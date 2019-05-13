@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
+import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -50,25 +50,22 @@ public class XMLParse {
 	}
 	
 	
-	private static interface Function<M,E,R> {
-		R appley(M m,E e);
+	private static interface Function<E,R> {
+		R appley(E e);
 	}
 	
-	static boolean exists(Resource resource, String resourceName, String dataSourceName,String tagName) {
-		return toWho(resource, resourceName, dataSourceName,tagName, (map,ele) -> (map!=null && !map.isEmpty()) || ele != null);
+	public static boolean exists(Resource resource, String resourceName, String dataSourceName,String tagName) {
+		return toWho(resource, resourceName, dataSourceName,tagName, Objects::nonNull); // ele -> ele != null
 	}
 	
-	public static Map<Object, Object> toMap(Resource resource, String resourceName, String dataSourceName,String tagName) {
-		return toWho(resource, resourceName, dataSourceName,tagName,(m,unitElement) -> {
-			if(m!=null && !m.isEmpty()) {
-				return m;
-			}
-			
+	public static Map<String, String> toMap(Resource resource, String resourceName, String dataSourceName,String tagName) {
+		return toWho(resource, resourceName, dataSourceName,tagName,unitElement -> {
+
 			String key = null;
 			String val = null;
 			Node node = null;
 			
-			Map<Object, Object> map = new HashMap<>();			
+			Map<String, String> map = new HashMap<>();			
 			NodeList childNodes = unitElement.getChildNodes();
 			
 			for (int j = 0; j < childNodes.getLength(); j++) {
@@ -80,7 +77,10 @@ public class XMLParse {
 					if(val==null || "".equals(val)) {
 						val = unitElement.getAttribute("value");
 					}
-					check(key, val); // 存之前检测
+					if(val==null || "".equals(val)) {
+						val = unitElement.getAttribute("class");
+					}
+					check(resourceName, key, val); // 存之前检测
 					map.put(key, val);
 				}
 			}
@@ -88,29 +88,15 @@ public class XMLParse {
 		});
 	}
 
-	private static void check(String key, String val) {
-		if ("".equals(key)) {
-			throw new RepositoryException("druid.xml 中的property其name属性不能是空字符且不能为null");
-		}
-		if ("".equals(val)) {
-			throw new RepositoryException("druid.xml 中的property其值不能是空字符且不能为null");
+	private static void check(String resourceName, String key, String val) {
+		if ("".equals(key) || "".equals(val)) {
+			throw new RepositoryException(resourceName + " 配置错误,name属性和value属性或class属性必须合法");
 		}
 	}
 	
-	private static <R> R toWho(Resource resource, String resourceName, String dataSourceName,String tagName, XMLParse.Function<Map<Object, Object>, Element, R> fun) {
+	private static <R> R toWho(Resource resource, String resourceName, String dataSourceName,String tagName, XMLParse.Function<Element, R> fun) {
 		
-		// 首先判断是否有 ${nodeName}.properties
-		String properName = new StringBuilder(dataSourceName).append('.').append("properties").toString();
-		if (resource.exist(properName)) {
-			try (InputStream inputStream = resource.getResourceAsStream(properName)) {
-				Map<Object, Object> properties = new Properties();
-				((Properties) properties).load(inputStream);
-				return fun.appley(properties, null);
-			} catch (IOException e) {
-				throw new ExceptionInInitializerError(e);
-			}
-
-		} else if (resource.exist(resourceName)) {
+		if (resource.exist(resourceName)) {
 			try (InputStream inputStream = resource.getResourceAsStream(resourceName)) {
 
 				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -123,13 +109,16 @@ public class XMLParse {
 				Element element = document.getDocumentElement();
 
 				NodeList nodes = element.getElementsByTagName(tagName);
+				if(nodes.getLength() == 0) {
+					nodes = document.getElementsByTagName(tagName);
+				}
 				Element unitElement = null;
 				String named = null;
 				for (int i = 0; i < nodes.getLength(); i++) {
 					unitElement = (Element) nodes.item(i);
 					named = unitElement.getAttribute("name");
 					if (dataSourceName.equals(named)) {
-						return fun.appley(null, unitElement);
+						return fun.appley(unitElement);
 					}
 				}
 

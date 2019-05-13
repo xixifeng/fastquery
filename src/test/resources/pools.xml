@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<pools name="providers">
+			<pool name="c3p0" class="org.fastquery.pool.C3p0PoolProvider" />		
+			<pool name="druid" class="org.fastquery.pool.DruidPoolProvider" />		
+			<pool name="hikari" class="org.fastquery.pool.HikariPoolProvider" />		
+			<pool name="mySQLDriver" class="org.fastquery.pool.MySQLDriverProvider" />		
+</pools>
+ 
+ 

@@ -158,7 +158,7 @@ JRE 8+
 // 配置必须遵循标准的json语法.
 {
   "scope":[
-		    // config目前支持的可选值有"jdbc","c3p0","druid"
+		    // config 用于指定由谁来提供数据源,如,"mySQLDriver","c3p0","druid","hikari"
 		    {
 		        "config": "c3p0",            // 表示由c3p0负责提供数据源
 		        "dataSourceName": "xk-c3p0", // 数据源的名称
@@ -174,7 +174,7 @@ JRE 8+
 		      再配置一个数据源作用域
 		     */
 		     {
-		        "config" : "jdbc",             // 表示由jdbc驱动负责提供数据源
+		        "config" : "mySQLDriver",      // 表示由mySQLDriver负责提供数据源
 		        "dataSourceName": "shtest_db", // 数据源的名称
 		        "basePackages": [              // 该数据源的作用范围
 		            "org.fastquery.example.DataAcquireDbService"
@@ -897,7 +897,8 @@ List<Student> findByIn(@Param("sex")String sex,@Param("age")Integer age,@Param("
 |  &quot; | &amp;quot;| &amp;#34; | 双引号 |
 
 如果想把一些公用的SQL代码片段提取出来,以便重用,通过定义`<parts>`元素(零件集)就可以做到. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件.  
-若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`<query>`都能引用它.一个非分页的函数,如果绑定的模板中包含`<countQuery>`,那么这个函数只会提取查询语句,而不会提取计数语句.
+若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`<query>`都能引用它.  
+一个非分页的函数,如果绑定的模板中包含`<countQuery>`,那么这个函数只会提取`<query>`语句,而不会提取计数语句.
 
 ```java
 public interface QueryByNamedDBExample extends QueryRepository {
@@ -1259,6 +1260,37 @@ Map<String, Object> findOne(Integer age,@Source String dataSourceName);
 
 ### 适配数据源的优先级
 如果在fastquery.json文件里明确指定了数据源的作用域,同时接口函数也存在`@Source`,那么以`@Source`指定的数据源优先,其次是配置文件.
+
+## 扩展支持数据连接池
+默认已经支持的连接池有,`c3p0`,`druid`,`hikariCP`...当然,开发者很容易在此基础上进行扩展.  
+示例,让`FastQuery`支持`hikariCP`连接池.实现过程如下:  
+步骤1: 自定义类实现`org.fastquery.core.ConnectionPoolProvider`接口
+
+```java
+public class HikariPoolProvider implements ConnectionPoolProvider {
+
+	@Override
+	public DataSource getDataSource(Resource resource, String dataSourceName) {
+	    // 读取 hikari.xml 配置文件
+		Map<String, String> hikariMap = XMLParse.toMap(resource, "hikari.xml", dataSourceName,"bean");
+		Properties props = new Properties();
+		// 设置配置
+		hikariMap.forEach(props::setProperty); // (k,v) -> props.setProperty(k, v)
+		// 返回数据源
+		return new com.zaxxer.hikari.HikariDataSource(new com.zaxxer.hikari.HikariConfig(props));
+	}
+
+}
+```
+步骤2: 在`pool.xml`里注册
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<pools name="providers">
+	<pool name="hikari" class="org.fastquery.pool.HikariPoolProvider" />
+</pools>
+```
 
 ## @Before拦截器
 在执行方法之前拦截  

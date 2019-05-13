@@ -27,9 +27,9 @@
 
   "scope":[
     {
-        "config": "hikari",           // 可选: hikari, c3p0, druid, jdbc
+        "config": "hikari",           // 连接池的提供者.如: hikari, c3p0, druid
         "dataSourceName": "xkdb2",    // 数据源的名称
-        "basePackages": [            // 该数据源的作用范围
+        "basePackages": [             // 该数据源的作用范围
             "org.fastquery.example",              // 包地址
             "org.fastquery.dao.UserInfoDBService",// 完整类名称
             "org.fastquery.dao.QueryByNamedDBExample",
@@ -60,7 +60,7 @@
     
     ,
     {
-        "config": "jdbc",            // 表示由jdbc负责提供数据源
+        "config": "mySQLDriver",            // 表示由jdbc负责提供数据源
         "dataSourceName": "xk3",     // 数据源的名称
         "basePackages": [   
              "org.fastquery.dao2.UserInfoDBService3",
@@ -70,7 +70,7 @@
     
     ,
     {
-        "config": "jdbc",           
+        "config": "mySQLDriver",           
         "dataSourceName": "s1", 
         "basePackages": [   
              "org.fastquery.db"
@@ -79,7 +79,7 @@
     
     ,
     {
-        "config": "jdbc",           
+        "config": "mySQLDriver",           
         "dataSourceName": "s2", 
         "basePackages": [   
              "org.fastquery.dbm"
@@ -88,12 +88,12 @@
     
     ,
     {
-        "config": "jdbc",           
+        "config": "mySQLDriver",           
     }
     
     ,
     {
-        "config": "jdbc",           
+        "config": "mySQLDriver",           
         "dataSourceName": "s3"
     }
     
@@ -113,7 +113,7 @@
     
     ,
     {
-        "config": "jdbc",            
+        "config": "mySQLDriver",            
         "dataSourceName": "cc", 
         "basePackages": [ "org.fastquery.db2.CC"]
     }
