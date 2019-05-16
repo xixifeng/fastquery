@@ -58,6 +58,9 @@ public class LoadPrperties {
 		String config;
 		
 		Map<String, String> poolMap = XMLParse.toMap(fqueryResource, "pools.xml", "providers", "pools");
+		if(fqueryResource.exist("pool-extend.xml")) {
+			poolMap.putAll(XMLParse.toMap(fqueryResource, "pool-extend.xml", "providers", "pools"));
+		}
 		
 		for (FastQueryJson fQueryPropertie : fqProperties) {
 			config = fQueryPropertie.getConfig(); // 获取fastquery.json 中的config属性

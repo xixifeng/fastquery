@@ -661,7 +661,7 @@ public class TypeUtil implements Opcodes {
 	 * @param args 参数集
 	 * @return where部分sql
 	 */
-	private static String getWhereSQL(Method method, Object[] args) {
+	public static String getWhereSQL(Method method, Object[] args) {
 		StringBuilder sb = new StringBuilder();
 		
 		// 追加条件
@@ -744,13 +744,7 @@ public class TypeUtil implements Opcodes {
 		}
 		return sqls;
 	}
-
-	public static String getCountQuerySQL(Method method, String sql, Object[] args) {
-		String csql = sql.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(getWhereSQL(method, args)));
-		LOG.info("求和:{}", csql);
-		return csql;
-	}
-
+	
 	/**
 	 * 过滤java语法中的注释
 	 * 

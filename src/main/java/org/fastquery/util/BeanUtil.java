@@ -92,9 +92,8 @@ public final class BeanUtil {
 						// 1. 不是主键的字段 
 						// 或
 						// 2. 不为null的字段
-						sb.append('`');
 						sb.append(field.getName());
-						sb.append("`,");
+						sb.append(',');
 					}
 				} catch (IllegalAccessException | IllegalArgumentException e) {
 					throw new RepositoryException(e);
@@ -272,9 +271,9 @@ public final class BeanUtil {
 			// 表名称
 			String tableName = getTableName(dbName, cls);		
 			if(selectEntity) {
-				return String.format("select %s from %s where `%s` = %s",selectFields(cls),tableName, keyFeild, key.toString());
+				return String.format("select %s from %s where %s = %s",selectFields(cls),tableName, keyFeild, key.toString());
 			} else {
-				return String.format("select `%s` from %s where `%s` = %s",keyFeild,tableName, keyFeild, key.toString());
+				return String.format("select %s from %s where %s = %s",keyFeild,tableName, keyFeild, key.toString());
 			}	
 		}
 	}
@@ -297,9 +296,9 @@ public final class BeanUtil {
 	}
 
 	private static String getTableName(String dbName, Class<?> cls) {
-		String tableName = StringUtils.wrap(getEntitySimpleName(cls), '`');
+		String tableName = getEntitySimpleName(cls);
 		if (dbName != null) {
-			return new StringBuilder().append('`').append(dbName).append("`.").append(tableName).toString();
+			return new StringBuilder().append(dbName).append('.').append(tableName).toString();
 		} else {
 			return tableName;	
 		}
@@ -344,9 +343,8 @@ public final class BeanUtil {
 					Id id = field.getAnnotation(Id.class);
 					if (val != null && id == null) {
 						args.add(val);
-						sb.append(" `");
+						sb.append(' ');
 						sb.append(field.getName());
-						sb.append('`');
 						sb.append("=?,");
 
 					}
@@ -360,15 +358,14 @@ public final class BeanUtil {
 				// 去掉sb最后的一个字符
 				sb.deleteCharAt(sb.length() - 1);
 				sb.append(" where ");
-				sb.append('`');
 				sb.append(keyFeild);
-				sb.append("`=?");
+				sb.append("=?");
 				args.add(key);
 				Object[] updateinfo = new Object[3];
 				updateinfo[0] = sb.toString();
 				updateinfo[1] = args;
 				if (toSQL) {
-					updateinfo[2] = String.format("select * from %s where `%s` = %s", tableName, keyFeild, key.toString());
+					updateinfo[2] = String.format("select * from %s where %s = %s", tableName, keyFeild, key.toString());
 				}
 				return updateinfo;
 			}
@@ -405,9 +402,8 @@ public final class BeanUtil {
 					Object val = field.get(bean);
 					if (val != null && !wps.contains(":" + field.getName())) {
 						args.add(val);
-						sb.append(" `");
+						sb.append(' ');
 						sb.append(field.getName());
-						sb.append('`');
 						sb.append("=?,");
 
 					}
@@ -490,12 +486,10 @@ public final class BeanUtil {
 				field.setAccessible(true);
 
 				String fieldName = field.getName();
-				sets.append('`');
 				sets.append(fieldName);
-				sets.append("` = case ");
-				sets.append('`');
+				sets.append(" = case ");
 				sets.append(key.getName());
-				sets.append("` ");
+				sets.append(' ');
 				for (B b : beans) {
 					Object keyVal = getFieldVal(key, b);
 					if (keyVal == null) {
@@ -514,15 +508,14 @@ public final class BeanUtil {
 						sets.append(fieldVal);
 						sets.append("' ");
 					} else {
-						sets.append('`');
 						sets.append(fieldName);
-						sets.append("` ");
+						sets.append(' ');
 					}
 				}
 				addIds = false;
-				sets.append("else `");
+				sets.append("else ");
 				sets.append(fieldName);
-				sets.append("` end,");
+				sets.append(" end,");
 			}
 
 			
@@ -537,9 +530,8 @@ public final class BeanUtil {
 		sql.append(" set ");
 		sql.append(sets);
 		sql.append(" where ");
-		sql.append('`');
 		sql.append(key.getName());
-		sql.append("` in(");
+		sql.append(" in(");
 		sql.append(ids);
 		sql.append(')');
 		return sql.toString();
@@ -557,16 +549,14 @@ public final class BeanUtil {
 
 	public static String toDelete(String tableName, String keyName, long keyVal, String dbName) {
 		StringBuilder sq = new StringBuilder();
-		sq.append("delete from `");
+		sq.append("delete from ");
 		if (dbName != null) {
-			sq.append(dbName).append('`').append('.').append('`').append(tableName).append('`').toString();
+			sq.append(dbName).append('.').append(tableName).toString();
 		} else {
-			sq.append(tableName).append('`').toString();
+			sq.append(tableName).toString();
 		}
 		sq.append(" where ");
-		sq.append('`');
 		sq.append(keyName);
-		sq.append('`');
 		sq.append('=');
 		sq.append(keyVal);
 
@@ -670,9 +660,8 @@ public final class BeanUtil {
 		List<Field> fields = mapFields(bean);
 		StringBuilder sb = new StringBuilder(6*fields.size());
 		fields.forEach( f -> {
-			sb.append(",`");
+			sb.append(',');
 			sb.append(f.getName());
-			sb.append('`');
 		});
 		int len = sb.length();
 		if(len > 0) {

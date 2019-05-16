@@ -102,7 +102,7 @@ public class SQLValue {
 							val = val.replaceAll("\\$\\{" + param.value() + "\\}", replacement);
 							val = val.replaceAll("\\$" + param.value() + "\\b", replacement);
 							values.set(i, val);
-							// 也有可能存在冒号表达式,冒号表达式会影响主体SQL和参数值较为复杂(之前已经处理好,需要重新设计,针对冒号表达式在一处处理较为适合), 在此,`format`暂不考虑冒号表达式.
+							// 也有可能存在冒号表达式,冒号表达式会影响主体SQL和参数值较为复杂(之前已经处理好,需要重新设计,针对冒号表达式在一处处理较为适合), 在此,format暂不考虑冒号表达式.
 							// format 重点在于值模版
 						}
 						// ②

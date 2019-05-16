@@ -20,42 +20,41 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.dialect;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+
+import org.fastquery.core.QueryContext;
+import org.fastquery.core.RepositoryException;
+import org.fastquery.page.PageDialect;
 
 /**
- * 标识改操作
  * 
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
-@Documented
-public @interface Modifying {
-
-	/**
-	 * 主键字段的名称,默认值"id"
-	 * 
-	 * @return String
-	 */
-	String id() default "id";
-
-	/**
-	 * 指定当前正在修改的表
-	 * 
-	 * @return String
-	 */
-	String table() default "";
+public class DialectScheduler {
 	
-	/**
-	 * 改操作若返回实体,selectFields 用来明确指定查询相应表的哪几个字段,默认是 "*",字段与字段之间请用英文逗号隔开
-	 * 
-	 * @return String
-	 */
-	String selectFields() default "*";
+	private DialectScheduler() {
+	}
+
+	public static PageDialect getCurrentPageDialect() {
+		Connection conn = QueryContext.getConn();
+		String dbProductName = "";
+		try {
+			DatabaseMetaData metaData = conn.getMetaData();
+			dbProductName = metaData.getDatabaseProductName();
+			if ("MySQL".equals(dbProductName)) {
+				return MySQLPageDialect.getInstance();
+			} else if ("PostgreSQL".equals(dbProductName)) {
+				return PostgreSQLPageDialect.getInstance();
+			} else {
+				return DefaultPageDialect.getInstance();
+			}
+		} catch (SQLException e) {
+			throw new RepositoryException(e);
+		}
+	}
+	
 }

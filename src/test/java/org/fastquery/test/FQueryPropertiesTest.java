@@ -84,7 +84,7 @@ public class FQueryPropertiesTest extends FastQueryTest  {
 		maps.forEach((k, v) -> {
 			LOG.debug(k + ":" + v);
 		});
-		assertThat(maps.size(), is(18));
+		assertThat(maps.size(), is(19));
 	}
 
 	@Test
@@ -94,7 +94,7 @@ public class FQueryPropertiesTest extends FastQueryTest  {
 		maps.forEach((k, v) -> {
 			LOG.debug(k + ":" + v);
 		});
-		assertThat(maps.size(), either(is(6)).or(is(10)).or(is(9)));
+		assertThat(maps.size(), either(is(6)).or(is(10)).or(is(11)));
 		Set<String> keys = maps.keySet();
 		assertThat(keys, hasItems("sunnydb", "xkdb2", "xk3", "s1", "s2"));
 		

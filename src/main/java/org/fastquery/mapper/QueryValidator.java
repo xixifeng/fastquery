@@ -151,7 +151,7 @@ public class QueryValidator {
 				Class<?> returnType = method.getReturnType();
 				if (returnType == Page.class && (countQuery == null || "".equals(countQuery.trim()))
 						&& method.getAnnotation(NotCount.class) == null) {
-					error(method, String.format("该方法指明需要分页并且没有标识@NotCount. 而在%s.queries.xml里,<query id=\"%s\">下面没有发现求和语句", className, id));
+					error(method, String.format("该方法指明要分页,而在%s.queries.xml里,<query id=\"%s\">下面没有发现count语句.分页而不统计总行数,可以在当前方法上标识@NotCount.", className, id));
 					return;
 				}
 

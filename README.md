@@ -6,13 +6,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.68</version> <!-- fastquery.version -->
+    <version>1.0.69</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.68'
+compile 'org.fastquery:fastquery:1.0.69'
 ```
 
 # FastQuery 数据持久层框架
@@ -41,30 +41,6 @@ JRE 8+
 ### 配置文件的存放位置
 
 默认从`classpath`目录下去寻找配置文件. 配置文件的存放位置支持自定义, 如: `System.setProperty("fastquery.config.dir","/data/fastquery/configs");`, 它将会覆盖`classpath`目录里的同名配置文件.  如果项目是以jar包的形式启动,那么可以通过java命令的 `-D` 参数指定配置文件的目录, 如: `java -jar Start.jar -Dfastquery.config.dir=/data/fastquery/configs`. 
-
-### jdbc-config.xml
-用来配置支持jdbc. **注意**:如果采用连接池,该配置文件可以不要.
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<jdbc-config>  
-        <!-- 配置第一个数据源 -->
-        <named-config name="xk_db">  
-        <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
-        <property name="url">jdbc:mysql://192.168.1.1:3306/xk?user=xk&amp;password=abc123</property>
-        </named-config>
-
-        <!-- 配置第二个数据源 -->
-        <named-config name="shtest_db">  
-        <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  <!-- jdbc 驱动 -->
-        <property name="databaseName">dbname</property>                   <!-- 数据库的名称 -->
-        <property name="user">username</property>                         <!-- 数据库用户名称 -->
-        <property name="password">userpasswd</property>                   <!-- 数据库用户的密码 --> 
-        <property name="portNumber">3306</property>                       <!-- 端口 -->
-        <property name="serverName">192.168.1.1</property>                <!-- 数据库主机地址 -->
-    </named-config>
-</jdbc-config>
-```
 
 ### c3p0-config.xml
 完全支持c3p0官方配置,详情配置请参照c3p0官网的说明.
@@ -158,7 +134,7 @@ JRE 8+
 // 配置必须遵循标准的json语法.
 {
   "scope":[
-		    // config 用于指定由谁来提供数据源,如,"mySQLDriver","c3p0","druid","hikari"
+		    // config 用于指定由谁来提供数据源,如,"c3p0","druid","hikari"等等
 		    {
 		        "config": "c3p0",            // 表示由c3p0负责提供数据源
 		        "dataSourceName": "xk-c3p0", // 数据源的名称
@@ -1262,34 +1238,54 @@ Map<String, Object> findOne(Integer age,@Source String dataSourceName);
 如果在fastquery.json文件里明确指定了数据源的作用域,同时接口函数也存在`@Source`,那么以`@Source`指定的数据源优先,其次是配置文件.
 
 ## 扩展支持数据连接池
-默认已经支持的连接池有,`c3p0`,`druid`,`hikariCP`...当然,开发者很容易在此基础上进行扩展.  
-示例,让`FastQuery`支持`hikariCP`连接池.实现过程如下:  
+默认已经支持的连接池有,`c3p0`,`druid`,`hikari`...当然,开发者很容易在此基础上进行扩展.  
+示例,让`FastQuery`支持自定义的连接池.实现过程如下:  
 步骤1: 自定义类实现`org.fastquery.core.ConnectionPoolProvider`接口
 
 ```java
-public class HikariPoolProvider implements ConnectionPoolProvider {
+public class MyPoolProvider implements ConnectionPoolProvider {
 
 	@Override
 	public DataSource getDataSource(Resource resource, String dataSourceName) {
-	    // 读取 hikari.xml 配置文件
-		Map<String, String> hikariMap = XMLParse.toMap(resource, "hikari.xml", dataSourceName,"bean");
+	    // 读取配置文件
+		InputStream inputStream = resource.getResourceAsStream(name);
+		.... ...
+
 		Properties props = new Properties();
-		// 设置配置
-		hikariMap.forEach(props::setProperty); // (k,v) -> props.setProperty(k, v)
-		// 返回数据源
-		return new com.zaxxer.hikari.HikariDataSource(new com.zaxxer.hikari.HikariConfig(props));
+		props.setProperty(k, v);
+		... ...
+		
+		// 创建数据源实例
+		return new MyDataSource(props);
 	}
 
 }
 ```
-步骤2: 在`pool.xml`里注册
+步骤2: 在`pool-extend.xml`里注册
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
 <pools name="providers">
-	<pool name="hikari" class="org.fastquery.pool.HikariPoolProvider" />
+	<pool name="mypool" class="org.fastquery.<your.domain>.MyPoolProvider" />
 </pools>
+```
+
+步骤3: 使用自定义的连接池`mypool`  
+配置`fastquery.json`文件
+
+```js
+{
+    "scope": [
+        {
+            "config": "mypool", // 用这个池提供数据源 
+            "dataSourceName": "hiworld",
+            "basePackages": [
+                "<your.domain>.XxxDBService"
+            ]
+        }
+    ]
+}
 ```
 
 ## @Before拦截器

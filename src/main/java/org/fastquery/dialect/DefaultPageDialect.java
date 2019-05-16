@@ -20,42 +20,25 @@
  * 
  */
 
-package org.fastquery.core;
+package org.fastquery.dialect;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.fastquery.page.PageDialect;
 
 /**
- * 标识改操作
  * 
- * @author xixifeng (fastquery@126.com)
+ * @author mei.sir@aliyun.cn
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
-@Documented
-public @interface Modifying {
-
-	/**
-	 * 主键字段的名称,默认值"id"
-	 * 
-	 * @return String
-	 */
-	String id() default "id";
-
-	/**
-	 * 指定当前正在修改的表
-	 * 
-	 * @return String
-	 */
-	String table() default "";
+public class DefaultPageDialect implements PageDialect {
 	
-	/**
-	 * 改操作若返回实体,selectFields 用来明确指定查询相应表的哪几个字段,默认是 "*",字段与字段之间请用英文逗号隔开
-	 * 
-	 * @return String
-	 */
-	String selectFields() default "*";
+	private DefaultPageDialect(){
+	}
+	private static class LazyHolder {
+		private static final DefaultPageDialect INSTANCE = new DefaultPageDialect();
+		private LazyHolder() {
+		}
+	}
+	
+	public static PageDialect getInstance() {
+		return LazyHolder.INSTANCE;
+	}
 }

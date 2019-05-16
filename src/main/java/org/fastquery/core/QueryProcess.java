@@ -203,7 +203,7 @@ class QueryProcess {
 
 			List<Map<String, Object>> results = DB.find(sqlValues.get(1));
 			if (!results.isEmpty()) {
-				totalElements = (long) results.get(0).values().iterator().next();
+				totalElements = ((Number) results.get(0).values().iterator().next()).longValue();
 			} else {
 				totalElements = 0;
 			}
@@ -281,7 +281,7 @@ class QueryProcess {
 		if (method.getAnnotation(NotCount.class) == null) { // 需要求和
 			List<Map<String, Object>> results = DB.find(sqlValues.get(1));
 			if (!results.isEmpty()) {
-				totalElements = (long) results.get(0).values().iterator().next();
+				totalElements = ((Number)results.get(0).values().iterator().next()).longValue();
 			} else {
 				totalElements = 0;
 			}

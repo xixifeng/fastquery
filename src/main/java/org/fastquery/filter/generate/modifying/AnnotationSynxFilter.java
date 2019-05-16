@@ -71,7 +71,7 @@ public class AnnotationSynxFilter implements MethodFilter {
 				}
 
 				// 3) @Modifying 必须中的id 和 table值,在数据库中是存在的.
-				// 参考:SHOW COLUMNS from student where `KEY`='PRI'
+				// 参考:SHOW COLUMNS from student where KEY='PRI'
 				// String packageName = method.getDeclaringClass().getPackage().getName()
 				//String packageName = method.getDeclaringClass().getName()
 				// id 是 table表的主键吗?

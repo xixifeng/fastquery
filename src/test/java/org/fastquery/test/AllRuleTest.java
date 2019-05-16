@@ -39,9 +39,9 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({ FQueryTest.class, StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class, UserInfoDBServiceTest3.class,
 		TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class, BeanUtilTest.class, PageTest.class, FastQueryJSONObjectTest.class,
 		FQueryResourceImplTest.class, SunnyDBServiceTest.class, SaveToIdTest.class, PlaceholderTest.class, DBTest.class, ProductDBServiceTest.class,
-		FQueryPropertiesTest.class, QueryPoolTest.class, ParamFilterTest.class, ConditionTest.class, QueryParserTest.class, DefaultMethodTest.class,
+		FQueryPropertiesTest.class, QueryPoolTest.class, ParamFilterTest.class, ConditionTest.class, MySQLPageDialectTest.class, DefaultMethodTest.class,
 		RepVersion.class, FormatterTest.class, SetDBServiceTest.class, SetDBServiceTest2.class, SharpExprParserTest.class, DeliyunDBServiceTest.class,
-		TransactionalTest.class,QueryByNamedDBExtendTest.class,JudgeTest.class,Script2ClassTest.class,TxTest.class})
+		TransactionalTest.class,QueryByNamedDBExtendTest.class,JudgeTest.class,Script2ClassTest.class,TxTest.class,WorldDBTest.class})
 public class AllRuleTest {
 	
 	@Test

@@ -57,48 +57,48 @@ public class BeanUtilTest {
 	public void testToInsertSQL() {
 		UserInfo userInfo = new UserInfo(33, "想向公主", 18);
 		String sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into `UserInfo`(`id`,`name`,`age`) values('33','想向公主','18')"));
+		assertThat(sql, equalTo("insert into UserInfo(id,name,age) values('33','想向公主','18')"));
 
 		// 主键设置为null
 		userInfo.setId(null);
 		sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into `UserInfo`(`name`,`age`) values('想向公主','18')"));
+		assertThat(sql, equalTo("insert into UserInfo(name,age) values('想向公主','18')"));
 
 		userInfo.setName(null);
 		sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into `UserInfo`(`name`,`age`) values(null,'18')"));
+		assertThat(sql, equalTo("insert into UserInfo(name,age) values(null,'18')"));
 
 		userInfo.setAge(null);
 		sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into `UserInfo`(`name`,`age`) values(null,null)"));
+		assertThat(sql, equalTo("insert into UserInfo(name,age) values(null,null)"));
 
 		T t = new T();
 		sql = BeanUtil.toInsertSQL(t);
-		assertThat(sql, equalTo("insert into `T`(`key`) values(null)"));
+		assertThat(sql, equalTo("insert into T(key) values(null)"));
 	}
 
 	@Test
 	public void testToInsertSQL2() {
 		UserInfo userInfo = new UserInfo(33, "想向公主", 18);
 		String sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into `UserInfo`(`id`,`name`,`age`) values('33','想向公主','18')"));
+		assertThat(sql, equalTo("insert into UserInfo(id,name,age) values('33','想向公主','18')"));
 
 		// 主键设置为null
 		userInfo.setId(null);
 		sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into `UserInfo`(`name`,`age`) values('想向公主','18')"));
+		assertThat(sql, equalTo("insert into UserInfo(name,age) values('想向公主','18')"));
 
 		userInfo.setName(null);
 		sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into `UserInfo`(`name`,`age`) values(null,'18')"));
+		assertThat(sql, equalTo("insert into UserInfo(name,age) values(null,'18')"));
 
 		userInfo.setAge(null);
 		sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into `UserInfo`(`name`,`age`) values(null,null)"));
+		assertThat(sql, equalTo("insert into UserInfo(name,age) values(null,null)"));
 
 		T t = new T();
 		sql = BeanUtil.toInsertSQL(t);
-		assertThat(sql, equalTo("insert into `T`(`key`) values(null)"));
+		assertThat(sql, equalTo("insert into T(key) values(null)"));
 	}
 
 	@Test
@@ -115,32 +115,32 @@ public class BeanUtilTest {
 		List<UserInfo> userInfos = new ArrayList<>();
 		userInfos.add(new UserInfo("牵牛花", 3));
 		String str = BeanUtil.toInsertSQL(userInfos, null, false);
-		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('牵牛花','3')"));
+		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values('牵牛花','3')"));
 		userInfos.clear();
 
 		userInfos.add(new UserInfo("牵牛花", null));
 		str = BeanUtil.toInsertSQL(userInfos, null, false);
-		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('牵牛花',null)"));
+		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values('牵牛花',null)"));
 		userInfos.clear();
 
 		userInfos.add(new UserInfo(null, 3));
 		str = BeanUtil.toInsertSQL(userInfos, null, false);
-		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values(null,'3')"));
+		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values(null,'3')"));
 		userInfos.clear();
 
 		userInfos.add(new UserInfo(null, null));
 		str = BeanUtil.toInsertSQL(userInfos, null, false);
-		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values(null,null)"));
+		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values(null,null)"));
 		userInfos.clear();
 
 		userInfos.add(new UserInfo(null, "abc", null));
 		str = BeanUtil.toInsertSQL(userInfos, null, false);
-		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('abc',null)"));
+		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values('abc',null)"));
 		userInfos.clear();
 
 		userInfos.add(new UserInfo(null, "叶'兰", null));
 		str = BeanUtil.toInsertSQL(userInfos, null, false);
-		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('叶''兰',null)"));
+		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values('叶''兰',null)"));
 	}
 
 	@Test
@@ -149,17 +149,17 @@ public class BeanUtilTest {
 		userInfos.add(new UserInfo("牵牛花", 3));
 		userInfos.add(new UserInfo(10, "松'鼠", 5));
 		String str = BeanUtil.toInsertSQL(userInfos, null, false);
-		assertThat(str, equalToIgnoringCase("insert into `UserInfo`(`name`,`age`) values('牵牛花','3'),('10','松''鼠','5')"));
+		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values('牵牛花','3'),('10','松''鼠','5')"));
 	}
 	
 	@Test
 	public void selectFields() {
 		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
 		String selectFields =  BeanUtil.selectFields(userInfo);
-		assertThat(selectFields, equalTo("`id`,`name`,`age`"));
+		assertThat(selectFields, equalTo("id,name,age"));
 		
 		selectFields =  BeanUtil.selectFields(UserInfo.class);
-		assertThat(selectFields, equalTo("`id`,`name`,`age`"));
+		assertThat(selectFields, equalTo("id,name,age"));
 	}
 
 	@Test
@@ -167,7 +167,7 @@ public class BeanUtilTest {
 		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
 
 		String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk",true);
-		assertThat(sql, equalTo("select `id`,`name`,`age` from `xk`.`UserInfo` where `id` = 36"));
+		assertThat(sql, equalTo("select id,name,age from xk.UserInfo where id = 36"));
 	}
 	
 	@Test
@@ -175,7 +175,7 @@ public class BeanUtilTest {
 		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
 
 		String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk",false);
-		assertThat(sql, equalTo("select `id` from `xk`.`UserInfo` where `id` = 36"));
+		assertThat(sql, equalTo("select id from xk.UserInfo where id = 36"));
 	}
 
 	@Test
@@ -198,11 +198,11 @@ public class BeanUtilTest {
 		Field[] fields = clazz.getDeclaredFields();
 		UserInfo bean = new UserInfo(null, "叶'兰", null);
 		String str = BeanUtil.toFields(fields, bean);
-		assertThat(str, equalTo("(`name`,`age`)"));
+		assertThat(str, equalTo("(name,age)"));
 
 		bean = new UserInfo(1, "叶'兰", null);
 		str = BeanUtil.toFields(fields, bean);
-		assertThat(str, equalTo("(`id`,`name`,`age`)"));
+		assertThat(str, equalTo("(id,name,age)"));
 	}
 
 	@Test
@@ -227,21 +227,21 @@ public class BeanUtilTest {
 	public void testToUpdateSQL() {
 		UserInfo userInfo1 = new UserInfo(33, "想向公主", 18);
 		Object[] updateInfo = BeanUtil.toUpdateSQL(userInfo1, "xk", true);
-		assertThat(updateInfo[0].toString(), equalTo("update `xk`.`UserInfo` set `name`=?, `age`=? where `id`=?"));
+		assertThat(updateInfo[0].toString(), equalTo("update xk.UserInfo set name=?, age=? where id=?"));
 		List<Object> args = (List<Object>) updateInfo[1];
 		assertThat(args.get(0).toString(), equalTo("想向公主"));
 		assertThat(args.get(1).toString(), equalTo("18"));
 		assertThat(args.get(2).toString(), equalTo("33"));
-		assertThat(updateInfo[2].toString(), equalTo("select * from `xk`.`UserInfo` where `id` = 33"));
+		assertThat(updateInfo[2].toString(), equalTo("select * from xk.UserInfo where id = 33"));
 
 		userInfo1 = new UserInfo(38, "向公主", 23);
 		updateInfo = BeanUtil.toUpdateSQL(userInfo1, null, true);
-		assertThat(updateInfo[0].toString(), equalTo("update `UserInfo` set `name`=?, `age`=? where `id`=?"));
+		assertThat(updateInfo[0].toString(), equalTo("update UserInfo set name=?, age=? where id=?"));
 		args = (List<Object>) updateInfo[1];
 		assertThat(args.get(0).toString(), equalTo("向公主"));
 		assertThat(args.get(1).toString(), equalTo("23"));
 		assertThat(args.get(2).toString(), equalTo("38"));
-		assertThat(updateInfo[2].toString(), equalTo("select * from `UserInfo` where `id` = 38"));
+		assertThat(updateInfo[2].toString(), equalTo("select * from UserInfo where id = 38"));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -252,7 +252,7 @@ public class BeanUtilTest {
 		Integer age = 18;
 		UserInfo userInfo1 = new UserInfo(id, name, age);
 		Object[] updateInfo = BeanUtil.toUpdateSQL(userInfo1, "xk", "name = :name");
-		assertThat(updateInfo[0].toString(), equalTo("update `xk`.`UserInfo` set `id`=?, `age`=? where name = ?"));
+		assertThat(updateInfo[0].toString(), equalTo("update xk.UserInfo set id=?, age=? where name = ?"));
 		List<Object> args = (List<Object>) updateInfo[1];
 		assertThat(args.size(), is(3));
 		assertThat(args.get(0), equalTo(id));
@@ -264,7 +264,7 @@ public class BeanUtilTest {
 		age = 18;
 		userInfo1 = new UserInfo(id, name, age);
 		updateInfo = BeanUtil.toUpdateSQL(userInfo1, null, "name = :name");
-		assertThat(updateInfo[0].toString(), equalTo("update `UserInfo` set `id`=?, `age`=? where name = ?"));
+		assertThat(updateInfo[0].toString(), equalTo("update UserInfo set id=?, age=? where name = ?"));
 		args = (List<Object>) updateInfo[1];
 		assertThat(args.size(), is(3));
 		assertThat(args.get(0), equalTo(id));
@@ -275,14 +275,14 @@ public class BeanUtilTest {
 		Student student = new Student("113", "zhangsan", "男", 18, "计算机");
 		student.setDept(null);
 		updateInfo = BeanUtil.toUpdateSQL(student, null, "name = '张三'");
-		assertThat(updateInfo[0].toString(), equalTo("update `Student` set `no`=?, `name`=?, `sex`=?, `age`=? where name = '张三'"));
+		assertThat(updateInfo[0].toString(), equalTo("update Student set no=?, name=?, sex=?, age=? where name = '张三'"));
 
 	}
 
 	@Test
 	public void toUpdate3() {
 		String sql = BeanUtil.toInsertSQL(new UserInfo(null, "zhansan", 30));
-		assertThat(sql, equalTo("insert into `UserInfo`(`name`,`age`) values('zhansan','30')"));
+		assertThat(sql, equalTo("insert into UserInfo(name,age) values('zhansan','30')"));
 	}
 
 	@Test
@@ -295,7 +295,7 @@ public class BeanUtilTest {
 		String sql = BeanUtil.toUpdateSQL(userInfos, null);
 
 		assertThat(sql, equalTo(
-				"update `UserInfo` set `name` = case `id` when 77 then '茝若' when 88 then '芸兮' when 99 then '梓' else `name` end,`age` = case `id` when 77 then '18' when 88 then `age` when 99 then '16' else `age` end where `id` in(77,88,99)"));
+				"update UserInfo set name = case id when 77 then '茝若' when 88 then '芸兮' when 99 then '梓' else name end,age = case id when 77 then '18' when 88 then age when 99 then '16' else age end where id in(77,88,99)"));
 	}
 
 	@Test
@@ -307,7 +307,7 @@ public class BeanUtilTest {
 
 		String sql = BeanUtil.toUpdateSQL(userInfos, null);
 		assertThat(sql, equalTo(
-				"update `UserInfo` set `name` = case `id` when 77 then '茝若' when 88 then `name` when 99 then '梓' else `name` end,`age` = case `id` when 77 then '18' when 88 then `age` when 99 then '16' else `age` end where `id` in(77,88,99)"));
+				"update UserInfo set name = case id when 77 then '茝若' when 88 then name when 99 then '梓' else name end,age = case id when 77 then '18' when 88 then age when 99 then '16' else age end where id in(77,88,99)"));
 	}
 
 	@Test
@@ -320,7 +320,7 @@ public class BeanUtilTest {
 		String sql = BeanUtil.toUpdateSQL(userInfos, null);
 
 		assertThat(sql, equalTo(
-				"update `UserInfo` set `name` = case `id` when 77 then '茝若' when 88 then `name` when 99 then '梓' else `name` end,`age` = case `id` when 77 then `age` when 88 then `age` when 99 then `age` else `age` end where `id` in(77,88,99)"));
+				"update UserInfo set name = case id when 77 then '茝若' when 88 then name when 99 then '梓' else name end,age = case id when 77 then age when 88 then age when 99 then age else age end where id in(77,88,99)"));
 	}
 
 	@Test
@@ -332,7 +332,7 @@ public class BeanUtilTest {
 
 		String sql = BeanUtil.toUpdateSQL(userInfos, null);
 		assertThat(sql, equalTo(
-				"update `UserInfo` set `name` = case `id` when 77 then `name` when 88 then `name` when 99 then `name` else `name` end,`age` = case `id` when 77 then `age` when 88 then `age` when 99 then '16' else `age` end where `id` in(77,88,99)"));
+				"update UserInfo set name = case id when 77 then name when 88 then name when 99 then name else name end,age = case id when 77 then age when 88 then age when 99 then '16' else age end where id in(77,88,99)"));
 	}
 
 	@Test
@@ -342,7 +342,7 @@ public class BeanUtilTest {
 		long keyVal = 18;
 		String dbName = "Pe";
 		String sql = BeanUtil.toDelete(tableName, keyName, keyVal, dbName);
-		assertThat(sql, equalTo("delete from `Pe`.`Student` where `uuid`=18"));
+		assertThat(sql, equalTo("delete from Pe.Student where uuid=18"));
 	}
 
 	@Test

@@ -31,10 +31,10 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.fastquery.dialect.DialectScheduler;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.NotCount;
+import org.fastquery.page.PageDialect;
 import org.fastquery.page.Pageable;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.struct.ParamMap;
@@ -46,11 +46,7 @@ import org.fastquery.util.TypeUtil;
  * @author mei.sir@aliyun.cn
  */
 public class QueryParser {
-
-	private static final Logger LOG = LoggerFactory.getLogger(QueryParser.class);
-
-	private static final String LIMIT = " limit ";
-
+	
 	private QueryParser() {
 	}
 
@@ -101,62 +97,28 @@ public class QueryParser {
 
 	public static List<SQLValue> pageParser() {
 
-		// 当前页query
-		// 求和query
-		// 下一页query
-		List<SQLValue> sqlValues = new ArrayList<>(2);
-
 		Method method = QueryContext.getMethod();
 		Object[] args = QueryContext.getArgs();
+		
+		Pageable pageable = getPageable(method, args);
+		int offset = pageable.getOffset();
+		int pageSize = pageable.getPageSize();
+		
 		Query[] querys = method.getAnnotationsByType(Query.class);
+		String querySQL = TypeUtil.getQuerySQL(method, querys, args).get(0);
+		
+		PageDialect pageDialect = DialectScheduler.getCurrentPageDialect();
 
-		// 获取sql
-		String sql = TypeUtil.getQuerySQL(method, querys, args).get(0);
-		Pageable pageable = null;
-		for (Object arg : args) {
-			if (arg instanceof Pageable) { // 如果当前arg是Pageable接口的一个实例
-				pageable = (Pageable) arg;
-				break;
-			}
-		}
-		Parameter[] parameters = method.getParameters();
-		if (pageable == null) {
-			// 没有传递Pageable,那么必然有 pageIndex, pageSize 不然,不能通过初始化
-			pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
-		}
+		String currentPageSQL = pageDialect.getCurrentPageSQL(querySQL, offset, pageSize);
+		List<SQLValue> sqlValues = new ArrayList<>(2);// 有3条记录 0.当前页query,1.求和query,2.下一页query
+		sqlValues.add(inParser(currentPageSQL));
 
-		int firstResult = pageable.getOffset();
-		int maxResults = pageable.getPageSize();
-
-		LOG.debug("firstResult:{} maxResults:{}", firstResult, maxResults);
-
-		// 针对 mysql 分页
-		// 获取limit
-		StringBuilder sb = new StringBuilder(LIMIT);
-		sb.append(firstResult);
-		sb.append(',');
-		sb.append(maxResults);
-		String limit = sb.toString();
-
-		List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE);
-		if (strs.isEmpty()) { // 如果没有#{#limit}, 默认在末尾增加.
-			sql += Placeholder.LIMIT;
-		}
-
-		String ssql = sql; // 创建一个副本,String是不可变的,在后面sql不管怎么改变,也不会影响ssql
-
-		sql = sql.replaceFirst(Placeholder.LIMIT_RGE, Matcher.quoteReplacement(limit));
-
-		sqlValues.add(inParser(sql));
-
-		if (method.getAnnotation(NotCount.class) == null) {
-			// 求和 ---------------------------------------------------
+		if (method.getAnnotation(NotCount.class) == null) { // 表明需要求和
 			Query query = querys[0];
 			String countField = query.countField();
-			// 获取求和sql
 			String countQuery = query.countQuery();
 
-			//
+			// isBuilderQuery
 			if (QueryContext.isBuilderQuery()) {
 				countField = QueryContext.getCountField();
 				countQuery = QueryContext.getCountQuery();
@@ -164,65 +126,61 @@ public class QueryParser {
 			}
 			// end
 
+			String countPageSQL;
 			if (countQuery == null || "".equals(countQuery)) { // 表明在声明时没有指定求和语句
-				// 那么通过主体查询语句算出count语句
-				sql = calcCountStatement(sql, countField);
-				sql = TypeUtil.getCountQuerySQL(method, sql, args);
+				// 那么通过主体查询语句算出count语句,querySQL的where问题已经处理好
+				countPageSQL = pageDialect.countSQLInference(querySQL, countField);
 			} else {
-				sql = TypeUtil.getCountQuerySQL(method, countQuery, args);
+				countPageSQL = countQuery.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(TypeUtil.getWhereSQL(method, args)));
 			}
-
-			// 求和语句不需要order by 和 limit
-			// (?i) : 表示不区分大小写
-			// 过滤order by 后面的字符串(包含本身)
-			sql = sql.replaceFirst("(?i)(order by )(.|\n)+", "");
-			// 过滤limit后面的字符串(包含自身)
-			sql = sql.replaceFirst("(?i)(limit )(.|\n)+", "");
-
-			sqlValues.add(inParser(sql));
+			
+			sqlValues.add(inParser(countPageSQL));
 		} else {
-			// 在查一下推算出下一页是否有数据, 要不要把下一页的数据存储起来,有待考虑...
-			firstResult = pageable.getOffset() + pageable.getPageSize();
-			sb = new StringBuilder(LIMIT);
-			sb.append(firstResult);
-			sb.append(',');
-			sb.append(maxResults);
-			limit = sb.toString();
-			sql = ssql.replaceFirst(Placeholder.LIMIT_RGE, Matcher.quoteReplacement(limit));
-
-			sqlValues.add(inParser(sql));
+			offset = offset + pageSize;
+			String nextPageSQL =  pageDialect.getCurrentPageSQL(querySQL, offset, pageSize); 
+			sqlValues.add(inParser(nextPageSQL));
 		}
 
 		return sqlValues;
 	}
 
-	private static String calcCountStatement(String sql, String countField) {
-		String tmp = sql.toLowerCase();
-		// 计算求和语句
-		// 把select 与 from 之间的 内容变为 count(countField)
-		int fromIndex = tmp.lastIndexOf("from") - 1;
-		StringBuilder sb = new StringBuilder("select count(");
-		sb.append(countField);
-		sb.append(')');
-		sb.append(sql.substring(fromIndex));
-		return sb.toString();
-	}
-
 	public static List<SQLValue> pageParserByNamed() {
 
-		// 当前页query
-		// 求和query
-		// 下一页query
-		List<SQLValue> sqlValues = new ArrayList<>(2);
+		List<SQLValue> sqlValues = new ArrayList<>(2); // 有3条记录 0.当前页query,1.求和query,2.下一页query
 
 		String query = QueryPool.render(true);
 
 		Method method = QueryContext.getMethod();
 		Object[] args = QueryContext.getArgs();
 		// 获取 pageable
+		Pageable pageable = getPageable(method, args);
+		int offset = pageable.getOffset();
+		int pageSize = pageable.getPageSize();
+
+		// 获取sql
+		String querySQL = TypeUtil.paramNameFilter(method, query);
+		PageDialect pageDialect = DialectScheduler.getCurrentPageDialect();
+		String currentPageSQL = pageDialect.getCurrentPageSQL(querySQL, offset, pageSize);
+		sqlValues.add(inParser(currentPageSQL));
+
+		if (method.getAnnotation(NotCount.class) == null) { // 需要求和
+			String countPageSQL = QueryPool.render(false);
+			countPageSQL = TypeUtil.paramNameFilter(method, countPageSQL);
+			sqlValues.add(inParser(countPageSQL));
+		} else {
+			// 获取sql
+			offset = offset + pageSize;
+			String nextPageQuery =  pageDialect.getCurrentPageSQL(querySQL, offset, pageSize); 
+			sqlValues.add(inParser(nextPageQuery));
+		}
+
+		return sqlValues;
+	}
+
+	private static Pageable getPageable(Method method, Object[] args) {
 		Pageable pageable = null;
 		for (Object arg : args) {
-			if (arg instanceof Pageable) { // 如果当前arg是Pageable接口的一个实例
+			if (arg instanceof Pageable) {
 				pageable = (Pageable) arg;
 				break;
 			}
@@ -232,53 +190,9 @@ public class QueryParser {
 			// 没有传递Pageable,那么必然有 pageIndex, pageSize 不然,不能通过初始化
 			pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
 		}
-		// 获取 pageable End
-
-		// 获取sql
-		String sql = TypeUtil.paramNameFilter(method, query);
-
-		String limit = getLimit(pageable.getOffset(), pageable.getPageSize());
-		if (sql.indexOf(Placeholder.LIMIT) != -1) { // 如果#{#limit}存在
-			sql = sql.replaceAll(Placeholder.LIMIT_RGE, Matcher.quoteReplacement(limit));
-		} else {
-			sql += limit;
-		}
-
-		sqlValues.add(inParser(sql));
-
-		if (method.getAnnotation(NotCount.class) == null) { // 需要求和
-			String countQuery = QueryPool.render(false);
-			sql = TypeUtil.paramNameFilter(method, countQuery);
-
-			sqlValues.add(inParser(sql));
-
-			// 求和 --------------------------------------------------- End
-		} else {
-			// 获取sql
-			sql = TypeUtil.paramNameFilter(method, query); // 06-11-11
-			// 在查一下推算出下一页是否有数据, 要不要把下一页的数据存储起来,有待考虑...
-			int firstResult = pageable.getOffset() + pageable.getPageSize();
-			limit = getLimit(firstResult, pageable.getPageSize());
-			if (sql.indexOf(Placeholder.LIMIT) != -1) {
-				sql = sql.replaceAll(Placeholder.LIMIT_RGE, Matcher.quoteReplacement(limit));
-			} else {
-				sql += limit;
-			}
-
-			sqlValues.add(inParser(sql));
-		}
-
-		return sqlValues;
+		return pageable;
 	}
-
-	private static String getLimit(int firstResult, int maxResults) {
-		StringBuilder sb = new StringBuilder(LIMIT);
-		sb.append(firstResult);
-		sb.append(',');
-		sb.append(maxResults);
-		return sb.toString();
-	}
-
+	
 	private static SQLValue inParser(String sql) {
 		int[] ints = TypeUtil.getSQLParameter(sql);
 		// sql 中的"?"号调整

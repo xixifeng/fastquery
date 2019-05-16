@@ -19,6 +19,30 @@
 		<property name="portNumber">3305</property>                       <!-- 端口 -->
 		<property name="serverName">192.168.8.10</property>               <!-- 数据库主机地址 -->
 	</named-config>
+	
+	<named-config name="world">
+		<property name="databaseName">world</property>                    
+		<property name="user">sa</property>                             
+		<property name="password">123456</property>                        
+		<property name="portNumber">1433</property>                      
+		<property name="serverName">192.168.192.129</property>          
+	</named-config>
+	
+	<named-config name="world-mysql">
+		<property name="databaseName">world</property>                    
+		<property name="user">sa</property>                             
+		<property name="password">123456</property>                        
+		<property name="portNumber">3305</property>                      
+		<property name="serverName">192.168.8.10</property>          
+	</named-config>
+	
+	<named-config name="world-pgsql">
+		<property name="databaseName">world</property>                    
+		<property name="user">postgres</property>                             
+		<property name="password">123456</property>                        
+		<property name="portNumber">5432</property>                      
+		<property name="serverName">192.168.192.129</property>          
+	</named-config>
 
 	<!-- 测试 -->
 	<named-config name="s1">

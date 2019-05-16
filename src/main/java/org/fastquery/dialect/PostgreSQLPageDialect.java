@@ -20,35 +20,39 @@
  * 
  */
 
-package org.fastquery.test;
+package org.fastquery.dialect;
 
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.*;
-
-import java.lang.reflect.Method;
-
-import org.fastquery.core.QueryParser;
-import org.junit.Test;
+import org.fastquery.page.PageDialect;
 
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
-public class QueryParserTest extends FastQueryTest  {
-
-	private static String calcCountStatement(String sql, String countField) throws Exception {
-		Class<QueryParser> clazz = QueryParser.class;
-		Method method = clazz.getDeclaredMethod("calcCountStatement", String.class, String.class);
-		method.setAccessible(true);
-		return method.invoke(null, sql, countField).toString();
+public class PostgreSQLPageDialect implements PageDialect {
+	
+	private PostgreSQLPageDialect(){
+	}
+	private static class LazyHolder {
+		private static final PostgreSQLPageDialect INSTANCE = new PostgreSQLPageDialect();
+		private LazyHolder() {
+		}
+	}
+	
+	public static PageDialect getInstance() {
+		return LazyHolder.INSTANCE;
 	}
 
-	@Test
-	public void calcCountStatement() throws Exception {
-		String sql = "selEct u.id,u.name,u.tel,u.flag,u.state,u.count,u.createdate,u.lastlogindate,(select count(uid) fRom tiduid where uid=u.id) as occupy frOm `user` as u";
-		String countField = "id";
-		String str = calcCountStatement(sql, countField);
-		assertThat(str, equalTo("select count(id) frOm `user` as u"));
+	@Override
+	public String getCurrentPageSQL(String querySQL, int offset, int pageSize) {
 
+		StringBuilder sb = new StringBuilder();
+		sb.append(querySQL);
+		sb.append(" limit ");
+		sb.append(pageSize);
+		sb.append(" offset ");
+		sb.append(offset);
+
+		return sb.toString();
 	}
+
 }

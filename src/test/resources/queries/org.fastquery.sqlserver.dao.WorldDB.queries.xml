@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml> 
+<queries>
+	<query id="findPage">
+	
+		<value>select id,code,cityAbb,cityName from City where #{#conditional}</value>
+		
+		<countQuery>
+			select count(id) from City where #{#conditional}
+		</countQuery>
+		
+		<parts>
+			<!-- 小于号需要转义&#62; -->
+			<part name="conditional">
+			   id &#62; :id and cityAbb like :cityAbb
+			</part>
+		</parts>
+	</query>
+</queries>
