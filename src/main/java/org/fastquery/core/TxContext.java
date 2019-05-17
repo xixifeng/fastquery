@@ -36,7 +36,7 @@ import org.fastquery.struct.DC;
  */
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-public class TxContext {
+class TxContext {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TxContext.class);
 	

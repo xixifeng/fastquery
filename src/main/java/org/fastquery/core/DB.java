@@ -96,7 +96,7 @@ public class DB {
 	 * @param hasPK 是否需要返回主健
 	 * @return 改操作响应数据
 	 */
-	public static List<RespUpdate> modify(List<SQLValue> sqlValues, boolean hasPK) {
+	static List<RespUpdate> modify(List<SQLValue> sqlValues, boolean hasPK) {
 		List<RespUpdate> rus = null;
 		Connection conn = QueryContext.getConn(); // 由QueryContext自动关闭
 		try {

@@ -34,6 +34,7 @@ import org.fastquery.page.Page;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.service.FQuery;
 import org.fastquery.sqlserver.dao.WorldDB;
+import org.junit.Rule;
 import org.junit.Test;
 
 
@@ -43,6 +44,9 @@ import org.junit.Test;
  */
 public class WorldDBTest extends FastQueryTest  {
 
+	@Rule
+	public FastQueryTestRule rule = new FastQueryTestRule();
+	
 	private WorldDB db = FQuery.getRepository(WorldDB.class);
 	
 	@Test
@@ -114,6 +118,12 @@ public class WorldDBTest extends FastQueryTest  {
 		assertThat(page.getTotalPages(), is(3));
 		checkPage(page, group2);
 		
+		page = db.findPage(id, cityAbb, new PageableImpl(60,pageSize));
+		List<String> executedSQLs = rule.getExecutedSQLs();
+		assertThat(executedSQLs.size(), is(1));
+		assertThat(executedSQLs.get(0), not(containsString("count")));
+		
+		
 	}
 	
 	@Test
@@ -143,6 +153,23 @@ public class WorldDBTest extends FastQueryTest  {
 
 		assertThat(db.findPageWithWhere(id, cityAbb, 7,pageSize).isHasContent(), is(false));
 		
+	}
+
+	@Test
+	public void findPageWithWhere2() {
+	
+		Integer id = 2;
+		String cityAbb = "%A";
+		int pageSize = 5;
+		assertThat(db.findPageWithWhere(id, cityAbb, 6,pageSize).isHasContent(), is(true));
+		List<String> executedSQLs = rule.getExecutedSQLs();
+		assertThat(executedSQLs.size(), is(2));
+		assertThat(executedSQLs.get(1), equalTo("select count(id) from City where id > ? and cityAbb like ?"));
+		
+		assertThat(db.findPageWithWhere(id, cityAbb, 7,pageSize).isHasContent(), is(false));
+		executedSQLs = rule.getExecutedSQLs();
+		assertThat(executedSQLs.size(), is(1));
+		assertThat(executedSQLs.get(0), not(containsString("count")));
 	}
 
 	private void checkPage(Page<City> page, City...cities) {

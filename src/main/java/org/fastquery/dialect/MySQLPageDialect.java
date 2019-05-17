@@ -33,7 +33,7 @@ import org.fastquery.util.TypeUtil;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class MySQLPageDialect implements PageDialect {
+class MySQLPageDialect implements PageDialect {
 	
 	private MySQLPageDialect(){
 	}
@@ -43,7 +43,7 @@ public class MySQLPageDialect implements PageDialect {
 		}
 	}
 	
-	public static PageDialect getInstance() {
+	static PageDialect getInstance() {
 		return LazyHolder.INSTANCE;
 	}
 

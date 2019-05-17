@@ -80,7 +80,7 @@ public final class BeanUtil {
 		return TypeUtil.isWarrp(field.getType()) && field.getDeclaredAnnotation(Transient.class) == null;
 	}
 	
-	static <B> String toFields(Field[] fields, B bean) {
+	private static <B> String toFields(Field[] fields, B bean) {
 		StringBuilder sb = new StringBuilder();
 		sb.append('(');
 		for (Field field : fields) {
@@ -112,7 +112,7 @@ public final class BeanUtil {
 	 * @param bean 实体
 	 * @return sql value部分
 	 */
-	static <B> String toValue(Field[] fields, B bean,boolean containMark) {
+	private static <B> String toValue(Field[] fields, B bean,boolean containMark) {
 		StringBuilder sb = new StringBuilder();
 		if(containMark) {
 			sb.append("values");
@@ -655,7 +655,7 @@ public final class BeanUtil {
 		return list;
 	}
 	
-	static String selectFields(Object bean) {
+	private static String selectFields(Object bean) {
 		Objects.requireNonNull(bean);
 		List<Field> fields = mapFields(bean);
 		StringBuilder sb = new StringBuilder(6*fields.size());

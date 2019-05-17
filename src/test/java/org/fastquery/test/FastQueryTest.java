@@ -22,6 +22,8 @@
 
 package org.fastquery.test;
 
+import java.lang.reflect.Method;
+
 import org.junit.BeforeClass;
 
 /**
@@ -36,4 +38,12 @@ public class FastQueryTest {
 		System.setProperty("fastquery.config.dir",System.getProperty("user.dir") + "/src/test/resources/testFiles");
 	}
 	
+	public static String countSQLInference(String classAddr,String sql,String countField) throws Exception {
+		Class<?> clazz = Class.forName(classAddr);
+		Method method = clazz.getDeclaredMethod("getInstance");
+		method.setAccessible(true);
+		Object pageDialectObj = method.invoke(null);
+		Method countSQLInferenceMethod = clazz.getMethod("countSQLInference", String.class,String.class);
+		return countSQLInferenceMethod.invoke(pageDialectObj, sql,countField).toString();
+	}
 }

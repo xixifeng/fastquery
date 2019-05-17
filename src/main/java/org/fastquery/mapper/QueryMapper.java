@@ -26,7 +26,7 @@ package org.fastquery.mapper;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class QueryMapper {
+class QueryMapper {
 
 	private String id; // 重写id的hashCode和equals,用它作为唯一标识
 	private String template; // 模板
@@ -36,11 +36,11 @@ public class QueryMapper {
 		this.template = template;
 	}
 
-	public String getId() {
+	String getId() {
 		return id;
 	}
 
-	public String getTemplate() {
+	String getTemplate() {
 		return template;
 	}
 

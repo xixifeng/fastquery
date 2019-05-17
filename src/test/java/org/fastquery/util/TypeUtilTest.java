@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.fastquery.core.Id;
@@ -319,28 +320,33 @@ public class TypeUtilTest implements Opcodes {
 	abstract class DB6 implements QueryRepository {
 	}
 
+	private static String removePart(String str) throws Exception {
+		Method method = TypeUtil.class.getDeclaredMethod("removePart", String.class);
+		method.setAccessible(true);
+		return (String) method.invoke(null, str);
+	}
 	@Test
-	public void removePart() {
-		String sub = TypeUtil.removePart("a ");
+	public void removePart() throws Exception {
+		String sub = removePart("a ");
 		assertThat(sub, equalTo("a"));
 
-		sub = TypeUtil.removePart("    a ");
+		sub = removePart("    a ");
 		assertThat(sub, equalTo("a"));
 
-		sub = TypeUtil.removePart("    a                 ");
+		sub = removePart("    a                 ");
 		assertThat(sub, equalTo("a"));
 
-		sub = TypeUtil.removePart(" a b");
+		sub = removePart(" a b");
 		assertThat(sub, equalTo("b"));
 
-		sub = TypeUtil.removePart(" a     b");
+		sub = removePart(" a     b");
 		assertThat(sub, equalTo("b"));
 
 		// 注意: 如下a与b之间的空白是键入Tab键产生的
-		sub = TypeUtil.removePart(" a		b");
+		sub = removePart(" a		b");
 		assertThat(sub, equalTo("b"));
 
-		sub = TypeUtil.removePart(" a\t\b\nb");
+		sub = removePart(" a\t\b\nb");
 		assertThat(sub, equalTo("b"));
 	}
 
@@ -422,25 +428,31 @@ public class TypeUtilTest implements Opcodes {
 		String str = "\t\nabc\n\t";
 		assertThat(str.trim(), equalTo("abc"));
 	}
+	
+	private static String overChar(int overlap) throws Exception {
+		Method method = TypeUtil.class.getDeclaredMethod("overChar", int.class);
+		method.setAccessible(true);
+		return (String) method.invoke(null, overlap);
+	}
 
 	@Test
-	public void overChar() {
-		String str = TypeUtil.overChar(-1);
+	public void overChar() throws Exception {
+		String str = overChar(-1);
 		assertThat(str, equalTo(""));
 
-		str = TypeUtil.overChar(0);
+		str = overChar(0);
 		assertThat(str, equalTo(""));
 
-		str = TypeUtil.overChar(1);
+		str = overChar(1);
 		assertThat(str, equalTo("?"));
 
-		str = TypeUtil.overChar(2);
+		str = overChar(2);
 		assertThat(str, equalTo("?,?"));
 
-		str = TypeUtil.overChar(3);
+		str = overChar(3);
 		assertThat(str, equalTo("?,?,?"));
 
-		str = TypeUtil.overChar(8);
+		str = overChar(8);
 		assertThat(str, equalTo("?,?,?,?,?,?,?,?"));
 	}
 
@@ -537,47 +549,64 @@ public class TypeUtilTest implements Opcodes {
 		assertThat(TypeUtil.listMapValueTyep(method) == String.class, is(true));
 	}
 
-	@Test(expected = NullPointerException.class)
-	public void toList1() {
-		TypeUtil.toList(null);
+	@SuppressWarnings("unchecked")
+	private static List<Object> toList(Object array) throws Exception {
+		Method method = TypeUtil.class.getDeclaredMethod("toList", Object.class);
+		method.setAccessible(true);
+		return (List<Object>) method.invoke(null, array);
 	}
-
-	@Test(expected = ClassCastException.class)
-	public void toList2() {
-		TypeUtil.toList(1);
+	
+	@Test
+	public void toList1() {
+		try {
+			toList(null);
+		} catch (Exception e) {
+			String stack = ExceptionUtils.getStackTrace(e);
+			assertThat(stack, containsString("Caused by: java.lang.NullPointerException"));
+		}
 	}
 
 	@Test
-	public void toList3() {
+	public void toList2() {
+		try {
+			toList(1);
+		} catch (Exception e) {
+			String stack = ExceptionUtils.getStackTrace(e);
+			assertThat(stack, containsString("Caused by: java.lang.ClassCastException: 你传递的不是一个数组"));
+		}
+	}
+
+	@Test
+	public void toList3() throws Exception {
 		int[] ids = { 1, 2, 3 };
-		List<Object> objects = TypeUtil.toList(ids);
+		List<Object> objects = toList(ids);
 		for (int i = 0; i < ids.length; i++) {
 			assertThat(ids[i], is(objects.get(i)));
 		}
 	}
 
 	@Test
-	public void toList4() {
+	public void toList4() throws Exception {
 		Integer[] ids = { 1, 2, 3 };
-		List<Object> objects = TypeUtil.toList(ids);
+		List<Object> objects = toList(ids);
 		for (int i = 0; i < ids.length; i++) {
 			assertThat(ids[i], equalTo(objects.get(i)));
 		}
 	}
 
 	@Test
-	public void toList5() {
+	public void toList5() throws Exception {
 		Object ids = new Integer[] { 1, 2, 3 };
-		List<Object> objects = TypeUtil.toList(ids);
+		List<Object> objects = toList(ids);
 		assertThat(objects.get(0), equalTo(1));
 		assertThat(objects.get(1), equalTo(2));
 		assertThat(objects.get(2), equalTo(3));
 	}
 
 	@Test
-	public void toList6() {
+	public void toList6() throws Exception {
 		Object ids = new int[] { 1, 2, 3 };
-		List<Object> objects = TypeUtil.toList(ids);
+		List<Object> objects = toList(ids);
 		assertThat(objects.get(0), equalTo(1));
 		assertThat(objects.get(1), equalTo(2));
 		assertThat(objects.get(2), equalTo(3));

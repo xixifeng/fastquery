@@ -28,7 +28,7 @@ import org.fastquery.page.PageDialect;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class PostgreSQLPageDialect implements PageDialect {
+class PostgreSQLPageDialect implements PageDialect {
 	
 	private PostgreSQLPageDialect(){
 	}
@@ -38,7 +38,7 @@ public class PostgreSQLPageDialect implements PageDialect {
 		}
 	}
 	
-	public static PageDialect getInstance() {
+	static PageDialect getInstance() {
 		return LazyHolder.INSTANCE;
 	}
 

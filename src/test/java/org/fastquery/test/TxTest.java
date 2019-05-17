@@ -26,7 +26,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -35,7 +34,6 @@ import javax.sql.DataSource;
 import org.fastquery.bean.Fish;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.RepositoryException;
-import org.fastquery.core.TxContext;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.db2.AA;
 import org.fastquery.db2.BB;
@@ -141,20 +139,17 @@ public class TxTest extends FastQueryTest {
 	
 	@SuppressWarnings("unchecked")
 	private static List<DC> getDclist() {
-		Class<TxContext> tc = TxContext.class;
 		try {
-			
+			Class<?> tc = Class.forName("org.fastquery.core.TxContext");			
 			Method ldc = tc.getDeclaredMethod("getTxContext");
 			ldc.setAccessible(true);
 			Object obj = ldc.invoke(null);
 			Field field = tc.getDeclaredField("dclist");
 			field.setAccessible(true);
 			return (List<DC>) field.get(obj);
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		return null;
 	}
 	
 	@SuppressWarnings("unchecked")

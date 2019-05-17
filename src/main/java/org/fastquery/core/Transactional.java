@@ -27,7 +27,7 @@ package org.fastquery.core;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public @interface Transactional {
+public @interface Transactional { // NO_UCD (use default)
 
 	/**
 	 * 超时,默认-1,表示永不超时

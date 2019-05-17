@@ -295,7 +295,7 @@ public class TypeUtil implements Opcodes {
 		}
 	}
 	
-	static String overChar(int overlap) {
+	private static String overChar(int overlap) {
 		if (overlap < 1) {
 			return "";
 		}
@@ -844,7 +844,7 @@ public class TypeUtil implements Opcodes {
 	 * @param str 待处理字符串
 	 * @return 处理之后的字符串
 	 */
-	static String removePart(String str) {
+	private static String removePart(String str) {
 		if (str == null) {
 			return null;
 		}
@@ -957,7 +957,7 @@ public class TypeUtil implements Opcodes {
 	 * @param array 数组
 	 * @return 数组
 	 */
-	static List<Object> toList(Object array) {
+	private static List<Object> toList(Object array) {
 		Objects.requireNonNull(array);
 		if (array.getClass().isArray()) {
 			int len = Array.getLength(array);

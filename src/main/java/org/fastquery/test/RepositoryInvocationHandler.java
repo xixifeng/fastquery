@@ -25,6 +25,8 @@ package org.fastquery.test;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -104,6 +106,19 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 		} else {
 			LOG.error("暂时没考虑");
 		}
+		
+		Field executedSQLsField = qcclazz.getDeclaredField("executedSQLs");
+		executedSQLsField.setAccessible(true);
+		
+		Class<QueryContext> contextClass = QueryContext.class;
+		Field sqlsField = contextClass.getDeclaredField("sqls");
+		sqlsField.setAccessible(true);
+		@SuppressWarnings("unchecked")
+		List<String> currSQLS = (List<String>) sqlsField.get(QueryContextHelper.getQueryContext());
+		List<String> list = new ArrayList<>();
+		list.addAll(currSQLS);
+		currSQLS.clear(); // 被人赋值之后就clear
+		executedSQLsField.set(rule, list);
 	}
 
 	@Override

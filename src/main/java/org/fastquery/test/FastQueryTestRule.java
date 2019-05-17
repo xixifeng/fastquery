@@ -52,6 +52,7 @@ public class FastQueryTestRule implements TestRule {
 	private static final Logger LOG = LoggerFactory.getLogger(FastQueryTestRule.class);
 	private SQLValue sqlValue;
 	private List<SQLValue> sqlValues;
+	private List<String> executedSQLs;
 
 	private void proxy(Statement base, Description description) throws IllegalAccessException {
 		Object testTarget = getTestTarget(base);
@@ -152,7 +153,15 @@ public class FastQueryTestRule implements TestRule {
 			return sqlValues;
 		}
 	}
-
+	
+	/**
+	 * 获取当前DB执行过的sql语句
+	 * @return sql集
+	 */
+	public List<String> getExecutedSQLs() {
+		return executedSQLs;
+	}
+	
 	private void after(Description description) throws SQLException {
 		LOG.debug("{} --------------------------------------------已经结束,当前线程:{}", description.getMethodName(), Thread.currentThread());
 		QueryContext context = QueryContextHelper.getQueryContext();

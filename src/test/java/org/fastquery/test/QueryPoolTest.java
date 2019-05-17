@@ -31,7 +31,6 @@ import java.util.Set;
 
 import org.fastquery.core.Resource;
 import org.fastquery.dao.UserInfoDBService;
-import org.fastquery.mapper.QueryMapper;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.service.FQuery;
 import org.fastquery.util.QueryContextUtil;
@@ -81,10 +80,10 @@ public class QueryPoolTest extends FastQueryTest  {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Set<QueryMapper> xml2QueryMapper(String className, Resource resource) throws Exception {
+	private Set<Object> xml2QueryMapper(String className, Resource resource) throws Exception {
 		Method method = QueryPool.class.getDeclaredMethod("xml2QueryMapper", String.class, Resource.class);
 		method.setAccessible(true);
-		return (Set<QueryMapper>) method.invoke(null, className, resource);
+		return (Set<Object>) method.invoke(null, className, resource);
 	}
 
 	private String render(String tpl, String logTag, Map<String, Object> map) throws Exception {
@@ -92,13 +91,25 @@ public class QueryPoolTest extends FastQueryTest  {
 		method.setAccessible(true);
 		return method.invoke(null, tpl, logTag, map).toString();
 	}
+	
+	private String queryMapper$getId(Object queryMapper) throws Exception {
+		Method method = queryMapper.getClass().getDeclaredMethod("getId");
+		method.setAccessible(true);
+		return (String) method.invoke(queryMapper);
+	}
+	
+	private String queryMapper$getTemplate(Object queryMapper) throws Exception {
+		Method method = queryMapper.getClass().getDeclaredMethod("getTemplate");
+		method.setAccessible(true);
+		return (String) method.invoke(queryMapper);
+	}
 
 	@Test
 	public void testXml2QueryMapper() throws Exception {
-		Set<QueryMapper> queryMappers = xml2QueryMapper("org.fastquery.dao.QueryByNamedDBExample", resource);
-		queryMappers.forEach(queryMapper -> {
-			String id = queryMapper.getId();
-			String template = queryMapper.getTemplate();
+		Set<Object> queryMappers = xml2QueryMapper("org.fastquery.dao.QueryByNamedDBExample", resource);
+		for (Object queryMapper : queryMappers) {
+			String id = queryMapper$getId(queryMapper);
+			String template = queryMapper$getTemplate(queryMapper);
 			if ("findUAll".equals(id)) {
 				assertThat(template, equalToIgnoringWhiteSpace("select id,name,age from UserInfo limit 3"));
 			} else if ("findUserAll".equals(id)) {
@@ -106,8 +117,7 @@ public class QueryPoolTest extends FastQueryTest  {
 			} else if ("findUserInfo".equals(id)) {
 				assertThat(template, equalToIgnoringWhiteSpace("select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`"));
 			}
-
-		});
+		}
 	}
 
 	@Test

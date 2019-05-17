@@ -28,7 +28,7 @@ import org.fastquery.page.PageDialect;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class DefaultPageDialect implements PageDialect {
+class DefaultPageDialect implements PageDialect {
 	
 	private DefaultPageDialect(){
 	}
@@ -38,7 +38,7 @@ public class DefaultPageDialect implements PageDialect {
 		}
 	}
 	
-	public static PageDialect getInstance() {
+	static PageDialect getInstance() {
 		return LazyHolder.INSTANCE;
 	}
 }

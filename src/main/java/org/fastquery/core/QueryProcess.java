@@ -44,7 +44,6 @@ import org.fastquery.handler.QueryHandler;
 import org.fastquery.page.NotCount;
 import org.fastquery.page.PageImpl;
 import org.fastquery.page.Pageable;
-import org.fastquery.page.PageableImpl;
 import org.fastquery.page.Slice;
 import org.fastquery.struct.RespUpdate;
 import org.fastquery.struct.SQLValue;
@@ -168,25 +167,23 @@ class QueryProcess {
 	}
 
 	// 分页查询
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	Object queryPage() {
+	Object queryPage(QueryByNamed queryByNamed) {
 		Method method = QueryContext.getMethod();
-		Object[] args = QueryContext.getArgs();
 
-		Pageable pageable = null;
-		for (Object arg : args) {
-			if (arg instanceof Pageable) { // 如果当前arg是Pageable接口的一个实例
-				pageable = (Pageable) arg;
-				break;
-			}
-		}
-		Parameter[] parameters = method.getParameters();
-		if (pageable == null) {
-			// 没有传递Pageable,那么必然有 pageIndex, pageSize 不然,不能通过初始化
-			pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
-		}
+		Pageable pageable = QueryContext.getPageable();
 
-		List<SQLValue> sqlValues = QueryParser.pageParser();
+		List<SQLValue> sqlValues;
+		if(queryByNamed==null) {
+			sqlValues = QueryParser.pageParser();	
+		} else {
+			sqlValues = QueryParser.pageParserByNamed();
+		}
+		return page(method, pageable, sqlValues);
+
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private Object page(Method method, Pageable pageable, List<SQLValue> sqlValues) {
 		List<Map<String, Object>> keyvals = DB.find(sqlValues.get(0));
 
 		int size = pageable.getPageSize(); // 每页多少条数据
@@ -199,28 +196,33 @@ class QueryProcess {
 		boolean hasNext; // 有下一页吗? 在这里不用给默认值,如下一定会给他赋值.
 		boolean isLast;
 
-		if (method.getAnnotation(NotCount.class) == null) {
+		if(hasContent) {
+			if (method.getAnnotation(NotCount.class) == null) { // 需要求和
+				List<Map<String, Object>> results = DB.find(sqlValues.get(1));
+				if (!results.isEmpty()) {
+					totalElements = ((Number) results.get(0).values().iterator().next()).longValue();
+				} else {
+					totalElements = 0;
+				}
 
-			List<Map<String, Object>> results = DB.find(sqlValues.get(1));
-			if (!results.isEmpty()) {
-				totalElements = ((Number) results.get(0).values().iterator().next()).longValue();
+				// 计算总页数
+				totalPages = ((int) totalElements) / size;
+				if (((int) totalElements) % size != 0) {
+					totalPages += 1;
+				}
+				hasNext = number < totalPages;
+				isLast = number == totalPages;
 			} else {
-				totalElements = 0;
+				List<Map<String, Object>> nextvalues = DB.find(sqlValues.get(1));
+				boolean next = nextvalues.isEmpty();
+				hasNext = !next; // 下一页有数据
+				isLast = next; // 下一页没有数据了,表明这是最后一页了.
 			}
-
-			// 计算总页数
-			totalPages = ((int) totalElements) / size;
-			if (((int) totalElements) % size != 0) {
-				totalPages += 1;
-			}
-			hasNext = number < totalPages;
-			isLast = number == totalPages;
-			// 求和 --------------------------------------------------- End
 		} else {
-			List<Map<String, Object>> nextvalues = DB.find(sqlValues.get(1));
-			boolean next = nextvalues.isEmpty();
-			hasNext = !next; // 下一页有数据
-			isLast = next; // 下一页没有数据了,表明这是最后一页了.
+			totalElements = 0;
+			totalPages = 0;
+			hasNext = false;
+			isLast = false;
 		}
 
 		boolean isFirst = number == 1;
@@ -242,86 +244,8 @@ class QueryProcess {
 
 		return new PageImpl(size, numberOfElements, number, list, totalElements, totalPages, hasContent, hasNext, hasPrevious, isFirst, isLast,
 				nextPageable, previousPageable);
-
 	}
-
-	// 分页查询(仅针对QueryByNamed Page分页查询,不针对Query)
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	Object queryByNamedPage() {
-		Method method = QueryContext.getMethod();
-		Object[] args = QueryContext.getArgs();
-		// 获取 pageable
-		Pageable pageable = null;
-		for (Object arg : args) {
-			if (arg instanceof Pageable) { // 如果当前arg是Pageable接口的一个实例
-				pageable = (Pageable) arg;
-				break;
-			}
-		}
-		Parameter[] parameters = method.getParameters();
-		if (pageable == null) {
-			// 没有传递Pageable,那么必然有 pageIndex, pageSize 不然,不能通过初始化
-			pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
-		}
-		// 获取 pageable End
-
-		List<SQLValue> sqlValues = QueryParser.pageParserByNamed();
-		List<Map<String, Object>> keyvals = DB.find(sqlValues.get(0));
-
-		int size = pageable.getPageSize(); // 每页多少条数据
-		long totalElements = -1L; // 总行数,如果不求和默认-1L
-		int totalPages = -1; // 总页数,如果不求和默认-1
-		int numberOfElements = keyvals.size(); // 每页实际显示多少条数据
-		int number = pageable.getPageIndex(); // 当前页码
-		boolean hasContent = !keyvals.isEmpty();// 这页有内容吗?
-		boolean hasPrevious = (number > 1) && hasContent;// number不是第1页且当前页有数据,就可以断言它有上一页.
-		boolean hasNext; // 有下一页吗? 在这里不用给默认值,如下一定会给他赋值.
-		boolean isLast;
-
-		if (method.getAnnotation(NotCount.class) == null) { // 需要求和
-			List<Map<String, Object>> results = DB.find(sqlValues.get(1));
-			if (!results.isEmpty()) {
-				totalElements = ((Number)results.get(0).values().iterator().next()).longValue();
-			} else {
-				totalElements = 0;
-			}
-
-			// 计算总页数
-			totalPages = ((int) totalElements) / size;
-			if (((int) totalElements) % size != 0) {
-				totalPages += 1;
-			}
-			hasNext = number < totalPages;
-			isLast = number == totalPages;
-		} else {
-			List<Map<String, Object>> nextvalues = DB.find(sqlValues.get(1));
-			boolean next = nextvalues.isEmpty();
-			hasNext = !next; // 下一页有数据
-			isLast = next; // 下一页没有数据了,表明这是最后一页了.
-		}
-
-		boolean isFirst = number == 1;
-		Slice nextPageable = new Slice((!isLast) ? (number + 1) : number, size);
-		Slice previousPageable = new Slice((!isFirst) ? (number - 1) : number, size);
-
-		List<?> list = keyvals;
-		// Page<T> 中的 T如果是一个实体,那么需要把 HashMap 转换成实体
-		// method.getGenericReturnType()
-		if (!method.getGenericReturnType().getTypeName().contains("Page<java.util.Map<java.lang.String, java.lang.Object>>")) {
-			// 则说明是一个T是一个实体
-			java.lang.reflect.Type type = method.getGenericReturnType();
-			if (type instanceof ParameterizedType) {
-				ParameterizedType parameterizedType = (ParameterizedType) method.getGenericReturnType();
-				Class<?> bean = (Class<?>) parameterizedType.getActualTypeArguments()[0];
-				list = TypeUtil.listMap2ListBean(keyvals, bean);
-			}
-		}
-
-		return new PageImpl(size, numberOfElements, number, list, totalElements, totalPages, hasContent, hasNext, hasPrevious, isFirst, isLast,
-				nextPageable, previousPageable);
-
-	}
-
+	
 	@SuppressWarnings("unchecked")
 	Object methodQuery(Id id) {
 		Method method = QueryContext.getMethod();

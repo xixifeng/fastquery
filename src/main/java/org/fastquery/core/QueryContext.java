@@ -16,6 +16,8 @@ import com.alibaba.fastjson.JSONObject;
 
 import org.slf4j.Logger;
 import org.fastquery.dsm.FQueryProperties;
+import org.fastquery.page.Pageable;
+import org.fastquery.page.PageableImpl;
 import org.fastquery.util.TypeUtil;
 
 /**
@@ -39,6 +41,7 @@ public final class QueryContext {
 	private List<String> sqls = new ArrayList<>(); // 当前method所执行的SQL集合
 	private MetaData metaData; // 当前上下文元数据
 	private boolean builderQuery;
+	private Pageable pageable;
 		
 	// 作用于调式
 	private static boolean debug;
@@ -104,6 +107,19 @@ public final class QueryContext {
 			context.metaData = new MetaData();
 			bq.accept(context.metaData);
 		}
+		
+		context.pageable = null;
+		for (Object arg : args) {
+			if (arg instanceof Pageable) { // 如果当前arg是Pageable接口的一个实例
+				context.pageable = (Pageable) arg;
+				break;
+			}
+		}
+		Parameter[] parameters = method.getParameters();
+		if (context.pageable == null) {
+			// 没有传递Pageable,那么必然有 pageIndex, pageSize 不然,不能通过初始化
+			context.pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
+		}
 	}
 
 	static List<String> getSqls() {
@@ -131,6 +147,10 @@ public final class QueryContext {
 	public static Object[] getArgs() {
 		return getQueryContext().args;
 	}
+	
+	static Pageable getPageable() {
+		return getQueryContext().pageable;
+	}
 
 	public static Class<? extends Repository> getIclass() {
 		return getQueryContext().iclass;
@@ -139,18 +159,19 @@ public final class QueryContext {
 	static void clear() throws SQLException {
 		QueryContext context = getQueryContext();
 		if (!debug && context != null) {
+			context.pageable = null;
+			if (context.metaData != null) {
+				context.metaData.clear();
+				context.metaData = null;
+			}
+			context.method = null;
+			context.sqls.clear();
+			context.sqls = null;
+			context.returnType = null;
+			context.sourceName = null;
+			context.iclass = null;
+			context.args = null;
 			try {
-				if (context.metaData != null) {
-					context.metaData.clear();
-					context.metaData = null;
-				}
-				context.method = null;
-				context.sqls.clear();
-				context.sqls = null;
-				context.returnType = null;
-				context.sourceName = null;
-				context.iclass = null;
-				context.args = null;
 				if (context.connection != null && !TxContext.enabled()) {
 					context.connection.close();
 				}

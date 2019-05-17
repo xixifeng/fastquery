@@ -23,6 +23,7 @@
 package org.fastquery.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -152,13 +153,19 @@ public class BeanUtilTest {
 		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values('牵牛花','3'),('10','松''鼠','5')"));
 	}
 	
+	private static String selectFields(Object bean) throws Exception {
+		Method method = BeanUtil.class.getDeclaredMethod("selectFields", Object.class);
+		method.setAccessible(true);
+		return (String) method.invoke(null, bean);
+	}
+	
 	@Test
-	public void selectFields() {
+	public void selectFields() throws Exception {
 		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
-		String selectFields =  BeanUtil.selectFields(userInfo);
+		String selectFields =  selectFields(userInfo);
 		assertThat(selectFields, equalTo("id,name,age"));
 		
-		selectFields =  BeanUtil.selectFields(UserInfo.class);
+		selectFields =  selectFields(UserInfo.class);
 		assertThat(selectFields, equalTo("id,name,age"));
 	}
 
@@ -191,34 +198,46 @@ public class BeanUtilTest {
 		vs = BeanUtil.parseList(strings);
 		assertThat(vs.toString(), equalTo("\"aa\",\"bb\",\"cc\""));
 	}
-
+	
+	private static <B> String toFields(Field[] fields, B bean) throws Exception {
+		Method method = BeanUtil.class.getDeclaredMethod("toFields", fields.getClass(), Object.class);
+		method.setAccessible(true);
+		return (String) method.invoke(null,fields, bean);
+	}
+	
 	@Test
-	public void toFields() {
+	public void toFields() throws Exception {
 		Class<UserInfo> clazz = UserInfo.class;
 		Field[] fields = clazz.getDeclaredFields();
 		UserInfo bean = new UserInfo(null, "叶'兰", null);
-		String str = BeanUtil.toFields(fields, bean);
+		String str = toFields(fields, bean);
 		assertThat(str, equalTo("(name,age)"));
 
 		bean = new UserInfo(1, "叶'兰", null);
-		str = BeanUtil.toFields(fields, bean);
+		str = toFields(fields, bean);
 		assertThat(str, equalTo("(id,name,age)"));
 	}
 
+	private static <B> String toValue(Field[] fields, B bean,boolean containMark) throws Exception {
+		Method method = BeanUtil.class.getDeclaredMethod("toValue", Field[].class,Object.class,boolean.class);
+		method.setAccessible(true);
+		return (String) method.invoke(null, fields,bean,containMark);
+	}
+	
 	@Test
-	public void toValue() {
+	public void toValue() throws Exception {
 		UserInfo u = new UserInfo();
 		Class<UserInfo> clazz = UserInfo.class;
 		Field[] fields = clazz.getDeclaredFields();
-		String str = BeanUtil.toValue(fields, u,false);
+		String str = toValue(fields, u,false);
 		assertThat(str, equalTo("('',null)"));
 
 		u = new UserInfo(null, "叶'兰", null);
-		str = BeanUtil.toValue(fields, u,false);
+		str = toValue(fields, u,false);
 		assertThat(str, equalTo("('叶''兰',null)"));
 
 		u = new UserInfo(1, "叶'兰", 2);
-		str = BeanUtil.toValue(fields, u,false);
+		str = toValue(fields, u,false);
 		assertThat(str, equalTo("('1','叶''兰','2')"));
 	}
 

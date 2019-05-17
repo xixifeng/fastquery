@@ -1247,7 +1247,7 @@ public class MyPoolProvider implements ConnectionPoolProvider {
 
 	@Override
 	public DataSource getDataSource(Resource resource, String dataSourceName) {
-	    // 读取配置文件
+		// 读取配置文件
 		InputStream inputStream = resource.getResourceAsStream(name);
 		.... ...
 

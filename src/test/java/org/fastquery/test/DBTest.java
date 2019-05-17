@@ -52,20 +52,28 @@ public class DBTest extends FastQueryTest {
 
 	private StudentDBService db = FQuery.getRepository(StudentDBService.class);
 
+	// 调用: DB.modify
+	@SuppressWarnings("unchecked")
+	private static List<RespUpdate> modify(List<SQLValue> sqlValues, boolean hasPK) throws Exception {
+		Method method = DB.class.getDeclaredMethod("modify", List.class,boolean.class);
+		method.setAccessible(true);
+		return (List<RespUpdate>) method.invoke(null, sqlValues,hasPK);
+	}
+	
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
 
-	public List<RespUpdate> delete(Object... obs) {
+	public List<RespUpdate> delete(Object... obs) throws Exception {
 		List<Object> objs = Arrays.asList(obs);
 
 		List<SQLValue> sqlValues = new ArrayList<>();
 
 		sqlValues.add(new SQLValue("DELETE FROM `userinfo` WHERE id = ?", objs));
 
-		return DB.modify(sqlValues, true);
+		return modify(sqlValues, true);
 	}
 
-	public void update() {
+	public void update() throws Exception {
 		List<SQLValue> sqlValues = new ArrayList<>();
 		sqlValues.add(new SQLValue("INSERT INTO `userinfo`(`name`, `age`) VALUES (?,?)", Arrays.asList("回家孩子1", 21)));
 		sqlValues.add(new SQLValue("INSERT INTO `userinfo`(`name`, `age`) VALUES (?,?)", Arrays.asList("回家孩子2", 22)));
@@ -79,13 +87,18 @@ public class DBTest extends FastQueryTest {
 		sqlValues.add(new SQLValue("INSERT INTO `userinfo`(`name`, `age`) VALUES (?,?)", Arrays.asList("回家孩子10", 30)));
 		sqlValues.add(new SQLValue("INSERT INTO `userinfo`(`name`, `age`) VALUES (?,?)", Arrays.asList("回家孩子11", 31)));
 
-		List<RespUpdate> rus = DB.modify(sqlValues, true);
+		List<RespUpdate> rus = modify(sqlValues, true);
 		assertThat(rus.size(), is(11));
 		rus.forEach(ru -> {
 			assertThat(ru.getEffect(), greaterThanOrEqualTo(1));
 			assertThat(ru.getPk(), greaterThanOrEqualTo(1L));
 			LOG.debug("正在删除:" + ru.getPk());
-			List<RespUpdate> rusx = delete(ru.getPk());
+			List<RespUpdate> rusx = null;
+			try {
+				rusx = delete(ru.getPk());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 			rusx.forEach(r -> {
 				assertThat(r.getEffect(), greaterThanOrEqualTo(1));
 				assertThat(r.getPk(), nullValue());
@@ -95,7 +108,7 @@ public class DBTest extends FastQueryTest {
 	}
 
 	@Test
-	public void db() {
+	public void db() throws Exception {
 		db.db();
 		assertThat(QueryContextHelper.getQueryContext(), notNullValue());
 		update();

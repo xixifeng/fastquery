@@ -23,7 +23,6 @@
 package org.fastquery.core;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,6 @@ import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.NotCount;
 import org.fastquery.page.PageDialect;
 import org.fastquery.page.Pageable;
-import org.fastquery.page.PageableImpl;
 import org.fastquery.struct.ParamMap;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.util.TypeUtil;
@@ -100,7 +98,7 @@ public class QueryParser {
 		Method method = QueryContext.getMethod();
 		Object[] args = QueryContext.getArgs();
 		
-		Pageable pageable = getPageable(method, args);
+		Pageable pageable = QueryContext.getPageable();
 		int offset = pageable.getOffset();
 		int pageSize = pageable.getPageSize();
 		
@@ -151,9 +149,8 @@ public class QueryParser {
 		String query = QueryPool.render(true);
 
 		Method method = QueryContext.getMethod();
-		Object[] args = QueryContext.getArgs();
 		// 获取 pageable
-		Pageable pageable = getPageable(method, args);
+		Pageable pageable = QueryContext.getPageable();
 		int offset = pageable.getOffset();
 		int pageSize = pageable.getPageSize();
 
@@ -175,22 +172,6 @@ public class QueryParser {
 		}
 
 		return sqlValues;
-	}
-
-	private static Pageable getPageable(Method method, Object[] args) {
-		Pageable pageable = null;
-		for (Object arg : args) {
-			if (arg instanceof Pageable) {
-				pageable = (Pageable) arg;
-				break;
-			}
-		}
-		Parameter[] parameters = method.getParameters();
-		if (pageable == null) {
-			// 没有传递Pageable,那么必然有 pageIndex, pageSize 不然,不能通过初始化
-			pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
-		}
-		return pageable;
 	}
 	
 	private static SQLValue inParser(String sql) {

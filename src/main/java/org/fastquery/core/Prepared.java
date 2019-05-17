@@ -140,19 +140,16 @@ public class Prepared {
 			Query[] querys = method.getAnnotationsByType(Query.class);
 			Modifying modifying = method.getAnnotation(Modifying.class);
 			QueryByNamed queryById = method.getAnnotation(QueryByNamed.class);
-			if ((querys.length > 0 || queryById != null) && modifying != null) { // ->进入Modify
-				return QueryProcess.getInstance().modifying();
-			} else if (querys.length > 0 || queryById != null) {
-				if (returnType == Page.class && queryById != null) { // ->进入QueryByNamed Page
-					return QueryProcess.getInstance().queryByNamedPage();
-				}
 
-				if (returnType == Page.class) { // ->进入Page
-					return QueryProcess.getInstance().queryPage();
+			boolean hasVehicle = querys.length > 0 || queryById != null; // 有SQL载体吗?
+			if (hasVehicle) {
+				if (returnType == Page.class) {
+					return QueryProcess.getInstance().queryPage(queryById);
+				} else if (modifying != null) {
+					return QueryProcess.getInstance().modifying();
+				} else {
+					return QueryProcess.getInstance().query();
 				}
-
-				// -> 进入query
-				return QueryProcess.getInstance().query();
 			} else {
 				// 分两种 是否有@Id
 				Id id = method.getAnnotation(Id.class);
