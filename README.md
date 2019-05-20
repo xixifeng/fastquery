@@ -168,14 +168,6 @@ JRE 8+
 }
 ```
 **注意**: 在fastquery.json中配置作用域,其中"dataSourceName"不是必须的,"dataSourceName"要么不指定,要指定的话那么必须正确.如果没有指定"dataSourceName",那么在调用接口的时候必须指定数据源的名称.下面的适配数据源章节会讲到."basePackages"若配置了包地址,那么对应的数据源会作用这个包的所有类,及所有子包中的类.  
-fastquery.json其他可选配置选项:
-
-| 属性名 | 类型 | 默认值 | 作用 | 示例 |
-|:-----:|:-----:|:-----:|:-----|:-----|
-| basedir | string | 无 | 基准目录,注意: 后面记得加上 "/" <br> 该目录用来放SQL文件,需要执行SQL文件时,指定其名称就够了 | "/tmp/sql/" |
-| debug | boolean | false | 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目<br>默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式 | false |
-| queries | array | [ ] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:配置文件的位置不一定基于classpath目录,也可以通过`"fastquery.config.dir"`另行指定,上文已经提及到.每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
-| slowQueryTime | int | 0 | 设置慢查询的时间值(单位:毫秒; 默认:0,表示不开启慢查询功能), 如果 `QueryRepository` 中的方法执行超过这个时间,则会警告输出那些执行慢的方法,以便优化 | 50 |
 
 数据源的初始化是从"fastquery.json"开始的,根据从里面读到"dataSourceName"的值,取相应的配置,继而完成数据源的创建.如,创建一个名为"rex-db"的数据源:
 
@@ -303,6 +295,27 @@ List<Map<String, Object>> find(String sex);
 // 查询单个字段,若没有查到,就返回空List<String>(非null)
 @Query("select name from Student limit 3")
 List<String> findNames(); 
+```
+
+## 类属性名称与表字段不一致时,如何映射?  
+为了说明这个问题先准备一个实体  
+
+```java
+public class UserInformation {
+	private Integer uid;
+	private String myname;
+	private Integer myage;
+	// getters / setters
+	// ... ...
+}
+```
+
+而数据库中的表字段分别是id,name,age,通过`SQL`别名的方式,可以解决类属性名称与表字段不一致的映射问题.如下:  
+
+```java
+// 把查询到的结果映射给UserInformation
+@Query("select id as uid,name as myname,age as myage from UserInfo u where u.id = ?1")
+UserInformation findUserInfoById(Integer id);
 ```
 
 ## 动态条件查询
@@ -1033,8 +1046,18 @@ JSONObject callProcedure(String no,@Param("name")String name,String sex,int age,
 ```
 
 ## 分页
+要处理查询语句的参数,只需定义方法参数,为了在运行时对参数名称可见就额外加上`@Param`,上面有很多示例.另外,方法的设计还能识别某些特殊的类型,如`BuilderQuery`,`Pageable`,以便核心能智能地将动态构建查询和分页应用于查询中.
 
 - 通过`@QueryByNamed`实现分页
+
+DB接口:
+
+```java
+@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
+Page<Student> findPage(Pageable pageable, @Param("name") String name,@Param("age") Integer age);
+```
+
+模板文件:
 
 ```xml
 <query id="findPage">
@@ -1079,13 +1102,6 @@ JSONObject callProcedure(String no,@Param("name")String name,String sex,int age,
 - `#{#limit}`是分页模板的内置零件,表示分页区间. `#{#limit}`默认是放在尾部,在符合`SQL`语法的前提下也可以把它放在`SQL`语句中的其他地方
 - 动态条件部分若用`<where>`元素进行包裹,会自动处理好条件连接符问题(避免出现where紧接`or`或`and`)
 - `<value>`和`<countQuery>`节点引用的零件若包含`<where>`元素,零件解析成字符串后会自动加上 *"where"* ,请不要在引入切口处重复追加 *"where"* 字符串
-
-DB接口:
-
-```java
-@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
-Page<Student> findPage(Pageable pageable, @Param("name") String name,@Param("age") Integer age);
-```
 
 - 通过@Query实现分页
 
@@ -1190,6 +1206,9 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 - 如果在分页函数上标识`@NotCount`,表示在分页中不统计总行数.那么分页对象中的`totalElements`的值为-1L,`totalPages`为-1.其他属性都有效并且真实.    
 - 如果明确指定不统计行数,那么设置`countField`和`countQuery`就会变得无意义.    
 - `#{#limit}`不仅能使用在 XML 文件里,也可以使用在`@Query`里,无特殊要求,建议不要指定`#{#limit}`.
+
+### 扩展分页实现
+目前该框架默认支持分页的数据库有`MySQL`,`Microsoft SQL Server`,`PostgreSQL`,因此,扩展的空间非常大,并且非常容易.实现`org.fastquery.page.PageDialect`类,有针对性地重写相关方法,解决`SQL`中的差异.细节部分建议去参考`org.fastquery.dialect.MySQLPageDialect`,`org.fastquery.dialect.PostgreSQLPageDialect`.
 
 ## JavaScript分页插件
 [PJAXPage](https://gitee.com/xixifeng.com/pjaxpage)分页插件,完美支持`Page`数据结构.        
@@ -1482,7 +1501,7 @@ FastQuery提供的测试方式能轻松解决如下问题.
 - 运行时获取SQL和它的参数值,以便开发者验证生成的SQL是否跟期望值一致.
 - 运行DB方法后自动回滚数据库事务.
 
-`FastQueryTestRule` 实现了Junit中的 `TestRule` 类,用来扩展测试用例.可以在测试方法中获取执行过的SQL语句及SQL所对应的参数值,以便做断言.加上`@Rollback`注解,可以用来控制测试方法执行完毕之后是否让数据事务回滚或提交.测试方法结束后默认自动回滚,既可以达到测试效果,又不影响数据库(可回滚到改之前状态). 如下是例子,请留意注释,细节就不再赘述了.
+`FastQueryTestRule` 实现了Junit中的 `TestRule` 类,用来扩展测试用例.可以在测试方法中获取执行过的SQL语句及SQL所对应的参数值,以便做断言.加上`@Rollback`注解,可以用来控制测试方法执行完毕之后是否让数据事务回滚或提交.测试方法结束后默认自动回滚,既可以达到测试效果,又不影响数据库(可回滚到改之前状态). 如下是例子,请留意注释.
 
 ```java
 // junit fastquery的扩展
@@ -1501,7 +1520,7 @@ public void update() {
 	int effect = studentDBService.update(no, name, age);
 	// 断言: 影响的行数是1
 	assertThat(effect, is(1));
-	// 获取DB操作后所产生的SQL
+	// 获取DB操作所绑定的SQL
 	List<SQLValue> sqlValues = rule.getListSQLValue();
 	// 断言: studentDBService.update 执行后产生的SQL为一条
 	assertThat(sqlValues.size(), is(1));
@@ -1521,27 +1540,34 @@ public void update() {
 }
 ```
 
-## FAQ
-1. 类属性名称与表字段不一致时,如何映射?  
-答: 为了说明这个问题先准备一个实体  
+并不是绑定了多少条`SQL`就一定执行多少条.就拿分页来说,并不是总会执行`count`,查不到数据时,就没有必要发出`count`语句.使用`rule.getExecutedSQLs()`可以取得已被执行过的`SQL`.每个`DB`方法执行之前都会清除历史记录从新统计.
 
 ```java
-public class UserInformation {
-	private Integer uid;
-	private String myname;
-	private Integer myage;
-	// getters / setters
-	// ... ...
-}
+assertThat(db.findPageWithWhere(id, cityAbb, 6,pageSize).isHasContent(), is(true));
+//  获取上行执行后,所执行过的sql
+List<String> executedSQLs = rule.getExecutedSQLs();
+// 断言已经执行了2条sql语句
+assertThat(executedSQLs.size(), is(2));
+// 断言第二条sql是...
+assertThat(executedSQLs.get(1), equalTo("select count(id) from City where id > ? and cityAbb like ?"));
+
+assertThat(db.findPageWithWhere(id, cityAbb, 7,pageSize).isHasContent(), is(false));
+// 获取上行执行后,所执行过的sql
+executedSQLs = rule.getExecutedSQLs();
+assertThat(executedSQLs.size(), is(1));
+assertThat(executedSQLs.get(0), not(containsString("count")));
 ```
 
-而数据库中的表字段分别是id,name,age,通过`SQL`别名的方式,可以解决类属性名称与表字段不一致的映射问题.如下:  
+`FastQuery`已经迭代了很久,每次发布新版本是如何保证之前的功能不受影响的呢?那是因为`FastQuery`的每个功能特性都有非常缜密的断言测试,发布时把能否通过所有断言做为先决条件,当然也得益于深思熟虑的设计.`Junit`是众多Java框架中,真正有用的为数不多的其中之一吧.
 
-```java
-// 把查询到的结果映射给UserInformation
-@Query("select id as uid,name as myname,age as myage from UserInfo u where u.id = ?1")
-UserInformation findUserInfoById(Integer id);
-```
+## fastquery.json其他可选配置选项:
+
+| 属性名 | 类型 | 默认值 | 作用 | 示例 |
+|:-----:|:-----:|:-----:|:-----|:-----|
+| basedir | string | 无 | 基准目录,注意: 后面记得加上 "/" <br> 该目录用来放SQL文件,需要执行SQL文件时,指定其名称就够了 | "/tmp/sql/" |
+| debug | boolean | false | 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目<br>默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式 | false |
+| queries | array | [ ] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:配置文件的位置不一定基于classpath目录,也可以通过`"fastquery.config.dir"`另行指定,上文已经提及到.每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
+| slowQueryTime | int | 0 | 设置慢查询的时间值(单位:毫秒; 默认:0,表示不开启慢查询功能), 如果 `QueryRepository` 中的方法执行超过这个时间,则会警告输出那些执行慢的方法,以便优化 | 50 |
 
 ## 源码
 
@@ -1553,9 +1579,9 @@ UserInformation findUserInfoById(Integer id);
   IDE: eclipse          
 build: maven 
 
-## 交流
-![FastQuery QQ群号:621656696](https://gitee.com/uploads/images/2017/0705/115519_b9f971c8_788636.png "FastQuery QQ群号:621656696，发现更多内容")    
-FastQuery QQ交流群号(621656696) 由支持者自由发起,非常感谢!
+## 微信交流
+![FastQuery 微信交流](https://images.gitee.com/uploads/images/2019/0520/144837_6892b03e_788636.png "微信交流群,与作者交流FastQuery.")  
+与作者一起探讨FastQuery.
 
 ## 反馈问题
 https://gitee.com/xixifeng.com/fastquery/issues  
