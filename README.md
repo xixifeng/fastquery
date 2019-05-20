@@ -1580,8 +1580,8 @@ assertThat(executedSQLs.get(0), not(containsString("count")));
 build: maven 
 
 ## 微信交流
-![FastQuery 微信交流](https://images.gitee.com/uploads/images/2019/0520/144837_6892b03e_788636.png "微信交流群,与作者交流FastQuery.")  
-与作者一起探讨FastQuery.
+![FastQuery 微信交流](https://images.gitee.com/uploads/images/2019/0520/160223_39815e8e_788636.png "微信交流群,与作者交流FastQuery.")  
+与作者一起探讨FastQuery(加入时请标注java,谢谢).
 
 ## 反馈问题
 https://gitee.com/xixifeng.com/fastquery/issues  
