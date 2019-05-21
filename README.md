@@ -1050,8 +1050,6 @@ JSONObject callProcedure(String no,@Param("name")String name,String sex,int age,
 
 - 通过`@QueryByNamed`实现分页
 
-DB接口:
-
 ```java
 @QueryByNamed("findPage") // 引用id为"findPage"的分页模板
 Page<Student> findPage(Pageable pageable, @Param("name") String name,@Param("age") Integer age);
@@ -1558,7 +1556,7 @@ assertThat(executedSQLs.size(), is(1));
 assertThat(executedSQLs.get(0), not(containsString("count")));
 ```
 
-`FastQuery`已经迭代了很久,每次发布新版本是如何保证之前的功能不受影响的呢?那是因为`FastQuery`的每个功能特性都有非常缜密的断言测试,发布时把能否通过所有断言做为先决条件,当然也得益于深思熟虑的设计.`Junit`是众多Java框架中,真正有用的为数不多的其中之一吧.
+`FastQuery`已经迭代了很久,每次发布新版本是如何保证之前的功能不受影响的呢?那是因为`FastQuery`的每个功能特性都有非常缜密的断言测试,发布时把能否通过所有断言做为先决条件,当然也得益于深思熟虑的设计.`Junit`是众多Java框架中,真正有用的为数不多的其中之一.
 
 ## fastquery.json其他可选配置选项:
 

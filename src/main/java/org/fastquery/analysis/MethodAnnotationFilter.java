@@ -20,39 +20,45 @@
  * 
  */
 
-package org.fastquery.filter.generate.querya;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
-import java.util.Set;
 
-import org.fastquery.core.Placeholder;
+import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
-import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.util.TypeUtil;
 
 /**
- * 拦截 SQL中 ?N+ 能否从方法参数中找到匹配
+ * 检测注解上的SQL 是否是Modifying
  * 
- * @author mei.sir@aliyun.cn
+ * @author xixifeng (fastquery@126.com)
  */
-public class MuestionFilter implements MethodFilter {
+public class MethodAnnotationFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
-		int parameterCount = method.getParameterCount();
-		Query[] queries = method.getAnnotationsByType(Query.class);
-		for (Query query : queries) {
-			String value = query.value();
-			Set<String> strs = TypeUtil.matchesNotrepeat(value, Placeholder.SP1_REG);
-			strs.forEach(str -> {
-				int index = Integer.valueOf(str.replace("?", ""));
-				if (index > parameterCount) {
-					this.abortWith(method,
-							String.format("%n@Query(%s)中的\"?%d\"表示指定该方法的第%d个参数,可是该方法一共只有%d个参数%n", value, index, index, parameterCount));
+	public void doFilter(Method method) {
+
+		// SQL Modifying 关键字汇总
+		String[] updateFlags = { "update", "insert", "delete", "create", "alter" };
+
+		// 1). 检测是否是update,如果是,需要加注解Modifying
+		// 返回与该元素关联的注释。如果没有与该元素关联的注释，返回值是一个长度为0的数组。
+		Query[] querys = method.getAnnotationsByType(Query.class);
+		for (Query query : querys) {
+			// 获取sql语句
+			String sql = query.value();
+
+			if (method.getAnnotation(Modifying.class) == null) {
+				for (String updateFlag : updateFlags) {
+					if (TypeUtil.containsIgnoreCase(sql, updateFlag)) {
+						this.abortWith(method, query.value() + "中包含有SQL关键字" + updateFlag + ",它属于修改操作,必须要配合@Modifying一起使用.");
+					}
 				}
-			});
+			}
 		}
-		return method;
+
+		// 2). 检测...
+
 	}
 
 }

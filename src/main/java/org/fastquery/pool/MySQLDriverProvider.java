@@ -21,13 +21,10 @@
  */
 
 package org.fastquery.pool;
-import java.util.Map;
 
 import javax.sql.DataSource;
 import org.fastquery.core.ConnectionPoolProvider;
-import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
-import org.fastquery.util.XMLParse;
 
 /**
  * 
@@ -37,37 +34,7 @@ public class MySQLDriverProvider implements ConnectionPoolProvider {
 
 	@Override
 	public DataSource getDataSource(Resource resource, String dataSourceName) {
-		
-		// 校验是否存在 jdbc-config.xml 文件
-		if (!resource.exist("jdbc-config.xml")) {
-			throw new RepositoryException("fastquery.json 配置文件中, config设置了mySQLDriver,因此依赖jdbc-config.xml配置文件,可是没有找到.");
-		}
-		
-		Map<String, String> map = XMLParse.toMap(resource, "jdbc-config.xml", dataSourceName,"named-config");
-		if(map.isEmpty()) {
-			throw new RepositoryException("fastquery.json 配置文件中, 指定了数据源为" + dataSourceName + ",而在jdbc-config.xml中,找不到对该数据源的配置.");
-		} else {
-			String databaseName = map.get("databaseName");
-			String password = map.get("password");
-			String portNumber = map.get("portNumber");
-			String serverName = map.get("serverName");
-			String user = map.get("user");
-			String url = map.get("url");
-
-			com.mysql.cj.jdbc.MysqlDataSource cpd = new com.mysql.cj.jdbc.MysqlDataSource();
-			cpd.setDatabaseName(databaseName);
-			cpd.setPassword(password);
-			if (portNumber != null) {
-				cpd.setPortNumber(Integer.parseInt(portNumber));
-			}
-			cpd.setServerName(serverName);
-			cpd.setUser(user);
-			if (url != null) {
-				cpd.setUrl(url);
-			}
-			
-			return cpd;
-		}
+		return this.jdbc(com.mysql.cj.jdbc.MysqlDataSource.class, resource, dataSourceName);
 	}
 
 }

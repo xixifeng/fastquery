@@ -20,33 +20,41 @@
  * 
  */
 
-package org.fastquery.filter.generate.common;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.fastquery.where.Judge;
+import org.fastquery.where.Set;
 
 /**
- * 责任链
- * 
- * @author xixifeng (fastquery@126.com)
+ * Set注解校验
+ *  
+ * @author mei.sir@aliyun.cn
  */
-public class MethodFilterChain implements MethodFilter {
-
-	private List<MethodFilter> methodFilters = new ArrayList<>();
-
-	public MethodFilterChain addFilter(MethodFilter methodFilter) {
-		methodFilters.add(methodFilter);
-		return this;
-	}
+public class SetFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
-		Method m = method;
-		for (MethodFilter methodFilter : methodFilters) {
-			m = methodFilter.doFilter(method);
+	public void doFilter(Method method) {
+		
+		// 1). @Set#ignore() 指定的class 必须有一个不带参数且public的构造方法
+		// 2). if$ 和 ignoreScript 不能共存
+		Set[] sets = method.getAnnotationsByType(Set.class);
+		for (Set set : sets) {
+				Class<? extends Judge> judge = set.ignore();
+				try {
+					judge.newInstance();
+				} catch (InstantiationException | IllegalAccessException e) {
+					this.abortWith(method, set.ignore() + " 必须有一个不带参数并且用public修饰的构造方法");
+				}
+				
+				// > 2)
+				if(!"true".equals(set.if$()) && !"false".equals(set.ignoreScript())) {
+					this.abortWith(method, "@set中的if$属性和ignoreScript属性不能同时被自定义");
+				}
+
 		}
-		return m;
+		
 	}
 
 }

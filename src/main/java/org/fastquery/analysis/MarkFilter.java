@@ -20,7 +20,7 @@
  * 
  */
 
-package org.fastquery.filter.generate.querya;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
-import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.util.TypeUtil;
 import org.fastquery.where.Condition;
 
@@ -45,7 +44,7 @@ import org.fastquery.where.Condition;
 public class MarkFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
+	public void doFilter(Method method) {
 
 		Set<String> params = new HashSet<>();
 		Parameter[] parameters = method.getParameters();
@@ -137,7 +136,6 @@ public class MarkFilter implements MethodFilter {
 			}
 		}
 
-		return method;
 	}
 
 }

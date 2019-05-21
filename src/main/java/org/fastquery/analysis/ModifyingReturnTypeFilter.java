@@ -20,17 +20,15 @@
  * 
  */
 
-package org.fastquery.filter.generate.modifying;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Primarykey;
 import org.fastquery.core.Query;
-import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.util.TypeUtil;
 
 import com.alibaba.fastjson.JSONObject;
@@ -43,12 +41,18 @@ import com.alibaba.fastjson.JSONObject;
 public class ModifyingReturnTypeFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
+	public void doFilter(Method method) {
 
 		String errmsg = String.format(
 				"为这个方法设置返回值错误!%n该方法允许的返回值类型如下: %n%s \t- 没有返回值;%n%s \t- 用来获取影响行数;%n%s \t- 保存的实体以Map封装后输出;%n%s \t- 保存的实体JSON格式;%n%s \t- 保存的实体Bean(注意:该bean必须有默认不带参数的构造方法);%n%s \t- 获取主键;%n%s \t - 操作是否正确.",
-				"void", "int", "java.util.Map<String, Object>或java.util.Map<String, String>", "com.alibaba.fastjson.JSONObject", "Bean",
-				Primarykey.class.getName(), boolean.class);
+				"void",
+				"int",
+				"java.util.Map<String, Object>或java.util.Map<String, String>",
+				"com.alibaba.fastjson.JSONObject",
+				"Bean",
+				Primarykey.class.getName(),
+				boolean.class);
+		
 		String errmsg2 = " 该SQL的操作结果不能映射成Map格式";
 		Type genericReturnType = method.getGenericReturnType();
 		Class<?> returnType = method.getReturnType();
@@ -87,34 +91,18 @@ public class ModifyingReturnTypeFilter implements MethodFilter {
 			}
 
 			// 5). 校验返回值所允许的类型
-			if (returnType == void.class) {
-				return method;
-			} else if (returnType == int.class) {
-				return method;
-			} else if (returnType == int[].class) {
-				return method;
-			} else if (ParameterizedType.class.isAssignableFrom(genericReturnType.getClass())) {
-				// 如果type是ParameterizedType的子类,并且返回值的类型是Map,并且该Map中的<>里分别是类型String.class和Object.class
-				ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
-				Type[] types = parameterizedType.getActualTypeArguments(); // 获取<>中的参数类型
-				if ((parameterizedType.getRawType() == Map.class) && (types[0] == String.class)
-						&& (types[1] == Object.class || types[1] == String.class)) {
-					return method;
-				} else {
-					this.abortWith(method, errmsg);
-				}
-			} else if (returnType == JSONObject.class) {
-				return method;
-			} else if (returnType == Primarykey.class) {
-				return method;
-			} else if (TypeUtil.hasDefaultConstructor(returnType)) { // 判断是否是 Bean
-				return method;
-			} else if (returnType == boolean.class) {
-				return method;
-			} else {
+			if(returnType != void.class && 
+				returnType != int.class &&
+				returnType != int[].class &&
+				returnType != boolean.class &&
+				!TypeUtil.isMapSO(genericReturnType) &&
+				returnType != JSONObject.class &&
+				returnType != Primarykey.class &&
+				!TypeUtil.hasDefaultConstructor(returnType) // 不是bean
+		           ){
 				this.abortWith(method, errmsg);
-			}
+	           }
+	
 		}
-		return method;
 	}
 }

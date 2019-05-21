@@ -20,47 +20,37 @@
  * 
  */
 
-package org.fastquery.filter.generate.querya;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 
-import org.fastquery.core.Modifying;
+import org.fastquery.core.BuilderQuery;
 import org.fastquery.core.Query;
-import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.util.TypeUtil;
 
 /**
- * 检测注解上的SQL 是否是Modifying
+ * SQL 安全检测
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class MethodAnnotationFilter implements MethodFilter {
+public class SQLFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
-
-		// SQL Modifying 关键字汇总
-		String[] updateFlags = { "update", "insert", "delete", "create", "alter" };
-
-		// 1). 检测是否是update,如果是,需要加注解Modifying
-		// 返回与该元素关联的注释。如果没有与该元素关联的注释，返回值是一个长度为0的数组。
-		Query[] querys = method.getAnnotationsByType(Query.class);
-		for (Query query : querys) {
-			// 获取sql语句
+	public void doFilter(Method method) {
+		Query[] queries = method.getAnnotationsByType(Query.class);
+		boolean b = TypeUtil.hasType(BuilderQuery.class, method.getParameters());
+		for (Query query : queries) {
 			String sql = query.value();
 
-			if (method.getAnnotation(Modifying.class) == null) {
-				for (String updateFlag : updateFlags) {
-					if (TypeUtil.containsIgnoreCase(sql, updateFlag)) {
-						this.abortWith(method, query.value() + "中包含有SQL关键字" + updateFlag + ",它属于修改操作,必须要配合@Modifying一起使用.");
-					}
-				}
+			if ("".equals(sql) && !b) { // 如果@Query的value为"",并且又没有传递BuilderQuery(BuilderQuery:用于构建SQL)
+				this.abortWith(method, sql + "该方法,没有标注任何SQL语句. 帮定SQL又多种方式:通过@Query;采用xml模板;用BuilderQuery,或参数传入...");
+			}
+
+			if (sql.length() < 2 && !b) {
+				this.abortWith(method, sql + "SQL语法错误");
 			}
 		}
 
-		// 2). 检测...
-
-		return method;
 	}
 
 }

@@ -20,11 +20,10 @@
  * 
  */
 
-package org.fastquery.filter.generate.global;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 
-import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.util.TypeUtil;
 
 /**
@@ -35,7 +34,7 @@ import org.fastquery.util.TypeUtil;
 public class ReturnTypeFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
+	public void doFilter(Method method) {
 
 		// 1). 返回值不能是Object
 		Class<?> returnType = method.getReturnType();
@@ -66,7 +65,6 @@ public class ReturnTypeFilter implements MethodFilter {
 			this.abortWith(method, "返回值不支持Boolean类型,换成boolean试试看.");
 		}
 
-		return method;
 	}
 
 }

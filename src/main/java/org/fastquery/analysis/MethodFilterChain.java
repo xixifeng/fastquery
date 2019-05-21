@@ -20,33 +20,32 @@
  * 
  */
 
-package org.fastquery.filter.generate.querya;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
-
-import org.fastquery.core.Modifying;
-import org.fastquery.core.Query;
-import org.fastquery.core.QueryByNamed;
-import org.fastquery.filter.generate.common.MethodFilter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * 在QueryRepository中 {@link Modifying} 依赖检测 <br>
- * Modifying 要么跟 Query 组合, 要么跟QueryByNamed组合 不能独存
+ * 责任链
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class ModifyingDependencyFilter implements MethodFilter {
+public class MethodFilterChain implements MethodFilter {
+
+	private List<MethodFilter> methodFilters = new ArrayList<>();
+
+	public MethodFilterChain addFilter(MethodFilter methodFilter) {
+		methodFilters.add(methodFilter);
+		return this;
+	}
 
 	@Override
-	public Method doFilter(Method method) {
-		Modifying m = method.getAnnotation(Modifying.class);
-		int queryLen = method.getAnnotationsByType(Query.class).length;
-		QueryByNamed queryByNamed = method.getAnnotation(QueryByNamed.class);
-		if (m != null && queryLen == 0 && queryByNamed == null) { // m存在 并且 queryLen为0 并且
-																	// queryByNamed不存在
-			this.abortWith(method, "@Modifying 要么跟 @Query 组合, 要么跟@QueryByNamed组合不能独存!");
+	public void doFilter(Method method) {
+		for (MethodFilter methodFilter : methodFilters) {
+			methodFilter.doFilter(method);
 		}
-		return method;
+		methodFilters.clear();
 	}
 
 }

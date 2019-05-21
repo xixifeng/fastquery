@@ -20,12 +20,11 @@
  * 
  */
 
-package org.fastquery.filter.generate.query;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.util.TypeUtil;
 
 /**
@@ -37,7 +36,7 @@ import org.fastquery.util.TypeUtil;
 public class ParameterFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
+	public void doFilter(Method method) {
 		StringBuilder sb = new StringBuilder();
 		List<String> list = QueryFilterHelper.getQuerySQL(method);
 		list.forEach(sb::append);
@@ -82,7 +81,6 @@ public class ParameterFilter implements MethodFilter {
 			}
 		}
 
-		return method;
 	}
 
 }

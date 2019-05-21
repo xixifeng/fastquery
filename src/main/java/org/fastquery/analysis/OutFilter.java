@@ -20,36 +20,28 @@
  * 
  */
 
-package org.fastquery.filter.generate.common;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 
-import org.fastquery.core.RepositoryException;
+import org.fastquery.core.Query;
+import org.fastquery.core.QueryByNamed;
 
 /**
- * Method 检测过滤器
+ * 注解排斥校验
  * 
  * @author xixifeng (fastquery@126.com)
  */
-@FunctionalInterface
-public interface MethodFilter {
+public class OutFilter implements MethodFilter {
 
-	/**
-	 * 过滤
-	 * 
-	 * @param method 待检测的Method
-	 * @return 检测后的Method,允许中途修改它
-	 */
-	Method doFilter(Method method);
+	@Override
+	public void doFilter(Method method) {
 
-	/**
-	 * 终止(扯断链条)
-	 * 
-	 * @param method 当前方法
-	 * @param msg 终止理由
-	 */
-	default void abortWith(Method method, String msg) {
-		throw new RepositoryException(String.format("%s->: %s ", method.toString(), msg));
+		// 1). 不能同时标识@Query,@QueryByNamed
+		if (method.getAnnotationsByType(Query.class).length > 0 && method.getAnnotation(QueryByNamed.class) != null) {
+			this.abortWith(method, "该方法不能同时标识@Query和@QueryByNamed");
+		}
+
 	}
 
 }

@@ -20,13 +20,12 @@
  * 
  */
 
-package org.fastquery.filter.generate.modifying;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
 import org.fastquery.core.Id;
-import org.fastquery.filter.generate.common.MethodFilter;
 
 /**
  * 
@@ -35,7 +34,7 @@ import org.fastquery.filter.generate.common.MethodFilter;
 public class ArgsFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
+	public void doFilter(Method method) {
 		// 1). 校验: 方法的参数如果标识有@Id,那么该参数的类型必须是如下类int,Integer,long,Long,String
 		Parameter[] parameters = method.getParameters();
 		Class<?> currentType;
@@ -57,7 +56,6 @@ public class ArgsFilter implements MethodFilter {
 		if (count > 1) {
 			this.abortWith(method, "列表中@Id不能出现多次.");
 		}
-		return method;
 	}
 
 }

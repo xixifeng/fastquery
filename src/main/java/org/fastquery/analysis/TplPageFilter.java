@@ -20,14 +20,13 @@
  * 
  */
 
-package org.fastquery.filter.generate.global;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.page.Page;
 import org.fastquery.page.PageIndex;
 import org.fastquery.page.PageSize;
@@ -38,36 +37,15 @@ import org.fastquery.util.TypeUtil;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageableFilter implements MethodFilter {
-
-	// 如果当前方法不是分页, 其参数就不应该出现Pageable对象,更不能出现@PageIndex @PageSize
+public class TplPageFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
+	public void doFilter(Method method) {
 
-		Class<?> returnType = method.getReturnType();
-		Parameter[] parameters = method.getParameters();
-		if (returnType != Page.class) {
-			for (int i = 0; i < parameters.length; i++) {
-				if (Pageable.class.isAssignableFrom(parameters[i].getType())) {
-					this.abortWith(method, String.format("又不是分页,该方法的第%s个参数中为何要用%s类型呢?", i + 1, parameters[i].getType().getSimpleName()));
-				}
+		if (method.getReturnType() == Page.class) {
 
-				if (parameters[i].getAnnotation(PageIndex.class) != null) {
-					this.abortWith(method, String.format("又不是分页,该方法的第%s个参数中为何要标识@PageIndex呢?", i + 1));
-				}
-
-				if (parameters[i].getAnnotation(PageSize.class) != null) {
-					this.abortWith(method, String.format("又不是分页,该方法的第%s个参数中为何要标识@PageSize呢?", i + 1));
-				}
-			}
-		} else {
 			// 1). Page<T> 中的T要么是Map,要么是一个实体.
-			Type genericReturnType = method.getGenericReturnType();
-			if (!(genericReturnType instanceof ParameterizedType)) {
-				this.abortWith(method, "分页Page必须是一个范型");
-			}
-			ParameterizedType type = (ParameterizedType) genericReturnType;
+			ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
 
 			Type[] types = type.getActualTypeArguments();
 			Type t = types[0];
@@ -80,9 +58,11 @@ public class PageableFilter implements MethodFilter {
 				this.abortWith(method, "Page<T> 中的T要么是Map<String,Object>,要么是一个实体.");
 			}
 
+			Parameter[] parameters = method.getParameters();
+
 			// 2). 方法参数中,要么出现Pageable类型,要么存在@PageIndex和@PageSize
 			if (!TypeUtil.hasType(Pageable.class, parameters) && !hasPageAnn(parameters)) {
-				this.abortWith(method, "这是分页,参数中要么存在Pageable类型的参数(不能是Pageable的子类),要么存在@PageIndex和@PageSize");
+				this.abortWith(method, "这是分页,参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize");
 			}
 
 			// 3). 参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize,不能同时都出现
@@ -114,7 +94,7 @@ public class PageableFilter implements MethodFilter {
 				this.abortWith(method, "@PageSize 只能标识在int类型的参数上");
 			}
 		}
-		return method;
+
 	}
 
 	private boolean hasPageAnn(Parameter[] parameters) {

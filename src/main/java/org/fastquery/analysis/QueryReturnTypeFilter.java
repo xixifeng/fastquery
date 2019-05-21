@@ -20,13 +20,12 @@
  * 
  */
 
-package org.fastquery.filter.generate.query;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.page.Page;
 import org.fastquery.util.TypeUtil;
 
@@ -41,8 +40,8 @@ import com.alibaba.fastjson.JSONObject;
 public class QueryReturnTypeFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
-		String errmsg = String.format("为这个方法设置的返回值错误,其返回值类型支持类型如下:%n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n",
+	public void doFilter(Method method) {
+		String errmsg = String.format("为这个方法设置的返回值错误,其返回值类型支持类型如下:%n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n%s %n",
 				"1). long/int 用于统计总行数", "2). boolean 判断是否存在", "3). Map<String,Object>", "4). List<Map<String,Object>>",
 				"5). List<Map<String,String>>", "6). List<实体>", "7). Page", "8). JSONObject", "9). JSONArray",
 				"10). Integer,Double,Long,Short,Byte,Character,Float,String 八种基本类型(除了Boolean)",
@@ -51,42 +50,23 @@ public class QueryReturnTypeFilter implements MethodFilter {
 		Type genericReturnType = method.getGenericReturnType();
 		Class<?> returnType = method.getReturnType();
 
-		// 返回值所允许的类型
-		if (returnType == long.class || returnType == int.class) {
-			return method;
-		} else if (returnType == boolean.class) {
-			return method;
-		} else if (TypeUtil.isMapSO(genericReturnType) || TypeUtil.isListMapSO(genericReturnType)) {
-			return method;
-		} else if (returnType == List.class) { // List<Bean> 类型
-			return method;
-		} else if (returnType == Page.class) {
-			return method;
-		} else if (returnType == JSONObject.class) {
-			return method;
-		} else if (returnType == JSONArray.class) {
-			return method;
-		} else if (isWarrp(returnType)) {
-			return method;
-		} else if (isWarrp(returnType.getComponentType())) { // 包装类型[]
-			return method;
-		} else if (TypeUtil.hasDefaultConstructor(returnType.getComponentType())) { // bean[]
-			return method;
-		} else if (TypeUtil.hasDefaultConstructor(returnType)) { // bean
-			return method;
-		} else {
+		// 如果不在允许类型范围之内
+		if(returnType != long.class && 
+			returnType != int.class &&
+			returnType != boolean.class &&
+			!TypeUtil.isMapSO(genericReturnType) &&
+			!TypeUtil.isListMapSO(genericReturnType) &&
+			returnType != List.class &&
+			returnType != Page.class && 
+			returnType != JSONObject.class &&
+			returnType != JSONArray.class &&
+			!TypeUtil.isWarrp(returnType) &&
+			!(returnType!=null && TypeUtil.isWarrp(returnType.getComponentType())) && // 如果不是 "包装类型[]" 
+			! (returnType!=null && TypeUtil.hasDefaultConstructor(returnType.getComponentType())) && // 如果不是 "bean[]"
+			!TypeUtil.hasDefaultConstructor(returnType) // 不是bean
+	           ){
 			this.abortWith(method, errmsg);
-		}
+           }
 
-		return method;
-	}
-
-	// 判断 returnType 是否是包装类型
-	private boolean isWarrp(Class<?> returnType) {
-		if (returnType == null) {
-			return false;
-		}
-		return (returnType == Integer.class) || (returnType == Double.class) || (returnType == Long.class) || (returnType == Short.class)
-				|| (returnType == Byte.class) || (returnType == Character.class) || (returnType == Float.class) || (returnType == String.class);
 	}
 }

@@ -20,7 +20,7 @@
  * 
  */
 
-package org.fastquery.filter.generate.global;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fastquery.core.Query;
-import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.util.SharpExprParser;
 import org.fastquery.where.Condition;
 
@@ -40,7 +39,7 @@ import org.fastquery.where.Condition;
 public class SharpFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
+	public void doFilter(Method method) {
 		Set<String> allows = Stream.of("#{#sets}" , "#{#condition}" , "#{#table}", "#{#id}" , "#{#limit}" , "#{#where}").collect(Collectors.toCollection(HashSet::new));
 		Query[] queries = method.getAnnotationsByType(Query.class);
 		for (Query query : queries) {
@@ -58,7 +57,6 @@ public class SharpFilter implements MethodFilter {
 				}
 			});
 		}
-		return method;
 	}
 	
 }

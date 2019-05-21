@@ -20,14 +20,13 @@
  * 
  */
 
-package org.fastquery.filter.generate.query;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
-import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
 import org.fastquery.util.TypeUtil;
@@ -41,7 +40,7 @@ import org.fastquery.util.TypeUtil;
 public class PageFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
+	public void doFilter(Method method) {
 		if (method.getReturnType() == Page.class) {
 
 			// 部分校验已经提取到 全局 PageableFilter里去了
@@ -67,7 +66,6 @@ public class PageFilter implements MethodFilter {
 
 		}
 
-		return method;
 	}
 
 }

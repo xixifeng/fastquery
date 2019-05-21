@@ -20,7 +20,7 @@
  * 
  */
 
-package org.fastquery.filter.generate.modifying;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -29,7 +29,6 @@ import java.util.regex.Matcher;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
-import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.util.TypeUtil;
 
 import com.alibaba.fastjson.JSONObject;
@@ -41,7 +40,7 @@ import com.alibaba.fastjson.JSONObject;
 public class AnnotationSynxFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
+	public void doFilter(Method method) {
 
 		Class<?> returnType = method.getReturnType();
 
@@ -95,7 +94,6 @@ public class AnnotationSynxFilter implements MethodFilter {
 			}
 		}
 
-		return method;
 	}
 
 }

@@ -20,43 +20,37 @@
  * 
  */
 
-package org.fastquery.filter.generate.querya;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 
-import org.fastquery.filter.generate.common.MethodFilter;
-import org.fastquery.where.Judge;
-import org.fastquery.where.Set;
+import org.fastquery.core.Placeholder;
+import org.fastquery.core.Query;
+import org.fastquery.util.TypeUtil;
 
 /**
- * Set注解校验
- *  
+ * 拦截 SQL中 ?N+ 能否从方法参数中找到匹配
+ * 
  * @author mei.sir@aliyun.cn
  */
-public class SetFilter implements MethodFilter {
+public class MuestionFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
-		
-		// 1). @Set#ignore() 指定的class 必须有一个不带参数且public的构造方法
-		// 2). if$ 和 ignoreScript 不能共存
-		Set[] sets = method.getAnnotationsByType(Set.class);
-		for (Set set : sets) {
-				Class<? extends Judge> judge = set.ignore();
-				try {
-					judge.newInstance();
-				} catch (InstantiationException | IllegalAccessException e) {
-					this.abortWith(method, set.ignore() + " 必须有一个不带参数并且用public修饰的构造方法");
+	public void doFilter(Method method) {
+		int parameterCount = method.getParameterCount();
+		Query[] queries = method.getAnnotationsByType(Query.class);
+		for (Query query : queries) {
+			String value = query.value();
+			Set<String> strs = TypeUtil.matchesNotrepeat(value, Placeholder.SP1_REG);
+			strs.forEach(str -> {
+				int index = Integer.parseInt(str.replace("?", ""));
+				if (index > parameterCount) {
+					this.abortWith(method,
+							String.format("%n@Query(%s)中的\"?%d\"表示指定该方法的第%d个参数,可是该方法一共只有%d个参数%n", value, index, index, parameterCount));
 				}
-				
-				// > 2)
-				if(!"true".equals(set.if$()) && !"false".equals(set.ignoreScript())) {
-					this.abortWith(method, "@set中的if$属性和ignoreScript属性不能同时被自定义");
-				}
-
+			});
 		}
-		
-		return method;
 	}
 
 }

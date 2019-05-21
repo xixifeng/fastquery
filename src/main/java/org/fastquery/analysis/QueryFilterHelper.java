@@ -20,7 +20,7 @@
  * 
  */
 
-package org.fastquery.filter.generate.query;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

@@ -20,7 +20,7 @@
  * 
  */
 
-package org.fastquery.filter.generate.global;
+package org.fastquery.analysis;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -35,7 +35,6 @@ import org.fastquery.filter.After;
 import org.fastquery.filter.AfterFilter;
 import org.fastquery.filter.Before;
 import org.fastquery.filter.BeforeFilter;
-import org.fastquery.filter.generate.common.MethodFilter;
 
 /**
  * 对Before/After 拦截器安全校验
@@ -45,7 +44,7 @@ import org.fastquery.filter.generate.common.MethodFilter;
 public class InterceptorFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
+	public void doFilter(Method method) {
 
 		// 接口的Class
 		Class<?> iclazz = method.getDeclaringClass();
@@ -70,7 +69,6 @@ public class InterceptorFilter implements MethodFilter {
 			}
 		}
 
-		return method;
 	}
 
 	// 假设: 有两个类,其class分别为c1和c2. c1的直接父类的范型为X

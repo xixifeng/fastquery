@@ -20,14 +20,13 @@
  * 
  */
 
-package org.fastquery.filter.generate.queryn;
+package org.fastquery.analysis;
 
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
 
-import org.fastquery.filter.generate.common.MethodFilter;
 import org.fastquery.util.FastQueryJSONObject;
 
 /**
@@ -38,7 +37,7 @@ import org.fastquery.util.FastQueryJSONObject;
 public class QueriesFileFilter implements MethodFilter {
 
 	@Override
-	public Method doFilter(Method method) {
+	public void doFilter(Method method) {
 		
 		String suffix = ".queries.xml";
 		
@@ -50,7 +49,6 @@ public class QueriesFileFilter implements MethodFilter {
 			this.abortWith(method, sb.toString());
 		}
 		
-		return method;
 	}
 
 

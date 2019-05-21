@@ -20,27 +20,35 @@
  * 
  */
 
-package org.fastquery.filter.generate.query;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 
-import org.fastquery.core.Query;
-import org.fastquery.filter.generate.common.MethodFilter;
+import org.fastquery.core.RepositoryException;
 
 /**
- * 在生成代码之前不允许Query注解重复.
+ * Method 检测过滤器
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class NotAllowedRepeat implements MethodFilter {
+@FunctionalInterface
+interface MethodFilter {
 
-	@Override
-	public Method doFilter(Method method) {
-		Query[] queries = method.getAnnotationsByType(Query.class);
-		if (queries.length > 1) {
-			this.abortWith(method, "@Query注解在这个方法上不能重复! 改操作的情形下@Query可以重复.");
-		}
-		return method;
+	/**
+	 * 过滤
+	 * 
+	 * @param method 待检测的Method
+	 */
+	void doFilter(Method method);
+
+	/**
+	 * 终止(扯断链条)
+	 * 
+	 * @param method 当前方法
+	 * @param msg 终止理由
+	 */
+	default void abortWith(Method method, String msg) {
+		throw new RepositoryException(String.format("%s->: %s ", method.toString(), msg));
 	}
 
 }
