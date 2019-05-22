@@ -40,7 +40,6 @@ import org.fastquery.util.ClassUtil;
 import org.fastquery.util.LoadPrperties;
 
 /**
- * 这个类在osgi环境中不能调用
  * 
  * @author xixifeng (fastquery@126.com)
  */

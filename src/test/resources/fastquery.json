@@ -44,16 +44,16 @@
     }
     ,
     {
-        //"config": "mySQLDriver",  
-        //"dataSourceName": "world-mysql",
+        "config": "mySQLDriver",  
+        "dataSourceName": "world-mysql",
         
          // or
          //"config": "sqlServerDriver",
          //"dataSourceName": "world",
          
          // or
-         "config": "postgreSQLDriver",
-         "dataSourceName": "world-pgsql",
+         //"config": "postgreSQLDriver",
+         //"dataSourceName": "world-pgsql",
         
         "basePackages": ["org.fastquery.sqlserver.dao"]
     }

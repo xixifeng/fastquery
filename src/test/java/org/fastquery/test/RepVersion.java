@@ -87,10 +87,10 @@ public class RepVersion extends FastQueryTest  {
 		String initialSelectionValue = "";
 
 		try (BufferedReader br = new BufferedReader(
-				new InputStreamReader(new FileInputStream(new File(userDir, "/src/main/resources/META-INF/MANIFEST.MF"))))) {
+				new InputStreamReader(new FileInputStream(new File(userDir, "/pom.xml"))))) {
 			String lineTxt = null;
 			while ((lineTxt = br.readLine()) != null) {
-				if (lineTxt.startsWith("Bundle-Version:")) {
+				if (lineTxt.endsWith("<!-- fastquery.version -->")) {
 					initialSelectionValue = TypeUtil.matches(lineTxt, REG).get(0);
 					break;
 				}
@@ -102,17 +102,16 @@ public class RepVersion extends FastQueryTest  {
 		String version = confirm(initialSelectionValue);
 		LOG.debug("最终确认的版本号是: " + version);
 
-		String[] names = new String[] { "/src/main/resources/META-INF/MANIFEST.MF", "/pom.xml", "/README.md" };
+		String[] names = new String[] { "/pom.xml", "/README.md" };
 		for (String name : names) {
-			File tmp = File.createTempFile("temp", ".java");// 创建临时文件
+			File tmp = File.createTempFile("temp", ".fquery");// 创建临时文件
 			String tpf = tmp.getAbsolutePath();
 			File f = new File(userDir, name);
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
 					BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tmp)));) {
 				String lineTxt = null;
 				while ((lineTxt = br.readLine()) != null) {
-					if (lineTxt.endsWith("<!-- fastquery.version -->") || lineTxt.startsWith("compile 'org.fastquery:fastquery")
-							|| lineTxt.startsWith("Bundle-Version:")) {
+					if (lineTxt.endsWith("<!-- fastquery.version -->") || lineTxt.startsWith("compile 'org.fastquery:fastquery") ) {
 						bw.write(lineTxt.replaceAll(REG, version) + "\n");
 					} else {
 						bw.write(lineTxt + "\n");

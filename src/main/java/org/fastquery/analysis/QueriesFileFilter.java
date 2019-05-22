@@ -73,7 +73,7 @@ public class QueriesFileFilter implements MethodFilter {
 
 		for (String per : pers) {
 			String perxml = new StringBuilder().append(per).append(className).append(suffix).toString();
-			URL url = QueriesFileFilter.class.getClassLoader().getResource(perxml); // osgi不支持 QueriesFileFilter.class.getClassLoader().getResource 这种写法!
+			URL url = QueriesFileFilter.class.getClassLoader().getResource(perxml);
 			boolean urlExits = url != null;
 			if(urlExits || (fcd != null && !"".equals(fcd) && new File(fcd, per + className + ".queries.xml").exists())) {
 				return true;

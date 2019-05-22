@@ -52,14 +52,12 @@ import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Repository;
-import org.fastquery.core.RepositoryException;
 
 /**
  * 生成 Repository的实现扩展, 在生成的时候,额外要做的事情(extend)
  * 
  * @author xixifeng (fastquery@126.com)
  */
-// 该方法只为AsmRepository 服务
 class GenerateExtends {
 
 	private GenerateExtends() {
@@ -74,41 +72,24 @@ class GenerateExtends {
 
 		MethodFilterChain filterChain;
 
-		Modifying modifying;
-		Query[] querys;
-		QueryByNamed queryByNamed;
-
 		Method[] methods = repositoryClazz.getMethods();
+
 		for (Method method : methods) {
 
 			Class<?> declaringClass = method.getDeclaringClass();
+			if (declaringClass != QueryRepository.class && declaringClass != Repository.class
+					&& QueryRepository.class.isAssignableFrom(repositoryClazz)) {
 
-			// 规范接口中的方法不参与校验
-			if (declaringClass == QueryRepository.class || declaringClass == Repository.class) {
-				continue;
-			}
+				Modifying modifying = method.getAnnotation(Modifying.class);
+				Query[] querys = method.getAnnotationsByType(Query.class);
+				QueryByNamed queryByNamed = method.getAnnotation(QueryByNamed.class);
 
-			modifying = method.getAnnotation(Modifying.class);
-			querys = method.getAnnotationsByType(Query.class);
-			queryByNamed = method.getAnnotation(QueryByNamed.class);
-
-			// filter/modifying 拦截标注有@Query @modifying的方法,并且是QueryRepository的实现方法
-			// filter/mquery 拦截既没有标注@Query,又没有标注@modifying的方法, 并且是QueryRepository的实现方法
-			// filter/query 拦截既标注有@Query,没有标注@modifying的方法, 并且是QueryRepository的实现方法
-			// filter/querya 拦截QueryRepository的实现方法
-
-			// 拦截全局的方法
-			filterChain = new MethodFilterChain();
-			filterChain.addFilter(new ReturnTypeFilter());
-			filterChain.addFilter(new InterceptorFilter()); // @Before,@After拦截器安全校验
-			filterChain.addFilter(new PageableFilter());
-			filterChain.addFilter(new SharpFilter()); // #{#表达式} 合法检测
-
-
-			if (QueryRepository.class.isAssignableFrom(repositoryClazz)) { // 若:QueryRepository 是
-																			// repositoryClazz的父类
-
-				// filter/querya
+				// 拦截全局
+				filterChain = new MethodFilterChain();
+				filterChain.addFilter(new ReturnTypeFilter());
+				filterChain.addFilter(new InterceptorFilter()); // @Before,@After拦截器安全校验
+				filterChain.addFilter(new PageableFilter());
+				filterChain.addFilter(new SharpFilter()); // #{#表达式} 合法检测
 				filterChain.addFilter(new ModifyingDependencyFilter());
 				filterChain.addFilter(new MethodAnnotationFilter());
 				filterChain.addFilter(new SQLFilter());
@@ -118,45 +99,29 @@ class GenerateExtends {
 				filterChain.addFilter(new MarkFilter());
 				filterChain.addFilter(new MuestionFilter());
 				filterChain.addFilter(new SetFilter());
-				
 
-				// filter/modifying
-				if (modifying != null && querys.length > 0) {
+				if (modifying != null) { // 改
+
 					filterChain.addFilter(new AnnotationSynxFilter());
 					filterChain.addFilter(new ArgsFilter());
 					filterChain.addFilter(new ModifyingReturnTypeFilter());
+
+				} else { // 查
+					if (querys.length > 0) { // @Query查
+						filterChain.addFilter(new QueryReturnTypeFilter());
+						filterChain.addFilter(new ParameterFilter());
+						filterChain.addFilter(new NotAllowedRepeat());
+						filterChain.addFilter(new PageFilter());
+					} else if (queryByNamed != null) { // @queryByNamed查
+						filterChain.addFilter(new TplPageFilter());
+						filterChain.addFilter(new QueriesFileFilter());
+					} 
 				}
 
-				// filter/query
-				if (querys.length > 0 && modifying == null) {
-					filterChain.addFilter(new QueryReturnTypeFilter());
-					filterChain.addFilter(new ParameterFilter());
-					filterChain.addFilter(new NotAllowedRepeat());
-					filterChain.addFilter(new PageFilter());
-				}
+				// 执行Filter
+				filterChain.doFilter(method);
 
-				// @QueryByNamed && @modifying
-				if (modifying != null && queryByNamed != null) {
-
-				}
-				// @QueryByNamed, !@modifying
-				if (queryByNamed != null && modifying == null) {
-					filterChain.addFilter(new TplPageFilter());
-					filterChain.addFilter(new QueriesFileFilter());
-				}
-
-				// filter/mquery
-				if (querys.length == 0 && modifying == null) {
-					// 有待扩展...
-				}
-
-			} else {
-				throw new RepositoryException(repositoryClazz + "不能解析");
 			}
-
-			// 把责任链条连接起来
-			// 多根链接衔接完毕之后就执行过滤
-			filterChain.doFilter(method);
 
 		}
 	}

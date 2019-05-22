@@ -101,14 +101,7 @@
         <version>3.3.1</version>
         <scope>provided</scope>
       </dependency>
-
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.framework</artifactId>
-			<version>1.8.0</version>
-			<scope>provided</scope>
-		</dependency>
-
+      
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>

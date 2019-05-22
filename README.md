@@ -355,6 +355,9 @@ Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable page
 ```
 其中, `:age`引用的是`@Param("age")int age`的实参值.`:name`是`@Param("name")String name`的实参值.这个脚本要表达的意思不言而喻. 不过脚本的解析能力还不能自动**拆箱**(unboxing),需要调用拆箱方法,在这里age变量如果是`Integer`类型,要想如上脚本能正确编译,必须这么做: `":age.intValue() > 18 && :name!=null && :name.contains(\"Rex\")"`, 请留意住`:age.intValue()`. 其他包装类型`Short`, `Long`, `Byte`, `Boolean`, `Character`, `Float`, `Double` 以此类推.  
 
+### 什么是JAVA脚本?
+在这里将一段承载着程序的字符串称之为JAVA脚本.脚本在初始化阶段被解释成能在`JVM`里运行的字节码,在脚本里能通过`:expression`(冒号表达式)获取当前方法在运行时所接受到的所有参数,引用的参数可以是一个复杂对象,完全可以把`:expression`当成是对象的引用句柄.虽然允许把脚本写得很长,写出较为复杂的逻辑,但是,不建议这么做,因为那样可读性极差,不便迭代维护.做再庞杂的程序,都应该拆分成若干小而简单的功能,`FastQuery`自始自终会遵守简单,严谨,清晰的编程风格.
+
 ### @Condition 中的 if...else
 条件是否保留可以通过`if`条件来确定,`if`绑定的JAVA脚本运行后的结果若为`true`就保留该`Condition`,反之就取`else`的捆绑值,`else`如果没有值或者是空值,表示移除该`Condition`.  
 举例:
@@ -369,7 +372,7 @@ Page<UserInfo> findPage(@Param("age")int age,@Param("name")String name,Pageable 
 ### 自定义类控制条件增减
 决定一个条件是否参与运算,有时候需要根据多个不同的参数进行某种计算来决定, 并且这种计算逻辑用JAVA脚本(非JS)难以表达或者不太乐意让JAVA脚本登场. 那么就使用`@Condition`中的`ignore`选项,指定一个类,它叫`Judge`,是一个裁判员,条件是否去除的决定权可以理所当然地委托给自定义的`Judge`类来处理.   
 举例: 若:年龄大于18及姓名不为空且包含"Rex".则,剔除条件`and name like :name`.  
-定制一个决定条件存活的类,需要遵循一些约定: 继承`org.fastquery.where.Judge`,当完成这一步,IDE就会提示开发者必须实现ignore方法, 否则,不能举足前行. 这样的设计可以减少犯错的可能. 当`ignore`方法最终返回`true`时,则,删除相对应的条件;当最后返回`false`时,则,保留条件.
+定制一个决定条件存活的类,需要遵循一些约定: 继承`org.fastquery.where.Judge`,当完成这一步,IDE就会提示开发者必须实现ignore方法, 否则,面对的是红叉. 这样的设计可以减少犯错的可能. 当`ignore`方法最终返回`true`时,则,删除相对应的条件;当最后返回`false`时,则,保留条件.
 
 ```java
 public class LikeNameJudge extends Judge {
@@ -1152,7 +1155,7 @@ Page<UserInfo> page  = userInfoDBService.findSome(age, id,pageable);
 List<UserInfo> userInfos = page.getContent(); // 获取这页的数据
 Slice slice = page.getNextPageable();         // 下一页
 int number = page.getNumber();                // 当前页数(当前是第几页)
-// 更多 page.? 就不赘述了.
+// 更多 page.? 不妨亲自去试试看
 ``` 
 
 `Page`转换成`JSON`后的结构如下:
@@ -1206,7 +1209,7 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 - `#{#limit}`不仅能使用在 XML 文件里,也可以使用在`@Query`里,无特殊要求,建议不要指定`#{#limit}`.
 
 ### 扩展分页实现
-目前该框架默认支持分页的数据库有`MySQL`,`Microsoft SQL Server`,`PostgreSQL`,因此,扩展的空间非常大,并且非常容易.实现`org.fastquery.page.PageDialect`类,有针对性地重写相关方法,解决`SQL`中的差异.细节部分建议去参考`org.fastquery.dialect.MySQLPageDialect`,`org.fastquery.dialect.PostgreSQLPageDialect`.
+目前该框架默认支持分页的数据库有`MySQL`,`Microsoft SQL Server`,`PostgreSQL`,因此,扩展的空间非常大,并且非常容易.实现`org.fastquery.page.PageDialect`类,有针对性地重写相关方法,解决`SQL`中的差异.欲了解更多细节请参考`org.fastquery.dialect.MySQLPageDialect`,`org.fastquery.dialect.PostgreSQLPageDialect`.
 
 ## JavaScript分页插件
 [PJAXPage](https://gitee.com/xixifeng.com/pjaxpage)分页插件,完美支持`Page`数据结构.        
@@ -1451,7 +1454,7 @@ public interface UserInfoDBService extends QueryRepository {
 ```
 
 没错, **不用去写任何实现类**, 访问 `http://<your host>/rest/userInfo/findAll?pageIndex=1&pageSize=5`, 就可以看到效果.  
-**DB接口不仅能当做WEB Service(服务),同时也是一个DB接口**.  
+**DB接口不仅能当做WEB Service(服务),同时也是一个DB接口**.除非逻辑是数据即服务,否则,不提倡`DAO`层跟`HTTP`服务融在一起.JAX-RS Resource的实现类,在WEB容器初始化之前就已经被`FastQuery`推导创建好了.
 
 ### 配置支持HttpSign
 [HttpSign](https://github.com/xixifeng/httpsign) 是一种RESTful接口签名认证的实现.  
@@ -1556,7 +1559,7 @@ assertThat(executedSQLs.size(), is(1));
 assertThat(executedSQLs.get(0), not(containsString("count")));
 ```
 
-`FastQuery`已经迭代了很久,每次发布新版本是如何保证之前的功能不受影响的呢?那是因为`FastQuery`的每个功能特性都有非常缜密的断言测试,发布时把能否通过所有断言做为先决条件,当然也得益于深思熟虑的设计.`Junit`是众多Java框架中,真正有用的为数不多的其中之一.
+`FastQuery`已经迭代了很久,每次发布新版本是如何保证之前的功能不受影响的呢?那是因为`FastQuery`的每个功能特性都有非常缜密的断言测试,发布时把能否通过所有断言做为先决条件,当然也得益于深思熟虑的设计.`Junit`是众多Java框架中,真正有用的为数不多的其中之一,`FastQuery`乐此不疲.
 
 ## fastquery.json其他可选配置选项:
 
