@@ -48,7 +48,7 @@ class FqClassLoader extends ClassLoader {
 			resourceNames.add(name);
 		} else {
 			try {
-				binder.bind(clazz.getMethod("getInstance").invoke(null)).to(clazz.getInterfaces()[0]);
+				binder.bind(clazz.getMethod("g").invoke(null)).to(clazz.getInterfaces()[0]);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				throw new RepositoryException(e);
 			}

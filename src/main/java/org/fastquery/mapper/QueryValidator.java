@@ -30,7 +30,7 @@ import java.util.Map.Entry;
 
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryByNamed;
-import org.fastquery.core.Repository;
+import org.fastquery.core.QueryRepository;
 import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
 import org.fastquery.util.TypeUtil;
@@ -46,7 +46,7 @@ public class QueryValidator {
 	private QueryValidator() {
 	}
 
-	public static void check(List<Class<Repository>> classes) {
+	public static void check(List<Class<QueryRepository>> classes) {
 		List<String> queries = new ArrayList<>();
 
 		Map<String, String> countQueryMap = QueryPool.getCountQueryMap();
@@ -121,7 +121,7 @@ public class QueryValidator {
 		}
 
 		// 10). 检验方法
-		for (Class<Repository> cls : classes) {
+		for (Class<QueryRepository> cls : classes) {
 			String className = cls.getName();
 			Method[] methods = cls.getMethods();
 			for (Method method : methods) {

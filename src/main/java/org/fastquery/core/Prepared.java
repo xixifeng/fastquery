@@ -54,12 +54,12 @@ public class Prepared {
 	 * @param target 目标 Repository
 	 * @return 执行之后的值
 	 */
-	public static Object excute(String methodName, String methodDescriptor, Object[] args, Repository target) { // NO_UCD
+	public static Object excute(String methodName, String methodDescriptor, Object[] args, QueryRepository target) { // NO_UCD
 		long start = System.currentTimeMillis();
 		Method method = null;
 		try {
 			@SuppressWarnings("unchecked") // 是动态生成的实例,因此它的接口可以很明确就是一个
-			Class<? extends Repository> iclazz = (Class<? extends Repository>) target.getClass().getInterfaces()[0];
+			Class<? extends QueryRepository> iclazz = (Class<? extends QueryRepository>) target.getClass().getInterfaces()[0];
 			method = TypeUtil.getMethod(iclazz, methodName, methodDescriptor);
 
 			// 如果是调试模式

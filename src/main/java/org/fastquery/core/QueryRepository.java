@@ -33,7 +33,7 @@ import org.fastquery.util.BeanUtil;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public interface QueryRepository extends Repository { // NO_UCD
+public interface QueryRepository { // NO_UCD
 	/**
 	 * 保存一个实体,然后将主键值返回(不适用于联合主键).注意:永不返回null,没有找到主键返回-1
 	 * 

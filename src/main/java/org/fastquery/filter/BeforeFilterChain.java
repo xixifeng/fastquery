@@ -27,15 +27,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.fastquery.core.Repository;
 
 import java.util.Set;
+
+import org.fastquery.core.QueryRepository;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-class BeforeFilterChain<R extends Repository> extends BeforeFilter<R> {
+class BeforeFilterChain<R extends QueryRepository> extends BeforeFilter<R> {
 
 	private static ThreadLocal<Object> threadLocal = new ThreadLocal<>(); // 存储:中断时留下的返回值
 

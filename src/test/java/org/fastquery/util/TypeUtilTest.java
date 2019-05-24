@@ -40,9 +40,6 @@ import org.fastquery.core.Id;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
-import org.fastquery.core.QueryRepository;
-import org.fastquery.core.Repository;
-import org.fastquery.filter.BeforeFilter;
 import org.fastquery.test.JarListClass;
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
@@ -256,70 +253,7 @@ public class TypeUtilTest implements Opcodes {
 		java.lang.reflect.Type type4 = TypeUtilTest.class.getMethod("todo4").getGenericReturnType();
 		assertThat(TypeUtil.isListMapSO(type4), is(true));
 	}
-
-	// 这些内部类,用做测试
-	class BeforeFilter0 extends BeforeFilter<Repository> {
-		@Override
-		protected void doFilter(Repository repository, Method method, Object[] args) {
-		}
-	}
-
-	class BeforeFilter1 extends BeforeFilter<DB1> {
-		@Override
-		protected void doFilter(DB1 db1, Method method, Object[] args) {
-		}
-	}
-
-	class BeforeFilter2 extends BeforeFilter<DB2> {
-		@Override
-		protected void doFilter(DB2 db2, Method method, Object[] args) {
-		}
-	}
-
-	class BeforeFilter3 extends BeforeFilter<DB3> {
-		@Override
-		protected void doFilter(DB3 db3, Method method, Object[] args) {
-		}
-	}
-
-	class BeforeFilter4 extends BeforeFilter<DB4> {
-		@Override
-		protected void doFilter(DB4 db4, Method method, Object[] args) {
-		}
-	}
-
-	class BeforeFilter5 extends BeforeFilter<DB5> {
-		@Override
-		protected void doFilter(DB5 db5, Method method, Object[] args) {
-		}
-	}
-
-	class BeforeFilter6 extends BeforeFilter<DB6> {
-		@Override
-		protected void doFilter(DB6 db6, Method method, Object[] args) {
-		}
-	}
-
-	// 这些内部类,用做测试
-	class DB1 implements Repository {
-	}
-
-	abstract class DB2 implements QueryRepository {
-	}
-
-	class DB3 implements Repository {
-	}
-
-	abstract class DB4 implements QueryRepository {
-
-	}
-
-	class DB5 implements Repository {
-	}
-
-	abstract class DB6 implements QueryRepository {
-	}
-
+	
 	private static String removePart(String str) throws Exception {
 		Method method = TypeUtil.class.getDeclaredMethod("removePart", String.class);
 		method.setAccessible(true);

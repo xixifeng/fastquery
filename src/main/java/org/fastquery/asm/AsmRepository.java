@@ -24,36 +24,118 @@ package org.fastquery.asm;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtField;
+import javassist.CtMethod;
+
 import org.fastquery.core.Placeholder;
-import org.fastquery.core.Prepared;
-import org.fastquery.core.Repository;
+import org.fastquery.core.QueryRepository;
 import org.fastquery.mapper.QueryValidator;
-import org.fastquery.util.TypeUtil;
 import org.fastquery.where.Script2Class;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.GeneratorAdapter;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class AsmRepository implements Opcodes {
+public class AsmRepository {
 
-	private static final String INIT = "<init>";
-	private static final String INSTANCE = "instance";
-	private static final String JAVA_LANG_OBJECT = "java/lang/Object";
 	private static final Logger LOG = LoggerFactory.getLogger(AsmRepository.class);
 
 	private AsmRepository() {
+	}
+
+	private static String getReturnTypeName(Method method) {
+		Class<?> returnType = method.getReturnType();
+		String rtName = returnType.getName();
+		if (returnType.getComponentType() != null) {
+			return returnType.getComponentType().getName() + "[]";
+		} else {
+			return rtName;
+		}
+	}
+
+	public static String getMethodDef(Method method) {
+		StringBuilder sb = new StringBuilder("public ");
+		sb.append(getReturnTypeName(method));
+		sb.append(' ');
+		sb.append(method.getName());
+		sb.append('(');
+		sb.append(getParameterDef(method.getParameterTypes()));
+		sb.append(')');
+		return sb.toString();
+	}
+
+	public static String getParameterDef(Class<?>[] parameterTypes) {
+		int len = parameterTypes.length;
+		if (len > 0) {
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < len; i++) {
+				Class<?> clazz = parameterTypes[i];
+				if (clazz.getComponentType() != null) {
+					sb.append(clazz.getComponentType().getName());
+					sb.append("[]");
+				} else {
+					sb.append(clazz.getName());
+				}
+				sb.append(' ');
+				sb.append("p");
+				sb.append(i);
+				sb.append(',');
+			}
+			return sb.deleteCharAt(sb.length() - 1).toString();
+		} else {
+			return "";
+		}
+	}
+
+	public static String getParameterNames(Class<?>[] parameterTypes) {
+		String str = null;
+		int len = parameterTypes.length;
+		if (len > 0) {
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < len; i++) {
+
+				Class<?> currentType = parameterTypes[i];
+
+				if (currentType == int.class) {
+					sb.append("Integer.valueOf");
+				} else if (currentType == double.class) {
+					sb.append("Double.valueOf");
+				} else if (currentType == long.class) {
+					sb.append("Long.valueOf");
+				} else if (currentType == short.class) {
+					sb.append("Short.valueOf");
+				} else if (currentType == byte.class) {
+					sb.append("Byte.valueOf");
+				} else if (currentType == boolean.class) {
+					sb.append("Boolean.valueOf");
+				} else if (currentType == char.class) {
+					sb.append("Character.valueOf");
+				} else if (currentType == float.class) {
+					sb.append("Float.valueOf");
+				}
+
+				sb.append("(p");
+				sb.append(i);
+				sb.append("),");
+			}
+			str = sb.deleteCharAt(sb.length() - 1).toString();
+		}
+		if (str == null) {
+			
+			return "org.apache.commons.lang3.ArrayUtils.EMPTY_OBJECT_ARRAY";
+		} else {
+			return "new Object[] { " + str + " }";
+		}
 	}
 
 	/**
@@ -61,212 +143,58 @@ public class AsmRepository implements Opcodes {
 	 * 
 	 * @param repositoryClazz repository class
 	 * @return 生成的类字节码
+	 * @throws Exception
 	 */
-	public static synchronized byte[] generateBytes(Class<? extends Repository> repositoryClazz) {
+	public static synchronized byte[] generateBytes(Class<? extends QueryRepository> repositoryClazz) {
 		// 安全检测
 		GenerateExtends.safeCheck(repositoryClazz);
-		
+
 		// 生成Judge
 		Script2Class.generate(repositoryClazz);
 
-		// internal Name 格式: org/fastquery/core/QueryRepository
-		String internalName = Type.getInternalName(repositoryClazz);
-
-		// 需要生成类的接口集合
-		String[] interfaces = new String[] { internalName };
-
-		// 给待生成的实现类取个名字
-		String proxyName = internalName + Placeholder.DB_SUF;
-
 		// 生成类
-		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-		cw.visit(V1_1, ACC_PUBLIC, proxyName, null, JAVA_LANG_OBJECT, interfaces);
+		ClassPool pool = ClassPool.getDefault();
+		// web容器中的repository 需要增加classPath
+		ClassClassPath classClassPath = new ClassClassPath(repositoryClazz);
+		pool.removeClassPath(classClassPath);
+		pool.insertClassPath(classClassPath);
+		String className = repositoryClazz.getName() + Placeholder.DB_SUF;
+		CtClass ctClass = pool.makeClass(className);
+		try {
+			// 增加接口
+			ctClass.setInterfaces(new CtClass[] { pool.get(repositoryClazz.getName()) });
 
-		// 单例
-		String repositoryDescriptor = Type.getDescriptor(repositoryClazz);
-		// 生成的私有静态方法,用于存储实例对象
-		FieldVisitor fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, INSTANCE, repositoryDescriptor, null, null);
-		fv.visitEnd();
+			// 单例设计 ********************************
+			// 创建一个私有的静态变量
+			ctClass.addField(CtField.make("private static " + className + " i;", ctClass));
 
-		org.objectweb.asm.MethodVisitor mv;
-		// 生成私有的不带参的构造方法
-		mv = cw.visitMethod(ACC_PRIVATE, INIT, "()V", null, null);
-		mv.visitCode();
-		mv.visitVarInsn(ALOAD, 0);
-		mv.visitMethodInsn(INVOKESPECIAL, JAVA_LANG_OBJECT, INIT, "()V", false);
-		mv.visitInsn(RETURN);
-		mv.visitMaxs(1, 1);
-		mv.visitEnd();
+			// 不带参数的私有方法
+			CtConstructor privateConstructor = new CtConstructor(new CtClass[] {}, ctClass);
+			privateConstructor.setModifiers(Modifier.PRIVATE);
+			privateConstructor.setBody("{}");
+			ctClass.addConstructor(privateConstructor);
 
-		// 生成获取实例方法
-		mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "getInstance", "()" + repositoryDescriptor, null, null);
-		mv.visitCode();
-		mv.visitFieldInsn(GETSTATIC, proxyName, INSTANCE, repositoryDescriptor);
-		Label l0 = new Label();
-		mv.visitJumpInsn(IFNONNULL, l0);
-		mv.visitTypeInsn(NEW, proxyName);
-		mv.visitInsn(DUP);
-		mv.visitMethodInsn(INVOKESPECIAL, proxyName, INIT, "()V", false);
-		mv.visitFieldInsn(PUTSTATIC, proxyName, INSTANCE, repositoryDescriptor);
-		mv.visitLabel(l0);
-		mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-		mv.visitFieldInsn(GETSTATIC, proxyName, INSTANCE, repositoryDescriptor);
-		mv.visitInsn(ARETURN);
-		mv.visitMaxs(2, 0);
-		mv.visitEnd();
-		// 单例 End
+			// 创建getInstance方法
+			String getInstanceMethodSrc = "public static " + className + " g() { if(i == null) { i = new " + className + "();}return i;}";
+			ctClass.addMethod(CtMethod.make(getInstanceMethodSrc, ctClass));
+			// 单例设计 ******************************** End
 
-		// 根据接口clazz 生成实现的方法
-		Method[] methods = repositoryClazz.getMethods();
-		for (Method method : methods) {
-			if (Modifier.isAbstract(method.getModifiers())) { // 只针对 abstract 方法
-				generateMethod(cw, method, Prepared.class);
-			}
-		}
-		cw.visitEnd();
+			// 实现抽象方法
+			Method[] methods = repositoryClazz.getMethods();
+			for (Method method : methods) {
+				if (!method.isDefault()) {
+					Class<?>[] ps = method.getParameterTypes();
 
-		return cw.toByteArray();
-	}
-
-	/**
-	 * 生成方法
-	 * 
-	 * @param cw
-	 * @param method
-	 * @param exceptions
-	 * @param interfaceClazz
-	 */
-	private static ClassWriter generateMethod(ClassWriter cw, java.lang.reflect.Method method, Class<Prepared> prepared) {
-
-		org.objectweb.asm.commons.Method m = new org.objectweb.asm.commons.Method(method.getName(), Type.getMethodDescriptor(method));
-		GeneratorAdapter mv = new GeneratorAdapter(ACC_PUBLIC, m, null, null, cw);
-
-		mv.visitLdcInsn(method.getName()); // excute的第1参数
-		mv.visitLdcInsn(Type.getType(method).getDescriptor()); // excute的第2参数
-
-		// excute的第3参数(是可变参数)
-		Parameter[] parameters = method.getParameters();
-		setIn(mv, parameters);
-
-		// excute的第4个参数
-		mv.visitVarInsn(ALOAD, 0);
-
-		// 调用Prepared中的excute方法
-		// INVOKESTATIC
-		mv.visitMethodInsn(INVOKESTATIC, Type.getType(prepared).getInternalName(), "excute",
-				"(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/Repository;)Ljava/lang/Object;", false);
-
-		// 返回值处理
-		String internalName = Type.getInternalName(method.getReturnType());
-		int sort = Type.getReturnType(method).getSort();
-		if (sort == 0) { // 如果返回值是 Void
-			mv.visitInsn(POP);
-			mv.visitInsn(RETURN);
-		} else if ((1 <= sort) && (sort <= 8)) { // 如果是基本类型 [1,8]
-			Object[] objs = TypeUtil.getTypeInfo(Type.getReturnType(method).getDescriptor());
-			String type = objs[0].toString();
-			mv.visitTypeInsn(CHECKCAST, type);
-			mv.visitMethodInsn(INVOKEVIRTUAL, type, objs[1].toString(), objs[2].toString(), false);
-			// Integer.parseInt(objs[3].toString()) 比
-			// Integer.valueOf(objs[3].toString()).intValue()更优.
-			mv.visitInsn(Integer.parseInt(objs[3].toString()));
-
-		} else { // sort==9 表述数组类型int[]或Integer[], srot=10表示包装类型
-			mv.visitTypeInsn(CHECKCAST, internalName);
-			mv.visitInsn(ARETURN);
-		}
-
-		// mv.visitEnd()
-		mv.endMethod();
-		return cw;
-	}
-
-	private static void setIn(GeneratorAdapter mv, Parameter[] parameters) {
-		int size = parameters.length;
-		if (size < 6) {
-			mv.visitInsn(size + ICONST_0);
-			// 注释不要删除
-			// 当 size = 0 时,则: mv.visitInsn(3); 3对应 ICONST_0
-			// 当 size = 1 时,则: mv.visitInsn(4); 4对应 ICONST_1
-			// 当 size = 2 时,则: mv.visitInsn(5); 5对应 ICONST_2
-			// 当 size = 3 时,则: mv.visitInsn(6); 6对应 ICONST_3
-			// 当 size = 4 时,则: mv.visitInsn(7); 7对应 ICONST_4
-			// 当 size = 5 时,则: mv.visitInsn(8); 8对应 ICONST_5
-		} else {
-			mv.visitIntInsn(BIPUSH, size);
-		}
-		mv.visitTypeInsn(ANEWARRAY, JAVA_LANG_OBJECT);
-
-		int nextIndex = 1; // 指定下一次?LOAD应该的使用的索引
-		for (int i = 0; i < size; i++) {
-			mv.visitInsn(DUP);
-			if (i < 6) {
-				mv.visitInsn(i + ICONST_0);
-				// 注释不要删除
-				// 当 i = 0 时, 则: mv.visitInsn(3); 3对应ICONST_0
-				// 当 i = 1 时, 则: mv.visitInsn(4); 3对应ICONST_1
-				// 当 i = 2 时, 则: mv.visitInsn(5); 3对应ICONST_2
-				// 当 i = 3 时, 则: mv.visitInsn(6); 3对应ICONST_3
-				// 当 i = 4 时, 则: mv.visitInsn(7); 3对应ICONST_4
-				// 当 i = 5 时, 则: mv.visitInsn(8); 3对应ICONST_5
-			} else {
-				mv.visitIntInsn(BIPUSH, i);
+					CtMethod cm = CtMethod.make(getMethodDef(method) + "{return ($r) org.fastquery.core.Prepared.excute(\"" + method.getName()
+							+ "\", \"" + Type.getType(method).getDescriptor() + "\", " + getParameterNames(ps) + ", this) ; }", ctClass);
+					ctClass.addMethod(cm);
+				}
 			}
 
-			// 注释不要删除
-			// int -> ILOAD
-			// double -> DLOAD
-			// long -> LLOAD
-			// short -> ILOAD
+			return ctClass.toBytecode();
 
-			// byte -> ILOAD
-			// boolean -> ILOAD
-			// char -> ILOAD
-
-			// float -> FLOAD
-
-			// 计算当前遍历的参数的类型
-			Class<?> currentType = parameters[i].getType();
-			// int","double","long","short","byte","boolean","char","float"
-			String valueOf = "valueOf";
-			if (currentType == int.class) {
-				mv.visitVarInsn(ILOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", valueOf, "(I)Ljava/lang/Integer;", false);
-				// 指定下一次?LOAD应该的使用的索引
-				nextIndex = nextIndex + 1;
-			} else if (currentType == double.class) {
-				mv.visitVarInsn(DLOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", valueOf, "(D)Ljava/lang/Double;", false);
-				nextIndex = nextIndex + 2;
-			} else if (currentType == long.class) {
-				mv.visitVarInsn(LLOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", valueOf, "(J)Ljava/lang/Long;", false);
-				nextIndex = nextIndex + 2;
-			} else if (currentType == short.class) {
-				mv.visitVarInsn(ILOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Short", valueOf, "(S)Ljava/lang/Short;", false);
-				nextIndex = nextIndex + 1;
-			} else if (currentType == byte.class) {
-				mv.visitVarInsn(ILOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Byte", valueOf, "(B)Ljava/lang/Byte;", false);
-				nextIndex = nextIndex + 1;
-			} else if (currentType == boolean.class) {
-				mv.visitVarInsn(ILOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", valueOf, "(Z)Ljava/lang/Boolean;", false);
-				nextIndex = nextIndex + 1;
-			} else if (currentType == char.class) {
-				mv.visitVarInsn(ILOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Character", valueOf, "(C)Ljava/lang/Character;", false);
-				nextIndex = nextIndex + 1;
-			} else if (currentType == float.class) {
-				mv.visitVarInsn(FLOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", valueOf, "(F)Ljava/lang/Float;", false);
-				nextIndex = nextIndex + 1;
-			} else {
-				mv.visitVarInsn(ALOAD, nextIndex);
-				nextIndex = nextIndex + 1;
-			}
-			mv.visitInsn(AASTORE);
+		} catch (Exception e) {
+			throw new ExceptionInInitializerError(e);
 		}
 	}
 
@@ -275,7 +203,7 @@ public class AsmRepository implements Opcodes {
 	 * 
 	 * @param classes Repository class 集合
 	 */
-	public static void after(List<Class<Repository>> classes) {
+	public static void after(List<Class<QueryRepository>> classes) {
 		QueryValidator.check(classes);
 		classes.clear();
 

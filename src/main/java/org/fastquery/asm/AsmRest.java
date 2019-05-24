@@ -28,7 +28,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 
 import org.fastquery.core.Placeholder;
-import org.fastquery.core.Repository;
+import org.fastquery.core.QueryRepository;
 import org.fastquery.jersey.Embed;
 import org.fastquery.util.TypeUtil;
 import org.objectweb.asm.AnnotationVisitor;
@@ -54,7 +54,7 @@ public class AsmRest implements Opcodes {
 	 * @param repositoryClazz repository class
 	 * @return 生成的类字节码
 	 */
-	public static synchronized byte[] generateBytes(Class<? extends Repository> repositoryClazz) {
+	public static synchronized byte[] generateBytes(Class<? extends QueryRepository> repositoryClazz) {
 
 		// internal Name 格式: org/fastquery/core/QueryRepository
 		String internalName = Type.getInternalName(repositoryClazz);
@@ -145,7 +145,7 @@ public class AsmRest implements Opcodes {
 		// INVOKESTATIC
 		mv.visitFieldInsn(GETFIELD, proxyName, "d", dbDes);
 		mv.visitMethodInsn(INVOKESTATIC, Type.getType(Embed.class).getInternalName(), "excute",
-				"(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/Repository;)Ljava/lang/Object;", false);
+				"(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/QueryRepository;)Ljava/lang/Object;", false);
 
 		// 返回值处理
 		String internalName = Type.getInternalName(method.getReturnType());

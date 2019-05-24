@@ -51,7 +51,6 @@ import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
-import org.fastquery.core.Repository;
 
 /**
  * 生成 Repository的实现扩展, 在生成的时候,额外要做的事情(extend)
@@ -68,7 +67,7 @@ class GenerateExtends {
 	 * 
 	 * @param repositoryClazz
 	 */
-	static void safeCheck(Class<? extends Repository> repositoryClazz) {
+	static void safeCheck(Class<? extends QueryRepository> repositoryClazz) {
 
 		MethodFilterChain filterChain;
 
@@ -77,8 +76,7 @@ class GenerateExtends {
 		for (Method method : methods) {
 
 			Class<?> declaringClass = method.getDeclaringClass();
-			if (declaringClass != QueryRepository.class && declaringClass != Repository.class
-					&& QueryRepository.class.isAssignableFrom(repositoryClazz)) {
+			if (declaringClass != QueryRepository.class && QueryRepository.class.isAssignableFrom(repositoryClazz)) {
 
 				Modifying modifying = method.getAnnotation(Modifying.class);
 				Query[] querys = method.getAnnotationsByType(Query.class);

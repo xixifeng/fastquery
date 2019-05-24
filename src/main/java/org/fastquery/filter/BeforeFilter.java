@@ -24,13 +24,14 @@ package org.fastquery.filter;
 
 import java.lang.reflect.Method;
 
-import org.fastquery.core.Repository;
+import org.fastquery.core.QueryRepository;
+
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public abstract class BeforeFilter<R extends Repository> {
+public abstract class BeforeFilter<R extends QueryRepository> {
 
 	/**
 	 * @param repository 当前拦截到的repository实例

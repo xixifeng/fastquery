@@ -36,7 +36,7 @@ import java.util.List;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.fastquery.core.QueryContext;
-import org.fastquery.core.Repository;
+import org.fastquery.core.QueryRepository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.filter.SkipFilter;
 import org.fastquery.service.FQuery;
@@ -61,14 +61,14 @@ public class FastQueryTestRule implements TestRule {
 		List<Field> fList = new ArrayList<>();
 		Field[] fields = BeanUtil.getFields(clazz);
 		for (Field field : fields) {
-			if (Repository.class.isAssignableFrom(field.getType())) {
+			if (QueryRepository.class.isAssignableFrom(field.getType())) {
 				field.setAccessible(true);
 				fList.add(field);
 			}
 		}
 		fields = clazz.getFields();
 		for (Field field : fields) {
-			if (Repository.class.isAssignableFrom(field.getType())) {
+			if (QueryRepository.class.isAssignableFrom(field.getType())) {
 				field.setAccessible(true);
 				fList.add(field);
 			}
@@ -76,8 +76,8 @@ public class FastQueryTestRule implements TestRule {
 
 		for (Field field : fList) {
 			@SuppressWarnings("unchecked")
-			Class<? extends Repository> rc = (Class<? extends Repository>) field.getType();
-			Repository repository = FQuery.getRepository(rc);
+			Class<? extends QueryRepository> rc = (Class<? extends QueryRepository>) field.getType();
+			QueryRepository repository = FQuery.getRepository(rc);
 			if(testTarget==null && !Modifier.isStatic(field.getModifiers())) {
 				throw new ExceptionInInitializerError(description.getTestClass().getSimpleName() + "中的变量 [" + rc.getSimpleName() + " " + field.getName() + "] 需要设置成static(静态类型)");
 			}

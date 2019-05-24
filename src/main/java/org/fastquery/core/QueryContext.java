@@ -36,7 +36,7 @@ public final class QueryContext {
 	private Class<?> returnType; // 返回类型
 	private Connection connection; // 当前连接
 	private String sourceName; // 当前数据源名称
-	private Class<? extends Repository> iclass;// 当前拦截到的接口
+	private Class<? extends QueryRepository> iclass;// 当前拦截到的接口
 	private Object[] args; // 当前方法的实参
 	private List<String> sqls = new ArrayList<>(); // 当前method所执行的SQL集合
 	private MetaData metaData; // 当前上下文元数据
@@ -53,7 +53,7 @@ public final class QueryContext {
 		return threadLocal.get();
 	}
 
-	static void start(Class<? extends Repository> iclass, Method method, Object[] args) throws SQLException {
+	static void start(Class<? extends QueryRepository> iclass, Method method, Object[] args) throws SQLException {
 		QueryContext context = getQueryContext();
 		if (context != null && !debug) {
 			if(context.connection != null && !context.connection.isClosed()) { // 不等于null并且没有关闭
@@ -152,7 +152,7 @@ public final class QueryContext {
 		return getQueryContext().pageable;
 	}
 
-	public static Class<? extends Repository> getIclass() {
+	public static Class<? extends QueryRepository> getIclass() {
 		return getQueryContext().iclass;
 	}
 

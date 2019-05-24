@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.fastquery.core.Repository;
+import org.fastquery.core.QueryRepository;
 import org.fastquery.util.TypeUtil;
 import org.slf4j.Logger;
 
@@ -52,7 +52,7 @@ public class Embed {
 	 * @param target 目标 Repository
 	 * @return 执行之后的值
 	 */
-	public static Object excute(String methodName, String methodDescriptor, Object[] args, Repository target) { // NO_UCD
+	public static Object excute(String methodName, String methodDescriptor, Object[] args, QueryRepository target) { // NO_UCD
 		LOG.debug("methodName={}, methodDescriptor={}, args={}, target={}", methodName, methodDescriptor, args, target);
 		Method method = TypeUtil.getMethod(target.getClass(), methodName, methodDescriptor);
 		try {

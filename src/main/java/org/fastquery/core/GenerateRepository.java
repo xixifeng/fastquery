@@ -38,5 +38,5 @@ public interface GenerateRepository {
 	 * @param repositoryClazz 接口class
 	 * @return 实现类的class
 	 */
-	<T extends Repository> Class<? extends T> generate(Class<T> repositoryClazz);
+	<T extends QueryRepository> Class<? extends T> generate(Class<T> repositoryClazz);
 }

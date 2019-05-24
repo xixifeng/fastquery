@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.fastquery.core.Repository;
+import org.fastquery.core.QueryRepository;
 
 import java.util.Set;
 
@@ -35,7 +35,7 @@ import java.util.Set;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-class AfterFilterChain<R extends Repository> extends AfterFilter<R> {
+class AfterFilterChain<R extends QueryRepository> extends AfterFilter<R> {
 
 	// 在此用map 主要目的是为了去重,相同的class后面覆盖前面的.
 	// 用LinkedHashMap而不用hashMap 是为了有顺序

@@ -24,17 +24,17 @@ package org.fastquery.filter;
 
 import java.lang.reflect.Method;
 
-import org.fastquery.core.Repository;
+import org.fastquery.core.QueryRepository;
 import org.fastquery.filter.BeforeFilter;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class MyBeforeFilter1 extends BeforeFilter<Repository> {
+public class MyBeforeFilter1 extends BeforeFilter<QueryRepository> {
 
 	@Override
-	public void doFilter(Repository repository, Method method, Object[] args) {
+	public void doFilter(QueryRepository repository, Method method, Object[] args) {
 		// repository: 当前拦截到的实例
 		// method: 当前拦截到的方法
 		// args: 当前传递进来的参数

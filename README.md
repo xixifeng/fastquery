@@ -356,7 +356,7 @@ Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable page
 其中, `:age`引用的是`@Param("age")int age`的实参值.`:name`是`@Param("name")String name`的实参值.这个脚本要表达的意思不言而喻. 不过脚本的解析能力还不能自动**拆箱**(unboxing),需要调用拆箱方法,在这里age变量如果是`Integer`类型,要想如上脚本能正确编译,必须这么做: `":age.intValue() > 18 && :name!=null && :name.contains(\"Rex\")"`, 请留意住`:age.intValue()`. 其他包装类型`Short`, `Long`, `Byte`, `Boolean`, `Character`, `Float`, `Double` 以此类推.  
 
 ### 什么是JAVA脚本?
-在这里将一段承载着程序的字符串称之为JAVA脚本.脚本在初始化阶段被解释成能在`JVM`里运行的字节码,在脚本里能通过`:expression`(冒号表达式)获取当前方法在运行时所接受到的所有参数,引用的参数可以是一个复杂对象,完全可以把`:expression`当成是对象的引用句柄.虽然允许把脚本写得很长,写出较为复杂的逻辑,但是,不建议这么做,因为那样可读性极差,不便迭代维护.做再庞杂的程序,都应该拆分成若干小而简单的功能,`FastQuery`自始自终会遵守简单,严谨,清晰的编程风格.
+在这里将一段承载着程序的字符串称之为JAVA脚本.脚本在初始化阶段被解释成能在`JVM`里运行的字节码,在脚本里能通过`:expression`(冒号表达式)获取当前方法在运行时所接受到的所有参数,引用的参数可以是一个复杂对象,完全可以把`:expression`当成是对象的引用句柄.虽然允许把脚本写得很长,更支持写出较为复杂的逻辑,但是,不建议这么做,因为那样可读性极差,不便迭代维护.做再庞杂的程序,都应该拆分成若干小而简单的功能,然后以优良的设计将其串联起来.`FastQuery`自始自终会遵守简单,严谨,清晰的编程风格.
 
 ### @Condition 中的 if...else
 条件是否保留可以通过`if`条件来确定,`if`绑定的JAVA脚本运行后的结果若为`true`就保留该`Condition`,反之就取`else`的捆绑值,`else`如果没有值或者是空值,表示移除该`Condition`.  
@@ -1316,10 +1316,10 @@ public class MyPoolProvider implements ConnectionPoolProvider {
  /**
   * @author xixifeng (fastquery@126.com)
   */
- public class MyBeforeFilter1 extends BeforeFilter<Repository> {
+ public class MyBeforeFilter1 extends BeforeFilter<QueryRepository> {
 
  	@Override
- 	public void doFilter(Repository repository, Method method, Object[] args) {
+ 	public void doFilter(QueryRepository repository, Method method, Object[] args) {
  	
  		// repository: 当前拦截到的实例
  		// method: 当前拦截到的方法
@@ -1350,10 +1350,10 @@ public interface StudentDBService extends QueryRepository {
 /**
  * @author xixifeng (fastquery@126.com)
  */
-public class MyAfterFilter extends AfterFilter<Repository> {
+public class MyAfterFilter extends AfterFilter<QueryRepository> {
 
 	@Override
-	public Object doFilter(Repository repository, Method method, Object[] args, Object returnVal) {
+	public Object doFilter(QueryRepository repository, Method method, Object[] args, Object returnVal) {
 		
 		// repository: 当前拦截到的实例
 		// method: 当前拦截到的method

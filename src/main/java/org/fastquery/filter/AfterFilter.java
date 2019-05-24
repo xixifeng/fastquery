@@ -24,13 +24,13 @@ package org.fastquery.filter;
 
 import java.lang.reflect.Method;
 
-import org.fastquery.core.Repository;
+import org.fastquery.core.QueryRepository;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public abstract class AfterFilter<R extends Repository> {
+public abstract class AfterFilter<R extends QueryRepository> {
 
 	/**
 	 * 过滤方法执行后的结果

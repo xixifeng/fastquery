@@ -26,7 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
 import org.fastquery.core.Placeholder;
-import org.fastquery.core.Repository;
+import org.fastquery.core.QueryRepository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dsm.FQueryProperties;
 import org.fastquery.util.BeanUtil;
@@ -48,10 +48,10 @@ public class FQuery { // NO_UCD
 	 * @return 接口的实例
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Repository> T getRepository(Class<T> clazz) {
+	public static <T extends QueryRepository> T getRepository(Class<T> clazz) {
 		String name = clazz.getName() + Placeholder.DB_SUF;
 		try {
-			return (T) GenerateRepositoryImpl.getInstance().getClassLoader().loadClass(name).getMethod("getInstance").invoke(null);
+			return (T) GenerateRepositoryImpl.getInstance().getClassLoader().loadClass(name).getMethod("g").invoke(null);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException
 				| ClassNotFoundException e) {
 			throw new RepositoryException("获取代理实现类异常", e);
