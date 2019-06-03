@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -48,12 +49,7 @@ public class XMLParse {
 
 	private XMLParse() {
 	}
-	
-	
-	private static interface Function<E,R> {
-		R appley(E e);
-	}
-	
+		
 	public static boolean exists(Resource resource, String resourceName, String dataSourceName,String tagName) {
 		return toWho(resource, resourceName, dataSourceName,tagName, Objects::nonNull); // ele -> ele != null
 	}
@@ -94,7 +90,7 @@ public class XMLParse {
 		}
 	}
 	
-	private static <R> R toWho(Resource resource, String resourceName, String dataSourceName,String tagName, XMLParse.Function<Element, R> fun) {
+	private static <R> R toWho(Resource resource, String resourceName, String dataSourceName,String tagName, Function<Element, R> fun) {
 		
 		if (resource.exist(resourceName)) {
 			try (InputStream inputStream = resource.getResourceAsStream(resourceName)) {
@@ -118,7 +114,7 @@ public class XMLParse {
 					unitElement = (Element) nodes.item(i);
 					named = unitElement.getAttribute("name");
 					if (dataSourceName.equals(named)) {
-						return fun.appley(unitElement);
+						return fun.apply(unitElement);
 					}
 				}
 

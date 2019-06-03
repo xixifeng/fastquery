@@ -38,7 +38,7 @@ import org.fastquery.where.Condition;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class ConditionParameterFilter implements MethodFilter {
+class ConditionParameterFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

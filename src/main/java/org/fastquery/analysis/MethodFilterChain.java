@@ -31,11 +31,11 @@ import java.util.List;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class MethodFilterChain implements MethodFilter {
+class MethodFilterChain implements MethodFilter {
 
 	private List<MethodFilter> methodFilters = new ArrayList<>();
 
-	public MethodFilterChain addFilter(MethodFilter methodFilter) {
+	MethodFilterChain addFilter(MethodFilter methodFilter) {
 		methodFilters.add(methodFilter);
 		return this;
 	}

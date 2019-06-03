@@ -20,33 +20,10 @@
  * 
  */
 
-package org.fastquery.asm;
+package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 
-import org.fastquery.analysis.AnnotationSynxFilter;
-import org.fastquery.analysis.ArgsFilter;
-import org.fastquery.analysis.ConditionParameterFilter;
-import org.fastquery.analysis.InterceptorFilter;
-import org.fastquery.analysis.MarkFilter;
-import org.fastquery.analysis.MethodAnnotationFilter;
-import org.fastquery.analysis.MethodFilterChain;
-import org.fastquery.analysis.ModifyingDependencyFilter;
-import org.fastquery.analysis.ModifyingReturnTypeFilter;
-import org.fastquery.analysis.MuestionFilter;
-import org.fastquery.analysis.NotAllowedRepeat;
-import org.fastquery.analysis.OutFilter;
-import org.fastquery.analysis.PageFilter;
-import org.fastquery.analysis.PageableFilter;
-import org.fastquery.analysis.ParameterFilter;
-import org.fastquery.analysis.QueriesFileFilter;
-import org.fastquery.analysis.QueryReturnTypeFilter;
-import org.fastquery.analysis.ReturnTypeFilter;
-import org.fastquery.analysis.SQLFilter;
-import org.fastquery.analysis.SetFilter;
-import org.fastquery.analysis.SharpFilter;
-import org.fastquery.analysis.SourceFilter;
-import org.fastquery.analysis.TplPageFilter;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
@@ -57,7 +34,7 @@ import org.fastquery.core.QueryRepository;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-class GenerateExtends {
+public class GenerateExtends {
 
 	private GenerateExtends() {
 	}
@@ -65,9 +42,9 @@ class GenerateExtends {
 	/**
 	 * 在生成Repository实现类之前,做安全检测
 	 * 
-	 * @param repositoryClazz
+	 * @param repositoryClazz 待检测repository
 	 */
-	static void safeCheck(Class<? extends QueryRepository> repositoryClazz) {
+	public static void safeCheck(Class<? extends QueryRepository> repositoryClazz) {
 
 		MethodFilterChain filterChain;
 

@@ -37,7 +37,7 @@ import org.fastquery.util.TypeUtil;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageableFilter implements MethodFilter {
+class PageableFilter implements MethodFilter {
 
 	// 如果当前方法不是分页, 其参数就不应该出现Pageable对象,更不能出现@PageIndex @PageSize
 

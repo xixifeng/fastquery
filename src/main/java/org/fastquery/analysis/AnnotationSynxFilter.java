@@ -37,7 +37,7 @@ import com.alibaba.fastjson.JSONObject;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class AnnotationSynxFilter implements MethodFilter {
+class AnnotationSynxFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

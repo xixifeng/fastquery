@@ -36,7 +36,7 @@ import org.fastquery.where.Condition;
  *  #{#表达式} 合法检测
  * @author mei.sir@aliyun.cn
  */
-public class SharpFilter implements MethodFilter {
+class SharpFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

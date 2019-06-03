@@ -185,7 +185,7 @@ public final class QueryContext {
 		}
 	}
 
-	public static void forceClear() throws SQLException { // NO_UCD (test only)
+	public static void forceClear() throws SQLException { // NO_UCD 
 		debug = false;
 		clear();
 	}

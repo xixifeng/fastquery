@@ -23,9 +23,7 @@
 package org.fastquery.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.fastquery.core.RepositoryException;
@@ -40,40 +38,36 @@ import com.alibaba.fastjson.JSONObject;
 public class FastQueryJSONObject {
 
 	private static final String DEBUG = "debug";
-	private static Map<ClassLoader, JSONObject> maps = new HashMap<>();
 
+	private static JSONObject jo;
+	
 	private FastQueryJSONObject() {
 	}
 
-	static void setJsonObject(JSONObject o) {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		if (!maps.containsKey(classLoader)) {
-			maps.put(classLoader, o);
+	static synchronized void setJsonObject(JSONObject o) {
+		if(jo == null) {
+			jo = o;
 		} else {
 			throw new RepositoryException("fastquery.json不能重复装载");
 		}
 	}
-
-	private static JSONObject getJsonObject() {
-		return maps.get(Thread.currentThread().getContextClassLoader());
-	}
-
+	
 	/**
 	 * 获取基准路径
 	 * 
 	 * @return basedir
 	 */
 	public static String getBasedir() {
-		return getJsonObject().getString("basedir");
+		return jo.getString("basedir");
 	}
 
 	public static boolean getDebug() {
-		return (boolean) getJsonObject().getOrDefault(DEBUG, false);
+		return (boolean) jo.getOrDefault(DEBUG, false);
 	}
 
 	public static List<String> getQueries() {
 		List<String> strs = new ArrayList<>();
-		JSONArray jsonArray = getJsonObject().getJSONArray("queries");
+		JSONArray jsonArray = jo.getJSONArray("queries");
 		if (jsonArray == null) {
 			return strs;
 		}
@@ -82,7 +76,7 @@ public class FastQueryJSONObject {
 	}
 	
 	public static int getSlowQueryTime() {
-		return getJsonObject().getIntValue("slowQueryTime");
+		return jo.getIntValue("slowQueryTime");
 	}
 
 	static void check() {
@@ -101,25 +95,17 @@ public class FastQueryJSONObject {
 		}
 		
 		// 2). debug
-		if(getJsonObject().containsKey(DEBUG)) {
-			Object debug = getJsonObject().get(DEBUG);
+		if(jo.containsKey(DEBUG)) {
+			Object debug = jo.get(DEBUG);
 			if(!(debug instanceof Boolean)) {
 				throw new RepositoryException("fastquery.json -> debug 它的值只能是true或false,也可以不用配置,要配,请配置正确");
 			}
 		}
 		
 		// 3). slowQueryTime
-		String slowQueryTime = getJsonObject().getString("slowQueryTime");
+		String slowQueryTime = jo.getString("slowQueryTime");
 		if(slowQueryTime!=null && !Pattern.matches("\\d+", slowQueryTime)) {
 			throw new RepositoryException("fastquery.json -> slowQueryTime 它的值只能是数字");
 		}
-	}
-
-	public static void removeCurrent() { // NO_UCD (unused code)
-		maps.remove(Thread.currentThread().getContextClassLoader());
-	}
-
-	public static void clear() {
-		maps.clear();
 	}
 }

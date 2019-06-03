@@ -37,7 +37,7 @@ import org.fastquery.util.TypeUtil;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageFilter implements MethodFilter {
+class PageFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

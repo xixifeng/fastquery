@@ -44,7 +44,7 @@ import com.alibaba.fastjson.JSONObject;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FQueryBinder extends AbstractBinder { // NO_UCD (use default)
+public class FQueryBinder extends AbstractBinder { // NO_UCD
 
 	private FqClassLoader fqClassLoader;
 
@@ -82,6 +82,7 @@ public class FQueryBinder extends AbstractBinder { // NO_UCD (use default)
 
 		@Override
 		public boolean isWriteable(Class<?> returnType, Type genericType, Annotation[] annotations, MediaType mediaType) {
+			// 注意 isWriteable 若发生异常,会直接导致MessageBodyWriter失效,并且异常没有被捕捉.
 			return extended("Authorization", annotations);
 		}
 
@@ -100,7 +101,7 @@ public class FQueryBinder extends AbstractBinder { // NO_UCD (use default)
 
 	}
 
-	public static void bind(ResourceConfig resource) { // NO_UCD (unused code)
+	public static void bind(ResourceConfig resource) { // NO_UCD 
 		FQueryBinder fb = new FQueryBinder(resource.getClassLoader());
 		resource.register(fb);
 		try {

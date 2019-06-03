@@ -31,7 +31,7 @@ import org.fastquery.core.Query;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class NotAllowedRepeat implements MethodFilter {
+class NotAllowedRepeat implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

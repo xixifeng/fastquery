@@ -32,7 +32,7 @@ import org.fastquery.where.Set;
  *  
  * @author mei.sir@aliyun.cn
  */
-public class SetFilter implements MethodFilter {
+class SetFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

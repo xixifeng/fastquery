@@ -120,12 +120,8 @@ public class FQueryProperties {
 		}
 	}
 
-	public static void removeDataSource(String dataSourceName) { // NO_UCD (unused code)
+	public static void removeDataSource(String dataSourceName) { // NO_UCD 
 		dataSources.remove(dataSourceName);
 	}
-
-	public static void clear() {
-		dataSourceIndexs.clear();
-		dataSources.clear();
-	}
+	
 }

@@ -549,4 +549,8 @@ public interface QueryRepository { // NO_UCD
 	 */
 	@Id(MethodId.QUERY9)
 	int tx(Supplier<Integer> fun);
+	
+	default Class<? extends QueryRepository> getInterfaceClass() {
+		return null;
+	}
 }

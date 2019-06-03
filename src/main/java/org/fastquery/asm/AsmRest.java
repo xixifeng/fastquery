@@ -25,25 +25,29 @@ package org.fastquery.asm;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
 
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryRepository;
-import org.fastquery.jersey.Embed;
-import org.fastquery.util.TypeUtil;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.GeneratorAdapter;
+
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.CtMethod;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ClassFile;
+import javassist.bytecode.ConstPool;
+import javassist.bytecode.FieldInfo;
+import javassist.bytecode.MethodInfo;
+import javassist.bytecode.annotation.ArrayMemberValue;
+import javassist.bytecode.annotation.ClassMemberValue;
 
 /**
  * 用于生成rest实现类
+ * 
  * @author xixifeng (fastquery@126.com)
  */
-public class AsmRest implements Opcodes {
+public class AsmRest {
 
 	private AsmRest() {
 	}
@@ -56,208 +60,73 @@ public class AsmRest implements Opcodes {
 	 */
 	public static synchronized byte[] generateBytes(Class<? extends QueryRepository> repositoryClazz) {
 
-		// internal Name 格式: org/fastquery/core/QueryRepository
-		String internalName = Type.getInternalName(repositoryClazz);
-
-		// 需要生成类的接口集合
-		String[] interfaces = new String[] { internalName };
-
-		// 给待生成的实现类取个名字
-		String proxyName = internalName + Placeholder.REST_SUF;
-
-		MethodVisitor mv;
-		FieldVisitor fv;
-		AnnotationVisitor av0;
 		// 生成类
-		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-		cw.visit(V1_8, ACC_PUBLIC, proxyName, null, "java/lang/Object", interfaces);
+		ClassPool pool = ClassPool.getDefault();
+		// web容器中的repository 需要增加classPath
+		ClassClassPath classClassPath = new ClassClassPath(repositoryClazz);
+		pool.removeClassPath(classClassPath);
+		pool.insertClassPath(classClassPath);
+		String className = repositoryClazz.getName() + Placeholder.REST_SUF;
+		CtClass ctClass = pool.makeClass(className);
 
-		// 给类标识@Singleton注解
-		av0 = cw.visitAnnotation("Ljavax/inject/Singleton;", true);
-		av0.visitEnd();
+		ClassFile ccFile = ctClass.getClassFile();
+		ConstPool constpool = ccFile.getConstPool();
 
-		String dbDes = Type.getDescriptor(repositoryClazz);
+		try {
+			// 增加接口
+			ctClass.setInterfaces(new CtClass[] { pool.get(repositoryClazz.getName()) });
 
-		// 注入依赖的db
-		fv = cw.visitField(ACC_PRIVATE, "d", dbDes, null, null);
-		av0 = fv.visitAnnotation("Ljavax/inject/Inject;", true);
-		av0.visitEnd();
-		fv.visitEnd();
+			// 增加字段
+			CtClass executor = pool.get(repositoryClazz.getName());
+			CtField field = new CtField(executor, "d", ctClass);
+			field.setModifiers(Modifier.PRIVATE);
+			FieldInfo fieldInfo = field.getFieldInfo();
+			// 标识属性注解
+			AnnotationsAttribute fieldAttr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			javassist.bytecode.annotation.Annotation autowired = new javassist.bytecode.annotation.Annotation(
+					"javax.inject.Inject", constpool);
+			fieldAttr.addAnnotation(autowired);
+			fieldInfo.addAttribute(fieldAttr);
+			ctClass.addField(field);
+			
+			AsmRepository.addGetInterfaceClassMethod(repositoryClazz, ctClass);
+			
+			// 标识类注解
+			AnnotationsAttribute classAttr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			javassist.bytecode.annotation.Annotation singAnn = new javassist.bytecode.annotation.Annotation(
+					"javax.inject.Singleton", constpool);
+			classAttr.addAnnotation(singAnn);
+			ccFile.addAttribute(classAttr);
 
-		// 生成不带参的构造方法
-		mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
-		mv.visitCode();
-		mv.visitVarInsn(ALOAD, 0);
-		mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-		mv.visitInsn(RETURN);
-		mv.visitMaxs(1, 1);
-		mv.visitEnd();
-		// 生成不带参的构造方法 End
-
-		// 根据接口clazz 生成实现的方法
-		Method[] methods = repositoryClazz.getMethods();
-		for (Method method : methods) {
-			if (Modifier.isAbstract(method.getModifiers())) { // 只针对 abstract 方法
-				cw = generateMethod(cw, method, proxyName, dbDes);
+			// 实现抽象方法
+			Method[] methods = repositoryClazz.getMethods();
+			for (Method method : methods) {
+				if (!method.isDefault()) {
+					CtMethod cm = CtMethod.make(AsmRepository.getMethodDef(method) + "{return d."+method.getName()+"($$);}", ctClass);
+					// 标识方法注解
+					AnnotationsAttribute methodAttr = new AnnotationsAttribute(constpool,
+							AnnotationsAttribute.visibleTag);
+					javassist.bytecode.annotation.Annotation extendsAnn = new javassist.bytecode.annotation.Annotation(
+							"org.fastquery.core.Extends", constpool);
+					ArrayMemberValue arrayMemberValue = new ArrayMemberValue(constpool);
+					Annotation[] mas = method.getAnnotations();
+					ClassMemberValue[] cmvs = new ClassMemberValue[mas.length];
+					for (int i = 0; i < mas.length; i++) {
+						cmvs[i] = new ClassMemberValue(mas[i].annotationType().getName(), constpool);
+					}
+					arrayMemberValue.setValue(cmvs);
+					extendsAnn.addMemberValue("value", arrayMemberValue);
+					methodAttr.addAnnotation(extendsAnn);
+					MethodInfo info = cm.getMethodInfo();
+					info.addAttribute(methodAttr);
+					ctClass.addMethod(cm);
+				}
 			}
-		}
-		cw.visitEnd();
+			
+			return ctClass.toBytecode();
 
-		return cw.toByteArray();
-	}
-
-	/**
-	 * 生成方法
-	 * 
-	 * @param cw
-	 * @param method
-	 * @param exceptions
-	 * @param interfaceClazz
-	 */
-	private static ClassWriter generateMethod(ClassWriter cw, java.lang.reflect.Method method, String proxyName, String dbDes) {
-
-		org.objectweb.asm.commons.Method m = new org.objectweb.asm.commons.Method(method.getName(), Type.getMethodDescriptor(method));
-		GeneratorAdapter mv = new GeneratorAdapter(ACC_PUBLIC, m, null, null, cw);
-		
-		// 加注解
-		// 加上@Extends 用于记录这个方法的接口方法含有哪些注解
-		AnnotationVisitor av0 = mv.visitAnnotation("Lorg/fastquery/core/Extends;", true);
-		AnnotationVisitor av1 = av0.visitArray("value");
-		Annotation[] mas = method.getAnnotations();
-		for (Annotation annotation : mas) {
-			av1.visit(null, Type.getType(annotation.annotationType()));
-		}
-		av1.visitEnd();
-		av0.visitEnd();
-		// 加注解 end
-
-		mv.visitLdcInsn(method.getName()); // excute的第1参数
-		mv.visitLdcInsn(Type.getType(method).getDescriptor()); // excute的第2参数
-
-		// excute的第3参数(是可变参数)
-		Parameter[] parameters = method.getParameters();
-		setIn(mv, parameters);
-
-		// excute的第4个参数
-		mv.visitVarInsn(ALOAD, 0);
-
-		// 调用Prepared中的excute方法
-		// INVOKESTATIC
-		mv.visitFieldInsn(GETFIELD, proxyName, "d", dbDes);
-		mv.visitMethodInsn(INVOKESTATIC, Type.getType(Embed.class).getInternalName(), "excute",
-				"(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Lorg/fastquery/core/QueryRepository;)Ljava/lang/Object;", false);
-
-		// 返回值处理
-		String internalName = Type.getInternalName(method.getReturnType());
-		int sort = Type.getReturnType(method).getSort();
-		if (sort == 0) { // 如果返回值是 Void
-			mv.visitInsn(POP);
-			mv.visitInsn(RETURN);
-		} else if ((1 <= sort) && (sort <= 8)) { // 如果是基本类型 [1,8]
-			Object[] objs = TypeUtil.getTypeInfo(Type.getReturnType(method).getDescriptor());
-			String type = objs[0].toString();
-			mv.visitTypeInsn(CHECKCAST, type);
-			mv.visitMethodInsn(INVOKEVIRTUAL, type, objs[1].toString(), objs[2].toString(), false);
-			// Integer.parseInt(objs[3].toString()) 比
-			// Integer.valueOf(objs[3].toString()).intValue()更优.
-			mv.visitInsn(Integer.parseInt(objs[3].toString()));
-
-		} else { // sort==9 表述数组类型int[]或Integer[], srot=10表示包装类型
-			mv.visitTypeInsn(CHECKCAST, internalName);
-			mv.visitInsn(ARETURN);
-		}
-
-		// mv.visitEnd()
-		mv.endMethod();
-		return cw;
-	}
-
-	private static void setIn(GeneratorAdapter mv, Parameter[] parameters) {
-		int size = parameters.length;
-		if (size < 6) {
-			mv.visitInsn(size + ICONST_0);
-			// 注释不要删除
-			// 当 size = 0 时,则: mv.visitInsn(3); 3对应 ICONST_0
-			// 当 size = 1 时,则: mv.visitInsn(4); 4对应 ICONST_1
-			// 当 size = 2 时,则: mv.visitInsn(5); 5对应 ICONST_2
-			// 当 size = 3 时,则: mv.visitInsn(6); 6对应 ICONST_3
-			// 当 size = 4 时,则: mv.visitInsn(7); 7对应 ICONST_4
-			// 当 size = 5 时,则: mv.visitInsn(8); 8对应 ICONST_5
-		} else {
-			mv.visitIntInsn(BIPUSH, size);
-		}
-		mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
-
-		int nextIndex = 1; // 指定下一次?LOAD应该的使用的索引
-		for (int i = 0; i < size; i++) {
-			mv.visitInsn(DUP);
-			if (i < 6) {
-				mv.visitInsn(i + ICONST_0);
-				// 注释不要删除
-				// 当 i = 0 时, 则: mv.visitInsn(3); 3对应ICONST_0
-				// 当 i = 1 时, 则: mv.visitInsn(4); 3对应ICONST_1
-				// 当 i = 2 时, 则: mv.visitInsn(5); 3对应ICONST_2
-				// 当 i = 3 时, 则: mv.visitInsn(6); 3对应ICONST_3
-				// 当 i = 4 时, 则: mv.visitInsn(7); 3对应ICONST_4
-				// 当 i = 5 时, 则: mv.visitInsn(8); 3对应ICONST_5
-			} else {
-				mv.visitIntInsn(BIPUSH, i);
-			}
-
-			// 注释不要删除
-			// int -> ILOAD
-			// double -> DLOAD
-			// long -> LLOAD
-			// short -> ILOAD
-
-			// byte -> ILOAD
-			// boolean -> ILOAD
-			// char -> ILOAD
-
-			// float -> FLOAD
-
-			// 计算当前遍历的参数的类型
-			Class<?> currentType = parameters[i].getType();
-			// int","double","long","short","byte","boolean","char","float"
-			String valueOf = "valueOf";
-			if (currentType == int.class) {
-				mv.visitVarInsn(ILOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", valueOf, "(I)Ljava/lang/Integer;", false);
-				// 指定下一次?LOAD应该的使用的索引
-				nextIndex = nextIndex + 1;
-			} else if (currentType == double.class) {
-				mv.visitVarInsn(DLOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", valueOf, "(D)Ljava/lang/Double;", false);
-				nextIndex = nextIndex + 2;
-			} else if (currentType == long.class) {
-				mv.visitVarInsn(LLOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", valueOf, "(J)Ljava/lang/Long;", false);
-				nextIndex = nextIndex + 2;
-			} else if (currentType == short.class) {
-				mv.visitVarInsn(ILOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Short", valueOf, "(S)Ljava/lang/Short;", false);
-				nextIndex = nextIndex + 1;
-			} else if (currentType == byte.class) {
-				mv.visitVarInsn(ILOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Byte", valueOf, "(B)Ljava/lang/Byte;", false);
-				nextIndex = nextIndex + 1;
-			} else if (currentType == boolean.class) {
-				mv.visitVarInsn(ILOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", valueOf, "(Z)Ljava/lang/Boolean;", false);
-				nextIndex = nextIndex + 1;
-			} else if (currentType == char.class) {
-				mv.visitVarInsn(ILOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Character", valueOf, "(C)Ljava/lang/Character;", false);
-				nextIndex = nextIndex + 1;
-			} else if (currentType == float.class) {
-				mv.visitVarInsn(FLOAD, nextIndex);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", valueOf, "(F)Ljava/lang/Float;", false);
-				nextIndex = nextIndex + 1;
-			} else {
-				mv.visitVarInsn(ALOAD, nextIndex);
-				nextIndex = nextIndex + 1;
-			}
-			mv.visitInsn(AASTORE);
+		} catch (Exception e) {
+			throw new ExceptionInInitializerError(e);
 		}
 	}
 }

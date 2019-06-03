@@ -41,7 +41,7 @@ import org.fastquery.filter.BeforeFilter;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class InterceptorFilter implements MethodFilter {
+class InterceptorFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

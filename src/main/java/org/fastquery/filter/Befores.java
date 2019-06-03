@@ -33,6 +33,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE })
-public @interface Befores { // NO_UCD (use default)
+public @interface Befores { // NO_UCD
 	Before[] value() default {};
 }

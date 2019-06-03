@@ -47,7 +47,7 @@ public interface ConnectionPoolProvider {
 	
 	/**
 	 * 如果不采用任何连接池,那么就直接使用jdbc实现方,提供数据源.
-	 * @param ds jdbc驱动方的数据源class
+	 * @param clazz jdbc驱动方的数据源class
 	 * @param resource 用于读取环境资源
 	 * @param dataSourceName 数据源名称
 	 * @return 用于提供连接的数据源

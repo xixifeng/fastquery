@@ -48,15 +48,12 @@ import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryContext;
-import org.fastquery.core.RepositoryException;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.PageIndex;
 import org.fastquery.page.PageSize;
 import org.fastquery.struct.ParamMap;
 import org.fastquery.where.Condition;
 import org.fastquery.where.Script2Class;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -65,91 +62,11 @@ import com.alibaba.fastjson.JSONObject;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class TypeUtil implements Opcodes {
+public class TypeUtil {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TypeUtil.class);
 
 	private TypeUtil() {
-	}
-
-	/**
-	 * 根据基本类型标识符取出类型信息<br>
-	 * [0]: 基本类型所对应的包转类型; [1]:解包方法 [3]:默认构造方法 [4]:asm操作码.
-	 * 
-	 * @param d 允许的字符串"I","Z","B","C","S","D","F","J" <br>
-	 *        "I" int Type.getType(int.class).getDescriptor() <br>
-	 *        "S" short <br>
-	 *        "J" long <br>
-	 *        "D" double <br>
-	 *        "F" float <br>
-	 *        "Z" boolean <br>
-	 *        "B" byte <br>
-	 *        "C" char <br>
-	 * @return 类型信息
-	 */
-	public static Object[] getTypeInfo(String d) {
-		Object[] strs = new Object[4];
-		if ("I".equals(d)) {
-			strs[0] = "java/lang/Integer";
-			strs[1] = "intValue"; // 用于解包的方法
-			strs[2] = "()I"; // 默认构造方法
-			strs[3] = IRETURN; // 返回类型
-		} else if ("Z".equals(d)) {
-			strs[0] = "java/lang/Boolean";
-			strs[1] = "booleanValue";
-			strs[2] = "()Z";
-			strs[3] = IRETURN;
-		} else if ("B".equals(d)) {
-			strs[0] = "java/lang/Byte";
-			strs[1] = "byteValue";
-			strs[2] = "()B";
-			strs[3] = IRETURN;
-		} else if ("C".equals(d)) {
-			strs[0] = "java/lang/Character";
-			strs[1] = "charValue";
-			strs[2] = "()C";
-			strs[3] = IRETURN;
-		} else if ("S".equals(d)) {
-			strs[0] = "java/lang/Short";
-			strs[1] = "shortValue";
-			strs[2] = "()S";
-			strs[3] = IRETURN;
-		} else if ("D".equals(d)) {
-			strs[0] = "java/lang/Double";
-			strs[1] = "doubleValue";
-			strs[2] = "()D";
-			strs[3] = DRETURN;
-		} else if ("F".equals(d)) {
-			strs[0] = "java/lang/Float";
-			strs[1] = "floatValue";
-			strs[2] = "()F";
-			strs[3] = FRETURN;
-		} else if ("J".equals(d)) {
-			strs[0] = "java/lang/Long";
-			strs[1] = "longValue";
-			strs[2] = "()J";
-			strs[3] = LRETURN;
-		}
-		
-		return strs;
-	}
-
-	/**
-	 * 从 clazz类中搜索具备有methodDescriptor属性,并且name为methodName的Method
-	 * 
-	 * @param clazz 类
-	 * @param methodName 方法名称
-	 * @param methodDescriptor asm方法描述
-	 * @return 匹配的方法, 如果没有匹配到抛出异常 {@link RuntimeException}
-	 */
-	public static Method getMethod(Class<?> clazz, String methodName, String methodDescriptor) {
-		Method[] methods = clazz.getMethods();
-		for (Method method : methods) {
-			if (method.getName().equals(methodName) && methodDescriptor.equals(Type.getType(method).getDescriptor())) {
-				return method;
-			}
-		}
-		throw new RepositoryException("致命错误,没有找到方法!");
 	}
 
 	// 给定一个"正则匹配"匹配在另一个字符串,把匹配上的字符串存入一个数组里. 这样一来即可以用,又可以统计出现次数!

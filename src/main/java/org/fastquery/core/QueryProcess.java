@@ -42,7 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.fastquery.handler.ModifyingHandler;
 import org.fastquery.handler.QueryHandler;
 import org.fastquery.page.NotCount;
-import org.fastquery.page.PageImpl;
+import org.fastquery.page.Page;
 import org.fastquery.page.Pageable;
 import org.fastquery.page.Slice;
 import org.fastquery.struct.RespUpdate;
@@ -50,7 +50,6 @@ import org.fastquery.struct.SQLValue;
 import org.fastquery.util.BeanUtil;
 import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
-import org.objectweb.asm.Type;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -256,7 +255,7 @@ class QueryProcess {
 			if (parameters[i].getParameterizedType() instanceof TypeVariable) { // 这个类型是变量类型吗?
 				Field[] fields = BeanUtil.getFields(iargs[i].getClass());
 				for (Field field : fields) {
-					if (Type.getType(field.getType()).getSort() != Type.OBJECT) {
+					if (field.getType().isPrimitive()) {
 						throw new RepositoryException(String.format("%s这个实体的成员变量%s %s %s不允许是基本类型", iargs[i].getClass().getName(),
 								Modifier.toString(field.getModifiers()), field.getType().getName(), field.getName()));
 					}
@@ -454,5 +453,108 @@ class QueryProcess {
 
 	Object methodQuery() {
 		return null;
+	}
+	
+	private static class PageImpl<E> implements Page<E> {
+
+		private int size; // 每页行数
+		private int number; // 当前页码,从0开始
+		private int numberOfElements; // 当前页的真实记录行数
+		private List<E> content; // 当前页的结果集
+
+		private long totalElements; // 总行数
+		private int totalPages; // 总页码
+		private boolean hasContent; // 是否有结果集
+
+		private boolean isFirst; // 是否是第一页
+		private boolean isLast; // 是否是最后一页
+
+		private boolean hasNext; // 是否有下一页
+		private boolean hasPrevious; // 是否有上一页
+
+		private Slice nextPageable; // 下一页的Pageable对象
+		private Slice previousPageable; // 上一页的Pageable对象
+
+		public PageImpl(int size, int numberOfElements, int number, List<E> content, long totalElements, int totalPages, boolean hasContent,
+				boolean hasNext, boolean hasPrevious, boolean isFirst, boolean isLast, Slice nextPageable, Slice previousPageable) {
+			this.size = size;
+			this.numberOfElements = numberOfElements;
+			this.number = number;
+			this.content = content;
+			this.totalElements = totalElements;
+			this.totalPages = totalPages;
+			this.hasContent = hasContent;
+			this.hasNext = hasNext;
+			this.hasPrevious = hasPrevious;
+			this.isFirst = isFirst;
+			this.isLast = isLast;
+			this.nextPageable = nextPageable;
+			this.previousPageable = previousPageable;
+		}
+
+		@Override
+		public int getSize() {
+			return size;
+		}
+
+		@Override
+		public int getNumberOfElements() {
+			return numberOfElements;
+		}
+
+		@Override
+		public int getNumber() {
+			return number;
+		}
+
+		@Override
+		public List<E> getContent() {
+			return content;
+		}
+
+		@Override
+		public long getTotalElements() {
+			return totalElements;
+		}
+
+		@Override
+		public int getTotalPages() {
+			return totalPages;
+		}
+
+		@Override
+		public boolean isHasContent() {
+			return hasContent;
+		}
+
+		@Override
+		public boolean isHasNext() {
+			return hasNext;
+		}
+
+		@Override
+		public boolean isHasPrevious() {
+			return hasPrevious;
+		}
+
+		@Override
+		public boolean isFirst() {
+			return isFirst;
+		}
+
+		@Override
+		public boolean isLast() {
+			return isLast;
+		}
+
+		@Override
+		public Slice getNextPageable() {
+			return nextPageable;
+		}
+
+		@Override
+		public Slice getPreviousPageable() {
+			return previousPageable;
+		}
 	}
 }

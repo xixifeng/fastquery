@@ -6,13 +6,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.69</version> <!-- fastquery.version -->
+    <version>1.0.70</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.69'
+compile 'org.fastquery:fastquery:1.0.70'
 ```
 
 # FastQuery 数据持久层框架
@@ -210,24 +210,29 @@ JRE 8+
 
 - 使用DAO接口.
 
- **注意**:不用去实现StudentDBService接口.
-
 ```java
-   // 获取实现类
-   StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
-   // 调用 findAll 方法
-   JSONArray jsonArray = studentDBService.findAll();
-   // 调用 find 方法
-   Student[] students = studentDBService.find(); 
+public class StudentDBServiceTest {
+	   // 获取实现类
+	   private static StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
+	   @Test
+	   public void test() {
+		   // 调用 findAll 方法
+		   JSONArray jsonArray = studentDBService.findAll();
+		   // 调用 find 方法
+		   Student[] students = studentDBService.find(); 
+	   }
+}
 ```
 
-一个接口不实现它的`public abstract`方法就毫无作用可言,因此,与之对应的实例对象是必须的,只不过是FastQuery内部替用户实现了,用户可通过`FQuery.getRepository`获取DB接口对应的实例.读者可能会问,这个自动生成的实例在什么时候生成? 动态生成的效率如何保持高效? 为此, 笔者做了相当多的功课:让所有DB实现类在项目初始化阶段进行,并且尽可能地对接口方法做静态分析,把有可能在运行期发生的错误尽最大努力提升到初始化阶段,生成代码前会检测SQL绑定是否合法有效、检测方法返回值是否符合常规、方法的参数是否满足模版的调用、是否正确地使用了分页...诸如此类问题.这些潜在问题一旦暴露,项目都启动不起来,迫使开发者必须朝正确的道路走.项目进入运行期,大量的校验就没必要写了,从而最大限度保证快速执行(至少在往这个方向不懈努力中).  
+**注意**:不用去实现StudentDBService接口.通过`FQuery.getRepository`获取DAO接口对应的实例,虽然每次获取实例消耗的性能微乎其微可以忽略不计,但是,作为一个接口并且频繁被调用,因此,建议把获取到的实例赋值给类成员变量,最好是用`static`修饰.`FQuery.getRepository`获得的实例是唯一的,不可变的.  
+
+一个接口不实现它的`public abstract`方法就毫无作用可言,因此,与之对应的实例对象是必须的,只不过是FastQuery内部替用户实现了.读者可能会问,这个自动生成的实例在什么时候生成? 动态生成的效率如何保持高效? 为此, 笔者做了相当多的功课:让所有DB实现类在项目初始化阶段进行,并且尽可能地对接口方法做静态分析,把有可能在运行期发生的错误尽最大努力提升到初始化阶段,生成代码前会检测SQL绑定是否合法有效、检测方法返回值是否符合常规、方法的参数是否满足模版的调用、是否正确地使用了分页...诸如此类问题.这些潜在问题一旦暴露,项目都启动不起来,错误信息将在开发阶段详细输出,并且必须干掉这些本该在生产环境才发生的错误,才能继续开发,迫使开发者必须朝正确的道路走,或者说框架的优良设计其核心理念引导开发者不得不写出稳健的程式.项目进入运行期,大量的校验就没必要写了,从而最大限度保证快速执行(至少在往这个方向不懈努力中).  
 
 唯一的出路,只能引用接口,这就使得开发者编程起来不得不简单,因为面对的是一个高度抽象的模型,而不必去考虑细枝末节.接口可以看成是一个能解析SQL并能自动执行的模型,方法的参数、绑定的模版和标识的注解无不是为了实现一个目的:执行SQL,返回结果.  
 
 这种不得不面向接口的编程风格,有很多好处:耦合度趋向0,天然就是**对修改封闭,对扩展开放**,不管是应用层维护还是对框架增加新特性,这些都变得特别容易.隐藏实现,可以减少bug或者是能消灭bug,就如**解决问题,不如消灭问题**一般,解决问题的造诣远远落后于消灭问题,原因在于问题被解决后,不能证明另一个潜在问题在解决代码中不再出现,显然消灭问题更胜一筹.应用层只用写声明抽象方法和标识注解,试问bug从何而来?该框架最大的优良之处就是让开发者没办法去制造bug,至少说很难搞出问题来.不得不简便,没法造bug,显然是该项目所追求的核心目标之一.  
 
-不管用不用这个项目,笔者都期望,读者至少能快速检阅一下该文档,有很多设计是众多同类框架所不具备的,希望读者从中得到正面启发或反面启发,哪怕一点点,都会使你收益.  
+不管用不用这个项目,笔者期望读者至少能快速地检阅一下该文档,有很多设计是众多同类框架所不具备的,希望读者从中得到正面启发或反面启发,哪怕一点点,都会使你收益.  
 
 ## 针对本文@Query的由来
 该项目开源后,有些习惯于繁杂编码的开发者表示,"*使用`@Query`语义不强,为何不用@SQL,@Select,@Insert,@Update...?*". SQL的全称是 Structured Query Language,本文的 `@Query` 就是来源于此. `@Query`只作为运行SQL的载体,要做什么事情由SQL自己决定.因此,不要片面的认为Query就是select操作. 针对数据库操作的注解没有必要根据SQL的四种语言(DDL,DML,DCL,TCL)来定义,定义太多,只会增加复杂度,并且毫无必要,如果是改操作加上`@Modifying`注解,反之,都是"查",这样不更简洁实用吗? 诸如此类:`@Insert("insert into table (name) values('Sir.Xi')")`,`@Select("select * from table")`,SQL的表达能力还不够吗? 就不觉得多出`@insert`和`@Select`有拖泥带水之嫌? SQL的语义本身就很强,甚至连`@Query`和`@Modifying`都略显多余,但是毕竟SQL需要有一个载体和一个大致的分类.
@@ -462,7 +467,7 @@ Primarykey saveUserInfo(String name,Integer age);
 Map<String, Object> addUserInfo(String name,Integer age);
 ```
 
-其中,`selectFields` 默认是 **<code>\*</code>**,字段与字段之间请用英文逗号隔开,待查询的字段名称跟`SQL`的保留关键字有可能存在冲突的话,那么,请用反引号(**<code>\`</code>**)包裹.  
+其中,`selectFields` 默认是 **<code>\*</code>**,字段与字段之间请用英文逗号隔开.  
 
 **注意**:
 - 改操作返回int类型:表示影响的行数,没有找到可以修改的,那么影响行数为0,并不能视为改失败了
@@ -483,8 +488,8 @@ Map<String, Object> addUserInfo(String name,Integer age);
 |`@Transactional`|事务|
 |`@Transient`|标识实体中的属性是临时的(例如:save对象时,该属性不存储到数据库里)|
 |`@NotCount`|标识分页中不统计总行数|
-|`@PageIndex`|标识页索引对应哪个参数|
-|`@PageSize`|标识页行数对应哪个参数|
+|`@PageIndex`|标识页索引|
+|`@PageSize`|标识页行数|
 |`@Condition`|标识条件单元|
 |`@Set`|标识设置字段单元|
 |`@Before`|标识函数执行前|
@@ -724,7 +729,7 @@ tx(() -> {
 ```
 因此,要想把`{}`中处理的数据拿出来使用,将其设置给一个外界的对象就行了. `tx`方法被回滚后会返回-1.
 
-## @Param参数模板
+## @Param参数
 
 **SQL中使用冒号表达式**
  
@@ -933,7 +938,7 @@ public List<Student> findSomeStudent();
 
 等效于 `@QueryByNamed("findSomeStudent")`  
 
-`@QueryByNamed` 中的`render`属性,表示是否启用模板引擎对配置文件进行渲染,默认是`true`表示开启. 如果`<query>`节点中没有使用到任何模板语法,仅用于存储目的,那么建议设置为`false`.  
+`@QueryByNamed` 中的`render`属性,表示是否启用模板引擎对配置文件进行渲染,默认是`true`表示开启. 如果`<query>`节点中没有使用到任何模板语法,仅用于存储目的,那么建议设置为`false`.`:expression`,`?N`,`$expression`这些都不依赖模板引擎.  
 
 **注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,可用于在模板中做逻辑判断,而`:name`用于标记参数位,SQL解析器会将其翻译成`?`号.  
 

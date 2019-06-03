@@ -32,7 +32,7 @@ import org.fastquery.core.QueryByNamed;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class OutFilter implements MethodFilter {
+class OutFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

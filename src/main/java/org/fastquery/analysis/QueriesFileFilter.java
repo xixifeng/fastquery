@@ -34,7 +34,7 @@ import org.fastquery.util.FastQueryJSONObject;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class QueriesFileFilter implements MethodFilter {
+class QueriesFileFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

@@ -37,7 +37,7 @@ import org.fastquery.util.TypeUtil;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class SourceFilter implements MethodFilter {
+class SourceFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

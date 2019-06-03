@@ -33,7 +33,7 @@ import org.fastquery.util.TypeUtil;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class ParameterFilter implements MethodFilter {
+class ParameterFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

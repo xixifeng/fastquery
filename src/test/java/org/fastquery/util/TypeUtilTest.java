@@ -24,11 +24,9 @@ package org.fastquery.util;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,11 +38,8 @@ import org.fastquery.core.Id;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
-import org.fastquery.test.JarListClass;
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 
 import static org.hamcrest.Matchers.*;
 
@@ -52,111 +47,9 @@ import static org.hamcrest.Matchers.*;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class TypeUtilTest implements Opcodes {
+public class TypeUtilTest {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TypeUtilTest.class);
-
-	@Test
-	public void testGetTypeInfo() {
-		Object[] strs = TypeUtil.getTypeInfo("I");
-		assertThat(strs[0], equalTo("java/lang/Integer"));
-		assertThat(strs[1], equalTo("intValue"));
-		assertThat(strs[2], equalTo("()I"));
-		assertThat(strs[3], equalTo(IRETURN));
-
-		strs = TypeUtil.getTypeInfo("Z");
-		assertThat(strs[0], equalTo("java/lang/Boolean"));
-		assertThat(strs[1], equalTo("booleanValue"));
-		assertThat(strs[2], equalTo("()Z"));
-		assertThat(strs[3], equalTo(IRETURN));
-
-		strs = TypeUtil.getTypeInfo("B");
-		assertThat(strs[0], equalTo("java/lang/Byte"));
-		assertThat(strs[1], equalTo("byteValue"));
-		assertThat(strs[2], equalTo("()B"));
-		assertThat(strs[3], equalTo(IRETURN));
-
-		strs = TypeUtil.getTypeInfo("C");
-		assertThat(strs[0], equalTo("java/lang/Character"));
-		assertThat(strs[1], equalTo("charValue"));
-		assertThat(strs[2], equalTo("()C"));
-		assertThat(strs[3], equalTo(IRETURN));
-
-		strs = TypeUtil.getTypeInfo("D");
-		assertThat(strs[0], equalTo("java/lang/Double"));
-		assertThat(strs[1], equalTo("doubleValue"));
-		assertThat(strs[2], equalTo("()D"));
-		assertThat(strs[3], equalTo(DRETURN));
-
-		strs = TypeUtil.getTypeInfo("F");
-		assertThat(strs[0], equalTo("java/lang/Float"));
-		assertThat(strs[1], equalTo("floatValue"));
-		assertThat(strs[2], equalTo("()F"));
-		assertThat(strs[3], equalTo(FRETURN));
-
-		strs = TypeUtil.getTypeInfo("J");
-		assertThat(strs[0], equalTo("java/lang/Long"));
-		assertThat(strs[1], equalTo("longValue"));
-		assertThat(strs[2], equalTo("()J"));
-		assertThat(strs[3], equalTo(LRETURN));
-
-		strs = TypeUtil.getTypeInfo("S");
-		assertThat(strs[0], equalTo("java/lang/Short"));
-		assertThat(strs[1], equalTo("shortValue"));
-		assertThat(strs[2], equalTo("()S"));
-		assertThat(strs[3], equalTo(IRETURN));
-		
-		strs = TypeUtil.getTypeInfo(null);
-		assertThat(strs[0], nullValue());
-		assertThat(strs[1], nullValue());
-		assertThat(strs[2], nullValue());
-		assertThat(strs[3], nullValue());
-		
-		strs = TypeUtil.getTypeInfo("");
-		assertThat(strs[0], nullValue());
-		assertThat(strs[1], nullValue());
-		assertThat(strs[2], nullValue());
-		assertThat(strs[3], nullValue());
-
-	}
-
-	@Test
-	// 测试 TypeUtil.getMethod
-	public void testGetMethod() {
-
-		// 找一些jar包来测试TypeUtil.getMethod这个方法
-		String dir1 = "/web/progm/java/jdk1.8.0_45/jre/lib";
-		String dir2 = "/web/progm/java/jdk1.8.0_45/jre/lib";
-
-		// 这两个目录的jar包中,大概有16744个类,如果能通过,表明这个TypeUtil.getMethod方法还是比较强壮的.
-
-		List<Class<?>> clazzs = new ArrayList<>();
-		if (new File(dir1).exists()) {
-			clazzs.addAll(JarListClass.jarClasses(dir1));
-		}
-		if (new File(dir2).exists()) {
-			clazzs.addAll(JarListClass.jarClasses(dir2));
-		}
-
-		long start = System.currentTimeMillis();
-		for (Class<?> clazz : clazzs) {
-			Method[] methods = clazz.getMethods();
-			for (Method method : methods) {
-				String methodName = method.getName();
-				String methodDescriptor = Type.getType(method).getDescriptor();
-				Method m2 = TypeUtil.getMethod(clazz, methodName, methodDescriptor);
-				assertThat(method.getParameterCount(), equalTo(m2.getParameterCount()));
-				Parameter[] parameters = method.getParameters();
-				Parameter[] parameters2 = m2.getParameters();
-				for (int i = 0; i < parameters.length; i++) {
-					assertThat((parameters[i].getType() == parameters2[i].getType()), is(true));
-				}
-				assertThat(methodName, equalTo(m2.getName()));
-				assertThat(methodDescriptor, equalTo(Type.getType(m2).getDescriptor()));
-			}
-		}
-		LOG.debug("testGetMethod,共测试了" + clazzs.size() + "个类, 用时: " + (System.currentTimeMillis() - start) + " 毫秒!");
-	}
 
 	@Test
 	public void testMatches() throws ClassNotFoundException {

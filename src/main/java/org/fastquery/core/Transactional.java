@@ -27,14 +27,14 @@ package org.fastquery.core;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public @interface Transactional { // NO_UCD (use default)
+public @interface Transactional { // NO_UCD
 
 	/**
 	 * 超时,默认-1,表示永不超时
 	 * 
 	 * @return int
 	 */
-	int timeout() default -1; // NO_UCD (unused code)
+	int timeout() default -1; // NO_UCD 
 
 	/**
 	 * 传播行为

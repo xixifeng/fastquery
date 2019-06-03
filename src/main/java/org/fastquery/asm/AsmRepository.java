@@ -29,6 +29,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javassist.CannotCompileException;
 import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -36,11 +37,11 @@ import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
 
+import org.fastquery.analysis.GenerateExtends;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.mapper.QueryValidator;
 import org.fastquery.where.Script2Class;
-import org.objectweb.asm.Type;
 
 /**
  * 
@@ -62,8 +63,8 @@ public class AsmRepository {
 			return rtName;
 		}
 	}
-
-	public static String getMethodDef(Method method) {
+	
+	static String getMethodDef(Method method) {
 		StringBuilder sb = new StringBuilder("public ");
 		sb.append(getReturnTypeName(method));
 		sb.append(' ');
@@ -74,7 +75,7 @@ public class AsmRepository {
 		return sb.toString();
 	}
 
-	public static String getParameterDef(Class<?>[] parameterTypes) {
+	private static String getParameterDef(Class<?>[] parameterTypes) {
 		int len = parameterTypes.length;
 		if (len > 0) {
 			StringBuilder sb = new StringBuilder();
@@ -97,8 +98,7 @@ public class AsmRepository {
 		}
 	}
 
-	public static String getParameterNames(Class<?>[] parameterTypes) {
-		String str = null;
+	private static String getParameterNames(Class<?>[] parameterTypes) {
 		int len = parameterTypes.length;
 		if (len > 0) {
 			StringBuilder sb = new StringBuilder();
@@ -128,22 +128,18 @@ public class AsmRepository {
 				sb.append(i);
 				sb.append("),");
 			}
-			str = sb.deleteCharAt(sb.length() - 1).toString();
-		}
-		if (str == null) {
-			
-			return "org.apache.commons.lang3.ArrayUtils.EMPTY_OBJECT_ARRAY";
+			sb.deleteCharAt(sb.length() - 1);
+			return "new Object[] { " + sb.toString() + " }";
 		} else {
-			return "new Object[] { " + str + " }";
+			return "org.apache.commons.lang3.ArrayUtils.EMPTY_OBJECT_ARRAY";
 		}
 	}
-
+	
 	/**
 	 * 自动生成Repository接口的实现类并以字节的形式返回, 该方法是线程安全的.
 	 * 
 	 * @param repositoryClazz repository class
 	 * @return 生成的类字节码
-	 * @throws Exception
 	 */
 	public static synchronized byte[] generateBytes(Class<? extends QueryRepository> repositoryClazz) {
 		// 安全检测
@@ -163,39 +159,55 @@ public class AsmRepository {
 		try {
 			// 增加接口
 			ctClass.setInterfaces(new CtClass[] { pool.get(repositoryClazz.getName()) });
+			
+			addGetInterfaceClassMethod(repositoryClazz, ctClass);
 
-			// 单例设计 ********************************
-			// 创建一个私有的静态变量
-			ctClass.addField(CtField.make("private static " + className + " i;", ctClass));
-
-			// 不带参数的私有方法
-			CtConstructor privateConstructor = new CtConstructor(new CtClass[] {}, ctClass);
-			privateConstructor.setModifiers(Modifier.PRIVATE);
-			privateConstructor.setBody("{}");
-			ctClass.addConstructor(privateConstructor);
-
-			// 创建getInstance方法
-			String getInstanceMethodSrc = "public static " + className + " g() { if(i == null) { i = new " + className + "();}return i;}";
-			ctClass.addMethod(CtMethod.make(getInstanceMethodSrc, ctClass));
-			// 单例设计 ******************************** End
-
-			// 实现抽象方法
-			Method[] methods = repositoryClazz.getMethods();
-			for (Method method : methods) {
-				if (!method.isDefault()) {
-					Class<?>[] ps = method.getParameterTypes();
-
-					CtMethod cm = CtMethod.make(getMethodDef(method) + "{return ($r) org.fastquery.core.Prepared.excute(\"" + method.getName()
-							+ "\", \"" + Type.getType(method).getDescriptor() + "\", " + getParameterNames(ps) + ", this) ; }", ctClass);
-					ctClass.addMethod(cm);
-				}
-			}
+			makeSingleton(className, ctClass);
+			
+			makeMethod(repositoryClazz, ctClass);
 
 			return ctClass.toBytecode();
 
 		} catch (Exception e) {
 			throw new ExceptionInInitializerError(e);
 		}
+	}
+
+	static void addGetInterfaceClassMethod(Class<? extends QueryRepository> repositoryClazz, CtClass ctClass) throws CannotCompileException {
+		// 增加字段
+		CtField field = CtField.make("private Class c = "+repositoryClazz.getName()+".class;", ctClass);
+		ctClass.addField(field);	
+		// 覆盖部分default 方法
+		CtMethod cm = CtMethod.make("public Class getInterfaceClass() {return c;}", ctClass);
+		ctClass.addMethod(cm);
+	}
+	
+	private static void makeMethod(Class<? extends QueryRepository> repositoryClazz,CtClass ctClass) throws CannotCompileException {
+		// 实现抽象方法
+		Method[] methods = repositoryClazz.getMethods();
+		for (Method method : methods) {
+			if (!method.isDefault()) {
+				Class<?>[] ps = method.getParameterTypes();
+				String body = "{java.lang.reflect.Method m;try {m = c.getMethod(\""+method.getName()+"\", $sig);} catch (Exception e) {throw new org.fastquery.core.RepositoryException(e);} return ($r) org.fastquery.core.Prepared.excute(m," + getParameterNames(ps) + ", this) ; }";
+				CtMethod cm = CtMethod.make(getMethodDef(method) + body, ctClass);
+				ctClass.addMethod(cm);
+			}
+		}
+	}
+
+	private static void makeSingleton(String className, CtClass ctClass) throws CannotCompileException {
+		// 创建一个私有的静态变量
+		ctClass.addField(CtField.make("private static " + className + " i;", ctClass));
+
+		// 不带参数的私有方法
+		CtConstructor privateConstructor = new CtConstructor(new CtClass[] {}, ctClass);
+		privateConstructor.setModifiers(Modifier.PRIVATE);
+		privateConstructor.setBody("{}");
+		ctClass.addConstructor(privateConstructor);
+
+		// 创建getInstance方法
+		String getInstanceMethodSrc = "public static " + className + " g() { if(i == null) { i = new " + className + "();}return i;}";
+		ctClass.addMethod(CtMethod.make(getInstanceMethodSrc, ctClass));
 	}
 
 	/**

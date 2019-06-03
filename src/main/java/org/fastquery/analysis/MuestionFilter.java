@@ -34,7 +34,7 @@ import org.fastquery.util.TypeUtil;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class MuestionFilter implements MethodFilter {
+class MuestionFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

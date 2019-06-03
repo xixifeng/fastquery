@@ -38,7 +38,7 @@ import com.alibaba.fastjson.JSONObject;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class ModifyingReturnTypeFilter implements MethodFilter {
+class ModifyingReturnTypeFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

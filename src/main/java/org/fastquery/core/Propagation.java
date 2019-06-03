@@ -27,7 +27,7 @@ package org.fastquery.core;
  * 
  * @author mei.sir@aliyun.cn
  */
-enum Propagation { // NO_UCD (unused code)
+enum Propagation { // NO_UCD 
 
 	/**
 	 * PROPAGATION_REQUIRED：如果当前没有事务，就创建一个新事务，如果当前存在事务，就加入该事务，该设置是最常用的设置。

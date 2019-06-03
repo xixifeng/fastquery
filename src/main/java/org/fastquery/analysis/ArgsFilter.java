@@ -31,7 +31,7 @@ import org.fastquery.core.Id;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class ArgsFilter implements MethodFilter {
+class ArgsFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

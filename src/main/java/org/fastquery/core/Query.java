@@ -42,5 +42,5 @@ public @interface Query {
 	 * 
 	 * @return 布尔 boolean
 	 */
-	boolean nativeQuery() default true; // NO_UCD (unused code)
+	boolean nativeQuery() default true; // NO_UCD 
 }

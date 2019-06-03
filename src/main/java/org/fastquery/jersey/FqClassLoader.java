@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.fastquery.core.QueryRepository;
 import org.fastquery.core.RepositoryException;
 
 /**
@@ -48,7 +49,8 @@ class FqClassLoader extends ClassLoader {
 			resourceNames.add(name);
 		} else {
 			try {
-				binder.bind(clazz.getMethod("g").invoke(null)).to(clazz.getInterfaces()[0]);
+				QueryRepository repository = (QueryRepository) clazz.getMethod("g").invoke(null);
+				binder.bind(repository).to(repository.getInterfaceClass());
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				throw new RepositoryException(e);
 			}

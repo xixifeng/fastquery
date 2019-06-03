@@ -34,7 +34,7 @@ import org.fastquery.core.QueryByNamed;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class ModifyingDependencyFilter implements MethodFilter {
+class ModifyingDependencyFilter implements MethodFilter {
 
 	@Override
 	public void doFilter(Method method) {

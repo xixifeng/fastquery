@@ -28,7 +28,7 @@ import java.util.Objects;
  * 
  * @author mei.sir@aliyun.cn
  */
-public class MetaData { // NO_UCD (use default)
+public class MetaData { // NO_UCD
 
 	private String query; // 为null表示没有设置
 	private String countQuery; // 为null表示没有设置

@@ -44,8 +44,7 @@ import org.glassfish.jersey.server.mvc.spi.TemplateProcessor;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class VelocityTemplateProcessor implements TemplateProcessor<String> { // NO_UCD (unused
-																				// code)
+public class VelocityTemplateProcessor implements TemplateProcessor<String> { // NO_UCD
 
 	@Context
 	private HttpServletRequest request;

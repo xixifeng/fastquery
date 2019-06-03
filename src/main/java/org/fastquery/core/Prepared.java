@@ -32,13 +32,12 @@ import org.fastquery.filter.FilterChainHandler;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.Page;
 import org.fastquery.util.FastQueryJSONObject;
-import org.fastquery.util.TypeUtil;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-public class Prepared {
+public class Prepared { // NO_UCD
 
 	private static final Logger LOG = LoggerFactory.getLogger(Prepared.class);
 
@@ -48,25 +47,21 @@ public class Prepared {
 	/**
 	 * 执行方法
 	 * 
-	 * @param methodName 方法名称
-	 * @param methodDescriptor 方法完整描述(asm)
+	 * @param method 当前接口方法
 	 * @param args 方法参数 注意: 此处参数列表的成员,永远都是包装类型(已经验证)
 	 * @param target 目标 Repository
 	 * @return 执行之后的值
 	 */
-	public static Object excute(String methodName, String methodDescriptor, Object[] args, QueryRepository target) { // NO_UCD
+	public static Object excute(Method method,Object[] args, QueryRepository target) { // NO_UCD
 		long start = System.currentTimeMillis();
-		Method method = null;
 		try {
-			@SuppressWarnings("unchecked") // 是动态生成的实例,因此它的接口可以很明确就是一个
-			Class<? extends QueryRepository> iclazz = (Class<? extends QueryRepository>) target.getClass().getInterfaces()[0];
-			method = TypeUtil.getMethod(iclazz, methodName, methodDescriptor);
+			Class<? extends QueryRepository> iclazz = target.getInterfaceClass();
 
 			// 如果是调试模式
 			if (FastQueryJSONObject.getDebug()) {
 				QueryPool.reset(iclazz.getName());
 			}
-
+			
 			// QueryContext 生命开始
 			QueryContext.start(iclazz, method, args);
 
@@ -87,7 +82,7 @@ public class Prepared {
 
 			return object;
 		} catch (Exception e) {
-			LOG.error("执行出错: " + methodName, e);
+			LOG.error("执行出错: " + method.getName(), e);
 			StringBuilder sb = new StringBuilder();
 			String msg = e.getMessage();
 			if (msg != null) {
