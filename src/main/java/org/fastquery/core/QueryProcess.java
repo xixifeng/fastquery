@@ -181,7 +181,6 @@ class QueryProcess {
 
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Object page(Method method, Pageable pageable, List<SQLValue> sqlValues) {
 		List<Map<String, Object>> keyvals = DB.find(sqlValues.get(0));
 
@@ -455,12 +454,13 @@ class QueryProcess {
 		return null;
 	}
 	
-	private static class PageImpl<E> implements Page<E> {
+	@SuppressWarnings("rawtypes")
+	private static class PageImpl implements Page {
 
 		private int size; // 每页行数
 		private int number; // 当前页码,从0开始
 		private int numberOfElements; // 当前页的真实记录行数
-		private List<E> content; // 当前页的结果集
+		private List<?> content; // 当前页的结果集
 
 		private long totalElements; // 总行数
 		private int totalPages; // 总页码
@@ -475,7 +475,7 @@ class QueryProcess {
 		private Slice nextPageable; // 下一页的Pageable对象
 		private Slice previousPageable; // 上一页的Pageable对象
 
-		public PageImpl(int size, int numberOfElements, int number, List<E> content, long totalElements, int totalPages, boolean hasContent,
+		public PageImpl(int size, int numberOfElements, int number, List<?> content, long totalElements, int totalPages, boolean hasContent,
 				boolean hasNext, boolean hasPrevious, boolean isFirst, boolean isLast, Slice nextPageable, Slice previousPageable) {
 			this.size = size;
 			this.numberOfElements = numberOfElements;
@@ -508,7 +508,7 @@ class QueryProcess {
 		}
 
 		@Override
-		public List<E> getContent() {
+		public List<?> getContent() {
 			return content;
 		}
 

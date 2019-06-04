@@ -129,15 +129,15 @@ public class DBTest extends FastQueryTest {
 		String name = System.getProperty("user.dir") + "/src/test/resources/testFiles" + "/update.sql";
 		Stream<String> stream = parserSQLFile(name);
 		List<String> list = stream.collect(Collectors.toList());
-		assertThat(list.get(0), equalTo("DELETE FROM `product` WHERE `pid` = 1 and `lid` = 2; "));
-		assertThat(list.get(1), equalTo("DELETE FROM `product` WHERE `pid` = 2 and `lid` = 1; "));
-		assertThat(list.get(2), equalTo("DELETE FROM `product` WHERE `pid` = 1 and `lid` = 3; "));
-		assertThat(list.get(3), equalTo("INSERT INTO `product`(`pid`, `lid`, `pname`, `description`) VALUES (1,2,'電風扇','效果很好'); "));
-		assertThat(list.get(4), equalTo("INSERT INTO `product`(`pid`, `lid`, `pname`, `description`) VALUES (2,1,'杯子','喝茶使用'); "));
-		assertThat(list.get(5), equalTo("INSERT INTO `product`(`pid`, `lid`, `pname`, `description`) VALUES (1,3,'電腦','寫代碼'); "));
-		assertThat(list.get(6), equalTo("DELETE FROM `product` WHERE `pid` = 1 and `lid` = 2; "));
-		assertThat(list.get(7), equalTo("DELETE FROM `product` WHERE `pid` = 2 and `lid` = 1; "));
-		assertThat(list.get(8), equalTo("DELETE FROM `product` WHERE `pid` = 1 and `lid` = 3; "));
-		assertThat(list.get(9), equalTo("update `UserInfo` set `name` = case `id` when 77 then '茝若' when 88 then '芸兮' when 99 then '梓' else `name` end, `age` = case `id` when 77 then '18' when 99 then '16' else `age` end where `id` in(77,88,99,66); "));
+		assertThat(list.get(0), equalTo("DELETE FROM `product` WHERE `pid` = 1 and `lid` = 2;"));
+		assertThat(list.get(1), equalTo("DELETE FROM `product` WHERE `pid` = 2 and `lid` = 1;"));
+		assertThat(list.get(2), equalTo("DELETE FROM `product` WHERE `pid` = 1 and `lid` = 3;"));
+		assertThat(list.get(3), equalTo("INSERT INTO `product`(`pid`, `lid`, `pname`, `description`) VALUES (1,2,'電風扇','效果很好');"));
+		assertThat(list.get(4), equalTo("INSERT INTO `product`(`pid`, `lid`, `pname`, `description`) VALUES (2,1,'杯子','喝茶使用');"));
+		assertThat(list.get(5), equalTo("INSERT INTO `product`(`pid`, `lid`, `pname`, `description`) VALUES (1,3,'電腦','寫代碼');"));
+		assertThat(list.get(6), equalTo("DELETE FROM `product` WHERE `pid` = 1 and `lid` = 2;"));
+		assertThat(list.get(7), equalTo("DELETE FROM `product` WHERE `pid` = 2 and `lid` = 1;"));
+		assertThat(list.get(8), equalTo("DELETE FROM `product` WHERE `pid` = 1 and `lid` = 3;"));
+		assertThat(list.get(9), equalTo("update `UserInfo` set `name` = case `id` when 77 then '茝若' when 88 then '芸兮' when 99 then '梓' else `name` end, `age` = case `id` when 77 then '18' when 99 then '16' else `age` end where `id` in(77,88,99,66);"));
 	}
 }

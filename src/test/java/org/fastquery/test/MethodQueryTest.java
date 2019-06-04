@@ -148,6 +148,13 @@ public class MethodQueryTest extends FastQueryTest {
 	}
 
 	@Test
+	public void executeBatch4() {
+		int[] ints = studentDBService.executeBatch("create.sql");
+		assertThat(ints.length, is(2));
+	}
+
+	
+	@Test
 	public void update2() {
 		Integer id = 3;
 		UserInfo userInfo = userInfoDBService.findById(id);

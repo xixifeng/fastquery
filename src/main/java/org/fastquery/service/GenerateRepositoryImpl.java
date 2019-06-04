@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.fastquery.asm.AsmRepository;
 import org.fastquery.core.FQueryResourceImpl;
-import org.fastquery.core.GenerateRepository;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Resource;
@@ -43,7 +42,7 @@ import org.fastquery.util.LoadPrperties;
  * 
  * @author xixifeng (fastquery@126.com)
  */
-class GenerateRepositoryImpl implements GenerateRepository {
+class GenerateRepositoryImpl {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GenerateRepositoryImpl.class);
 
@@ -91,7 +90,6 @@ class GenerateRepositoryImpl implements GenerateRepository {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public <T extends QueryRepository> Class<? extends T> generate(Class<T> repositoryClazz) {
 		String name = repositoryClazz.getName() + Placeholder.DB_SUF;
 

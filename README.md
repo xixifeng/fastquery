@@ -1,18 +1,17 @@
-[![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
-[![Badge](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu/#/zh_CN)
+![fastquery](logo.png "fastquery")
 
 ### Apache Maven
 ```xml
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.70</version> <!-- fastquery.version -->
+    <version>1.0.71</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.70'
+compile 'org.fastquery:fastquery:1.0.71'
 ```
 
 # FastQuery 数据持久层框架
@@ -226,7 +225,7 @@ public class StudentDBServiceTest {
 
 **注意**:不用去实现StudentDBService接口.通过`FQuery.getRepository`获取DAO接口对应的实例,虽然每次获取实例消耗的性能微乎其微可以忽略不计,但是,作为一个接口并且频繁被调用,因此,建议把获取到的实例赋值给类成员变量,最好是用`static`修饰.`FQuery.getRepository`获得的实例是唯一的,不可变的.  
 
-一个接口不实现它的`public abstract`方法就毫无作用可言,因此,与之对应的实例对象是必须的,只不过是FastQuery内部替用户实现了.读者可能会问,这个自动生成的实例在什么时候生成? 动态生成的效率如何保持高效? 为此, 笔者做了相当多的功课:让所有DB实现类在项目初始化阶段进行,并且尽可能地对接口方法做静态分析,把有可能在运行期发生的错误尽最大努力提升到初始化阶段,生成代码前会检测SQL绑定是否合法有效、检测方法返回值是否符合常规、方法的参数是否满足模版的调用、是否正确地使用了分页...诸如此类问题.这些潜在问题一旦暴露,项目都启动不起来,错误信息将在开发阶段详细输出,并且必须干掉这些本该在生产环境才发生的错误,才能继续开发,迫使开发者必须朝正确的道路走,或者说框架的优良设计其核心理念引导开发者不得不写出稳健的程式.项目进入运行期,大量的校验就没必要写了,从而最大限度保证快速执行(至少在往这个方向不懈努力中).  
+一个接口不实现它的`public abstract`方法就毫无作用可言,因此,与之对应的实例对象是必须的,只不过是FastQuery内部替用户实现了.读者可能会问,这个自动生成的实例在什么时候生成? 动态生成的效率如何保持高效? 为此, 笔者做了相当多的功课:让所有DB实现类在项目初始化阶段进行,并且尽可能地对接口方法做静态分析,把有可能在运行期发生的错误尽最大努力提升到初始化阶段,生成代码前会检测SQL绑定是否合法有效、检测方法返回值是否符合常规、方法的参数是否满足模版的调用、是否正确地使用了分页...诸如此类问题.这些潜在问题一旦暴露,项目都启动不起来,错误信息将在开发阶段详细输出,并且必须干掉这些本该在生产环境才发生的错误,才能继续开发,迫使开发者必须朝正确的道路走,或者说框架的优良设计其核心理念引导开发者不得不写出稳健的程式.项目进入运行期,大量的校验就没必要写了,从而最大限度保证快速执行.  
 
 唯一的出路,只能引用接口,这就使得开发者编程起来不得不简单,因为面对的是一个高度抽象的模型,而不必去考虑细枝末节.接口可以看成是一个能解析SQL并能自动执行的模型,方法的参数、绑定的模版和标识的注解无不是为了实现一个目的:执行SQL,返回结果.  
 
@@ -1227,8 +1226,10 @@ String sqlFile = "update.sql";
 int[] effects = studentDBService.executeBatch(sqlFile);
 ```
 
-- sqlFile 指定基准目录下的SQL文件. 注意: 基准目录在fastquery.json里配置,sqlFile 为绝对路径也行. 
-- 返回 `int[]`类型,用于记录SQL文件被执行后所影响的行数.若,effects[x] = m 表示第x行SQL执行后影响的行数是m; effects[y] = n 表示第y行SQL执行后所影响的行数是n.
+- sqlFile 指定基准目录下的SQL文件. 注意: 基准目录在fastquery.json里配置,sqlFile 为绝对路径也行
+- 返回 `int[]`类型,用于记录SQL文件被执行后所影响的行数.若,effects[x] = m 表示第x行SQL执行后影响的行数是m; effects[y] = n 表示第y行SQL执行后所影响的行数是n
+- 判定SQL文件里有多少条语句,依据以分号分割的结果作为标准
+- 只支持行注释,以`#`或`--`开头的行将视为注释
 
 ## 动态适配数据源
 ### 创建数据源

@@ -24,7 +24,6 @@ package org.fastquery.core;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -79,7 +78,7 @@ public class DB {
 			}
 			// 设置sql参数值 End
 			rs = stat.executeQuery();
-			keyvals = rs2Map(rs, QueryContext.getMethod());
+			keyvals = rs2Map(rs);
 			stat.close();
 		} catch (Exception e) {
 			throw new RepositoryException(e.getMessage(), e);
@@ -258,7 +257,7 @@ public class DB {
 			LOG.info(sql);
 			QueryContext.addSqls(sql);
 			rs = stat.executeQuery(sql);
-			List<Map<String, Object>> maps = rs2Map(rs, null);
+			List<Map<String, Object>> maps = rs2Map(rs);
 			if (maps.isEmpty()) {
 				return null;
 			}
@@ -295,12 +294,13 @@ public class DB {
 			String str;
 			while ((str = br.readLine()) != null) {
 				str = str.trim();
-				if (!"".equals(str)) {
+				if (!"".startsWith(str) && !str.startsWith("#") && !str.startsWith("--")) {
 					buff.append(str);
-					buff.append(' '); // 有可能一行语句分了多行书写,拼接时行与行要用空格隔开
-					if (buff.charAt(buff.length() - 2) == ';') {
+					if(str.endsWith(";")) {
 						builder.add(buff.toString());
-						buff = new StringBuilder();
+						buff.delete(0, buff.length());
+					} else {
+						buff.append(' '); // 有可能一行语句分了多行书写,拼接时行与行要用空格隔开
 					}
 				}
 			}
@@ -308,7 +308,7 @@ public class DB {
 			throw new RepositoryException(e);
 		}
 
-		return builder.build().filter(s -> !s.startsWith("#") && !s.startsWith("-- "));
+		return builder.build();
 	}
 
 	static int[] executeBatch(String sqlFile, BiConsumer<Statement, String> consumer) {
@@ -364,11 +364,10 @@ public class DB {
 	 * 将 rs 的结果集 转换成 List&lt;Map&gt;,rs没有结果则返回空对象(该方法永不返回null).
 	 * 
 	 * @param rs 结果集
-	 * @param method 当前方法
 	 * @return List map结果集
 	 * @throws SQLException SQL异常
 	 */
-	private static List<Map<String, Object>> rs2Map(ResultSet rs, Method method) throws SQLException {
+	private static List<Map<String, Object>> rs2Map(ResultSet rs) throws SQLException {
 		
 		List<Map<String, Object>> keyvals = new ArrayList<>();
 		Map<String, Object> keyval;
