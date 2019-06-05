@@ -381,13 +381,17 @@ class QueryProcess {
 			String sqlFile;
 			String f = (String) iargs[0];
 			if (f != null) {
+				String[] quotes = null;
+				if (iargs.length == 3 ) {
+					quotes = (String[]) iargs[2];
+				}
 				if (new File(f).isFile()) {
 					sqlFile = f;
 				} else {
 					sqlFile = FastQueryJSONObject.getBasedir() + (String) iargs[0];
 				}
 
-				return DB.executeBatch(sqlFile, (stat, s) -> {
+				return DB.executeBatch(sqlFile,quotes,(stat, s) -> {
 					try {
 						stat.addBatch(s);
 					} catch (SQLException e) {

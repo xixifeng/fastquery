@@ -1,17 +1,17 @@
-![fastquery](logo.png "fastquery")
+<p align="center"><img src="logo.png" alt="FastQuery logo"></p>
 
 ### Apache Maven
 ```xml
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.71</version> <!-- fastquery.version -->
+    <version>1.0.72</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.71'
+compile 'org.fastquery:fastquery:1.0.72'
 ```
 
 # FastQuery 数据持久层框架
@@ -513,7 +513,7 @@ Map<String, Object> addUserInfo(String name,Integer age);
 | `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),若给where传递null或"",默认按照主键修改,返回影响行数 |
 | `<E> int update(Collection<E> entities)` | 更新集合实体,成员属性如果是null,那么该属性将不会参与改运算,每个实体必须包含主键 |
 | `int delete(String tableName,String primaryKeyName,long id)` | 根据主键删除实体,返回影响行数 |
-| `int[] executeBatch(String sqlFile)` | 根据指定的SQL文件名称或绝对路径,执行批量操作SQL语句,返回int[],数组中的每个数对应一条SQL语句执行后所影响的行数 |
+| `int[] executeBatch(String sqlName)` | 根据指定的SQL文件名称或绝对路径,执行批量操作SQL语句,返回int[],数组中的每个数对应一条SQL语句执行后所影响的行数 |
 | `int tx(Supplier<Integer> fun)` | 事务函数.fun的返回值等于tx的返回值.fun返回null,-1或向上抛异常,tx会被回滚,并返回-1 |
 
 举例说明:  
@@ -1222,14 +1222,20 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 
 ## 执行SQL文件
 ```java
-String sqlFile = "update.sql";
-int[] effects = studentDBService.executeBatch(sqlFile);
+String sqlName = "update.sql";
+int[] effects = studentDBService.executeBatch(sqlName);
 ```
 
-- sqlFile 指定基准目录下的SQL文件. 注意: 基准目录在fastquery.json里配置,sqlFile 为绝对路径也行
+- sqlName 指定基准目录下的SQL文件. 注意: 基准目录在fastquery.json里配置,sqlName 为绝对路径也行
 - 返回 `int[]`类型,用于记录SQL文件被执行后所影响的行数.若,effects[x] = m 表示第x行SQL执行后影响的行数是m; effects[y] = n 表示第y行SQL执行后所影响的行数是n
 - 判定SQL文件里有多少条语句,依据以分号分割的结果作为标准
-- 只支持行注释,以`#`或`--`开头的行将视为注释
+- 只支持整行注释,以`#`或`--`开头的行将视为注释
+
+一个数据源可能管理着多个数据库,执行的SQL文件也有可能需要根据参数的不同而服务于不同的数据库.或者说SQL文件里有动态的部分,需要根据传递的参数加以区分.那么,可以使用`executeBatch(String sqlName,String[] quotes)`,第二个参数可以被SQL文件所用,引用方式为`$[N]`,表示引用数组的第`N`个元素.
+
+```sql
+drop table if exists $[0].demo_table;
+```
 
 ## 动态适配数据源
 ### 创建数据源

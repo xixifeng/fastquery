@@ -150,9 +150,14 @@ public class MethodQueryTest extends FastQueryTest {
 	@Test
 	public void executeBatch4() {
 		int[] ints = studentDBService.executeBatch("create.sql");
-		assertThat(ints.length, is(2));
+		assertThat(ints.length, is(3));
 	}
-
+	
+	@Test
+	public void executeBatch5() {
+		int[] ints = studentDBService.executeBatch("create2.sql",new String[] {null,"table","demo_table","table","auto_increment",""});
+		assertThat(ints.length, is(3));
+	}
 	
 	@Test
 	public void update2() {

@@ -306,6 +306,16 @@ public interface QueryRepository { // NO_UCD
 	 */
 	@Id(MethodId.QUERY6)
 	int[] executeBatch(String sqlName);
+	
+	/**
+	 * 执行SQL文件,注意: 只支持单行注释 "#...","-- ..."
+	 * @param sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置.当然,sqlName为绝对路径也可以.若传递null,什么也不做
+	 * @param quotes 在SQL文件里可以通过<code>$[N]</code>引用数组的元素,N从0开始计数
+	 * @return 数组中的每个数对应一条SQL语句执行后所影响的行数,有些数据库驱动没有实现该功能，成功提交成功后不能返回影响行数,而是返回-2。在JDBC的规范中Statement.SUCCESS_NO_INFO(-2)代表:执行成功,受影响行数不确定.
+	 */
+	default int[] executeBatch(String sqlName,String[] quotes) {
+		return executeBatch(sqlName, null, quotes);
+	}
 
 	/**
 	 * 执行SQL文件,注意: 只支持单行注释 "#...","-- ..."
@@ -316,6 +326,16 @@ public interface QueryRepository { // NO_UCD
 	 */
 	@Id(MethodId.QUERY6)
 	int[] executeBatch(String sqlName, @Source String dataSourceName);
+	
+	/**
+	 * 执行SQL文件,注意: 只支持单行注释 "#...","-- ..."
+	 * @param sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置.当然,sqlName为绝对路径也可以.若传递null,什么也不做
+	 * @param dataSourceName 数据源的名称
+	 * @param quotes 在SQL文件里可以通过<code>$[N]</code>引用数组的元素,N从0开始计数
+	 * @return 数组中的每个数对应一条SQL语句执行后所影响的行数,有些数据库驱动没有实现该功能，成功提交成功后不能返回影响行数,而是返回-2。在JDBC的规范中Statement.SUCCESS_NO_INFO(-2)代表:执行成功,受影响行数不确定.
+	 */
+	@Id(MethodId.QUERY6)
+	int[] executeBatch(String sqlName, @Source String dataSourceName,String[] quotes);
 
 	/**
 	 * 根据主键查询实体

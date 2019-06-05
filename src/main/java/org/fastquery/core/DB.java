@@ -296,14 +296,20 @@ public class DB {
 				str = str.trim();
 				if (!"".startsWith(str) && !str.startsWith("#") && !str.startsWith("--")) {
 					buff.append(str);
-					if(str.endsWith(";")) {
-						builder.add(buff.toString());
-						buff.delete(0, buff.length());
-					} else {
-						buff.append(' '); // 有可能一行语句分了多行书写,拼接时行与行要用空格隔开
+					buff.append(' ');
+					int index = buff.indexOf(";");
+					if(index != -1) {
+						builder.add(buff.substring(0,index).trim());
+						buff.delete(0, index+1);
 					}
 				}
 			}
+			
+			String lastStr = buff.toString().trim();
+			if(!"".equals(lastStr)) {
+				builder.add(lastStr);
+			}
+			
 		} catch (Exception e) {
 			throw new RepositoryException(e);
 		}
@@ -311,7 +317,7 @@ public class DB {
 		return builder.build();
 	}
 
-	static int[] executeBatch(String sqlFile, BiConsumer<Statement, String> consumer) {
+	static int[] executeBatch(String sqlFile,String[] quotes, BiConsumer<Statement, String> consumer) {
 		Connection conn = QueryContext.getConn();
 		Statement stat = null;
 		Stream<String> stream = parserSQLFile(sqlFile);
@@ -319,7 +325,19 @@ public class DB {
 			QueryContext.disableAutoCommit();
 			final Statement st = conn.createStatement();
 			stat = st;
-			stream.forEach(s -> consumer.accept(st, s));
+			stream.forEach(s -> {
+				if(quotes != null) {
+					int len = quotes.length;
+					for (int i = 0; i < len; i++) {
+						String val = quotes[i];
+						if(val == null) {
+							val = "";
+						} 
+						s = s.replaceAll("\\$\\["+i+"\\]", val);
+					}
+				}
+				consumer.accept(st, s);	
+			});
 			int[] ints = stat.executeBatch();
 			stat.clearBatch();
 			QueryContext.commit();
