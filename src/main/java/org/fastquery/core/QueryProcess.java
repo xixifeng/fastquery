@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.math.BigInteger;
 import java.sql.SQLException;
@@ -187,10 +188,8 @@ class QueryProcess {
 		int size = pageable.getPageSize(); // 每页多少条数据
 		long totalElements = -1L; // 总行数,如果不求和默认-1L
 		int totalPages = -1; // 总页数,如果不求和默认-1
-		int numberOfElements = keyvals.size(); // 每页实际显示多少条数据
 		int number = pageable.getPageIndex(); // 当前页码
 		boolean hasContent = !keyvals.isEmpty();// 这页有内容吗?
-		boolean hasPrevious = (number > 1) && hasContent;// number不是第1页且当前页有数据,就可以断言它有上一页.
 		boolean hasNext; // 有下一页吗? 在这里不用给默认值,如下一定会给他赋值.
 		boolean isLast;
 
@@ -204,7 +203,7 @@ class QueryProcess {
 				}
 
 				// 计算总页数
-				totalPages = ((int) totalElements) / size;
+				totalPages = (int) (totalElements / size);
 				if (((int) totalElements) % size != 0) {
 					totalPages += 1;
 				}
@@ -216,23 +215,22 @@ class QueryProcess {
 				hasNext = !next; // 下一页有数据
 				isLast = next; // 下一页没有数据了,表明这是最后一页了.
 			}
+			
+			
+			
 		} else {
 			totalElements = 0;
 			totalPages = 0;
 			hasNext = false;
 			isLast = false;
 		}
-
-		boolean isFirst = number == 1;
-		Slice nextPageable = new Slice((!isLast) ? (number + 1) : number, size);
-		Slice previousPageable = new Slice((!isFirst) ? (number - 1) : number, size);
-
+		
 		List<?> list = keyvals;
 		// Page<T> 中的 T如果是一个实体,那么需要把 HashMap 转换成实体
 		// method.getGenericReturnType()
 		if (!method.getGenericReturnType().getTypeName().contains("Page<java.util.Map<java.lang.String, java.lang.Object>>")) {
 			// 则说明是一个T是一个实体
-			java.lang.reflect.Type type = method.getGenericReturnType();
+			Type type = method.getGenericReturnType();
 			if (type instanceof ParameterizedType) {
 				ParameterizedType parameterizedType = (ParameterizedType) method.getGenericReturnType();
 				Class<?> bean = (Class<?>) parameterizedType.getActualTypeArguments()[0];
@@ -240,8 +238,7 @@ class QueryProcess {
 			}
 		}
 
-		return new PageImpl(size, numberOfElements, number, list, totalElements, totalPages, hasContent, hasNext, hasPrevious, isFirst, isLast,
-				nextPageable, previousPageable);
+		return new PageImpl(size,number, list, totalElements, totalPages,hasNext,isLast);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -276,7 +273,7 @@ class QueryProcess {
 				LOG.info(sql);
 				Object keyObj = DB.update(sql, false);
 				if (keyObj == null) {
-					return new BigInteger("-1");
+					return BigInteger.valueOf(-1);
 				} else {
 					return new BigInteger(keyObj.toString());
 				}
@@ -286,7 +283,7 @@ class QueryProcess {
 				LOG.info(sql);
 				Object keyObj = DB.update(sql, false);
 				if (keyObj == null) {
-					return new BigInteger("-1");
+					return BigInteger.valueOf(-1);
 				} else {
 					return new BigInteger(keyObj.toString());
 				}
@@ -479,21 +476,20 @@ class QueryProcess {
 		private Slice nextPageable; // 下一页的Pageable对象
 		private Slice previousPageable; // 上一页的Pageable对象
 
-		public PageImpl(int size, int numberOfElements, int number, List<?> content, long totalElements, int totalPages, boolean hasContent,
-				boolean hasNext, boolean hasPrevious, boolean isFirst, boolean isLast, Slice nextPageable, Slice previousPageable) {
+		public PageImpl(int size, int number, List<?> content, long totalElements, int totalPages,boolean hasNext,boolean isLast) {
 			this.size = size;
-			this.numberOfElements = numberOfElements;
+			this.numberOfElements = content.size();
 			this.number = number;
 			this.content = content;
 			this.totalElements = totalElements;
 			this.totalPages = totalPages;
-			this.hasContent = hasContent;
+			this.hasContent = !content.isEmpty();
 			this.hasNext = hasNext;
-			this.hasPrevious = hasPrevious;
-			this.isFirst = isFirst;
+			this.hasPrevious = (number > 1) && hasContent;// number不是第1页且当前页有数据,就可以断言它有上一页.
+			this.isFirst = number == 1;
 			this.isLast = isLast;
-			this.nextPageable = nextPageable;
-			this.previousPageable = previousPageable;
+			this.nextPageable = new Slice((!isLast) ? (number + 1) : number, size);
+			this.previousPageable = new Slice((!isFirst) ? (number - 1) : number, size);
 		}
 
 		@Override
