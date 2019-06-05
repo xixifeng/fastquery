@@ -215,9 +215,6 @@ class QueryProcess {
 				hasNext = !next; // 下一页有数据
 				isLast = next; // 下一页没有数据了,表明这是最后一页了.
 			}
-			
-			
-			
 		} else {
 			totalElements = 0;
 			totalPages = 0;
