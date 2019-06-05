@@ -89,5 +89,8 @@ public class PageTest extends FastQueryTest  {
 
 		long count = userInfoDBService.countByAgeAndId(age, id);
 		assertThat(page.getTotalElements(), is(count));
+		
+		page = userInfoDBService.findSome1(age, -100, new PageableImpl(pageIndex, size));
+		assertThat(page.getContent().isEmpty(), is(true));
 	}
 }
