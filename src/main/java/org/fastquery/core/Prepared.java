@@ -73,7 +73,6 @@ public class Prepared { // NO_UCD
 			}
 
 			LOG.info("准备执行方法:{}", method);
-			// 取出当前线程中method和args(BeforeFilter 有可能中途修换其他method, 因为过滤器有个功能this.change(..,...) )
 			object = businessProcess();
 
 			// 注入AfterFilter
@@ -123,40 +122,26 @@ public class Prepared { // NO_UCD
 	private static Object businessProcess() {
 		Method method = QueryContext.getMethod();
 		Class<?> returnType = QueryContext.getReturnType();
-		// 目前只有一种可能:Query Interface
-		// 在这里是一个分水岭
-		if (QueryRepository.class.isAssignableFrom(QueryContext.getIclass())) { // 判断iclazz
-																				// 是否就是QueryRepository.class,或是其子类
-			// QueryRepository 中的方法可分成4类
-			// 1. 同时包含有@Query和@Modify
-			// 2. 只包含@Query
-			// 3. 只包含@Modify 这是不允许的, 该检测已放在生成类之前做了.
-			// 4. 没有Query,也没有@Modify
-			Query[] querys = method.getAnnotationsByType(Query.class);
-			Modifying modifying = method.getAnnotation(Modifying.class);
-			QueryByNamed queryById = method.getAnnotation(QueryByNamed.class);
+		Query[] querys = method.getAnnotationsByType(Query.class);
+		Modifying modifying = method.getAnnotation(Modifying.class);
+		QueryByNamed queryById = method.getAnnotation(QueryByNamed.class);
 
-			boolean hasVehicle = querys.length > 0 || queryById != null; // 有SQL载体吗?
-			if (hasVehicle) {
-				if (returnType == Page.class) {
-					return QueryProcess.getInstance().queryPage(queryById);
-				} else if (modifying != null) {
-					return QueryProcess.getInstance().modifying();
-				} else {
-					return QueryProcess.getInstance().query();
-				}
-			} else {
-				// 分两种 是否有@Id
-				Id id = method.getAnnotation(Id.class);
-				if (id != null) {
-					return QueryProcess.getInstance().methodQuery(id);
-				} else {
-					return QueryProcess.getInstance().methodQuery();
-				}
+		boolean hasVehicle = querys.length > 0 || queryById != null; // 有SQL模板吗?
+		if (hasVehicle) {
+			if (returnType == Page.class) { // 分页
+				return QueryProcess.getInstance().queryPage(queryById);
+			} else if (modifying != null) { // 改
+				return QueryProcess.getInstance().modifying();
+			} else { // 查
+				return QueryProcess.getInstance().query();
 			}
-
 		} else {
-			throw new RepositoryException("不能识别的Repository");
+			Id id = method.getAnnotation(Id.class);
+			if (id != null) { // 有@id
+				return QueryProcess.getInstance().methodQuery(id);
+			} else { // 无@id
+				return QueryProcess.getInstance().methodQuery();
+			}
 		}
 	}
 }
