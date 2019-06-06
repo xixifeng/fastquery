@@ -39,6 +39,7 @@ import java.util.function.Supplier;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.handler.ModifyingHandler;
 import org.fastquery.handler.QueryHandler;
@@ -91,16 +92,10 @@ class QueryProcess {
 		List<SQLValue> sqlValues = QueryParser.modifyParser();
 
 		// 执行
-		List<RespUpdate> respUpdates;
-		if (QueryContext.isRequirePk()) {
-			respUpdates = DB.modify(sqlValues, true);
-		} else {
-			respUpdates = DB.modify(sqlValues, false);
-		}
-
+		List<RespUpdate> respUpdates = DB.modify(sqlValues, QueryContext.isRequirePk());
+		
 		Long autoIncKey = respUpdates.get(0).getPk();
 
-		// 返回类型分析=====================================
 		ModifyingHandler mh = ModifyingHandler.getInstance();
 		if (returnType == void.class) {
 			return mh.voidType();
@@ -124,7 +119,6 @@ class QueryProcess {
 		} else { // 把值强制转换成 returnType
 			return mh.beanType(autoIncKey);
 		}
-		// 返回类型分析===================================== End
 
 	}
 
@@ -137,7 +131,6 @@ class QueryProcess {
 		List<Map<String, Object>> keyvals = DB.find(sqlValue);
 
 		// 上面的try发生异常了,才会导致keyvals为null, 不过异常一旦捕获到就throw了,因此,程序执行到这里keyvals不可能为null.
-		// 返回类型分析=====================================
 		QueryHandler qh = QueryHandler.getInstance();
 		if (returnType == long.class) {
 			return qh.longType(keyvals);
@@ -163,28 +156,15 @@ class QueryProcess {
 		} else {
 			return qh.beanType(keyvals);
 		}
-		// 返回类型分析===================================== End
 	}
 
 	// 分页查询
 	Object queryPage(QueryByNamed queryByNamed) {
-		Method method = QueryContext.getMethod();
-
-		Pageable pageable = QueryContext.getPageable();
-
-		List<SQLValue> sqlValues;
-		if(queryByNamed==null) {
-			sqlValues = QueryParser.pageParser();	
-		} else {
-			sqlValues = QueryParser.pageParserByNamed();
-		}
-		return page(method, pageable, sqlValues);
-
-	}
-	
-	private Object page(Method method, Pageable pageable, List<SQLValue> sqlValues) {
+		
+		List<SQLValue> sqlValues = queryByNamed == null ? QueryParser.pageParser() : QueryParser.pageParserByNamed();
+		
 		List<Map<String, Object>> keyvals = DB.find(sqlValues.get(0));
-
+		Pageable pageable = QueryContext.getPageable();
 		int size = pageable.getPageSize(); // 每页多少条数据
 		long totalElements = -1L; // 总行数,如果不求和默认-1L
 		int totalPages = -1; // 总页数,如果不求和默认-1
@@ -193,14 +173,11 @@ class QueryProcess {
 		boolean hasNext; // 有下一页吗? 在这里不用给默认值,如下一定会给他赋值.
 		boolean isLast;
 
-		if(hasContent) {
+		Method method = QueryContext.getMethod();
+		if (hasContent) {
 			if (method.getAnnotation(NotCount.class) == null) { // 需要求和
 				List<Map<String, Object>> results = DB.find(sqlValues.get(1));
-				if (!results.isEmpty()) {
-					totalElements = ((Number) results.get(0).values().iterator().next()).longValue();
-				} else {
-					totalElements = 0;
-				}
+				totalElements = !results.isEmpty() ? ((Number) results.get(0).values().iterator().next()).longValue() : 0;
 
 				// 计算总页数
 				totalPages = (int) (totalElements / size);
@@ -221,7 +198,13 @@ class QueryProcess {
 			hasNext = false;
 			isLast = false;
 		}
+
+		List<?> list = convertContent(keyvals, method);
 		
+		return new PageImpl(size, number, list, totalElements, totalPages, hasNext, isLast);
+	}
+
+	private List<?> convertContent(List<Map<String, Object>> keyvals, Method method) {
 		List<?> list = keyvals;
 		// Page<T> 中的 T如果是一个实体,那么需要把 HashMap 转换成实体
 		// method.getGenericReturnType()
@@ -234,11 +217,9 @@ class QueryProcess {
 				list = TypeUtil.listMap2ListBean(keyvals, bean);
 			}
 		}
-
-		return new PageImpl(size,number, list, totalElements, totalPages,hasNext,isLast);
+		return list;
 	}
 	
-	@SuppressWarnings("unchecked")
 	Object methodQuery(Id id) {
 		Method method = QueryContext.getMethod();
 		Object[] iargs = QueryContext.getArgs();
@@ -256,178 +237,234 @@ class QueryProcess {
 			}
 		}
 		// 检验实体 end
-		byte methodId = id.value();
 
-		Object bean;
-		String sql;
-		String dbName = null;
-		boolean ignoreRepeat;
-		switch (methodId) {
+		switch (id.value()) {
 		case MethodId.QUERY:
-			if (iargs.length == 3) {
-				bean = iargs[2];
-				sql = BeanUtil.toInsertSQL((String) iargs[1], bean);
-				LOG.info(sql);
-				Object keyObj = DB.update(sql, false);
-				if (keyObj == null) {
-					return BigInteger.valueOf(-1);
-				} else {
-					return new BigInteger(keyObj.toString());
-				}
-			} else {
-				bean = iargs[0];
-				sql = BeanUtil.toInsertSQL(bean);
-				LOG.info(sql);
-				Object keyObj = DB.update(sql, false);
-				if (keyObj == null) {
-					return BigInteger.valueOf(-1);
-				} else {
-					return new BigInteger(keyObj.toString());
-				}
-			}
-
+			return q();
 		case MethodId.QUERY0:
-			if (iargs.length == 3) {
-				bean = iargs[2];
-				sql = BeanUtil.toInsertSQL((String) iargs[1], bean);
-				LOG.info(sql);
-				return DB.update(sql, true);
-			} else {
-				bean = iargs[0];
-				sql = BeanUtil.toInsertSQL(bean);
-				LOG.info(sql);
-				return DB.update(sql, true);
-			}
-
+			return q0();
 		case MethodId.QUERY1:
-			if (iargs.length == 1) {
-				bean = iargs[0];
-			} else if (iargs.length == 2) {
-				bean = iargs[1];
-			} else {
-				dbName = (String) iargs[1];
-				bean = iargs[2];
-			}
-			return DB.update(bean, dbName, null);
-
+			return q1();
 		case MethodId.QUERY2:
-			if (iargs.length == 1) {
-				bean = iargs[0];
-			} else if (iargs.length == 2) {
-				bean = iargs[1];
-			} else {
-				dbName = (String) iargs[1];
-				bean = iargs[2];
-			}
-			sql = BeanUtil.toSelectSQL(bean, null, dbName,false);
-			if (sql!=null && DB.exists(sql)) {
-				// 更新
-				return DB.update(bean, dbName, null);
-			} else {
-				// 保存
-				return DB.update((iargs.length == 3) ? BeanUtil.toInsertSQL(iargs[1].toString(), bean) : BeanUtil.toInsertSQL(bean), true);
-			}
+			return q2();
 		case MethodId.QUERY3:
-			if (iargs.length == 2) {
-				bean = iargs[0];
-			} else if (iargs.length == 3) {
-				bean = iargs[1];
-			} else {
-				dbName = (String) iargs[1];
-				bean = iargs[2];
-			}
-			return DB.update(bean, dbName, (String) iargs[iargs.length - 1]);
+			return q3();
 		case MethodId.QUERY4:
-			ignoreRepeat = (boolean) iargs[0];
-			Object entitiesObj = iargs[iargs.length - 1];
-			if(entitiesObj==null) {
-				return 0;
-			}
-			if (iargs.length == 4) {
-				dbName = (String) iargs[2];
-			}
-			if (entitiesObj.getClass().isArray()) {
-				Object[] arryObj = (Object[]) entitiesObj;
-				if(arryObj.length==0) {
-					return 0;
-				}
-				sql = BeanUtil.arr2InsertSQL(arryObj, dbName, ignoreRepeat);
-			} else {
-				Collection<Object> coll =  (Collection<Object>) entitiesObj;
-				if(coll.isEmpty()) {
-					return 0;
-				}
-				sql = BeanUtil.toInsertSQL(coll, dbName, ignoreRepeat);
-			}
-			LOG.info(sql);
-			return DB.update(sql, true);
-
+			return q4();
 		case MethodId.QUERY5:
-			Collection<Object> entities = (Collection<Object>) iargs[iargs.length - 1];
-			if (iargs.length == 3) {
-				dbName = (String) iargs[1];
-			}
-			sql = BeanUtil.toUpdateSQL(entities, dbName);
-			LOG.info(sql);
-			return DB.update(sql, true);
-
+			return q5();
 		case MethodId.QUERY6:
-			String sqlFile;
-			String f = (String) iargs[0];
-			if (f != null) {
-				String[] quotes = null;
-				if (iargs.length == 3 ) {
-					quotes = (String[]) iargs[2];
-				}
-				if (new File(f).isFile()) {
-					sqlFile = f;
-				} else {
-					sqlFile = FastQueryJSONObject.getBasedir() + (String) iargs[0];
-				}
-
-				return DB.executeBatch(sqlFile,quotes,(stat, s) -> {
-					try {
-						stat.addBatch(s);
-					} catch (SQLException e) {
-						throw new RepositoryException(e);
-					}
-				});
-			}
-
-			break;
-
+			return q6();
 		case MethodId.QUERY7:
-			Class<?> clazz = (Class<?>) iargs[0]; // 类型
-			long i = ((Long) iargs[1]).longValue(); // 主键
-			if (iargs.length == 4) {
-				dbName = (String) iargs[3]; // 数据库名称
-			}
-
-			return DB.select(BeanUtil.toSelectSQL(clazz, i, dbName,true), clazz);
-
+			return q7();
 		case MethodId.QUERY8:
-			String tableName = (String) iargs[0]; // 表名称
-			String name = (String) iargs[1]; // 主键名
-			if(StringUtils.isEmpty(tableName) || StringUtils.isEmpty(name) || StringUtils.isEmpty(tableName.trim()) || StringUtils.isEmpty(name.trim())) {
-				return 0;
-			} else {
-				long key = ((Long) iargs[2]).longValue(); // 主键值
-				if (iargs.length == 5) {
-					dbName = (String) iargs[4]; // 数据库名称
-				}
-				return DB.update(BeanUtil.toDelete(tableName, name, key, dbName), true);
-			}
-			
+			return q8();
 		case MethodId.QUERY9:
-			return tx();
-			
+			return q9();
 		default:
 			break;
 		}
 		return null;
 	}
-	
-	private Object tx() {
+
+	Object methodQuery() {
+		return null;
+	}
+
+	private Object q() {
+		Object bean;
+		String sql;
+		Object[] iargs = QueryContext.getArgs();
+		if (iargs.length == 3) {
+			bean = iargs[2];
+			sql = BeanUtil.toInsertSQL((String) iargs[1], bean);
+			LOG.info(sql);
+			Object keyObj = DB.update(sql, false);
+			if (keyObj == null) {
+				return BigInteger.valueOf(-1);
+			} else {
+				return new BigInteger(keyObj.toString());
+			}
+		} else {
+			bean = iargs[0];
+			sql = BeanUtil.toInsertSQL(bean);
+			LOG.info(sql);
+			Object keyObj = DB.update(sql, false);
+			if (keyObj == null) {
+				return BigInteger.valueOf(-1);
+			} else {
+				return new BigInteger(keyObj.toString());
+			}
+		}
+	}
+
+	private Object q0() {
+		Object bean;
+		String sql;
+		Object[] iargs = QueryContext.getArgs();
+		if (iargs.length == 3) {
+			bean = iargs[2];
+			sql = BeanUtil.toInsertSQL((String) iargs[1], bean);
+			LOG.info(sql);
+			return DB.update(sql, true);
+		} else {
+			bean = iargs[0];
+			sql = BeanUtil.toInsertSQL(bean);
+			LOG.info(sql);
+			return DB.update(sql, true);
+		}
+	}
+
+	private Object q1() {
+		Object bean;
+		String dbName = null;
+		Object[] iargs = QueryContext.getArgs();
+		if (iargs.length == 1) {
+			bean = iargs[0];
+		} else if (iargs.length == 2) {
+			bean = iargs[1];
+		} else {
+			dbName = (String) iargs[1];
+			bean = iargs[2];
+		}
+		return DB.update(bean, dbName, null);
+	}
+
+	private Object q2() {
+		Object bean;
+		String sql;
+		String dbName = null;
+		Object[] iargs = QueryContext.getArgs();
+		if (iargs.length == 1) {
+			bean = iargs[0];
+		} else if (iargs.length == 2) {
+			bean = iargs[1];
+		} else {
+			dbName = (String) iargs[1];
+			bean = iargs[2];
+		}
+		sql = BeanUtil.toSelectSQL(bean, null, dbName, false);
+		if (sql != null && DB.exists(sql)) {
+			// 更新
+			return DB.update(bean, dbName, null);
+		} else {
+			// 保存
+			return DB.update((iargs.length == 3) ? BeanUtil.toInsertSQL(iargs[1].toString(), bean) : BeanUtil.toInsertSQL(bean), true);
+		}
+	}
+
+	private Object q3() {
+		Object b;
+		String dname = null;
+		Object[] iargs = QueryContext.getArgs();
+		if (iargs.length == 2) {
+			b = iargs[0];
+		} else if (iargs.length == 3) {
+			b = iargs[1];
+		} else {
+			dname = (String) iargs[1];
+			b = iargs[2];
+		}
+		return DB.update(b, dname, (String) iargs[iargs.length - 1]);
+	}
+
+	private Object q4() {
+		String sql;
+		String dbName = null;
+		boolean ignoreRepeat;
+		Object[] iargs = QueryContext.getArgs();
+		ignoreRepeat = (boolean) iargs[0];
+		Object entitiesObj = iargs[iargs.length - 1];
+		if (entitiesObj == null) {
+			return 0;
+		}
+		if (iargs.length == 4) {
+			dbName = (String) iargs[2];
+		}
+		if (entitiesObj.getClass().isArray()) {
+			Object[] arryObj = (Object[]) entitiesObj;
+			if (arryObj.length == 0) {
+				return 0;
+			}
+			sql = BeanUtil.arr2InsertSQL(arryObj, dbName, ignoreRepeat);
+		} else {
+			@SuppressWarnings("unchecked")
+			Collection<Object> coll = (Collection<Object>) entitiesObj;
+			if (coll.isEmpty()) {
+				return 0;
+			}
+			sql = BeanUtil.toInsertSQL(coll, dbName, ignoreRepeat);
+		}
+		LOG.info(sql);
+		return DB.update(sql, true);
+	}
+
+	private Object q5() {
+		String sql;
+		String dbName = null;
+		Object[] iargs = QueryContext.getArgs();
+		@SuppressWarnings("unchecked")
+		Collection<Object> entities = (Collection<Object>) iargs[iargs.length - 1];
+		if (iargs.length == 3) {
+			dbName = (String) iargs[1];
+		}
+		sql = BeanUtil.toUpdateSQL(entities, dbName);
+		LOG.info(sql);
+		return DB.update(sql, true);
+	}
+
+	private Object q6() {
+		String sqlFile;
+		Object[] iargs = QueryContext.getArgs();
+		String f = (String) iargs[0];
+		if (f != null) {
+			String[] quotes = null;
+			if (iargs.length == 3) {
+				quotes = (String[]) iargs[2];
+			}
+			sqlFile = new File(f).isFile() ? f : FastQueryJSONObject.getBasedir() + (String) iargs[0];
+			return DB.executeBatch(sqlFile, quotes, (stat, s) -> {
+				try {
+					stat.addBatch(s);
+				} catch (SQLException e) {
+					throw new RepositoryException(e);
+				}
+			});
+		} else {
+			return ArrayUtils.EMPTY_INT_ARRAY;
+		}
+	}
+
+	private Object q7() {
+		String dbName = null;
+		Object[] iargs = QueryContext.getArgs();
+		Class<?> clazz = (Class<?>) iargs[0]; // 类型
+		long i = ((Long) iargs[1]).longValue(); // 主键
+		if (iargs.length == 4) {
+			dbName = (String) iargs[3]; // 数据库名称
+		}
+
+		return DB.select(BeanUtil.toSelectSQL(clazz, i, dbName, true), clazz);
+	}
+
+	private Object q8() {
+		String dbName = null;
+		Object[] iargs = QueryContext.getArgs();
+		String tableName = (String) iargs[0]; // 表名称
+		String name = (String) iargs[1]; // 主键名
+		if (StringUtils.isEmpty(tableName) || StringUtils.isEmpty(name) || StringUtils.isEmpty(tableName.trim())
+				|| StringUtils.isEmpty(name.trim())) {
+			return 0;
+		} else {
+			long key = ((Long) iargs[2]).longValue(); // 主键值
+			if (iargs.length == 5) {
+				dbName = (String) iargs[4]; // 数据库名称
+			}
+			return DB.update(BeanUtil.toDelete(tableName, name, key, dbName), true);
+		}
+	}
+
+	private Object q9() {
 		try {
 			TxContext.start();
 			Object obj = ((Supplier<?>) (QueryContext.getArgs()[0])).get();
@@ -448,10 +485,6 @@ class QueryProcess {
 		}
 	}
 
-	Object methodQuery() {
-		return null;
-	}
-	
 	@SuppressWarnings("rawtypes")
 	private static class PageImpl implements Page {
 
@@ -473,7 +506,7 @@ class QueryProcess {
 		private Slice nextPageable; // 下一页的Pageable对象
 		private Slice previousPageable; // 上一页的Pageable对象
 
-		public PageImpl(int size, int number, List<?> content, long totalElements, int totalPages,boolean hasNext,boolean isLast) {
+		public PageImpl(int size, int number, List<?> content, long totalElements, int totalPages, boolean hasNext, boolean isLast) {
 			this.size = size;
 			this.numberOfElements = content.size();
 			this.number = number;

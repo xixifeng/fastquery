@@ -306,14 +306,15 @@ public interface QueryRepository { // NO_UCD
 	 */
 	@Id(MethodId.QUERY6)
 	int[] executeBatch(String sqlName);
-	
+
 	/**
 	 * 执行SQL文件,注意: 只支持单行注释 "#...","-- ..."
+	 * 
 	 * @param sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置.当然,sqlName为绝对路径也可以.若传递null,什么也不做
 	 * @param quotes 在SQL文件里可以通过<code>$[N]</code>引用数组的元素,N从0开始计数
 	 * @return 数组中的每个数对应一条SQL语句执行后所影响的行数,有些数据库驱动没有实现该功能，成功提交成功后不能返回影响行数,而是返回-2。在JDBC的规范中Statement.SUCCESS_NO_INFO(-2)代表:执行成功,受影响行数不确定.
 	 */
-	default int[] executeBatch(String sqlName,String[] quotes) {
+	default int[] executeBatch(String sqlName, String[] quotes) {
 		return executeBatch(sqlName, null, quotes);
 	}
 
@@ -326,16 +327,17 @@ public interface QueryRepository { // NO_UCD
 	 */
 	@Id(MethodId.QUERY6)
 	int[] executeBatch(String sqlName, @Source String dataSourceName);
-	
+
 	/**
 	 * 执行SQL文件,注意: 只支持单行注释 "#...","-- ..."
+	 * 
 	 * @param sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置.当然,sqlName为绝对路径也可以.若传递null,什么也不做
 	 * @param dataSourceName 数据源的名称
 	 * @param quotes 在SQL文件里可以通过<code>$[N]</code>引用数组的元素,N从0开始计数
 	 * @return 数组中的每个数对应一条SQL语句执行后所影响的行数,有些数据库驱动没有实现该功能，成功提交成功后不能返回影响行数,而是返回-2。在JDBC的规范中Statement.SUCCESS_NO_INFO(-2)代表:执行成功,受影响行数不确定.
 	 */
 	@Id(MethodId.QUERY6)
-	int[] executeBatch(String sqlName, @Source String dataSourceName,String[] quotes);
+	int[] executeBatch(String sqlName, @Source String dataSourceName, String[] quotes);
 
 	/**
 	 * 根据主键查询实体
@@ -508,7 +510,8 @@ public interface QueryRepository { // NO_UCD
 	/**
 	 * 保存或更新一个实体,返回实体 <br>
 	 * 前提条件:这个实体必须包含主键字段,主键值若是null,直接存 <br>
-	 * 另见: {@link #executeSaveOrUpdate(Object)}  返回影响行数(int类型)
+	 * 另见: {@link #executeSaveOrUpdate(Object)} 返回影响行数(int类型)
+	 * 
 	 * @param <E> 实体
 	 * @param entity 实体
 	 * @return 返回实体
@@ -526,7 +529,8 @@ public interface QueryRepository { // NO_UCD
 	/**
 	 * 保存或更新一个实体,返回实体<br>
 	 * 前提条件:这个实体必须包含主键字段,主键值若是null,直接存 <br>
-	 * 另见: {@link #executeSaveOrUpdate(String, Object)}  返回影响行数(int类型)
+	 * 另见: {@link #executeSaveOrUpdate(String, Object)} 返回影响行数(int类型)
+	 * 
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param entity 实体
@@ -545,7 +549,8 @@ public interface QueryRepository { // NO_UCD
 	/**
 	 * 保存或更新一个实体,返回实体<br>
 	 * 前提条件:这个实体必须包含主键字段,主键值若是null,直接存 <br>
-	 * 另见: {@link #executeSaveOrUpdate(String, String, Object)}  返回影响行数(int类型)
+	 * 另见: {@link #executeSaveOrUpdate(String, String, Object)} 返回影响行数(int类型)
+	 * 
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
@@ -561,15 +566,16 @@ public interface QueryRepository { // NO_UCD
 		long id = BeanUtil.toId(entity);
 		return (E) find(entity.getClass(), id, dataSourceName, dbName);
 	}
-	
+
 	/**
 	 * 事务函数
+	 * 
 	 * @param fun 函数式子
 	 * @return fun函数体中有任何没被捕获的异常或fun函数体返回null或返回-1,就会导致fun里面的全部操作回滚,被回滚后的tx最后会返回-1,除此之外,tx的返回值等于fun的返回值.
 	 */
 	@Id(MethodId.QUERY9)
 	int tx(Supplier<Integer> fun);
-	
+
 	default Class<? extends QueryRepository> getInterfaceClass() {
 		return null;
 	}

@@ -144,7 +144,8 @@ public class MethodQueryTest extends FastQueryTest {
 
 	@Test
 	public void executeBatch3() {
-		studentDBService.executeBatch(null);
+		int[] ints = studentDBService.executeBatch(null);
+		assertThat(ints, notNullValue());
 	}
 
 	@Test

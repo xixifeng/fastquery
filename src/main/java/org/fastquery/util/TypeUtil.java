@@ -117,7 +117,7 @@ public class TypeUtil {
 	 * @return sql
 	 */
 	public static int[] getSQLParameter(String sql) {
-		List<String> subs = matches(sql, "\\?\\d+");
+		List<String> subs = matches(sql, Placeholder.SP1_REG);
 		int len = subs.size();
 		int[] ints = new int[len];
 		for (int i = 0; i < len; i++) {
@@ -535,7 +535,7 @@ public class TypeUtil {
 		
 		</pre>
 		*/
-		Set<String> pars = TypeUtil.matchesNotrepeat(value, "\\?\\d+");
+		Set<String> pars = TypeUtil.matchesNotrepeat(value, Placeholder.SP1_REG);
 		for (String par : pars) {
 			int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
 			Object arg = QueryContext.getArgs()[index - 1];
@@ -551,24 +551,28 @@ public class TypeUtil {
 		}
 		
 		// if$ , else$ 解析
-		if(!"true".equals(condition.if$()) && !Script2Class.getJudge(conditionPosition).ignore()) {
+		if(!"true".equals(condition.if$()) && !Script2Class.getJudge(conditionPosition).ignore()) { // 如果if结果为假
 			String elseValue = condition.else$();
 			if("".equals(elseValue)) {
 				return null;
 			} else {
-				elseValue = paramFilter(QueryContext.getMethod(), QueryContext.getArgs(), elseValue);
-				pars = TypeUtil.matchesNotrepeat(elseValue, "\\?\\d+");
-				for (String par : pars) {
-					int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
-					if(QueryContext.getArgs()[index - 1] == null) { // ?num 对应的实参是null,要附加处理下
-						elseValue = extReplaceAll(elseValue, index);	
-					}
-				}
-				return elseValue;
+				return elseVal(elseValue);
 			}
-		} 
-		
-		return value;
+		} else {
+			return value;
+		}
+	}
+
+	private static String elseVal(String elseValue) {
+		elseValue = paramFilter(QueryContext.getMethod(), QueryContext.getArgs(), elseValue);
+		Set<String> pars = TypeUtil.matchesNotrepeat(elseValue, Placeholder.SP1_REG);
+		for (String par : pars) {
+			int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
+			if(QueryContext.getArgs()[index - 1] == null) { // ?num 对应的实参是null,要附加处理下
+				elseValue = extReplaceAll(elseValue, index);	
+			}
+		}
+		return elseValue;
 	}
 
 	/**

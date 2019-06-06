@@ -592,17 +592,18 @@ assertThat(effect, is(3));
 最终会解释成一条SQL语句:
 
 ```sql
-update `UserInfo`
-set `name` = case `id`
-	when 77 then '茝若'
-	when 88 then '芸兮'
-	else `name`
-end, `age` = case `id`
-	when 77 then '18'
-	when 99 then '16'
-	else `age`
-end
-where `id` in (77, 88, 99)
+update UserInfo
+set
+  name = case id
+  when 77 then '茝若'
+  when 88 then '芸兮'
+  else name end 
+  ,
+  age = case id
+  when 77 then '18'
+  when 99 then '16'
+  else age end
+where id in (77, 88, 99)
 ```
 
 ## @Set 实现动态修改不同字段

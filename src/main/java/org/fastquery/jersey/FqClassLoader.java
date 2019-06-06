@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.RepositoryException;
 
@@ -68,7 +69,7 @@ class FqClassLoader extends ClassLoader {
 			resourceNames.clear();
 			return classes;
 		} else {
-			return null;
+			return ArrayUtils.EMPTY_CLASS_ARRAY;
 		}
 	}
 }

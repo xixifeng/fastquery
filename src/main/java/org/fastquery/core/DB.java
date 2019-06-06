@@ -206,19 +206,19 @@ public class DB {
 	}
 
 	static int update(Object bean, String dbName, String where) {
-		int effect = 0;
 		Connection conn = null;
 		PreparedStatement stat = null;
 		Object[] updateInfo = (where == null || "".equals(where)) ? BeanUtil.toUpdateSQL(bean, dbName, false)
 				: BeanUtil.toUpdateSQL(bean, dbName, where);
-		if (updateInfo == null) {
-			return effect;
+		if (updateInfo == null || updateInfo.length == 0) {
+			return 0;
 		}
 		String sql = updateInfo[0].toString();
 		LOG.info(sql);
 		@SuppressWarnings("unchecked")
 		List<Object> args = (List<Object>) updateInfo[1];
 		int count = args.size();
+		int effect = 0;
 		try {
 			conn = QueryContext.getConn();
 			QueryContext.disableAutoCommit();

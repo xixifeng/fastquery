@@ -35,7 +35,10 @@ import org.fastquery.core.RepositoryException;
  * @author xixifeng (fastquery@126.com)
  */
 public class FilterChainHandler {
-
+	
+	 private FilterChainHandler() {
+	 }
+	 
 	/**
 	 * 绑定before filter
 	 * 
