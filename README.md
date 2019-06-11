@@ -769,22 +769,6 @@ UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
 JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") String orderby);
 ```
 
-### 参数格式解释器
-`@Param`中的`format`属性,可以对参数进行某种格式化,默认为`""`(空字符串),表示无格式处理. 该实现依赖于`String.format(String format, Object... args)`, 其中`args`为当前方法的参数集. 格式化语法请查阅[java.util.Formatter](https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html).  
-用法举例:  
-需求,给一个参数首尾加上 `%` 符号
-
-```java
-@Param(value="name",format="%%%1$s%%") String name
-```
-`%` 是格式化语法的关键字, 要输出`%`本身,那么就需要连续写两个`%`来转义,其中,`%1$s`表示引用这个方法的第1个参数(从1开始计数)并且将该参数格式化为字符串.  
-`format` 中支持 `${名称}` 表达式引用参数:
-
-```java
-@Param(value="name",format="%%${name}%%") String name
-```
-可见, **在format里,通过`$`表达式引用参数值比采取百分号索引引用参数值更优越.方法的参数顺序倘若被改变,引用的索引号也要同步修改.而,`$`表达式,跟参数顺序没关系.**
-
 ## 微笑表达式
 定义: **以<code>\`-</code> 作为开始,以<code>-\`</code>作为结尾,包裹着若干字符,因为<code>\`- -\`</code>酷似微笑表情,因此将这样的表达式称之为`微笑表达式`.** <br>例如: <code> \`-%${name}%-\` </code>. **\`** 反撇号的位置如下图所示:<br>
 ![反撇号](https://xixifeng.github.io/pjaxpage/example/img/fanpie.png "反撇号")    
@@ -1113,7 +1097,7 @@ Page<Student> findPage(Pageable pageable, @Param("name") String name,@Param("age
 ```java
 public interface UserInfoDBService extends QueryRepository {
 
-     // Pageable 用做描述当前页的索引和每页条数.
+	// Pageable 用做描述当前页的索引和每页条数.
     
 	// countField : 明确指定用来统计总行数的字段,count(countField)中的countField默认值是"id"
 	@Query(value="select id,name,age from `userinfo` where 1",countField="id")

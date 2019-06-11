@@ -24,6 +24,7 @@ package org.fastquery.test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +61,7 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 		this.description = description;
 	}
 
-	private void before() throws Throwable {
+	private void before() throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException  {
 		if (description.getAnnotation(SkipFilter.class) != null) {
 			return;
 		}
@@ -72,7 +73,7 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 		debugField.set(null, true);
 	}
 
-	private void after() throws Throwable {
+	private void after() throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException, InvocationTargetException {
 		if (description.getAnnotation(SkipFilter.class) != null) {
 			return;
 		}
@@ -134,7 +135,7 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 			result = method.invoke(repository, args);
 			after();
 			return result;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new RepositoryException(e);
 		}
 

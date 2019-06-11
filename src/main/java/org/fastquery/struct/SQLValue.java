@@ -22,16 +22,12 @@
 
 package org.fastquery.struct;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.fastquery.core.MethodInfo;
-import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
@@ -55,6 +51,33 @@ public class SQLValue {
 		LOG.info("SQL扩展之前:{}", sql);
 		Object[] args = QueryContext.getArgs();
 		// 1. 处理"% ? % "问题, 对应的正则 "[_\\s*%]+\\?[_\\s*%]+"
+		List<String> ssms = percent(sql, values, args);
+
+		// 2. 防SQL注入
+		antiSQLInject(sql);
+		
+		if (!ssms.isEmpty()) {
+			this.sql = sql.replaceAll(Placeholder.SMILE, "?");
+		} else {
+			this.sql = sql;
+		}
+
+		this.sql = this.sql.replaceAll(Placeholder.SP1_REG, "?");
+		this.values = values;
+	}
+	
+	private void antiSQLInject(String sql) {
+		List<String> ins = TypeUtil.matches(sql, Placeholder.SMILE_BIG);
+		for (String in : ins) {
+			if (PreventSQLInjection.isInjectStr(in) && TypeUtil.matches(in, Placeholder.SMILE).isEmpty()) {
+				String tip = in.replace("`-", "").replace("-`", "") + "中包含有危险关键字,正在尝试SQL注入";
+				LOG.error(tip);
+				throw new RepositoryException(tip);
+			}
+		}
+	}
+
+	private List<String> percent(String sql, List<Object> values, Object[] args) {
 		List<String> ssms = TypeUtil.matches(sql, Placeholder.SMILE);
 		for (String ssm : ssms) {
 			int end = sql.indexOf(ssm);
@@ -71,55 +94,7 @@ public class SQLValue {
 				throw new RepositoryException("这个SQL实参值禁止都是%组成");
 			}
 		}
-
-		// 2. 防SQL注入
-		List<String> ins = TypeUtil.matches(sql, Placeholder.SMILE_BIG);
-		for (String in : ins) {
-			if (PreventSQLInjection.isInjectStr(in) && TypeUtil.matches(in, Placeholder.SMILE).isEmpty()) {
-				String tip = in.replace("`-", "").replace("-`", "") + "中包含有危险关键字,正在尝试SQL注入";
-				LOG.error(tip);
-				throw new RepositoryException(tip);
-			}
-		}
-
-		// 3. 处理参数
-		int l = values.size();
-		if(l!=0) {
-			MethodInfo method = QueryContext.getMethodInfo();
-			Annotation[][] annotations = method.getParameterAnnotations();
-			int len = annotations.length;
-			for (int i = 0; i < len; i++) {
-				Annotation[] anns = annotations[i];
-				for (Annotation ann : anns) {
-					if (ann.annotationType() == Param.class) {
-						Param param = (Param) ann;
-						// ① 解析参数格式化
-						if(!param.format().trim().equals("") && l>i) {
-							String val = String.format(param.format(), args);
-							// val 里面可能有$表达式
-							Object o = values.get(i);
-							String replacement = o == null ? "" :  Matcher.quoteReplacement(o.toString());
-							val = val.replaceAll("\\$\\{" + param.value() + "\\}", replacement);
-							val = val.replaceAll("\\$" + param.value() + "\\b", replacement);
-							values.set(i, val);
-							// 也有可能存在冒号表达式,冒号表达式会影响主体SQL和参数值较为复杂(之前已经处理好,需要重新设计,针对冒号表达式在一处处理较为适合), 在此,format暂不考虑冒号表达式.
-							// format 重点在于值模版
-						}
-						// ②
-						// ③
-					}
-				}
-			}
-		}
-
-		if (!ssms.isEmpty()) {
-			this.sql = sql.replaceAll(Placeholder.SMILE, "?");
-		} else {
-			this.sql = sql;
-		}
-
-		this.sql = this.sql.replaceAll(Placeholder.SP1_REG, "?");
-		this.values = values;
+		return ssms;
 	}
 
 	public String getSql() {

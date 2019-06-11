@@ -185,9 +185,9 @@ public class AsmRepository {
 		// 实现抽象方法
 		Method[] methods = repositoryClazz.getMethods();
 		int len = methods.length;
-		
-		// 新增Method缓存数组
-		CtField field = CtField.make("private org.fastquery.core.MethodInfo[] m = new org.fastquery.core.MethodInfo["+(len-11)+"];", ctClass);
+		int defaultMethodNum = countDefaultMethod(methods);// 默认方法default Method的个数
+		// 新增MethodInfo缓存数组
+		CtField field = CtField.make("private org.fastquery.core.MethodInfo[] m = new org.fastquery.core.MethodInfo["+(len-defaultMethodNum)+"];", ctClass);
 		ctClass.addField(field);	
 		
 		int index = 0;
@@ -212,6 +212,16 @@ public class AsmRepository {
 				
 			}
 		}
+	}
+	
+	private static int countDefaultMethod(Method[] methods) {
+		int i = 0;
+		for (Method method : methods) {
+			if(method.isDefault()) {
+				++i;
+			}
+		}
+		return i;
 	}
 
 	private static void makeSingleton(String className, CtClass ctClass) throws CannotCompileException {

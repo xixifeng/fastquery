@@ -44,58 +44,20 @@ public class UserInfoDBServiceTest3 extends FastQueryTest  {
 	public FastQueryTestRule rule = new FastQueryTestRule();
 
 	@Test
-	public void findByRegxp1() {
-		String regxp = "[0]{0,10}123456747$";
-		userInfoDBService.findByRegxp1(regxp);
-		SQLValue sv = rule.getSQLValue();
-		assertThat(sv.getSql(), equalTo("select * from userinfo where age regexp '" + regxp + "' limit 1"));
-		assertThat(sv.getValues().isEmpty(), is(true));
-
-		regxp = "[0]{0,10}123$";
-		userInfoDBService.findByRegxp1(regxp);
-		sv = rule.getSQLValue();
-		assertThat(sv.getSql(), equalTo("select * from userinfo where age regexp '" + regxp + "' limit 1"));
-		assertThat(sv.getValues().isEmpty(), is(true));
-	}
-
-	@Test
-	public void findByRegxp2() {
-		String regxp = null;
-		userInfoDBService.findByRegxp2(regxp);
-		SQLValue sv = rule.getSQLValue();
-		assertThat(sv.getSql(), equalTo("select * from userinfo where age regexp '[0]{0,10}123456747$' limit 1"));
-		assertThat(sv.getValues().isEmpty(), is(true));
-
-		regxp = "[0]${0,10}123$";
-		userInfoDBService.findByRegxp2(regxp);
-		sv = rule.getSQLValue();
-		assertThat(sv.getSql(), equalTo("select * from userinfo where age regexp '" + regxp + "' limit 1"));
-		assertThat(sv.getValues().isEmpty(), is(true));
-	}
-
-	@Test
-	public void findByRegxp3() {
-		String regxp = null;
-		userInfoDBService.findByRegxp3(regxp);
-		SQLValue sv = rule.getSQLValue();
-		assertThat(sv.getSql(), equalTo("select * from userinfo where age regexp ? limit 1"));
-		assertThat(sv.getValues().size(), is(1));
-		assertThat(sv.getValues().get(0), is("'[0]{0,10}123456747$'"));
-
-		regxp = "[0]${0,10}123$";
-		userInfoDBService.findByRegxp3(regxp);
-		sv = rule.getSQLValue();
-		assertThat(sv.getSql(), equalTo("select * from userinfo where age regexp ? limit 1"));
-		assertThat(sv.getValues().size(), is(1));
-		assertThat(sv.getValues().get(0), is("'" + regxp + "'"));
-	}
-
-	@Test
 	public void testUpdateBatch() {
 
 		// 修改 xk3 里的数据 (xk3是用jdbc连接的,未使用到连接池)
 		int effect = userInfoDBService.updateBatch("大张张", 66, 1, "xk3");
 		assertThat("断言该行修改操作一共影响了3行", effect, equalTo(3));
+	}
+	
+	@Test
+	public void findByName() {
+		String name = null;
+		userInfoDBService.findByName(name);
+		SQLValue sv = rule.getSQLValue();
+		assertThat(sv.getSql(), equalTo("select name from UserInfo where name like ? limit 1"));
+		assertThat(sv.getValues().get(0), equalTo("%谷子%"));
 	}
 
 }

@@ -400,13 +400,6 @@ public class TypeUtil {
 					Param param = (Param) ann;
 					Object objx = args[i];
 					objx = BeanUtil.parseList(objx);
-					// 如果参数值需要格式化(format)
-					if(!param.format().trim().equals("")) {
-						objx = String.format(param.format(), args); // 参数值可能包含有$表达式
-						String replacement = getReplacement(args[i], param.defaultVal());
-						objx = replaceAllEL(objx.toString(), param.value(), replacement);
-					}
-
 					// 这里的replaceAll的先后顺序很重要
 					// '{' 是正则语法的关键字,必须转义
 					if (queryByNamed == null) {

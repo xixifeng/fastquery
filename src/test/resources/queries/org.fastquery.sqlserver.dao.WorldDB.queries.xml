@@ -10,6 +10,7 @@
 		</countQuery>
 		
 		<parts>
+			<groupId>12.36</groupId> <!-- 故意给一个无用的元素,也不会污染parts功能 -->
 			<!-- 小于号需要转义&#62; -->
 			<part name="conditional">
 			   id &#62; :id and cityAbb like :cityAbb

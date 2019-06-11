@@ -132,12 +132,12 @@ public class QueryPool {
 			// 全局 parts
 			for (int i = 0; i < len; i++) {
 				Node node = nodeList.item(i);
-				if (node.getNodeType() == Document.ELEMENT_NODE && "parts".equals(node.getNodeName())) {
+				if (isElementNode(node,"parts")) {
 					Allocation.center(xmlName, (Element) node);
 					NodeList partNodes = node.getChildNodes();
 					for (int j = 0; j < partNodes.getLength(); j++) {
 						Node partNode = partNodes.item(j);
-						if (partNode.getNodeType() == Document.ELEMENT_NODE && "part".equals(partNode.getNodeName())) {
+						if (isElementNode(partNode,"part")) {
 							gparts.put(((Element) partNode).getAttribute("name"), partNode.getTextContent());
 						}
 					}
@@ -147,18 +147,13 @@ public class QueryPool {
 
 			for (int i = 0; i < len; i++) {
 				Node node = nodeList.item(i);
-				if (node.getNodeType() == Document.ELEMENT_NODE && "query".equals(node.getNodeName())) {
+				if (isElementNode(node, "query")) {
 					Allocation.center(xmlName, (Element) node);
 					element = (Element) node;
 					String id = element.getAttribute("id");
 					String postion = String.format("错误位置:%s  --> <%s id=\"%s\"", xmlName, element.getNodeName(), id);
 					String template = fuseValTpl(postion, gparts, element, "value", true);
 					String countQuery = fuseValTpl(postion, gparts, element, "countQuery", false);
-
-					// 在存储template, 和 countQuery 之前 需要做数据库过滤
-					// 待续...
-					// 在存储template, 和 countQuery 之前 需要做数据库过滤 end
-
 					// countQuery 单独存储起来 (className + "." + id)可以确保唯一值,
 					putCountQuery(className + "." + id, countQuery); // 该方法接受到null值后,会视而不见
 					LOG.debug("id={} , template={}", id, template);
@@ -174,6 +169,11 @@ public class QueryPool {
 			throw new RepositoryException(e.getMessage(), e);
 		}
 		return queryMappers;
+	}
+
+	// 判断是否是<nodeName> ELEMENT_NODE 节点
+	private static boolean isElementNode(Node node,String nodeName) {
+		return node.getNodeType() == Document.ELEMENT_NODE && nodeName.equals(node.getNodeName());
 	}
 
 	/**
@@ -194,20 +194,7 @@ public class QueryPool {
 			// 看<value> 节点是否有兄弟节点<parts>
 			Element parts = getChildElement(element, "parts");
 			if (parts != null) { // 存在parts节点
-				NodeList ps = parts.getChildNodes();
-				for (int j = 0; j < ps.getLength(); j++) {
-					if (ps.item(j).getNodeType() == Element.ELEMENT_NODE) {
-						Element p = (Element) ps.item(j);
-						String name = p.getAttribute("name");
-						if ("".equals(name)) {
-							throw new ExceptionInInitializerError(String.format("%s> 下面的 part 节点没有设置name属性", postion));
-						}
-						// p.getTextContent() 里面很可能包含有$ 或 \
-						// 如果不用Matcher.quoteReplacement进行处理,那么$表示反向引用,就会报错的
-						// 这个name在初始化阶段就被限定只能是字母和数字,应此不存在包含有正则符号
-						template = template.replaceAll("\\#\\{\\#" + name + "\\}", Matcher.quoteReplacement(p.getTextContent()));
-					}
-				}
+				template = fuseStr(postion, template, parts);
 			}
 		} else if (defaultText) {
 			template = element.getTextContent();
@@ -227,6 +214,26 @@ public class QueryPool {
 		return template;
 	}
 
+	// template 和 parts 融合
+	private static String fuseStr(String postion, String template, Element parts) throws ExceptionInInitializerError {
+		NodeList ps = parts.getChildNodes();
+		for (int j = 0; j < ps.getLength(); j++) {
+			if (isElementNode(ps.item(j), "part")) {
+				Element p = (Element) ps.item(j);
+				String name = p.getAttribute("name");
+				if ("".equals(name)) {
+					throw new ExceptionInInitializerError(String.format("%s> 下面的 part 节点没有设置name属性", postion));
+				} else {
+					// p.getTextContent() 里面很可能包含有$ 或 \
+					// 如果不用Matcher.quoteReplacement进行处理,那么$表示反向引用,就会报错的
+					// 这个name在初始化阶段就被限定只能是字母和数字,应此不存在包含有正则符号
+					template = template.replaceAll("\\#\\{\\#" + name + "\\}", Matcher.quoteReplacement(p.getTextContent()));
+				}
+			}
+		}
+		return template;
+	}
+
 	/**
 	 * 从给定节点中查询名称为nodeName的子元素. 没有找到返回null
 	 * 
@@ -238,7 +245,7 @@ public class QueryPool {
 		NodeList nodeList = node.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node n = nodeList.item(i);
-			if (n.getNodeType() == Element.ELEMENT_NODE && n.getNodeName().equals(nodeName)) {
+			if (isElementNode(n, nodeName)) {
 				return (Element) n;
 			}
 		}

@@ -30,6 +30,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -92,7 +93,7 @@ public class VelocityTemplateProcessor implements TemplateProcessor<String> { //
 			properties.load(in);
 			properties.setProperty("file.resource.loader.path", request.getServletContext().getRealPath("/WEB-INF/vm"));
 		} catch (IOException e) {
-			throw e;
+			throw new WebApplicationException(e);
 		}
 
 		VelocityEngine velocityEngine = new VelocityEngine(properties);

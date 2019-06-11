@@ -48,11 +48,4 @@ public @interface Param {
 	 * @return String
 	 */
 	String defaultVal() default "";
-
-	/**
-	 * "" 表示无格式
-	 * 
-	 * @return String
-	 */
-	String format() default ""; // NO_UCD 
 }

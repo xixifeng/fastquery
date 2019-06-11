@@ -27,7 +27,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -88,7 +87,7 @@ public class FQueryBinder extends AbstractBinder { // NO_UCD
 
 		@Override
 		public void writeTo(Object returnInstance, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
-				MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+				MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
 			JSONObject json = new JSONObject();
 			json.put("code", 0);
 			if (returnInstance == null) {
