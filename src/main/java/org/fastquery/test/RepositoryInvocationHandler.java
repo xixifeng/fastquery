@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
@@ -77,17 +78,17 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 		}
 		Class<QueryParser> clazz = QueryParser.class;
 		LOG.debug("RepositoryInvocationHandler:当前线程:{}", Thread.currentThread());
-		Method currentMethod = QueryContext.getMethod();
+		MethodInfo currentMethod = QueryContext.getMethodInfo();
 		Method modifyParserMethod = clazz.getDeclaredMethod("modifyParser");
 		Method queryParserMethod = clazz.getDeclaredMethod("queryParser");
 		modifyParserMethod.setAccessible(true);
 		queryParserMethod.setAccessible(true);
 		LOG.debug("modifyParserMethod:{}", modifyParserMethod);
 		LOG.info("currentMethod:{}", currentMethod);
-		Modifying modifying = currentMethod.getAnnotation(Modifying.class);
+		Modifying modifying = currentMethod.getModifying();
 		Class<?> returnType = QueryContext.getReturnType();
-		QueryByNamed queryById = currentMethod.getAnnotation(QueryByNamed.class);
-		Query query = currentMethod.getAnnotation(Query.class);
+		QueryByNamed queryById = currentMethod.getQueryByNamed();
+		Query query = currentMethod.getQuery();
 
 		Class<FastQueryTestRule> qcclazz = FastQueryTestRule.class;
 		Field sqlValueField = qcclazz.getDeclaredField("sqlValue");

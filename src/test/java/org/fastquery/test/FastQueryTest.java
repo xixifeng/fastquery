@@ -25,12 +25,18 @@ package org.fastquery.test;
 import java.lang.reflect.Method;
 
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
 public class FastQueryTest {
+	
+	@Test
+	public void init() {
+		// 
+	}
 
 	@BeforeClass
 	public static void bc() {

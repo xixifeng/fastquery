@@ -47,13 +47,14 @@ public class Prepared { // NO_UCD
 	/**
 	 * 执行方法
 	 * 
-	 * @param method 当前接口方法
+	 * @param methodInfo 当前接口方法
 	 * @param args 方法参数 注意: 此处参数列表的成员,永远都是包装类型(已经验证)
 	 * @param target 目标 Repository
 	 * @return 执行之后的值
 	 */
-	public static Object excute(Method method,Object[] args, QueryRepository target) { // NO_UCD
+	public static Object excute(MethodInfo methodInfo,Object[] args, QueryRepository target) { // NO_UCD
 		long start = System.currentTimeMillis();
+		Method method = methodInfo.getMethod();
 		try {
 			Class<? extends QueryRepository> iclazz = target.getInterfaceClass();
 
@@ -63,7 +64,7 @@ public class Prepared { // NO_UCD
 			}
 			
 			// QueryContext 生命开始
-			QueryContext.start(iclazz, method, args);
+			QueryContext.start(iclazz, methodInfo, args);
 
 			// 在businessProcess的先后加拦截器 ==================
 			// 注入BeforeFilter
@@ -89,7 +90,7 @@ public class Prepared { // NO_UCD
 			}
 
 			sb.append('\n');
-			sb.append("发生方法:" + QueryContext.getMethod());
+			sb.append("发生方法:" + QueryContext.getMethodInfo());
 			sb.append('\n');
 			sb.append("执行过的sql:");
 
@@ -120,11 +121,11 @@ public class Prepared { // NO_UCD
 	}
 
 	private static Object businessProcess() {
-		Method method = QueryContext.getMethod();
+		MethodInfo methodInfo = QueryContext.getMethodInfo();
 		Class<?> returnType = QueryContext.getReturnType();
-		Query[] querys = method.getAnnotationsByType(Query.class);
-		Modifying modifying = method.getAnnotation(Modifying.class);
-		QueryByNamed queryById = method.getAnnotation(QueryByNamed.class);
+		Query[] querys = methodInfo.getQueries();
+		Modifying modifying = methodInfo.getModifying();
+		QueryByNamed queryById = methodInfo.getQueryByNamed();
 
 		boolean hasVehicle = querys.length > 0 || queryById != null; // 有SQL模板吗?
 		if (hasVehicle) {
@@ -136,7 +137,7 @@ public class Prepared { // NO_UCD
 				return QueryProcess.getInstance().query();
 			}
 		} else {
-			Id id = method.getAnnotation(Id.class);
+			Id id = methodInfo.getId();
 			if (id != null) { // 有@id
 				return QueryProcess.getInstance().methodQuery(id);
 			} else { // 无@id

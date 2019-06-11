@@ -68,7 +68,7 @@ public abstract class Judge { // NO_UCD
 	
 	// 没有找到返回-1
 	private static int getParamIndex(String paramName) {
-		Annotation[][] annotations = QueryContext.getMethod().getParameterAnnotations();
+		Annotation[][] annotations = QueryContext.getMethodInfo().getParameterAnnotations();
 		int len = annotations.length;
 		for (int i = 0; i < len; i++) {
 			Annotation[] anns = annotations[i];

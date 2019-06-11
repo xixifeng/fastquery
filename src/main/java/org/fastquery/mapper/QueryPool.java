@@ -25,7 +25,6 @@ package org.fastquery.mapper;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Param;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryContext;
@@ -285,7 +285,7 @@ public class QueryPool {
 		map.forEach(context::put);
 		
 		// 把当前repository的Method放入模板上下文里
-		context.put("_method", QueryContext.getMethod());
+		context.put("_method", QueryContext.getMethodInfo());
 
 		// 输出流
 		StringWriter writer = new StringWriter();
@@ -299,9 +299,9 @@ public class QueryPool {
 	// 该方法永远不会返回null或空,因为在初始化时就做了检测
 	public static String render(boolean isQuery) {
 		String className = QueryContext.getIclass().getName();
-		Method method = QueryContext.getMethod();
+		MethodInfo method = QueryContext.getMethodInfo();
 		Object[] args = QueryContext.getArgs();
-		QueryByNamed qbn = method.getAnnotation(QueryByNamed.class);
+		QueryByNamed qbn = method.getQueryByNamed();
 		String id = qbn.value();
 		if ("".equals(id)) {
 			id = method.getName();

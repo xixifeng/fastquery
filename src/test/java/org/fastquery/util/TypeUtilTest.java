@@ -35,6 +35,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.fastquery.core.Id;
+import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
@@ -224,16 +225,16 @@ public class TypeUtilTest {
 
 	private static String paramFilter(Method method, Object[] args, String sql)
 			throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		Method pf = TypeUtil.class.getDeclaredMethod("paramFilter", Method.class, Object[].class, String.class);
+		Method pf = TypeUtil.class.getDeclaredMethod("paramFilter", MethodInfo.class, Object[].class, String.class);
 		pf.setAccessible(true);
-		return pf.invoke(null, method, args, sql).toString();
+		return pf.invoke(null, new MethodInfo(method), args, sql).toString();
 	}
 
 	@Test
 	public void paramFilter()
 			throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Method m1 = TypeUtilTest.class.getMethod("m1", int.class, int.class, int.class);
-		Object[] agrs = new Object[] { 11, 22, 33 };
+		Object[] agrs = { 11, 22, 33 };
 		String sql = "abc :i and :i1 where :i2";
 		String str = paramFilter(m1, agrs, sql);
 		assertThat(str, equalTo("abc ?1 and ?2 where ?3"));
@@ -246,7 +247,7 @@ public class TypeUtilTest {
 	public void paramNameFilter() throws NoSuchMethodException, SecurityException {
 		Method m1 = TypeUtilTest.class.getMethod("m1", int.class, int.class, int.class);
 		String sql = "abc :i and :i1 where :i2";
-		String str = TypeUtil.paramNameFilter(m1, sql);
+		String str = TypeUtil.paramNameFilter(new MethodInfo(m1), sql);
 		assertThat(str, equalTo("abc ?1 and ?2 where ?3"));
 	}
 
@@ -358,7 +359,7 @@ public class TypeUtilTest {
 
 		Class<?> clazz = A.class;
 		Method method = clazz.getMethod("todo");
-		assertThat(TypeUtil.mapValueTyep(method) == String.class, is(true));
+		assertThat(TypeUtil.mapValueTyep(new MethodInfo(method)) == String.class, is(true));
 	}
 
 	@Test
@@ -373,7 +374,7 @@ public class TypeUtilTest {
 
 		Class<?> clazz = B.class;
 		Method method = clazz.getMethod("todo");
-		assertThat(TypeUtil.listMapValueTyep(method) == String.class, is(true));
+		assertThat(TypeUtil.listMapValueTyep(new MethodInfo(method)) == String.class, is(true));
 	}
 
 	@SuppressWarnings("unchecked")

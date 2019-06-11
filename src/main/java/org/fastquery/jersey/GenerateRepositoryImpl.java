@@ -57,7 +57,7 @@ class GenerateRepositoryImpl {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends QueryRepository> Class<? extends T> generate(Class<T> repositoryClazz) {
+	private <T extends QueryRepository> Class<? extends T> generate(Class<T> repositoryClazz) {
 		String name = repositoryClazz.getName() + Placeholder.DB_SUF;
 
 		if (repositoryClazz.getAnnotation(Path.class) != null) { // 如果接口上标识有@Path 就生成rest实现类

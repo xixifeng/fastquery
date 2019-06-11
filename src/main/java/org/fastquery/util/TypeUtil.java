@@ -24,7 +24,6 @@ package org.fastquery.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -42,7 +41,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.fastquery.asm.Script2Class;
 import org.fastquery.core.Id;
+import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
@@ -53,7 +54,6 @@ import org.fastquery.page.PageIndex;
 import org.fastquery.page.PageSize;
 import org.fastquery.struct.ParamMap;
 import org.fastquery.where.Condition;
-import org.fastquery.where.Script2Class;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -204,7 +204,7 @@ public class TypeUtil {
 	}
 	
 	private static Object getParamDefVal(int paramIndex,Object mp) {
-		Param param = QueryContext.getMethod().getParameters()[paramIndex].getAnnotation(Param.class);
+		Param param = QueryContext.getMethodInfo().getParameters()[paramIndex].getAnnotation(Param.class);
 		if(param!=null && !param.defaultVal().trim().equals("")) {
 			return param.defaultVal();
 		} else {
@@ -387,11 +387,11 @@ public class TypeUtil {
 	 * @param sql sql语句
 	 * @return sql
 	 */
-	static String paramFilter(Method method, Object[] args, String sql) {
+	static String paramFilter(MethodInfo method, Object[] args, String sql) {
 		String s = sql;
 		// 替换@Param
 		Annotation[][] annotations = method.getParameterAnnotations();
-		QueryByNamed queryByNamed = method.getAnnotation(QueryByNamed.class);
+		QueryByNamed queryByNamed = method.getQueryByNamed();
 		int len = annotations.length;
 		for (int i = 0; i < len; i++) {
 			Annotation[] anns = annotations[i];
@@ -432,7 +432,7 @@ public class TypeUtil {
 	 * @param sql sql语句
 	 * @return sql
 	 */
-	public static String paramNameFilter(Method method, String sql) {
+	public static String paramNameFilter(MethodInfo method, String sql) {
 		String s = sql;
 		// 替换@Param
 		Annotation[][] annotations = method.getParameterAnnotations();
@@ -564,7 +564,7 @@ public class TypeUtil {
 	}
 
 	private static String elseVal(String elseValue) {
-		elseValue = paramFilter(QueryContext.getMethod(), QueryContext.getArgs(), elseValue);
+		elseValue = paramFilter(QueryContext.getMethodInfo(), QueryContext.getArgs(), elseValue);
 		Set<String> pars = TypeUtil.matchesNotrepeat(elseValue, Placeholder.SP1_REG);
 		for (String par : pars) {
 			int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
@@ -582,11 +582,11 @@ public class TypeUtil {
 	 * @param args 参数集
 	 * @return where部分sql
 	 */
-	public static String getWhereSQL(Method method, Object[] args) {
+	public static String getWhereSQL(MethodInfo method, Object[] args) {
 		StringBuilder sb = new StringBuilder();
 		
 		// 追加条件
-		Condition[] conditions = method.getAnnotationsByType(Condition.class);
+		Condition[] conditions = method.getConditions();
 		for (int i = 0; i < conditions.length; i++) {
 			String value = conditions[i].value();
 			value = paramFilter(method, args, value);
@@ -635,11 +635,11 @@ public class TypeUtil {
 	 * @param args 参数集
 	 * @return sql集
 	 */
-	public static List<String> getQuerySQL(Method method, Query[] queries, Object[] args) {
+	public static List<String> getQuerySQL(MethodInfo method, Query[] queries, Object[] args) {
 		List<String> sqls = new ArrayList<>();
 
 		// 如果是QueryByNamed
-		if (method.getAnnotation(QueryByNamed.class) != null) {
+		if (method.getQueryByNamed() != null) {
 			String s = QueryPool.render(true);
 			s = paramFilter(method, args, s);
 			sqls.add(s);
@@ -855,7 +855,7 @@ public class TypeUtil {
 	 * @param method 方法
 	 * @return clazz
 	 */
-	public static Class<?> mapValueTyep(Method method) {
+	public static Class<?> mapValueTyep(MethodInfo method) {
 		ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
 		return (Class<?>) type.getActualTypeArguments()[1];
 	}
@@ -866,7 +866,7 @@ public class TypeUtil {
 	 * @param method 方法
 	 * @return clazz
 	 */
-	public static Class<?> listMapValueTyep(Method method) {
+	public static Class<?> listMapValueTyep(MethodInfo method) {
 		ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
 		type = (ParameterizedType) type.getActualTypeArguments()[0];
 		return (Class<?>) type.getActualTypeArguments()[1];

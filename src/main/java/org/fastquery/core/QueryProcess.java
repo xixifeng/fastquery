@@ -24,7 +24,6 @@ package org.fastquery.core;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
@@ -43,7 +42,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.handler.ModifyingHandler;
 import org.fastquery.handler.QueryHandler;
-import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
 import org.fastquery.page.Pageable;
 import org.fastquery.page.Slice;
@@ -85,7 +83,7 @@ class QueryProcess {
 
 	// 改操作
 	Object modifying() {
-		Method method = QueryContext.getMethod();
+		MethodInfo method = QueryContext.getMethodInfo();
 		Class<?> returnType = QueryContext.getReturnType();
 
 		// 获取待执行的sql
@@ -125,7 +123,7 @@ class QueryProcess {
 	// 查操作
 	Object query() {
 
-		Method method = QueryContext.getMethod();
+		MethodInfo method = QueryContext.getMethodInfo();
 		Class<?> returnType = QueryContext.getReturnType();
 		SQLValue sqlValue = QueryParser.queryParser();
 		List<Map<String, Object>> keyvals = DB.find(sqlValue);
@@ -173,9 +171,9 @@ class QueryProcess {
 		boolean hasNext; // 有下一页吗? 在这里不用给默认值,如下一定会给他赋值.
 		boolean isLast;
 
-		Method method = QueryContext.getMethod();
+		MethodInfo method = QueryContext.getMethodInfo();
 		if (hasContent) {
-			if (method.getAnnotation(NotCount.class) == null) { // 需要求和
+			if (method.getNotCount() == null) { // 需要求和
 				List<Map<String, Object>> results = DB.find(sqlValues.get(1));
 				totalElements = !results.isEmpty() ? ((Number) results.get(0).values().iterator().next()).longValue() : 0;
 
@@ -204,7 +202,7 @@ class QueryProcess {
 		return new PageImpl(size, number, list, totalElements, totalPages, hasNext, isLast);
 	}
 
-	private List<?> convertContent(List<Map<String, Object>> keyvals, Method method) {
+	private List<?> convertContent(List<Map<String, Object>> keyvals, MethodInfo method) {
 		List<?> list = keyvals;
 		// Page<T> 中的 T如果是一个实体,那么需要把 HashMap 转换成实体
 		// method.getGenericReturnType()
@@ -221,7 +219,7 @@ class QueryProcess {
 	}
 	
 	Object methodQuery(Id id) {
-		Method method = QueryContext.getMethod();
+		MethodInfo method = QueryContext.getMethodInfo();
 		Object[] iargs = QueryContext.getArgs();
 		// 检验实体
 		Parameter[] parameters = method.getParameters();

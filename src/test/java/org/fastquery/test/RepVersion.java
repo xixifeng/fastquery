@@ -102,7 +102,7 @@ public class RepVersion extends FastQueryTest  {
 		String version = confirm(initialSelectionValue);
 		LOG.debug("最终确认的版本号是: " + version);
 
-		String[] names = new String[] { "/pom.xml", "/README.md" };
+		String[] names = { "/pom.xml", "/README.md" };
 		for (String name : names) {
 			File tmp = File.createTempFile("temp", ".fquery");// 创建临时文件
 			String tpf = tmp.getAbsolutePath();

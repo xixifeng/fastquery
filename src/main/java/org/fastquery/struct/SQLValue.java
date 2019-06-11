@@ -23,7 +23,6 @@
 package org.fastquery.struct;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +30,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryContext;
@@ -85,7 +85,7 @@ public class SQLValue {
 		// 3. 处理参数
 		int l = values.size();
 		if(l!=0) {
-			Method method = QueryContext.getMethod();
+			MethodInfo method = QueryContext.getMethodInfo();
 			Annotation[][] annotations = method.getParameterAnnotations();
 			int len = annotations.length;
 			for (int i = 0; i < len; i++) {

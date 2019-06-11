@@ -22,11 +22,10 @@
 
 package org.fastquery.util;
 
-import java.lang.reflect.Method;
-
+import org.fastquery.asm.Script2Class;
+import org.fastquery.core.MethodInfo;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
-import org.fastquery.where.Script2Class;
 import org.fastquery.where.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +42,8 @@ final class SetParser {
 	}
 	
 	static String process() {
-		Method method = QueryContext.getMethod();
-		Set[] sets = method.getAnnotationsByType(Set.class);
+		MethodInfo method = QueryContext.getMethodInfo();
+		Set[] sets = method.getSets();
 		int len = sets.length;
 		if(len == 0) {
 			return null;
@@ -61,7 +60,7 @@ final class SetParser {
 					if(!"true".equals(set.if$()) && !Script2Class.getJudge(i).ignore()) {
 						String elseValue = set.else$();
 						if(!"".equals(elseValue)) {
-							elseValue = TypeUtil.paramFilter(QueryContext.getMethod(), QueryContext.getArgs(), elseValue);
+							elseValue = TypeUtil.paramFilter(QueryContext.getMethodInfo(), QueryContext.getArgs(), elseValue);
 							sb.append(elseValue);
 							sb.append(",");
 						} 

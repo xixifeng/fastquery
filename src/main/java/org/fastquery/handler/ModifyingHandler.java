@@ -75,7 +75,7 @@ public final class ModifyingHandler {
 	}
 
 	public Map<String, Object> mapType(Long autoIncKey, Class<?> convertType) {
-		Modifying modifying = QueryContext.getMethod().getAnnotation(Modifying.class);
+		Modifying modifying = QueryContext.getMethodInfo().getModifying();
 		String keyFieldName = modifying.id(); // 不可能为null
 		String tableName = modifying.table();
 		List<Object> values = new ArrayList<>(1);
@@ -149,7 +149,7 @@ public final class ModifyingHandler {
 
 	private Object getId() { // 获取指定的主健,没有找到返回null
 		Object[] args = QueryContext.getArgs();
-		int index = TypeUtil.findId(QueryContext.getMethod().getParameters());
+		int index = TypeUtil.findId(QueryContext.getMethodInfo().getParameters());
 		if (index != -1) {
 			return args[index];
 		} else {

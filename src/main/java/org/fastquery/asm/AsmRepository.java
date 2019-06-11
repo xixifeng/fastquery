@@ -41,7 +41,6 @@ import org.fastquery.analysis.GenerateExtends;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.mapper.QueryValidator;
-import org.fastquery.where.Script2Class;
 
 /**
  * 
@@ -185,12 +184,32 @@ public class AsmRepository {
 	private static void makeMethod(Class<? extends QueryRepository> repositoryClazz,CtClass ctClass) throws CannotCompileException {
 		// 实现抽象方法
 		Method[] methods = repositoryClazz.getMethods();
-		for (Method method : methods) {
+		int len = methods.length;
+		
+		// 新增Method缓存数组
+		CtField field = CtField.make("private org.fastquery.core.MethodInfo[] m = new org.fastquery.core.MethodInfo["+(len-11)+"];", ctClass);
+		ctClass.addField(field);	
+		
+		int index = 0;
+		for (int i = 0; i < len; i++) {
+			Method method = methods[i];
 			if (!method.isDefault()) {
 				Class<?>[] ps = method.getParameterTypes();
-				String body = "{java.lang.reflect.Method m;try {m = c.getMethod(\""+method.getName()+"\", $sig);} catch (Exception e) {throw new org.fastquery.core.RepositoryException(e);} return ($r) org.fastquery.core.Prepared.excute(m," + getParameterNames(ps) + ", this) ; }";
-				CtMethod cm = CtMethod.make(getMethodDef(method) + body, ctClass);
+				StringBuilder bodyBuilder = new StringBuilder();
+				bodyBuilder.append('{');
+				bodyBuilder.append("int j = " + (index++) + ";");
+				// 缓存method...
+				bodyBuilder.append("if(this.m[j]==null) {");
+				bodyBuilder.append("java.lang.reflect.Method m;");
+				bodyBuilder.append("try {m = c.getMethod(\""+method.getName()+"\", $sig);} catch (Exception e) {throw new org.fastquery.core.RepositoryException(e);}");
+				bodyBuilder.append("this.m[j] = new org.fastquery.core.MethodInfo(m); ");
+				bodyBuilder.append("}");
+				// 缓存method... End
+				bodyBuilder.append("return ($r) org.fastquery.core.Prepared.excute(this.m[j]," + getParameterNames(ps) + ", this) ;");
+				bodyBuilder.append('}');
+				CtMethod cm = CtMethod.make(getMethodDef(method) + bodyBuilder.toString(), ctClass);
 				ctClass.addMethod(cm);
+				
 			}
 		}
 	}

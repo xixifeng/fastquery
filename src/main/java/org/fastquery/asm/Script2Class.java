@@ -20,7 +20,7 @@
  * 
  */
 
-package org.fastquery.where;
+package org.fastquery.asm;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -35,6 +35,9 @@ import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.util.TypeUtil;
+import org.fastquery.where.Condition;
+import org.fastquery.where.Judge;
+import org.fastquery.where.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,13 +106,13 @@ public class Script2Class {
 		return script;
 	}
 	
-	private static String makeClassName(Method method,int index) {
-		String src = method.toGenericString() + "$#" + index;
+	private static String makeClassName(String genericString,int index) {
+		String src = genericString + "$#" + index;
 		return Base64.getEncoder().encodeToString(src.getBytes());
 	}
 	
 	public static Judge getJudge(int index) {
-		return judges.get(makeClassName(QueryContext.getMethod(),index));
+		return judges.get(makeClassName(QueryContext.getMethodInfo().toGenericString(),index));
 	}
 	
 	/**
@@ -159,7 +162,7 @@ public class Script2Class {
 		
 		ClassPool pool = ClassPool.getDefault();
 		
-		String className = makeClassName(method, annotationIndex);
+		String className = makeClassName(method.toGenericString(), annotationIndex);
 		
 		CtClass ctClass = pool.makeClass(className);
 		

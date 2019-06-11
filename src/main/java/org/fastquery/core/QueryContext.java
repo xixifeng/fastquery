@@ -1,6 +1,5 @@
 package org.fastquery.core;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -30,7 +29,7 @@ public final class QueryContext {
 
 	private static ThreadLocal<QueryContext> threadLocal = new ThreadLocal<>();
 
-	private Method method; // 当前method
+	private MethodInfo methodInfo; // 当前method
 	private boolean supporTx; // 是否需要事务支持
 	private boolean requirePk;// 改操作的返回值是否依赖主键
 	private Class<?> returnType; // 返回类型
@@ -53,8 +52,8 @@ public final class QueryContext {
 		return threadLocal.get();
 	}
 
-	static void start(Class<? extends QueryRepository> iclass, Method method, Object[] args) throws SQLException {
-		QueryContext context = getQueryContext();
+	static void start(Class<? extends QueryRepository> iclass, MethodInfo methodInfo, Object[] args) throws SQLException {
+		QueryContext context = threadLocal.get();
 		if (context != null && !debug) {
 			if(context.connection != null && !context.connection.isClosed()) { // 不等于null并且没有关闭
 				throw new SQLException("QueryContext的连接没有正确释放");	
@@ -63,18 +62,35 @@ public final class QueryContext {
 			}
 		}
 		
-		if (threadLocal.get() == null) {
+		context = threadLocal.get(); // context 可能会被上面的代码毁掉
+		if (context == null) {
 			threadLocal.set(new QueryContext());
 			context = threadLocal.get();
 		}
+		
 		context.iclass = iclass;
-		context.method = method;
+		context.methodInfo = methodInfo;
 		context.args = args;
 
-		context.sourceName = findSource(method.getParameters(), args);
+		context.sourceName = findSource(methodInfo.getParameters(), args);
+		
+		setConnection(iclass, methodInfo.getId(), context);
+
+		Transactional t = methodInfo.getT();
+		context.supporTx = t == null || !t.propagation().equals(Propagation.NOT_SUPPORTED);
+
+		context.returnType = methodInfo.getReturnType();
+
+		setRequirePk(context);
+		
+		setBQMetaData(args, context);
+		
+		setPageable(methodInfo.getParameters(), args, context);
+	}
+
+	private static void setConnection(Class<? extends QueryRepository> iclass, Id id, QueryContext context) throws SQLException {
 		if (context.connection == null || context.connection.isClosed()) { // 不加这行,测试StudentDBServiceTest会卡顿
 			DataSource ds = getDataSource(context.sourceName, iclass.getName());
-			Id id = method.getAnnotation(Id.class);
 			if(TxContext.enabled()) {
 				context.connection = TxContext.getTxContext().addConn(ds);
 			} else if(id == null || id.value() != MethodId.QUERY9) { // 非tx(),注意:并代表tx函数体里的方法
@@ -84,17 +100,16 @@ public final class QueryContext {
 					}		
 			}
 		}
+	}
 
-		Transactional t = context.method.getAnnotation(Transactional.class);
-		context.supporTx = t == null || !t.propagation().equals(Propagation.NOT_SUPPORTED);
-
-		context.returnType = method.getReturnType();
-
+	private static void setRequirePk(QueryContext context) {
 		if (context.returnType == Map.class || context.returnType == JSONObject.class || context.returnType == Primarykey.class
 				|| TypeUtil.hasDefaultConstructor(context.returnType)) {
 			context.requirePk = true;
 		}
+	}
 
+	private static void setBQMetaData(Object[] args, QueryContext context) {
 		BuilderQuery bq = null;
 		for (Object arg : args) {
 			if (arg instanceof BuilderQuery) {
@@ -107,7 +122,9 @@ public final class QueryContext {
 			context.metaData = new MetaData();
 			bq.accept(context.metaData);
 		}
-		
+	}
+
+	private static void setPageable(Parameter[] parameters, Object[] args, QueryContext context) {
 		context.pageable = null;
 		for (Object arg : args) {
 			if (arg instanceof Pageable) { // 如果当前arg是Pageable接口的一个实例
@@ -115,7 +132,6 @@ public final class QueryContext {
 				break;
 			}
 		}
-		Parameter[] parameters = method.getParameters();
 		if (context.pageable == null) {
 			// 没有传递Pageable,那么必然有 pageIndex, pageSize 不然,不能通过初始化
 			context.pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
@@ -135,8 +151,8 @@ public final class QueryContext {
 		}
 	}
 
-	public static Method getMethod() {
-		return getQueryContext().method;
+	public static MethodInfo getMethodInfo() {
+		return getQueryContext().methodInfo;
 	}
 
 
@@ -164,7 +180,7 @@ public final class QueryContext {
 				context.metaData.clear();
 				context.metaData = null;
 			}
-			context.method = null;
+			context.methodInfo = null;
 			context.sqls.clear();
 			context.sqls = null;
 			context.returnType = null;

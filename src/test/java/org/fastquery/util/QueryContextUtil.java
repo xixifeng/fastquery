@@ -26,6 +26,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import org.fastquery.core.MethodInfo;
 import org.fastquery.core.QueryContext;
 
 /**
@@ -51,9 +52,9 @@ public class QueryContextUtil {
 	
 	public static void setCurrentMethod(Method method) throws Exception {
 		QueryContext queryContext = getThreadLocal().get();
-		Field mf = QueryContext.class.getDeclaredField("method");
+		Field mf = QueryContext.class.getDeclaredField("methodInfo");
 		mf.setAccessible(true);
-		mf.set(queryContext, method);
+		mf.set(queryContext, new MethodInfo(method));
 	}
 	
 	public static void setCurrentArgs(Object...args) throws Exception {

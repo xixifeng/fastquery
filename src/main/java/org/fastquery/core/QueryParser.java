@@ -22,7 +22,6 @@
 
 package org.fastquery.core;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,6 @@ import java.util.regex.Matcher;
 
 import org.fastquery.dialect.DialectScheduler;
 import org.fastquery.mapper.QueryPool;
-import org.fastquery.page.NotCount;
 import org.fastquery.page.PageDialect;
 import org.fastquery.page.Pageable;
 import org.fastquery.struct.ParamMap;
@@ -55,11 +53,11 @@ public class QueryParser {
 	 * @return
 	 */
 	static List<SQLValue> modifyParser() {
-		Method method = QueryContext.getMethod();
+		MethodInfo method = QueryContext.getMethodInfo();
 		Object[] args = QueryContext.getArgs();
-		Query[] queries = method.getAnnotationsByType(Query.class);
+		Query[] queries = method.getQueries();
 
-		Modifying modifying = method.getAnnotation(Modifying.class);
+		Modifying modifying = method.getModifying();
 		String id = modifying.id(); // 不可能为null
 		String table = modifying.table();
 
@@ -87,22 +85,22 @@ public class QueryParser {
 	 * @return
 	 */
 	static SQLValue queryParser() {
-		Method method = QueryContext.getMethod();
-		Query[] queries = method.getAnnotationsByType(Query.class);
+		MethodInfo method = QueryContext.getMethodInfo();
+		Query[] queries = method.getQueries();
 		String sql = TypeUtil.getQuerySQL(method, queries, QueryContext.getArgs()).get(0);
 		return inParser(sql);
 	}
 
 	public static List<SQLValue> pageParser() {
 
-		Method method = QueryContext.getMethod();
+		MethodInfo method = QueryContext.getMethodInfo();
 		Object[] args = QueryContext.getArgs();
 		
 		Pageable pageable = QueryContext.getPageable();
 		int offset = pageable.getOffset();
 		int pageSize = pageable.getPageSize();
 		
-		Query[] querys = method.getAnnotationsByType(Query.class);
+		Query[] querys = method.getQueries();
 		String querySQL = TypeUtil.getQuerySQL(method, querys, args).get(0);
 		
 		PageDialect pageDialect = DialectScheduler.getCurrentPageDialect();
@@ -111,7 +109,7 @@ public class QueryParser {
 		List<SQLValue> sqlValues = new ArrayList<>(2);// 有3条记录 0.当前页query,1.求和query,2.下一页query
 		sqlValues.add(inParser(currentPageSQL));
 
-		if (method.getAnnotation(NotCount.class) == null) { // 表明需要求和
+		if (method.getNotCount() == null) { // 表明需要求和
 			Query query = querys[0];
 			String countField = query.countField();
 			String countQuery = query.countQuery();
@@ -148,7 +146,7 @@ public class QueryParser {
 
 		String query = QueryPool.render(true);
 
-		Method method = QueryContext.getMethod();
+		MethodInfo method = QueryContext.getMethodInfo();
 		// 获取 pageable
 		Pageable pageable = QueryContext.getPageable();
 		int offset = pageable.getOffset();
@@ -160,7 +158,7 @@ public class QueryParser {
 		String currentPageSQL = pageDialect.getCurrentPageSQL(querySQL, offset, pageSize);
 		sqlValues.add(inParser(currentPageSQL));
 
-		if (method.getAnnotation(NotCount.class) == null) { // 需要求和
+		if (method.getNotCount() == null) { // 需要求和
 			String countPageSQL = QueryPool.render(false);
 			countPageSQL = TypeUtil.paramNameFilter(method, countPageSQL);
 			sqlValues.add(inParser(countPageSQL));

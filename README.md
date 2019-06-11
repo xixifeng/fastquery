@@ -5,13 +5,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.72</version> <!-- fastquery.version -->
+    <version>1.0.73</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.72'
+compile 'org.fastquery:fastquery:1.0.73'
 ```
 
 # FastQuery 数据持久层框架
@@ -592,8 +592,7 @@ assertThat(effect, is(3));
 最终会解释成一条SQL语句:
 
 ```sql
-update UserInfo
-set
+update UserInfo set
   name = case id
   when 77 then '茝若'
   when 88 then '芸兮'

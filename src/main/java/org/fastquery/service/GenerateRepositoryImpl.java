@@ -90,7 +90,7 @@ class GenerateRepositoryImpl {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends QueryRepository> Class<? extends T> generate(Class<T> repositoryClazz) {
+	private <T extends QueryRepository> Class<? extends T> generate(Class<T> repositoryClazz) {
 		String name = repositoryClazz.getName() + Placeholder.DB_SUF;
 
 		byte[] bytes = AsmRepository.generateBytes(repositoryClazz);

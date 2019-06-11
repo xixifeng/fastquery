@@ -24,6 +24,7 @@ package org.fastquery.test;
 
 import java.lang.reflect.Method;
 
+import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Param;
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
@@ -37,9 +38,9 @@ import static org.hamcrest.Matchers.*;
 public class ParamFilterTest extends FastQueryTest  {
 
 	public static String paramFilter(Method method, Object[] args, String sql) throws Exception {
-		Method m = TypeUtil.class.getDeclaredMethod("paramFilter", Method.class, Object[].class, String.class);
+		Method m = TypeUtil.class.getDeclaredMethod("paramFilter", MethodInfo.class, Object[].class, String.class);
 		m.setAccessible(true);
-		return m.invoke(null, method, args, sql).toString();
+		return m.invoke(null, new MethodInfo(method), args, sql).toString();
 	}
 
 	public void m1(@Param("name1") String name, @Param("age1") Integer age) {

@@ -43,10 +43,10 @@ public final class Placeholder {
 	public static final String REST_SUF = "b$";
 
 	public static final String TABLE = "#{#table}";
-	public static final String TABLE_REG = "\\#\\{\\#table\\}";
+	static final String TABLE_REG = "\\#\\{\\#table\\}";
 
 	public static final String ID = "#{#id}";
-	public static final String ID_REG = "\\#\\{\\#id\\}";
+	static final String ID_REG = "\\#\\{\\#id\\}";
 
 	public static final String SETS_REG = "\\#\\{\\#sets\\}";
 	public static final String WHERE_REG = "\\#\\{\\#where\\}";

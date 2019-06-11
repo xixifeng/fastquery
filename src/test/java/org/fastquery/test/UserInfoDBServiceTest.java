@@ -24,6 +24,7 @@ package org.fastquery.test;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInformation;
 import org.fastquery.core.RepositoryException;
@@ -64,6 +65,16 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
 
+	@Test
+	public void findId() {
+		try {
+			userInfoDBService.findId(1);
+		} catch (Exception e) {
+			String str = ExceptionUtils.getStackTrace(e);
+			assertThat(str, containsString("字段 id 的类型是 java.lang.Integer 不能强制转化成 java.lang.Long"));
+		}
+	}
+	
 	@Test
 	public void findById() {
 		Integer id = 1;
@@ -347,7 +358,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void findByIds() {
-		int[] ids = new int[] { 1, 2, 3 };
+		int[] ids = { 1, 2, 3 };
 		UserInfo[] userInfos = userInfoDBService.findByIds(ids);
 		assertThat(userInfos[0].getId(), equalTo(1));
 		assertThat(userInfos[1].getId(), equalTo(2));

@@ -53,7 +53,7 @@ public class PManager {
 	private Long createUid = 0L;// 默认:0 创建人UID
 	private Long lastUpdateUid;// 默认:0 最后修改人UID --云平台
 	
-	private int[] ins = new int[] {};
+	private int[] ins = {};
 	private List<String> lists = new ArrayList<>();
 	
 	public PManager() {

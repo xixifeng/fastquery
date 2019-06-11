@@ -22,20 +22,105 @@
 
 package org.fastquery.core;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
+
+import org.fastquery.page.NotCount;
+import org.fastquery.where.Condition;
+import org.fastquery.where.Set;
+
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
-public interface MethodInfo {
+public class MethodInfo {
 	
-	/**
-	 * 获取标识在方法上的 @Query
-	 */
-	Query[] queries = new Query[0];
+	private Method method;
+	private Modifying modifying;
+	private Query[] queries;
+	private Parameter[] parameters;
+	private Class<?> returnType;
+	private Id id;
+	private Transactional t;
+	private QueryByNamed queryByNamed;
+	private NotCount notCount;
+	private Condition[] conditions;
+	private Annotation[][] parameterAnnotations;
+	private Type genericReturnType;
+	private String name;
+	private Query query;
+	private Set[] sets;
+
+	public Transactional getT() {
+		return t;
+	}
+	public MethodInfo(Method method) { // NO_UCD
+		this.method = method;
+		this.modifying = method.getAnnotation(Modifying.class);
+		this.queries = method.getAnnotationsByType(Query.class);
+		this.parameters = method.getParameters();
+		this.returnType = method.getReturnType();
+		this.id = method.getAnnotation(Id.class);
+		this.t = method.getAnnotation(Transactional.class);
+		this.queryByNamed = method.getAnnotation(QueryByNamed.class);
+		this.notCount = method.getAnnotation(NotCount.class);
+		this.conditions = method.getAnnotationsByType(Condition.class);
+		this.parameterAnnotations =  method.getParameterAnnotations();
+		this.genericReturnType = method.getGenericReturnType();
+		this.name = method.getName();
+		this.query = method.getAnnotation(Query.class);
+		this.sets = method.getAnnotationsByType(Set.class);
+	}
+	Method getMethod() {
+		return method;
+	}
+	public Modifying getModifying() {
+		return modifying;
+	}
+	public Query[] getQueries() {
+		return queries;
+	}
+	public Parameter[] getParameters() {
+		return parameters;
+	}
+	public Class<?> getReturnType() {
+	        return returnType;
+	}
+	public Id getId() {
+		return id;
+	}
+	public QueryByNamed getQueryByNamed() {
+		return queryByNamed;
+	}
+	public NotCount getNotCount() {
+		return notCount;
+	}
+	public Condition[] getConditions() {
+		return conditions;
+	}
+	public Annotation[][] getParameterAnnotations() {
+		return parameterAnnotations;
+	}
+	public Type getGenericReturnType() {
+		return genericReturnType;
+	}
 	
-	/**
-	 * 获取标识在方法上的 @Modifying
-	 */
-	Modifying modifying = null;
-	
+	public String getName() {
+		return name;
+	}
+	public Query getQuery() {
+		return query;
+	}
+	public Set[] getSets() {
+		return sets;
+	}
+	@Override
+	public String toString() {
+		return this.method.toString();
+	}
+	public String toGenericString() {
+		return this.method.toGenericString();
+	}
 }

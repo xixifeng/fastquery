@@ -28,7 +28,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Properties;
 
 import static org.hamcrest.Matchers.*;
 
@@ -36,7 +35,6 @@ import org.fastquery.bean.PManager;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
 import org.fastquery.util.TypeUtil;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -49,24 +47,7 @@ public class FQueryTest extends FastQueryTest  {
 	public void testGetRepository() {
 		assertThat(FQuery.getRepository(StudentDBService.class), notNullValue());
 	}
-
-	@Ignore
-	@Test
-	public void testCreateDataSource() {
-		// 数据源名称
-		String dataSourceName = "xk100";
-
-		// 连接池配置
-		Properties properties = new Properties();
-		properties.setProperty("driverClass", "com.mysql.cj.jdbc.Driver");
-		properties.setProperty("jdbcUrl", "jdbc:mysql://192.168.8.10:3306/xk1");
-		properties.setProperty("user", "xk1");
-		properties.setProperty("password", "abc1");
-
-		// 创建一个数据源
-		FQuery.createDataSource(dataSourceName, properties);
-	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testReset()

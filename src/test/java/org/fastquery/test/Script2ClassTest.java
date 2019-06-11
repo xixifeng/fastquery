@@ -27,9 +27,9 @@ import static org.hamcrest.Matchers.*;
 
 import java.lang.reflect.Method;
 
+import org.fastquery.asm.Script2Class;
 import org.fastquery.core.Param;
 import org.fastquery.util.QueryContextUtil;
-import org.fastquery.where.Script2Class;
 import org.fastquery.where.Set;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
