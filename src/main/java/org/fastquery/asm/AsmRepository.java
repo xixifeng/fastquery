@@ -38,8 +38,8 @@ import javassist.CtField;
 import javassist.CtMethod;
 
 import org.fastquery.analysis.GenerateExtends;
+import org.fastquery.core.AbstractQueryRepository;
 import org.fastquery.core.Placeholder;
-import org.fastquery.core.QueryRepository;
 import org.fastquery.mapper.QueryValidator;
 
 /**
@@ -140,7 +140,7 @@ public class AsmRepository {
 	 * @param repositoryClazz repository class
 	 * @return 生成的类字节码
 	 */
-	public static synchronized byte[] generateBytes(Class<? extends QueryRepository> repositoryClazz) {
+	public static synchronized byte[] generateBytes(Class<?> repositoryClazz) {
 		// 安全检测
 		GenerateExtends.safeCheck(repositoryClazz);
 
@@ -156,6 +156,10 @@ public class AsmRepository {
 		String className = repositoryClazz.getName() + Placeholder.DB_SUF;
 		CtClass ctClass = pool.makeClass(className);
 		try {
+			
+			// 设置父类
+			ctClass.setSuperclass(pool.get(AbstractQueryRepository.class.getName()));
+						
 			// 增加接口
 			ctClass.setInterfaces(new CtClass[] { pool.get(repositoryClazz.getName()) });
 			
@@ -172,7 +176,7 @@ public class AsmRepository {
 		}
 	}
 
-	static void addGetInterfaceClassMethod(Class<? extends QueryRepository> repositoryClazz, CtClass ctClass) throws CannotCompileException {
+	static void addGetInterfaceClassMethod(Class<?> repositoryClazz, CtClass ctClass) throws CannotCompileException {
 		// 增加字段
 		CtField field = CtField.make("private Class c = "+repositoryClazz.getName()+".class;", ctClass);
 		ctClass.addField(field);	
@@ -181,19 +185,17 @@ public class AsmRepository {
 		ctClass.addMethod(cm);
 	}
 	
-	private static void makeMethod(Class<? extends QueryRepository> repositoryClazz,CtClass ctClass) throws CannotCompileException {
+	private static void makeMethod(Class<?> repositoryClazz, CtClass ctClass) throws CannotCompileException {
 		// 实现抽象方法
-		Method[] methods = repositoryClazz.getMethods();
+		Method[] methods = repositoryClazz.getDeclaredMethods();
 		int len = methods.length;
-		int defaultMethodNum = countDefaultMethod(methods);// 默认方法default Method的个数
-		// 新增MethodInfo缓存数组
-		CtField field = CtField.make("private org.fastquery.core.MethodInfo[] m = new org.fastquery.core.MethodInfo["+(len-defaultMethodNum)+"];", ctClass);
-		ctClass.addField(field);	
-		
-		int index = 0;
-		for (int i = 0; i < len; i++) {
-			Method method = methods[i];
-			if (!method.isDefault()) {
+		if (len > 0) {
+			// 新增MethodInfo缓存数组
+			CtField field = CtField.make("private org.fastquery.core.MethodInfo[] m = new org.fastquery.core.MethodInfo[" + len + "];", ctClass);
+			ctClass.addField(field);
+			int index = 0;
+			for (int i = 0; i < len; i++) {
+				Method method = methods[i];
 				Class<?>[] ps = method.getParameterTypes();
 				StringBuilder bodyBuilder = new StringBuilder();
 				bodyBuilder.append('{');
@@ -201,7 +203,8 @@ public class AsmRepository {
 				// 缓存method...
 				bodyBuilder.append("if(this.m[j]==null) {");
 				bodyBuilder.append("java.lang.reflect.Method m;");
-				bodyBuilder.append("try {m = c.getMethod(\""+method.getName()+"\", $sig);} catch (Exception e) {throw new org.fastquery.core.RepositoryException(e);}");
+				bodyBuilder.append("try {m = c.getMethod(\"" + method.getName()
+						+ "\", $sig);} catch (Exception e) {throw new org.fastquery.core.RepositoryException(e);}");
 				bodyBuilder.append("this.m[j] = new org.fastquery.core.MethodInfo(m); ");
 				bodyBuilder.append("}");
 				// 缓存method... End
@@ -209,21 +212,10 @@ public class AsmRepository {
 				bodyBuilder.append('}');
 				CtMethod cm = CtMethod.make(getMethodDef(method) + bodyBuilder.toString(), ctClass);
 				ctClass.addMethod(cm);
-				
 			}
 		}
 	}
 	
-	private static int countDefaultMethod(Method[] methods) {
-		int i = 0;
-		for (Method method : methods) {
-			if(method.isDefault()) {
-				++i;
-			}
-		}
-		return i;
-	}
-
 	private static void makeSingleton(String className, CtClass ctClass) throws CannotCompileException {
 		// 创建一个私有的静态变量
 		ctClass.addField(CtField.make("private static " + className + " i;", ctClass));
@@ -244,7 +236,7 @@ public class AsmRepository {
 	 * 
 	 * @param classes Repository class 集合
 	 */
-	public static void after(List<Class<QueryRepository>> classes) {
+	public static void after(List<Class<?>> classes) {
 		QueryValidator.check(classes);
 		classes.clear();
 

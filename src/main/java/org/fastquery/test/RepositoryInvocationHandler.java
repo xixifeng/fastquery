@@ -37,7 +37,7 @@ import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.QueryParser;
-import org.fastquery.core.QueryRepository;
+import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.filter.SkipFilter;
 import org.fastquery.page.Page;
@@ -51,11 +51,11 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RepositoryInvocationHandler.class);
 
-	private QueryRepository repository;
+	private Repository repository;
 	private FastQueryTestRule rule;
 	private Description description;
 
-	public RepositoryInvocationHandler(QueryRepository repository, FastQueryTestRule rule, Description description) {
+	public RepositoryInvocationHandler(Repository repository, FastQueryTestRule rule, Description description) {
 		this.repository = repository;
 		this.rule = rule;
 		this.description = description;

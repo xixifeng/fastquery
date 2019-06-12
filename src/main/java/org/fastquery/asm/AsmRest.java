@@ -27,7 +27,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import org.fastquery.core.Placeholder;
-import org.fastquery.core.QueryRepository;
 
 import javassist.ClassClassPath;
 import javassist.ClassPool;
@@ -58,7 +57,7 @@ public class AsmRest {
 	 * @param repositoryClazz repository class
 	 * @return 生成的类字节码
 	 */
-	public static synchronized byte[] generateBytes(Class<? extends QueryRepository> repositoryClazz) {
+	public static synchronized byte[] generateBytes(Class<?> repositoryClazz) {
 
 		// 生成类
 		ClassPool pool = ClassPool.getDefault();

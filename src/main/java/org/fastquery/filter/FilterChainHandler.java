@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.fastquery.core.QueryRepository;
+import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 
 /**
@@ -49,7 +49,7 @@ public class FilterChainHandler {
 	 * @param args 参数值
 	 * @return 执行结果
 	 */
-	public static <R extends QueryRepository> Object bindBeforeFilterChain(Class<?> iclazz, R repository, Method method, Object[] args) {
+	public static <R extends Repository> Object bindBeforeFilterChain(Class<?> iclazz, R repository, Method method, Object[] args) {
 		SkipFilter skipFilter = method.getAnnotation(SkipFilter.class);
 		List<Before> befores = new ArrayList<>();
 		if (skipFilter == null) {
@@ -75,7 +75,7 @@ public class FilterChainHandler {
 		return beforeFilterChain.start(repository, method, args);
 	}
 
-	public static <R extends QueryRepository> Object bindAfterFilterChain(Class<?> iclazz, R repository, Method method, Object[] args, Object object) {
+	public static <R extends Repository> Object bindAfterFilterChain(Class<?> iclazz, R repository, Method method, Object[] args, Object object) {
 		SkipFilter skipFilter = method.getAnnotation(SkipFilter.class);
 		List<After> afters = new ArrayList<>();
 		if (skipFilter == null) {

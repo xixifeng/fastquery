@@ -26,7 +26,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
 import org.fastquery.core.Placeholder;
-import org.fastquery.core.QueryRepository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dsm.FQueryProperties;
 import org.fastquery.util.BeanUtil;
@@ -48,7 +47,7 @@ public class FQuery { // NO_UCD
 	 * @return 接口的实例
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends QueryRepository> T getRepository(Class<T> clazz) {
+	public static <T> T getRepository(Class<T> clazz) {
 		String name = clazz.getName() + Placeholder.DB_SUF;
 		try {
 			return (T) GenerateRepositoryImpl.getInstance().getClassLoader().loadClass(name).getMethod("g").invoke(null);
@@ -65,8 +64,6 @@ public class FQuery { // NO_UCD
 	 * @param properties 连接池的配置
 	 */
 	public static void createDataSource(String dataSourceName, Properties properties) { // NO_UCD
-																						// (test
-																						// only)
 		FQueryProperties.createDataSource(dataSourceName, properties);
 	}
 

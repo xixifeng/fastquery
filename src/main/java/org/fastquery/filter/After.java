@@ -28,7 +28,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.fastquery.core.QueryRepository;
+import org.fastquery.core.Repository;
 
 
 /**
@@ -39,5 +39,5 @@ import org.fastquery.core.QueryRepository;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE })
 public @interface After {
-	Class<? extends AfterFilter<? extends QueryRepository>>[] value() default {};
+	Class<? extends AfterFilter<? extends Repository>>[] value() default {};
 }

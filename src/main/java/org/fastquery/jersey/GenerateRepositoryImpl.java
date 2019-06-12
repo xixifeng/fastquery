@@ -34,7 +34,6 @@ import org.fastquery.asm.AsmRepository;
 import org.fastquery.asm.AsmRest;
 import org.fastquery.core.FQueryResourceImpl;
 import org.fastquery.core.Placeholder;
-import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Resource;
 import org.fastquery.dsm.FastQueryJson;
 import org.fastquery.mapper.QueryPool;
@@ -57,7 +56,7 @@ class GenerateRepositoryImpl {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends QueryRepository> Class<? extends T> generate(Class<T> repositoryClazz) {
+	private <T> Class<? extends T> generate(Class<T> repositoryClazz) {
 		String name = repositoryClazz.getName() + Placeholder.DB_SUF;
 
 		if (repositoryClazz.getAnnotation(Path.class) != null) { // 如果接口上标识有@Path 就生成rest实现类
@@ -88,17 +87,17 @@ class GenerateRepositoryImpl {
 		// 1). 装载配置文件
 		Set<FastQueryJson> fqPropertie = LoadPrperties.load(resource);
 
-		List<Class<QueryRepository>> clses = new ArrayList<>();
+		List<Class<?>> clses = new ArrayList<>();
 
 		// 3). 批量生成 Repository 的实现类
 		Set<String> basePackages;
 		for (FastQueryJson fQueryPropertie : fqPropertie) {
 			basePackages = fQueryPropertie.getBasePackages();
 			for (String basePackage : basePackages) {
-				List<Class<QueryRepository>> classes = ClassUtil.getClasses(basePackage, classLoader);
+				List<Class<?>> classes = ClassUtil.getClasses(basePackage, classLoader);
 				clses.addAll(classes);
 				// classes.forEach(this::generate)
-				for (Class<QueryRepository> rcls : classes) {
+				for (Class<?> rcls : classes) {
 					generate(rcls); // 生成
 					QueryPool.put(rcls.getName(), resource);
 				}

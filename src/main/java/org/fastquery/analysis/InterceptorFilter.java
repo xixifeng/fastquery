@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.fastquery.core.QueryRepository;
+import org.fastquery.core.Repository;
 import org.fastquery.filter.After;
 import org.fastquery.filter.AfterFilter;
 import org.fastquery.filter.Before;
@@ -53,8 +53,8 @@ class InterceptorFilter implements MethodFilter {
 		List<Before> befores = new ArrayList<>(Arrays.asList(iclazz.getAnnotationsByType(Before.class))); // 获取类级别的before's
 		befores.addAll(Arrays.asList(method.getAnnotationsByType(Before.class))); // 获取方法上的before's
 		for (Before before : befores) {
-			Class<? extends BeforeFilter<? extends QueryRepository>>[] classz = before.value();
-			for (Class<? extends BeforeFilter<? extends QueryRepository>> class1 : classz) {
+			Class<? extends BeforeFilter<? extends Repository>>[] classz = before.value();
+			for (Class<? extends BeforeFilter<? extends Repository>> class1 : classz) {
 				compareType(method, iclazz, before, class1);
 			}
 		}
@@ -63,8 +63,8 @@ class InterceptorFilter implements MethodFilter {
 		List<After> afters = new ArrayList<>(Arrays.asList(iclazz.getAnnotationsByType(After.class))); // 获取类级别的after's
 		afters.addAll(Arrays.asList(method.getAnnotationsByType(After.class)));// 获取方法上的after's
 		for (After after : afters) {
-			Class<? extends AfterFilter<? extends QueryRepository>>[] classz = after.value();
-			for (Class<? extends AfterFilter<? extends QueryRepository>> class1 : classz) {
+			Class<? extends AfterFilter<? extends Repository>>[] classz = after.value();
+			for (Class<? extends AfterFilter<? extends Repository>> class1 : classz) {
 				compareType(method, iclazz, after, class1);
 			}
 		}
@@ -91,7 +91,7 @@ class InterceptorFilter implements MethodFilter {
 
 			if (Class.class.isAssignableFrom(ty.getClass())) { // 如果当前类型是Class的子类或者就是Class
 				Class<?> t = (Class<?>) ty;
-				if (QueryRepository.class.isAssignableFrom(t)) { // 如果t是Repository的子类或者t就是Repository
+				if (Repository.class.isAssignableFrom(t)) { // 如果t是Repository的子类或者t就是Repository
 					if (!t.isAssignableFrom(c2)) {
 						// 当前: c2不是t的子类且不就是t.
 						filterScopeError(method, annotation, parameterizedType, c2, t);

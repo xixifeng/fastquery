@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.fastquery.core.QueryRepository;
 import org.fastquery.core.RepositoryException;
 
 /**
@@ -53,16 +52,15 @@ public class ClassUtil {
 	 * @param loader 类加载器
 	 * @return clazz 集
 	 */
-	@SuppressWarnings("unchecked")
-	public static List<Class<QueryRepository>> getClasses(String packageName, ClassLoader loader) {
+	public static List<Class<?>> getClasses(String packageName, ClassLoader loader) {
 
 		// 第一个class类的集合
-		List<Class<QueryRepository>> classes = new ArrayList<>();
+		List<Class<?>> classes = new ArrayList<>();
 
 		// packageName 很可能是一个完整的类
 		try {
-			Class<QueryRepository> clazz = (Class<QueryRepository>) Class.forName(packageName, false, loader);
-			if (QueryRepository.class.isAssignableFrom(clazz)) {
+			Class<?> clazz = Class.forName(packageName, false, loader);
+			if (clazz.isInterface()) {
 				classes.add(clazz);
 			}
 		} catch (ClassNotFoundException e1) {
@@ -124,8 +122,8 @@ public class ClassUtil {
 										// 去掉后面的".class" 获取真正的类名
 										String className = name.substring(packageName.length() + 1, name.length() - 6);
 										try {
-											Class<QueryRepository> clsr = (Class<QueryRepository>) Class.forName(packageName + '.' + className);
-											if (QueryRepository.class.isAssignableFrom(clsr)) {
+											Class<?> clsr = Class.forName(packageName + '.' + className);
+											if (clsr.isInterface()) {
 												// 添加到classes
 												classes.add(clsr);
 											}
@@ -156,9 +154,8 @@ public class ClassUtil {
 	 * @param recursive
 	 * @param classes
 	 */
-	@SuppressWarnings("unchecked")
 	private static void findAndAddClassesInPackageByFile(String packageName, String packagePath, final boolean recursive,
-			List<Class<QueryRepository>> classes) {
+			List<Class<?>> classes) {
 		// 获取此包的目录 建立一个File
 		File dir = new File(packagePath);
 		// 如果不存在或者 也不是目录就直接返回
@@ -180,8 +177,8 @@ public class ClassUtil {
 				// 如果是java类文件 去掉后面的.class 只留下类名
 				String className = file.getName().substring(0, file.getName().length() - 6);
 				try {
-					Class<QueryRepository> rcls = (Class<QueryRepository>) Class.forName(packageName + '.' + className);
-					if (QueryRepository.class.isAssignableFrom(rcls)) {
+					Class<?> rcls = Class.forName(packageName + '.' + className);
+					if (rcls.isInterface()) {
 						// 添加到集合中去
 						classes.add(rcls);
 					}
