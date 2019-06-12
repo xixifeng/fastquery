@@ -28,4 +28,8 @@ package org.fastquery.core;
  * @author xixifeng (fastquery@126.com)
  */
 public interface Repository {
+	// 当前Repository接口的class
+	default Class<? extends Repository> getInterfaceClass() {
+		return null;
+	}
 }

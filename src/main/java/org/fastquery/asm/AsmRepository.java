@@ -40,6 +40,7 @@ import javassist.CtMethod;
 import org.fastquery.analysis.GenerateExtends;
 import org.fastquery.core.AbstractQueryRepository;
 import org.fastquery.core.Placeholder;
+import org.fastquery.core.QueryRepository;
 import org.fastquery.mapper.QueryValidator;
 
 /**
@@ -156,21 +157,16 @@ public class AsmRepository {
 		String className = repositoryClazz.getName() + Placeholder.DB_SUF;
 		CtClass ctClass = pool.makeClass(className);
 		try {
-			
-			// 设置父类
-			ctClass.setSuperclass(pool.get(AbstractQueryRepository.class.getName()));
-						
+			if(QueryRepository.class.isAssignableFrom(repositoryClazz)) {
+				// 设置父类
+				ctClass.setSuperclass(pool.get(AbstractQueryRepository.class.getName()));
+			}
 			// 增加接口
 			ctClass.setInterfaces(new CtClass[] { pool.get(repositoryClazz.getName()) });
-			
 			addGetInterfaceClassMethod(repositoryClazz, ctClass);
-
 			makeSingleton(className, ctClass);
-			
 			makeMethod(repositoryClazz, ctClass);
-
 			return ctClass.toBytecode();
-
 		} catch (Exception e) {
 			throw new ExceptionInInitializerError(e);
 		}
@@ -179,7 +175,7 @@ public class AsmRepository {
 	static void addGetInterfaceClassMethod(Class<?> repositoryClazz, CtClass ctClass) throws CannotCompileException {
 		// 增加字段
 		CtField field = CtField.make("private Class c = "+repositoryClazz.getName()+".class;", ctClass);
-		ctClass.addField(field);	
+		ctClass.addField(field);
 		// 覆盖部分default 方法
 		CtMethod cm = CtMethod.make("public Class getInterfaceClass() {return c;}", ctClass);
 		ctClass.addMethod(cm);

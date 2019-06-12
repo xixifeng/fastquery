@@ -165,7 +165,7 @@ public class FastQueryTestRule implements TestRule {
 	private void after(Description description) throws SQLException {
 		LOG.debug("{} --------------------------------------------已经结束,当前线程:{}", description.getMethodName(), Thread.currentThread());
 		QueryContext context = QueryContextHelper.getQueryContext();
-		if (context != null) {
+		if (context != null && QueryContext.getConn() != null) {
 			Rollback rollback = description.getAnnotation(Rollback.class);
 			if (rollback == null || rollback.value()) {
 				QueryContext.getConn().rollback();

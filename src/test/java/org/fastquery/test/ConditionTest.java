@@ -22,6 +22,7 @@
 
 package org.fastquery.test;
 
+import org.fastquery.core.QueryRepository;
 import org.fastquery.dao.ConditionDBService;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.service.FQuery;
@@ -30,6 +31,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertThat;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import static org.hamcrest.Matchers.*;
 
 /**
@@ -42,6 +46,17 @@ public class ConditionTest extends FastQueryTest {
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
+	
+	@Test
+	public void db() {
+		assertThat(QueryRepository.class.isAssignableFrom(db.getClass()), is(false));
+		// 断言是否继承了QueryRepository中的方法
+		try {
+			db.getClass().getMethod("executeBatch", String.class,String.class);
+		} catch (Exception e) {
+			assertThat(ExceptionUtils.getStackTrace(e), containsString("java.lang.NoSuchMethodException: com.sun.proxy.$Proxy42.executeBatch(java.lang.String, java.lang.String)"));
+		}
+	}
 	
 	@Test
 	public void findUserInfo1() {

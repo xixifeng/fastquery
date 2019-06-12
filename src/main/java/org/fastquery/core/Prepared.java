@@ -52,11 +52,11 @@ public class Prepared { // NO_UCD
 	 * @param target 目标 Repository
 	 * @return 执行之后的值
 	 */
-	public static Object excute(MethodInfo methodInfo,Object[] args, QueryRepository target) {
+	public static Object excute(MethodInfo methodInfo,Object[] args, Repository target) {
 		long start = System.currentTimeMillis();
 		Method method = methodInfo.getMethod();
 		try {
-			Class<? extends Repository> iclazz = target.getInterfaceClass();
+			Class<?> iclazz = target.getInterfaceClass();
 
 			// 如果是调试模式
 			if (FastQueryJSONObject.getDebug()) {

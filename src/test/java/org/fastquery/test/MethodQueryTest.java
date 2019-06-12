@@ -23,6 +23,7 @@
 package org.fastquery.test;
 
 import org.fastquery.bean.UserInfo;
+import org.fastquery.core.QueryRepository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.example.StudentDBService;
@@ -55,6 +56,15 @@ public class MethodQueryTest extends FastQueryTest {
 	private static StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
 	private static UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 
+	@Test
+	public void db() throws NoSuchMethodException, SecurityException {
+		assertThat(QueryRepository.class.isAssignableFrom(studentDBService.getClass()), is(true));
+		// 断言是否继承了QueryRepository中的方法
+		assertThat(studentDBService.getClass().getMethod("executeBatch", String.class,String.class), notNullValue());
+		assertThat(QueryRepository.class.isAssignableFrom(userInfoDBService.getClass()), is(true));
+		assertThat(userInfoDBService.getClass().getMethod("executeBatch", String.class,String.class), notNullValue());
+	}
+	
 	@Test
 	public void testSave() {
 

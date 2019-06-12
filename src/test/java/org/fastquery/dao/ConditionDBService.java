@@ -28,7 +28,7 @@ import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;
-import org.fastquery.core.QueryRepository;
+import org.fastquery.core.Repository;
 import org.fastquery.page.Page;
 import org.fastquery.page.Pageable;
 import org.fastquery.where.Condition;
@@ -38,7 +38,7 @@ import org.fastquery.where.Judge;
  * 
  * @author mei.sir@aliyun.cn
  */
-public interface ConditionDBService extends QueryRepository {
+public interface ConditionDBService extends Repository {
 
 	@Query("select * ${tname} #{#where} limit 3")
 	@Condition(value=" $nameWhere",ignoreScript=":nameWhere==null")
