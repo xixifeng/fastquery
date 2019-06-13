@@ -60,5 +60,4 @@ public class PageableImpl implements Pageable {
 	public int getOffset() {
 		return page * size - size;
 	}
-
 }

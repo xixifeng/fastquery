@@ -199,7 +199,7 @@ JRE 8+
 - DAO接口
 
 ```java
- public interface StudentDBService extends QueryRepository {
+ public interface StudentDBService extends org.fastquery.core.Repository {
     @Query("select no, name, sex from student")
     JSONArray findAll();
     @Query("select no,name,sex,age,dept from student")
@@ -211,15 +211,15 @@ JRE 8+
 
 ```java
 public class StudentDBServiceTest {
-	   // 获取实现类
-	   private static StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
-	   @Test
-	   public void test() {
-		   // 调用 findAll 方法
-		   JSONArray jsonArray = studentDBService.findAll();
-		   // 调用 find 方法
-		   Student[] students = studentDBService.find(); 
-	   }
+	// 获取实现类
+	private static StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
+	@Test
+	public void test() {
+		// 调用 findAll 方法
+		JSONArray jsonArray = studentDBService.findAll();
+		// 调用 find 方法
+		Student[] students = studentDBService.find(); 
+	}
 }
 ```
 
@@ -528,6 +528,16 @@ public class UserInfo {
 	// getter /setter 省略...	
 }
 ```
+
+使用QueryRepository的内置函数,必须要继承它:
+
+```java
+public interface StudentDBService extends QueryRepository {
+   ... ...
+}
+```
+
+**提醒**: 继承`Repository`适合应用于不使用内置函数的场景,显然更加轻量级.   
 
 保存实体,更新实体,保存或更新实体示例如下:
 
