@@ -205,4 +205,7 @@ public interface UserInfoDBService extends QueryRepository {
 	@Condition(value = "age = ?1", ignoreNull = false)
 	@Condition(value = " and name like ?2")
 	List<Map<String, Object>> findUserSome2(Integer age, String name);
+	
+	@Query("select name from UserInfo where name = `- %:name% -` limit 1")
+	String[] findNamesToSmile(@Param("name")String name);
 }

@@ -291,7 +291,6 @@ public class QueryPool {
 		// 往上下文设置值
 		map.forEach(context::put);
 		
-		// 把当前repository的Method放入模板上下文里
 		context.put("_method", QueryContext.getMethodInfo());
 
 		// 输出流

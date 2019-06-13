@@ -28,9 +28,8 @@ package org.fastquery.page;
  */
 public class PageableImpl implements Pageable {
 
-	// 这个给默认值是没有意义的, 当前访问的是第几页和每页显示多少条数据,应该让客户端决定.
-	private int page;
-	private int size;
+	private int page = 1;
+	private int size = 1;
 
 	/**
 	 * 构造分页
@@ -39,16 +38,11 @@ public class PageableImpl implements Pageable {
 	 * @param size 设定每页显示几条数据
 	 */
 	public PageableImpl(int page, int size) {
-
-		this.page = page;
-		this.size = size;
-
-		if (page < 1) {
-			this.page = 1;
+		if (page > 1) {
+			this.page = page;
 		}
-
-		if (size < 1) {
-			this.size = 1;
+		if (size > 1) {
+			this.size = size;
 		}
 	}
 

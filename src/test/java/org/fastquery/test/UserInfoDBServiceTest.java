@@ -470,5 +470,16 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		List<Object> objects = sqlValue.getValues();
 		assertThat(objects.isEmpty(), is(true));
 	}
+	
+	@Test
+	public void findNamesToSmile() {
+		String name = "Smile";
+		userInfoDBService.findNamesToSmile(name);
+		SQLValue sqlValue = rule.getSQLValue();
+		assertThat(sqlValue.getSql(), equalTo("select name from UserInfo where name = ? limit 1"));
+		List<Object> vals = sqlValue.getValues();
+		assertThat(vals.size(), is(1));
+		assertThat(vals.get(0).toString(), equalTo(" %Smile% "));
+	}
 
 }

@@ -925,7 +925,7 @@ public List<Student> findSomeStudent();
 
 **注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,可用于在模板中做逻辑判断,而`:name`用于标记参数位,SQL解析器会将其翻译成`?`号.  
 
-允许多个方法绑定同一个模板id. 在模板中使用`${_method}`可以引用到当前方法的`java.lang.reflect.Method`对象.  
+允许多个方法绑定同一个模板id. 在模板中使用`${_method}`可以引用到当前方法的`org.fastquery.core.MethodInfo`对象,该对象是反射`java.lang.reflect.Method`的缓存.  
 例: 根据当前方法名称的不同取不同的`SQL`语句
 
 ```java

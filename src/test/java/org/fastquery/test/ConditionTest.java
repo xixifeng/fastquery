@@ -54,7 +54,9 @@ public class ConditionTest extends FastQueryTest {
 		try {
 			db.getClass().getMethod("executeBatch", String.class,String.class);
 		} catch (Exception e) {
-			assertThat(ExceptionUtils.getStackTrace(e), containsString("java.lang.NoSuchMethodException: com.sun.proxy.$Proxy42.executeBatch(java.lang.String, java.lang.String)"));
+			String stackTrace = ExceptionUtils.getStackTrace(e);
+			assertThat(stackTrace, containsString("java.lang.NoSuchMethodException:"));
+			assertThat(stackTrace, containsString("executeBatch(java.lang.String, java.lang.String)"));
 		}
 	}
 	
