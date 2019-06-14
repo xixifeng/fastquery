@@ -52,7 +52,7 @@ import com.alibaba.fastjson.JSONObject;
 public interface UserInfoDBService extends QueryRepository {
 	
 	@Query("select id from UserInfo where id = :id")
-	Long findId(@Param("id") Integer id);
+	Character findId(@Param("id") Integer id);
 
 	@Query("select id,name,age from UserInfo where id = :id")
 	UserInfo findById(@Param("id") Integer id);

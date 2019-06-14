@@ -23,6 +23,8 @@
 package org.fastquery.handler;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +37,8 @@ import org.fastquery.core.MethodInfo;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.util.TypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import com.alibaba.fastjson.JSON;
@@ -47,6 +51,8 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class QueryHandler {
 
+	private static final Logger LOG = LoggerFactory.getLogger(QueryHandler.class);
+	
 	private static class LazyHolder {
 		private static final QueryHandler INSTANCE = new QueryHandler();
 
@@ -207,13 +213,18 @@ public class QueryHandler {
 				Object val = map.values().iterator().next();
 				if(returnType == String.class) {
 					return String.valueOf(val);
-				}
-				
-				if(val !=null && returnType != val.getClass()) {
+				} else if(val !=null && returnType != val.getClass()) {
+					String methodLongName = method.getClass().getName()+"."+method.getName();
 					String key = map.keySet().iterator().next();
-					throw new RepositoryException("字段 " + key + " 的类型是 " + val.getClass().getName() + " 不能强制转化成 " + returnType.getName()+" 请修改这个方法的返回类型,方法位置:" + method);
+					String typeName = val.getClass().getName();
+					LOG.error("字段 {} 的类型是 {} 不能强制转化成 {} 请把这个方法({})的返回类型修改为{},为了向后兼容,会执行强转,但是这是存在风险的,建议看到此日志请完善代码",key,typeName,returnType.getName(),methodLongName,typeName);
+					try {
+						Method valueOfMethod = returnType.getDeclaredMethod("valueOf", String.class);
+						return valueOfMethod.invoke(null, val.toString());
+					} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						throw new RepositoryException("发生方法:" + methodLongName + ", 将" + typeName +" 转换成 " + returnType + " 失败.");
+					}
 				}
-				
 				return val; 
 			} else {
 				throw new RepositoryException(method + "不能把多条记录赋值给" + returnType);

@@ -68,10 +68,11 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void findId() {
 		try {
-			userInfoDBService.findId(1);
+			Object id = userInfoDBService.findId(1);
+			LOG.info("id:{}",id);
 		} catch (Exception e) {
 			String str = ExceptionUtils.getStackTrace(e);
-			assertThat(str, containsString("字段 id 的类型是 java.lang.Integer 不能强制转化成 java.lang.Long"));
+			assertThat(str, containsString("发生方法:org.fastquery.core.MethodInfo.findId, 将java.lang.Integer 转换成 class java.lang.Character 失败."));
 		}
 	}
 	
