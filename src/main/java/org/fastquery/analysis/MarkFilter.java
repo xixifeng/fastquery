@@ -36,7 +36,6 @@ import org.fastquery.util.TypeUtil;
 import org.fastquery.where.Condition;
 
 /**
- * 如果Query,Condition中出现有":name" 表达式, 那么当前方法必须存在Parm注解并且保持一致. <br>
  * Parm("") 命名时禁止用""字符串
  * 
  * @author xixifeng (fastquery@126.com)
@@ -70,35 +69,12 @@ class MarkFilter implements MethodFilter {
 		Query[] queries = method.getAnnotationsByType(Query.class);
 		for (Query query : queries) {
 			String s = query.value() + query.countField() + query.countQuery();
-			if (!TypeUtil.matches(s, ":\\s+").isEmpty()) {
-				this.abortWith(method, "表达式不符合规范:冒号\":\"后面不能是空白");
-			}
 
-			if (!TypeUtil.matches(s, "\\$\\{?\\s+").isEmpty()) {
-				this.abortWith(method, "表达式不符合规范:不能出现\"${ \" 或 \"$ \"");
-			}
-
-			if (!TypeUtil.matches(s, "\\{\\s+").isEmpty()) {
-				this.abortWith(method, "表达式不符合规范:不能出现\"{ \"");
-			}
-
-			if (!TypeUtil.matches(s, "\\s+\\}").isEmpty()) {
-				this.abortWith(method, "表达式不符合规范:不能出现\" }\"");
-			}
-
-			if (!TypeUtil.matches(s, "[^\\$#]\\{").isEmpty()) {
-				this.abortWith(method, "表达式不符合规范:\"{\"前必须连接\"$\"或\"#\"");
-			}
+			// 表达式语法规范校验
+			expressionSpec(method, s);
 
 			// 2). 校验微笑表达式中的内容
-			List<String> smiles = TypeUtil.matches(s, Placeholder.SMILE_BIG);
-			for (String smile : smiles) {
-				int len = TypeUtil.matches(smile, Placeholder.EL_OR_COLON).size();
-				if (len != 1) {
-					this.abortWith(method, "微笑表达式中的内容必须只能包含一个$表达式或一个冒号表达式,而它包含了" + len + "个表达式");
-				}
-			}
-			smiles.clear();
+			checkSmile(method, s);
 
 			ps.addAll(TypeUtil.matchesNotrepeat(query.value(), slreg));
 			ps.addAll(TypeUtil.matchesNotrepeat(query.countField(), slreg));
@@ -116,26 +92,52 @@ class MarkFilter implements MethodFilter {
 		}
 
 		for (String p : ps) {
-			int c1 = TypeUtil.matches(p, "\\{").size();
-			int c2 = TypeUtil.matches(p, "\\}").size();
-			if (c1 == c2 && c1 == 0) {
-				continue;
-			}
-			if (c1 != c2 || (c1 == c2 && c1 != 1)) { // "{" 和 "}" 必须成比出现
-				this.abortWith(method, String.format("\"%s\"中的\"{\"和\"}\"分别只能出现一次或都不出现,据分析\"{\"出现%d次,而\"}\"出现%d次", p, c1, c2));
-			}
-
-			String s;
-			if (Pattern.matches(slreg, p)) { // 如果能匹配上冒号表达式
-				s = p.replaceFirst(":", "");
-			} else {
-				s = p.replace("${", "").replace("}", "").replace("$", "");
-			}
-			if (!params.contains(s)) {
-				this.abortWith(method, String.format("发现存在%s,而从参数中没有找到@Param(\"%s\"),这种语法是不被允许的.", p, s));
-			}
+			// "{" 和 "}" 必须成比出现
+			checkEL(method, p);
+			// Condition中出现有":name" 表达式, 那么当前方法必须存在Parm注解并且保持一致
+			checkColon(method, params, slreg, p);
 		}
 
+	}
+
+	private void expressionSpec(Method method, String s) {
+		if (!TypeUtil.matches(s, ":\\s+").isEmpty()) {
+			this.abortWith(method, "表达式不符合规范:冒号\":\"后面不能是空白");
+		} else if (!TypeUtil.matches(s, "\\$\\{?\\s+").isEmpty()) {
+			this.abortWith(method, "表达式不符合规范:不能出现\"${ \" 或 \"$ \"");
+		} else if (!TypeUtil.matches(s, "\\{\\s+").isEmpty()) {
+			this.abortWith(method, "表达式不符合规范:不能出现\"{ \"");
+		} else if (!TypeUtil.matches(s, "\\s+\\}").isEmpty()) {
+			this.abortWith(method, "表达式不符合规范:不能出现\" }\"");
+		} else if (!TypeUtil.matches(s, "[^\\$#]\\{").isEmpty()) {
+			this.abortWith(method, "表达式不符合规范:\"{\"前必须连接\"$\"或\"#\"");
+		}
+	}
+
+	private void checkSmile(Method method, String s) {
+		List<String> smiles = TypeUtil.matches(s, Placeholder.SMILE_BIG);
+		for (String smile : smiles) {
+			int len = TypeUtil.matches(smile, Placeholder.EL_OR_COLON).size();
+			if (len != 1) {
+				this.abortWith(method, "微笑表达式中的内容必须只能包含一个$表达式或一个冒号表达式,而它包含了" + len + "个表达式");
+			}
+		}
+		smiles.clear();
+	}
+
+	private void checkColon(Method method, Set<String> params, String slreg, String p) {
+		String s = Pattern.matches(slreg, p) ? p.replaceFirst(":", "") : p.replace("${", "").replace("}", "").replace("$", "");
+		if (!params.contains(s)) {
+			this.abortWith(method, String.format("发现存在%s,而从参数中没有找到@Param(\"%s\"),这种语法是不被允许的.", p, s));
+		}
+	}
+
+	private void checkEL(Method method, String p) {
+		int c1 = TypeUtil.matches(p, "\\{").size();
+		int c2 = TypeUtil.matches(p, "\\}").size();
+		if (c1 != c2 || c1 > 1) {
+			this.abortWith(method, String.format("\"%s\"中的\"{\"和\"}\"分别只能出现一次或都不出现,据分析\"{\"出现%d次,而\"}\"出现%d次", p, c1, c2));
+		}
 	}
 
 }

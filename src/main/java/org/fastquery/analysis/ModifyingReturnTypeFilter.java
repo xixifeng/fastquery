@@ -59,39 +59,21 @@ class ModifyingReturnTypeFilter implements MethodFilter {
 
 		Query[] queries = method.getAnnotationsByType(Query.class);
 		for (Query query : queries) {
-
-			// 1). 校验 SQL中存在"insert into" 才能允许其返回值为 Map<String,Object>
 			// 如果当前方法没有标记 @Modifying 和 @ Query 是进入不了这个过滤器的. 过滤器已经分成了8类
 			String sql = query.value();
 			// 如果返回值是Map 并且 没有包含 "insert into" 或 "update"
 
 			// sql中既不含insert又不含update,才会返回true
 			boolean nothas = !TypeUtil.containsIgnoreCase(sql, "insert into") && !TypeUtil.containsIgnoreCase(sql, "update");
-
-			if ((returnType == Map.class) && nothas) {
+			if ((returnType == Map.class) && nothas) { // 1). 校验 SQL中存在"insert into" 才能允许其返回值为 Map<String,Object>
 				this.abortWith(method, sql + errmsg2);
-			}
-
-			// 2). 校验:如果返回值是JSONObject,那么SQL必须是insert语句 或 "update"
-			if ((returnType == JSONObject.class) && nothas) {
+			} else if ((returnType == JSONObject.class) && nothas) { // 2). 校验:如果返回值是JSONObject,那么SQL必须是insert语句 或 "update"
 				this.abortWith(method, sql + errmsg2);
-			}
-
-			// 3). 校验:如果返回值是实体,那么SQL必须是insert 或 "update"
-			// 如果 returnType 是 bean 并且 没有包含 insert
-			if ((TypeUtil.hasDefaultConstructor(returnType)) && nothas) {
+			} else if ((TypeUtil.hasDefaultConstructor(returnType)) && nothas) { // 3). 校验:如果返回值是实体,那么SQL必须是insert 或 "update"
 				this.abortWith(method, sql + errmsg2);
-			}
-
-			// 4). 校验:如果是删除操作,那么返回值只能是void 或是 int, 或者int[]
-			// 返回值既不是void类型又不是int并且也不是boolean类型,才会返回true.
-			boolean hsx = (returnType != void.class) && (returnType != int.class) && (returnType != int[].class) && (returnType != boolean.class);
-			if (TypeUtil.containsIgnoreCase(sql, "delete") && hsx) {
+			} else if (TypeUtil.containsIgnoreCase(sql, "delete") && (returnType != void.class) && (returnType != int.class) && (returnType != int[].class) && (returnType != boolean.class)) { // 4). 校验:如果是删除操作,那么返回值只能是void 或是 int, 或者int[]
 				this.abortWith(method, sql + "该SQL是删除操作,返回值只能是void,int,int[]或boolean类型.");
-			}
-
-			// 5). 校验返回值所允许的类型
-			if(returnType != void.class && 
+			} else if(returnType != void.class && 
 				returnType != int.class &&
 				returnType != int[].class &&
 				returnType != boolean.class &&
@@ -99,10 +81,9 @@ class ModifyingReturnTypeFilter implements MethodFilter {
 				returnType != JSONObject.class &&
 				returnType != Primarykey.class &&
 				!TypeUtil.hasDefaultConstructor(returnType) // 不是bean
-		           ){
+		           ){ // 5). 校验返回值所允许的类型
 				this.abortWith(method, errmsg);
 	           }
-	
 		}
 	}
 }

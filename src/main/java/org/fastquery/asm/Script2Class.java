@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
@@ -57,31 +58,9 @@ public class Script2Class {
 	
 	private static Map<String, Judge> judges = new HashMap<>();
 	
-	private Script2Class() {}
+	private Script2Class() {
+	}
 	
-	// 根据基本类型获得包装类型
-		private static Class<?> wrapperType(Class<?> cls) {
-			if (cls == int.class) {
-				return Integer.class;
-			} else if (cls == short.class) {
-				return Short.class;
-			} else if (cls == long.class) {
-				return Long.class;
-			} else if (cls == byte.class) {
-				return Byte.class;
-			} else if (cls == boolean.class) {
-				return Boolean.class;
-			} else if (cls == char.class) {
-				return Character.class;
-			} else if (cls == float.class) {
-				return Float.class;
-			} else if (cls == double.class) {
-				return Double.class;
-			} else {
-				return cls;
-			}
-		}
-		
 	/**
 	 * 处理脚本中的冒号表达式
 	 * @param script 脚本
@@ -93,7 +72,7 @@ public class Script2Class {
 		for (String paramName : names) {
 			String name = paramName.replace(":", "");
 			Class<?> oldC = Judge.getParamType(name, method);
-			Class<?> newC = wrapperType(oldC);
+			Class<?> newC = ClassUtils.primitiveToWrapper(oldC);
 			if(oldC == newC) {
 				// 包装类型 如果后面跟着
 				script = script.replaceAll(paramName, "(("+newC.getName()+")this.getParameter(\""+name+"\"))");

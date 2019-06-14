@@ -74,7 +74,7 @@ class GenerateRepositoryImpl {
 		for (FastQueryJson fQueryPropertie : fqPropertie) {
 			basePackages = fQueryPropertie.getBasePackages();
 			for (String basePackage : basePackages) {
-				List<Class<?>> classes = ClassUtil.getClasses(basePackage, classLoader);
+				List<Class<?>> classes = ClassUtil.getClasses(basePackage);
 				clses.addAll(classes);
 				// classes.forEach(this::generate)
 				for (Class<?> rcls : classes) {

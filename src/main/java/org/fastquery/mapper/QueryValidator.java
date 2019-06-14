@@ -59,64 +59,17 @@ public class QueryValidator {
 		}
 
 		for (String query : queries) {
-			// 1).
-			if (!TypeUtil.matches(query, ":\\s+").isEmpty()) {
-				error("表达式不符合规范:冒号\":\"后面不能是空白", query);
-			}
-
-			if (!TypeUtil.matches(query, "\\$\\{?\\s+").isEmpty()) {
-				error("表达式不符合规范:不能出现\"${ \" 或 \"$ \"", query);
-			}
-
-			if (!TypeUtil.matches(query, "\\{\\s+").isEmpty()) {
-				error("表达式不符合规范:不能出现\"{ \"", query);
-			}
-
-			if (!TypeUtil.matches(query, "\\s+\\}").isEmpty()) {
-				error("表达式不符合规范:不能出现\" }\"", query);
-			}
-
-			if (!TypeUtil.matches(query, "[^\\$#]\\{").isEmpty()) {
-				error("表达式不符合规范:\"{\"前必须连接\"$\"或\"#\"", query);
-			}
-			List<String> mps = TypeUtil.matches(query, Placeholder.EL_REG);
-			for (String mp : mps) {
-				int c1 = TypeUtil.matches(mp, "\\{").size();
-				int c2 = TypeUtil.matches(mp, "\\}").size();
-				if (c1 == c2 && c1 == 0) {
-					continue;
-				}
-				if (c1 != c2 || (c1 == c2 && c1 != 1)) { // "{" 和 "}" 必须成比出现
-					error(String.format("\"%s\"中的\"{\"和\"}\"分别只能出现一次或都不出现,据分析\"{\"出现%d次,而\"}\"出现%d次", mp, c1, c2), query);
-				}
-			}
-			mps.clear();
+			// 1). 
+			checkQuery(query);
 
 			// 2). 校验微笑表达式中的内容
-			List<String> smiles = TypeUtil.matches(query, Placeholder.SMILE_BIG);
-			for (String smile : smiles) {
-				int len = TypeUtil.matches(smile, Placeholder.EL_OR_COLON).size();
-				if (len != 1) {
-					error("微笑表达式中的内容必须只能包含一个$表达式或一个冒号表达式,而它包含了" + len + "个表达式", query);
-				}
-			}
-			smiles.clear();
+			checkSmile(query);
 
 			// 3). query装载后,就不能再出现 #{#name} 表达式了
-			List<String> mts = TypeUtil.matches(query, "#\\{#\\S+\\}");
-			mts.remove(Placeholder.LIMIT); // 内置标签不参与校验 
-			if (!mts.isEmpty()) {
-				error(String.format("没有找到name=\"%s\"的part", mts.get(0).replace("{", "").replace("}", "").replace("#", "")), query);
-			}
+			checkSharp(query);
 
 			// 4). <where> </where> 只能是小写
-			Set<String> ss = TypeUtil.matchesNotrepeat(query, "(?i)</?where>");
-			ss.forEach(s -> {
-				if (!"<where>".equals(s) && !"</where>".equals(s)) {
-					error("<where> 或 </where> 只能是小写", query);
-				}
-			});
-
+			checkWhere(query);
 		}
 
 		// 10). 检验方法
@@ -124,25 +77,28 @@ public class QueryValidator {
 			String className = cls.getName();
 			Method[] methods = cls.getMethods();
 			for (Method method : methods) {
-				QueryByNamed queryByNamed = method.getAnnotation(QueryByNamed.class);
-				if (queryByNamed == null) {
-					continue;
-				}
+				checkQueryByNamed(mapQueryMapper, className, method);
+			}
+		}
 
-				String id = queryByNamed.value();
-				if ("".equals(id)) {
-					id = method.getName();
-				}
-				// m1: 标识有@QueryByNamed的方法,必须有对应的模板
-				String tmp = getTemplate(className, id, mapQueryMapper.get(className));
-				if (tmp == null) {
-					error(method, String.format("从%s.queries.xml里没有找到id为%s的模板,模板文件区分大小写.", className, id));
-					return;
-				}
-				if ("".equals(tmp.trim())) {
-					error(method, String.format("在%s.queries.xml里,id为%s的模板不能为空字符串", className, id));
-				}
+		queries.clear();
+	}
 
+	private static void checkQueryByNamed(Map<String, Set<QueryMapper>> mapQueryMapper, String className, Method method) {
+		QueryByNamed queryByNamed = method.getAnnotation(QueryByNamed.class);
+		if (queryByNamed != null) {
+			String id = queryByNamed.value();
+			if ("".equals(id)) {
+				id = method.getName();
+			}
+			
+			// m1: 标识有@QueryByNamed的方法,必须有对应的模板
+			String tmp = getTemplate(className, id, mapQueryMapper.get(className));
+			if (tmp == null) {
+				error(method, String.format("从%s.queries.xml里没有找到id为%s的模板,模板文件区分大小写.", className, id));
+			} else if ("".equals(tmp.trim())) {
+				error(method, String.format("在%s.queries.xml里,id为%s的模板不能为空字符串", className, id));
+			} else {
 				String key = className + "." + id;
 				String countQuery = QueryPool.getCountQuery(key);
 
@@ -151,18 +107,72 @@ public class QueryValidator {
 				if (returnType == Page.class && (countQuery == null || "".equals(countQuery.trim()))
 						&& method.getAnnotation(NotCount.class) == null) {
 					error(method, String.format("该方法指明要分页,而在%s.queries.xml里,<query id=\"%s\">下面没有发现count语句.分页而不统计总行数,可以在当前方法上标识@NotCount.", className, id));
-					return;
 				}
 
-				// 注意: 模板中的冒号表达式不必从方法参数中的@Param找到精准匹配, 因为模板是可以共享的
-				// 假设 F1,F2两个方法公用M模板, M中包含:a,:b,而F1只包含@Param("a"),F2只包含@Param("b"),这种情形,当然是允许的.
+				// 注意: 模板中的冒号表达式不必从方法参数中的@Param找到精准匹配, 因为模板是可以共享的, 假设 F1,F2两个方法公用M模板, M中包含:a,:b,而F1只包含@Param("a"),F2只包含@Param("b"),这种情形,当然是允许的.
 
-				// m3
-
+				// m3	
 			}
 		}
+	}
 
-		queries.clear();
+	private static void checkWhere(String query) {
+		Set<String> ss = TypeUtil.matchesNotrepeat(query, "(?i)</?where>");
+		ss.forEach(s -> {
+			if (!"<where>".equals(s) && !"</where>".equals(s)) {
+				error("<where> 或 </where> 只能是小写", query);
+			}
+		});
+	}
+
+	private static void checkSharp(String query) {
+		List<String> mts = TypeUtil.matches(query, "#\\{#\\S+\\}");
+		mts.remove(Placeholder.LIMIT); // 内置标签不参与校验 
+		if (!mts.isEmpty()) {
+			error(String.format("没有找到name=\"%s\"的part", mts.get(0).replace("{", "").replace("}", "").replace("#", "")), query);
+		}
+	}
+
+	private static void checkSmile(String query) {
+		List<String> smiles = TypeUtil.matches(query, Placeholder.SMILE_BIG);
+		for (String smile : smiles) {
+			int len = TypeUtil.matches(smile, Placeholder.EL_OR_COLON).size();
+			if (len != 1) {
+				error("微笑表达式中的内容必须只能包含一个$表达式或一个冒号表达式,而它包含了" + len + "个表达式", query);
+			}
+		}
+		smiles.clear();
+	}
+	
+	private static void checkQuery(String query) {
+		if (!TypeUtil.matches(query, ":\\s+").isEmpty()) {
+			error("表达式不符合规范:冒号\":\"后面不能是空白", query);
+		}
+
+		if (!TypeUtil.matches(query, "\\$\\{?\\s+").isEmpty()) {
+			error("表达式不符合规范:不能出现\"${ \" 或 \"$ \"", query);
+		}
+
+		if (!TypeUtil.matches(query, "\\{\\s+").isEmpty()) {
+			error("表达式不符合规范:不能出现\"{ \"", query);
+		}
+
+		if (!TypeUtil.matches(query, "\\s+\\}").isEmpty()) {
+			error("表达式不符合规范:不能出现\" }\"", query);
+		}
+
+		if (!TypeUtil.matches(query, "[^\\$#]\\{").isEmpty()) {
+			error("表达式不符合规范:\"{\"前必须连接\"$\"或\"#\"", query);
+		}
+		List<String> mps = TypeUtil.matches(query, Placeholder.EL_REG);
+		for (String mp : mps) {
+			int c1 = TypeUtil.matches(mp, "\\{").size();
+			int c2 = TypeUtil.matches(mp, "\\}").size();
+			if (c1 != c2 || c1 > 1) { // "{" 和 "}" 必须成比出现一次
+				error(String.format("\"%s\"中的\"{\"和\"}\"分别只能出现一次或都不出现,据分析\"{\"出现%d次,而\"}\"出现%d次", mp, c1, c2), query);
+			}
+		}
+		mps.clear();
 	}
 
 	private static void error(Method method, String msg) {

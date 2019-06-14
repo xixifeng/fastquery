@@ -124,8 +124,6 @@ class PropertiesUtil {
 				throw new RepositoryException("basePackages配置错误: " + b1 + " 已经包含了" + b2 + " 两者只能选一");
 			}
 		}));
-		
-		// x. ...
 	}
 
 	private static JSONObject getFQJSON(Resource fqueryResource) {

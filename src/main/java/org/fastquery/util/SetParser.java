@@ -55,25 +55,11 @@ final class SetParser {
 				String value = set.value();
 				value = TypeUtil.paramFilter(method, args, value);
 				if(!ignoreSet(set, value, i)) {
-					
 					// if$ , else$ 解析
-					if(!"true".equals(set.if$()) && !Script2Class.getJudge(i).ignore()) {
-						String elseValue = set.else$();
-						if(!"".equals(elseValue)) {
-							elseValue = TypeUtil.paramFilter(QueryContext.getMethodInfo(), QueryContext.getArgs(), elseValue);
-							sb.append(elseValue);
-							sb.append(",");
-						} 
-					   continue;
-					} 
-					// end
-										
-					sb.append(value);
-					sb.append(",");
+					ifelse(sb, i, set, value); 
 				}
 			}
 
-			
 			if("set ".equals(sb.toString())) {
 				throw new RepositoryException("@Set 修改选项全部被忽略了,这是不允许的");
 			} else {
@@ -81,6 +67,20 @@ final class SetParser {
 				sb.setCharAt(sb.length() - 1, ' ');
 				return sb.toString();
 			}
+		}
+	}
+
+	private static void ifelse(StringBuilder sb, int i, Set set, String value) {
+		if("true".equals(set.if$()) || Script2Class.getJudge(i).ignore()) { // if$绑定的脚本执行之后结果如果是"真"
+			sb.append(value);
+			sb.append(",");
+		} else {
+			String elseValue = set.else$();
+			if(!"".equals(elseValue)) {
+				elseValue = TypeUtil.paramFilter(QueryContext.getMethodInfo(), QueryContext.getArgs(), elseValue);
+				sb.append(elseValue);
+				sb.append(",");
+			} 
 		}
 	}
 

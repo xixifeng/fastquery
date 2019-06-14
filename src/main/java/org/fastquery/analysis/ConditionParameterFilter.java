@@ -43,49 +43,27 @@ class ConditionParameterFilter implements MethodFilter {
 	@Override
 	public void doFilter(Method method) {
 
-		// 注意: sql参数与方法参数个数匹配问题,已经在 ParameterFilter里做了安全校验.
-		// 1). @Query中的value值,有且只能出现一次#{#where} (允许不出现). 换言之,出现"#{#where}"的个数不能大于1
-		// 2). 如果有条件注解,那么@Query中的value值,必须有#where
-		// 3). 第1个@Condition不能包含有条件连接符("and" 或 "or")
-		// 4). if$ 和 ignoreScript 不能共存
-		// 5).
-		// 6).
 		Query[] queries = method.getAnnotationsByType(Query.class);
 		if (queries.length != 0) {
-			int countWhere = TypeUtil.matches(queries[0].value(), Placeholder.WHERE_REG).size(); //
-			// >1).
-			if (countWhere > 1) {
-				this.abortWith(method, "@Query中的value值,有且只能出现一次#{#where}");
-			}
+			
+			// >1). @Query中的value值,有且只能出现一次#{#where} (允许不出现). 换言之,出现"#{#where}"的个数不能大于1
+			checkWhereCount(method, queries);
 
-			// >2). 已经在 QueryFilterHelper 里做校验了
+			// >2). 如果有条件注解,那么@Query中的value值,必须有#where,已经在 QueryFilterHelper 里做校验了
 
-			// >3)
+			// >3). 第1个@Condition不能包含有条件连接符("and" 或 "or")
 			Condition[] conditions = method.getAnnotationsByType(Condition.class);
 			for (int i = 0; i < conditions.length; i++) {
-				// 截取第一个单词
+				
 				String value = conditions[i].value();
-				Set<String> ps = TypeUtil.matchesNotrepeat(value, Placeholder.EL_REG);
-				Parameter[] parameters = method.getParameters();
-				ps.forEach(p -> {
-					for (Parameter parameter : parameters) {
-						Param param = parameter.getAnnotation(Param.class);
-						if (param != null && (("${" + param.value() + "}").equals(p) || ("$" + param.value()).equals(p))) {
-							return;
-						}
-					}
-					this.abortWith(method, p + " 没有找到匹配的参数.");
-				});
-				String word = TypeUtil.getFirstWord(value);
-				if (i == 0 && ("or".equalsIgnoreCase(word) || "and".equalsIgnoreCase(word))) {
-					this.abortWith(method, "第1个@Condition的值,左边加条件连接符\"" + word + "\"干什么,这个条件跟谁相连?去掉吧.");
-				}
-
-				if (i != 0 && (!"or".equalsIgnoreCase(word) && !"and".equalsIgnoreCase(word)) && !Pattern.matches("^\\$\\S+(.|\n)*", value.trim()) ) {
-						this.abortWith(method, "第" + (i + 1) + "个@Condition的值\"" + value + "\",缺少条件连接符,如果上一个条件存在,用什么跟它相连?");
-				}
-
-				// > 4)
+				
+				// 校验Condition中的SQL语句其$表达式是否引用的是已经在@Param中声明的值
+				checkConditionEL(method, value);
+				
+				// 校验Condition条件连接符问题
+				checkConditionConnector(method, i, value);
+				
+				// > 4). if$ 和 ignoreScript 不能共存
 				if (!"true".equals(conditions[i].if$()) && !"false".equals(conditions[i].ignoreScript())) {
 					this.abortWith(method, "第" + (i + 1) + "个@Condition中的if$属性和ignoreScript属性不能同时被自定义");
 				}
@@ -94,4 +72,42 @@ class ConditionParameterFilter implements MethodFilter {
 		}
 
 	}
+
+	private void checkConditionConnector(Method method, int i, String value) {
+		// 截取第一个单词
+		String word = TypeUtil.getFirstWord(value);
+		if(i == 0) {
+			if( "or".equalsIgnoreCase(word) || "and".equalsIgnoreCase(word) )  {
+				this.abortWith(method, "第1个@Condition的值,左边加条件连接符\"" + word + "\"干什么,这个条件跟谁相连?去掉吧.");
+			}
+		} else {
+			if(!"or".equalsIgnoreCase(word) && !"and".equalsIgnoreCase(word) && !Pattern.matches("^\\$\\S+(.|\n)*", value.trim())) {
+				this.abortWith(method, "第" + (i + 1) + "个@Condition的值\"" + value + "\",缺少条件连接符,如果上一个条件存在,用什么跟它相连?");
+			}
+		}
+	}
+
+	private void checkConditionEL(Method method, String value) {
+		// 获取$表达式
+		Set<String> ps = TypeUtil.matchesNotrepeat(value, Placeholder.EL_REG);
+		Parameter[] parameters = method.getParameters();
+		ps.forEach(p -> {
+			for (Parameter parameter : parameters) {
+				Param param = parameter.getAnnotation(Param.class);
+				if (param != null && (("${" + param.value() + "}").equals(p) || ("$" + param.value()).equals(p))) {
+					return;
+				}
+			}
+			this.abortWith(method, p + " 没有找到匹配的参数.");
+		});
+	}
+
+	private void checkWhereCount(Method method, Query[] queries) {
+		int countWhere = TypeUtil.matches(queries[0].value(), Placeholder.WHERE_REG).size();
+		if (countWhere > 1) {
+			this.abortWith(method, "@Query中的value值,有且只能出现一次#{#where}");
+		}
+	}
 }
+
+
