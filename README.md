@@ -781,7 +781,7 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 
 ## 微笑表达式
 定义: **以<code>\`-</code> 作为开始,以<code>-\`</code>作为结尾,包裹着若干字符,因为<code>\`- -\`</code>酷似微笑表情,因此将这样的表达式称之为`微笑表达式`.** <br>例如: <code> \`-%${name}%-\` </code>. **\`** 反撇号的位置如下图所示:<br>
-![反撇号](https://xixifeng.github.io/pjaxpage/example/img/fanpie.png "反撇号")    
+![反撇号示意图](https://xixifeng.github.io/pjaxpage/example/img/fanpie.png "反撇号示意图")    
 作用:  
 1.可以作为实参的模板,举例: 查询出姓"张"的用户.没有`微笑表达式`时的写法:
 ```java
