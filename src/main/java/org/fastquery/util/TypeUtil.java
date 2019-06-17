@@ -474,12 +474,12 @@ public class TypeUtil {
 		if (allows.length != 0) { // 表明,允许的范围并不是全部,而是有所限定
 			if (arg == null) { // 范围有明确指定,还传递null,那么必然忽略
 				return true;
-			}
-
-			for (String allow : allows) {
-				// 因为注解的特性 allows的集合中的成员永远不可能出现null
-				if (!Pattern.matches(allow, arg.toString())) { // 不在允许范围立即忽略
-					return true;
+			} else {
+				for (String allow : allows) {
+					// 因为注解的特性 allows的集合中的成员永远不可能出现null
+					if (!Pattern.matches(allow, arg.toString())) { // 不在允许范围立即忽略
+						return true;
+					}
 				}
 			}
 		} 
@@ -681,9 +681,6 @@ public class TypeUtil {
 	 * @return y:true/n:false
 	 */
 	public static boolean isMapSO(java.lang.reflect.Type type) {
-		if (type == null) {
-			return false;
-		}
 		return "java.util.Map<java.lang.String, java.lang.Object>".equals(type.toString())
 				|| "java.util.Map<java.lang.String, java.lang.String>".equals(type.toString());
 	}
@@ -695,9 +692,6 @@ public class TypeUtil {
 	 * @return y:true/n:false
 	 */
 	public static boolean isListMapSO(java.lang.reflect.Type type) {
-		if (type == null) {
-			return false;
-		}
 		return "java.util.List<java.util.Map<java.lang.String, java.lang.Object>>".equals(type.toString())
 				|| "java.util.List<java.util.Map<java.lang.String, java.lang.String>>".equals(type.toString());
 	}
@@ -761,15 +755,16 @@ public class TypeUtil {
 	private static String removePart(String str) {
 		if (str == null) {
 			return null;
-		}
-		// 为了方便处理先把首尾空白去掉,把省下的空白换成空格
-		StringBuilder sb = new StringBuilder(str.trim().replaceAll("\\s+", " "));
-		int i = sb.indexOf(" "); // 查找第一个空格
-		if (i != -1) { // 如果还存在空格, 就把第1个空格前面的部分删除掉
-			sb.delete(0, i + 1);
-		}
+		} else {
+			// 为了方便处理先把首尾空白去掉,把省下的空白换成空格
+			StringBuilder sb = new StringBuilder(str.trim().replaceAll("\\s+", " "));
+			int i = sb.indexOf(" "); // 查找第一个空格
+			if (i != -1) { // 如果还存在空格, 就把第1个空格前面的部分删除掉
+				sb.delete(0, i + 1);
+			}
 
-		return sb.toString().trim();
+			return sb.toString().trim();
+		}
 	}
 
 	/**
@@ -784,30 +779,28 @@ public class TypeUtil {
 		final String openWhere = "<where>";
 		final String closeWhere = "</where>";
 		String[] wheres = StringUtils.substringsBetween(str, openWhere, closeWhere);
-		if (wheres == null) {
-			return str;
-		}
+		if (wheres != null) {
+			for (String where : wheres) {
 
-		String s = str;
-		for (String where : wheres) {
+				// sorce 不会受 where 的变化的变化
+				String sorce = where; // 把值copy一份
 
-			// sorce 不会受 where 的变化的变化
-			String sorce = where; // 把值copy一份
+				where = where.trim().replaceFirst("(?i)^where\\b", "");
+				// 如果第一个单词是"or"或者and,则去掉
+				where = where.trim().replaceFirst("(?i)^or\\b", "");
+				where = where.trim().replaceFirst("(?i)^and\\b", "");
+				where = where.trim();
 
-			where = where.trim().replaceFirst("(?i)^where\\b", "");
-			// 如果第一个单词是"or"或者and,则去掉
-			where = where.trim().replaceFirst("(?i)^or\\b", "");
-			where = where.trim().replaceFirst("(?i)^and\\b", "");
-			where = where.trim();
-
-			// 注意: 这里用quote是因为 sorce 很可能会包含有正则符号
-			if ("".equals(where)) {
-				s = s.replaceFirst(Pattern.quote(openWhere + sorce + closeWhere), "");
-			} else {
-				s = s.replaceFirst(Pattern.quote(openWhere + sorce + closeWhere), Matcher.quoteReplacement("where " + where));
+				// 注意: 这里用quote是因为 sorce 很可能会包含有正则符号
+				if ("".equals(where)) {
+					str = str.replaceFirst(Pattern.quote(openWhere + sorce + closeWhere), "");
+				} else {
+					str = str.replaceFirst(Pattern.quote(openWhere + sorce + closeWhere), Matcher.quoteReplacement("where " + where));
+				}
 			}
-		}
-		return s;
+		} 
+		
+		return str;
 	}
 
 	/**
@@ -819,13 +812,15 @@ public class TypeUtil {
 	public static String getFirstWord(String str) {
 		if (str == null) {
 			return null;
+		} else {
+			String word = str.trim().replaceAll("\\s+", " ");
+			int index = word.indexOf(' ');
+			if (index == -1) {
+				return str;
+			} else {
+				return word.substring(0, index);	
+			}
 		}
-		String word = str.trim().replaceAll("\\s+", " ");
-		int index = word.indexOf(' ');
-		if (index == -1) {
-			return str;
-		}
-		return word.substring(0, index);
 	}
 
 	/**
@@ -837,9 +832,10 @@ public class TypeUtil {
 	public static boolean isWarrp(java.lang.reflect.Type ct) {
 		if (ct == null) {
 			return false;
+		} else {
+			return ct == String.class || ct == Byte.class || ct == Short.class || ct == Integer.class || ct == Long.class || ct == Float.class
+					|| ct == Double.class || ct == Character.class || ct == Boolean.class;
 		}
-		return ct == String.class || ct == Byte.class || ct == Short.class || ct == Integer.class || ct == Long.class || ct == Float.class
-				|| ct == Double.class || ct == Character.class || ct == Boolean.class;
 	}
 
 	/**
