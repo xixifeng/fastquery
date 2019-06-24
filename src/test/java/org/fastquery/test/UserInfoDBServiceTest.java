@@ -72,7 +72,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 			LOG.info("id:{}",id);
 		} catch (Exception e) {
 			String str = ExceptionUtils.getStackTrace(e);
-			assertThat(str, containsString("发生方法:org.fastquery.core.MethodInfo.findId, 将java.lang.Integer 转换成 class java.lang.Character 失败."));
+			assertThat(str, containsString("类型转换失败,发生方法:org.fastquery.core.MethodInfo.findId, 建议将这个方法的返回类型由class java.lang.Character 修改成 java.lang.Integer"));
 		}
 	}
 	

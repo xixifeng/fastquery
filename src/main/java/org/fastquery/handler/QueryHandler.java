@@ -217,12 +217,12 @@ public class QueryHandler {
 					String methodLongName = method.getClass().getName()+"."+method.getName();
 					String key = map.keySet().iterator().next();
 					String typeName = val.getClass().getName();
-					LOG.error("字段 {} 的类型是 {} 不能强制转化成 {} 请把这个方法({})的返回类型修改为{},为了向后兼容,会执行强转,但是这是存在风险的,建议看到此日志请完善代码",key,typeName,returnType.getName(),methodLongName,typeName);
+					LOG.warn("字段 {} , JDBC对它映射的类型是 {}, 强制转化成 {} 有可能存在风险, 请把这个方法({})的返回类型修改为{}",key,typeName,returnType.getName(),methodLongName,typeName);
 					try {
 						Method valueOfMethod = returnType.getDeclaredMethod("valueOf", String.class);
 						return valueOfMethod.invoke(null, val.toString());
 					} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						throw new RepositoryException("发生方法:" + methodLongName + ", 将" + typeName +" 转换成 " + returnType + " 失败.");
+						throw new RepositoryException("类型转换失败,发生方法:" + methodLongName + ", 建议将这个方法的返回类型由" + returnType +" 修改成 " + typeName,e);
 					}
 				}
 				return val; 
