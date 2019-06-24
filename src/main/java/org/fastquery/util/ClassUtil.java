@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 
 /**
@@ -149,7 +150,7 @@ public class ClassUtil {
 	private static void putInterface(String className, List<Class<?>> classes) {
 		try {
 			Class<?> rcls = Class.forName(className);
-			if (rcls.isInterface()) {
+			if (rcls.isInterface() && Repository.class.isAssignableFrom(rcls)) {
 				// 添加到集合中去
 				classes.add(rcls);
 			}
