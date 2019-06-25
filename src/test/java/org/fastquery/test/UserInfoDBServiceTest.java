@@ -60,7 +60,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserInfoDBServiceTest.class);
 
-	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
+	private UserInfoDBService db = FQuery.getRepository(UserInfoDBService.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
@@ -68,7 +68,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void findId() {
 		try {
-			Object id = userInfoDBService.findId(1);
+			Object id = db.findId(1);
 			LOG.info("id:{}",id);
 		} catch (Exception e) {
 			String str = ExceptionUtils.getStackTrace(e);
@@ -80,7 +80,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	public void findById() {
 		Integer id = 1;
 		String sql = "select id,name,age from UserInfo where id = ?2";
-		UserInfo userInfo = userInfoDBService.findById(sql, id);
+		UserInfo userInfo = db.findById(sql, id);
 		assertThat(userInfo.getId(), is(id));
 
 		SQLValue sqlValue = rule.getSQLValue();
@@ -92,7 +92,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		assertThat(arg, is(id));
 
 		sql = "select id,name,age from UserInfo where id = :id";
-		userInfo = userInfoDBService.findById(sql, id);
+		userInfo = db.findById(sql, id);
 		assertThat(userInfo.getId(), is(id));
 		sqlValue = rule.getSQLValue();
 		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where id = ?"));
@@ -106,7 +106,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void findById2() {
 		int id = 35;
-		UserInfo userInfo = userInfoDBService.findById(id); // 没有找到
+		UserInfo userInfo = db.findById(id); // 没有找到
 															// userInfo会返回null
 		if (userInfo != null) {
 			assertThat(userInfo.getAge(), nullValue());
@@ -125,7 +125,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	public void findUserInfoByNameOrAge() {
 		String name = "王五";
 		Integer age = 8;
-		UserInfo[] userInfos = userInfoDBService.findUserInfoByNameOrAge(name, age);
+		UserInfo[] userInfos = db.findUserInfoByNameOrAge(name, age);
 		for (UserInfo userInfo : userInfos) {
 			assertThat((userInfo.getName().equals(name) || userInfo.getAge().intValue() == age), is(true));
 		}
@@ -143,7 +143,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void findUserInfoByIds() {
-		JSONArray json = userInfoDBService.findUserInfoByIds("2,3,4");
+		JSONArray json = db.findUserInfoByIds("2,3,4");
 		assertThat(JSONObject.parseObject(JSON.toJSONString(json.get(0))).getIntValue("id"), equalTo(2));
 		assertThat(JSONObject.parseObject(JSON.toJSONString(json.get(1))).getIntValue("id"), equalTo(3));
 		assertThat(JSONObject.parseObject(JSON.toJSONString(json.get(2))).getIntValue("id"), equalTo(4));
@@ -153,19 +153,19 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	public void findUserInfo() {
 		String orderby = "order by age desc";
 		int i = 1;
-		userInfoDBService.findUserInfo(orderby, i);
+		db.findUserInfo(orderby, i);
 	}
 
 	@Test
 	public void findUserInfoById() {
-		UserInformation userInformation = userInfoDBService.findUserInfoById(1);
+		UserInformation userInformation = db.findUserInfoById(1);
 		LOG.debug(userInformation.toString());
 	}
 
 	@Test
 	public void testFindUserInfoByAge() {
 		int age = 20;
-		JSONArray jsonArray = userInfoDBService.findUserInfoByAge(age);
+		JSONArray jsonArray = db.findUserInfoByAge(age);
 		for (int i = 0; i < jsonArray.size(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 			assertThat(jsonObject.getInteger("age"), greaterThan(age));
@@ -174,7 +174,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void findSome() {
-		List<UserInfo> userInfos = userInfoDBService.findSome(30);
+		List<UserInfo> userInfos = db.findSome(30);
 		userInfos.forEach(userInfo -> {
 			assertThat(userInfo.getId(), greaterThan(30));
 		});
@@ -185,7 +185,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		int age = 1000;
 		// 数据库中age没有大于1千的记录
 		// 断言: 查询返回的值应该是一个空对象,不是null.
-		JSONArray jsonArray = userInfoDBService.findUserInfoByAge(age);
+		JSONArray jsonArray = db.findUserInfoByAge(age);
 		assertThat(jsonArray, notNullValue());
 		assertThat(jsonArray.isEmpty(), is(true));
 	}
@@ -195,49 +195,49 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		int age = 1000;
 		// 数据库中age没有大于1千的记录
 		// 断言: 查询返回的值应该是一个空对象,不是null.
-		Map<String, Object> map = userInfoDBService.findOne(age, "xk-c3p0");
+		Map<String, Object> map = db.findOne(age, "xk-c3p0");
 		assertThat(map, notNullValue());
 		assertThat(map.isEmpty(), is(true));
 	}
 
 	@Test
 	public void testUpdateBatch() {
-		int effect = userInfoDBService.updateBatch("小张张", 26, 1);
+		int effect = db.updateBatch("小张张", 26, 1);
 		assertThat("断言该行修改操作一共影响了3行", effect, equalTo(3));
 	}
 
 	@Test
 	public void update1() {
-		boolean b = userInfoDBService.update(1);
+		boolean b = db.update(1);
 		assertThat(b, is(true));
 
-		b = userInfoDBService.update(-10);
+		b = db.update(-10);
 		assertThat(b, is(true));
 	}
 
 	@Test
 	public void update2() {
-		boolean b = userInfoDBService.update2(1);
+		boolean b = db.update2(1);
 		assertThat(b, is(true));
 	}
 
 	// 断言: 它会抛出RepositoryException异常
 	@Test(expected = RepositoryException.class)
 	public void testUpdateBatch2_a() {
-		int effect = userInfoDBService.updateBatch2("小不点", 6, 2);
+		int effect = db.updateBatch2("小不点", 6, 2);
 		// updateBatch2 中途会报错,因此修改影响的行数为0
 		assertThat(effect, equalTo(0));
 	}
 
 	@Test(expected = RepositoryException.class)
 	public void testUpdateBatch2_b() {
-		int effect = userInfoDBService.updateBatch2("小不点", 6, 2);
+		int effect = db.updateBatch2("小不点", 6, 2);
 		assertThat(effect, equalTo(0));
 	}
 
 	@Test
 	public void testUpdateBatch3() {
-		int[] effects = userInfoDBService.updateBatch3("清风习习", 23, 3);
+		int[] effects = db.updateBatch3("清风习习", 23, 3);
 		assertThat(effects.length, is(2));
 		assertThat(effects[0], is(1));
 		assertThat(effects[1], is(1));
@@ -248,7 +248,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 		int p = 1;
 		int size = 6;
-		Page<Map<String, Object>> page = userInfoDBService.findAll(new PageableImpl(p, size));
+		Page<Map<String, Object>> page = db.findAll(new PageableImpl(p, size));
 		assertThat(String.format("断言: 当前是第%s页", p), page.getNumber(), is(p));
 		assertThat(page.getNumberOfElements(), lessThanOrEqualTo(size));
 
@@ -261,7 +261,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	@SkipFilter
 	public void find() {
-		Page<UserInfo> page = userInfoDBService.find(100, 50, new PageableImpl(1, 3));
+		Page<UserInfo> page = db.find(100, 50, new PageableImpl(1, 3));
 		List<UserInfo> userInfos = page.getContent();
 		if (page.isHasContent()) {
 			userInfos.forEach(u -> LOG.debug(u.toString()));
@@ -275,7 +275,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void findSome1() {
-		Page<UserInfo> page = userInfoDBService.findSome1(1, 100, new PageableImpl(1, 15));
+		Page<UserInfo> page = db.findSome1(1, 100, new PageableImpl(1, 15));
 		assertThat(page, notNullValue());
 	}
 
@@ -293,7 +293,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		int age = 1;
 		int id = 100;
 		// 总行数
-		long totalElements = userInfoDBService.count(age, id);
+		long totalElements = db.count(age, id);
 		for (int i = 1; i <= totalElements; i++) {
 			pageIndex = i % 10;
 			pageSize = new Random().nextInt(1000) % (int) 10;
@@ -319,7 +319,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 			}
 			LOG.debug("totalElements:" + totalElements + " pageIndex:" + pageIndex + "  pageSize:" + pageSize + "  totalPages:" + totalPages);
 
-			Page<Map<String, Object>> page = userInfoDBService.findSome2(age, id, pageIndex, pageSize);
+			Page<Map<String, Object>> page = db.findSome2(age, id, pageIndex, pageSize);
 			assertThat(page, notNullValue());
 			assertThat(page.getNumber(), equalTo(pageIndex));
 			assertThat(page.getSize(), equalTo(pageSize));
@@ -351,7 +351,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void countDouble() {
-		Double d = userInfoDBService.countDouble(2100, 2308);
+		Double d = db.countDouble(2100, 2308);
 		if (d != null) {
 			LOG.debug(d.toString());
 		}
@@ -360,7 +360,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void findByIds() {
 		int[] ids = { 1, 2, 3 };
-		UserInfo[] userInfos = userInfoDBService.findByIds(ids);
+		UserInfo[] userInfos = db.findByIds(ids);
 		assertThat(userInfos[0].getId(), equalTo(1));
 		assertThat(userInfos[1].getId(), equalTo(2));
 		assertThat(userInfos[2].getId(), equalTo(3));
@@ -372,10 +372,10 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		String name = "香月儿";
 		Integer age = 23;
 
-		while (userInfoDBService.findById(id) != null) { // 该主键已经存在,直到该主键不存在时,才会结束循环
+		while (db.findById(id) != null) { // 该主键已经存在,直到该主键不存在时,才会结束循环
 			id += 1;
 		}
-		UserInfo u = userInfoDBService.insert(id, name, age);
+		UserInfo u = db.insert(id, name, age);
 		assertThat(u.getId(), equalTo(id));
 		assertThat(u.getName(), equalTo(name));
 		assertThat(u.getAge(), equalTo(age));
@@ -385,26 +385,26 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void updateNameById() {
 		int id = 2;
-		int i = userInfoDBService.updateNameById("'戚继光'", 2);
+		int i = db.updateNameById("'戚继光'", 2);
 		assertThat(i, is(1));
-		UserInfo u = userInfoDBService.findById(id);
+		UserInfo u = db.findById(id);
 		assertThat(u.getId(), equalTo(id));
 		assertThat(u.getName(), equalTo("戚继光"));
 	}
 
 	@Test
 	public void updateAgeById() {
-		UserInfo userInfo = userInfoDBService.updateAgeById(null, 3);
+		UserInfo userInfo = db.updateAgeById(null, 3);
 		assertThat(userInfo.getId(), is(3));
 		assertThat(userInfo.getAge(), nullValue());
-		userInfo = userInfoDBService.updateAgeById(21, 3);
+		userInfo = db.updateAgeById(21, 3);
 		assertThat(userInfo.getId(), is(3));
 		assertThat(userInfo.getAge(), is(21));
 	}
 
 	@Test
 	public void updateAge() {
-		JSONObject userInfo = userInfoDBService.updateAge(null, 3);
+		JSONObject userInfo = db.updateAge(null, 3);
 		assertThat(userInfo.getIntValue("id"), is(3));
 		// 断言:包含有age属性 (age即使是null)
 		assertThat(JSON.toJSONString(userInfo, SerializerFeature.WriteMapNullValue).indexOf("\"age\"") != -1, is(true));
@@ -412,21 +412,21 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void findAge() {
-		Integer age = userInfoDBService.findAge(35);
+		Integer age = db.findAge(35);
 		assertThat(age, nullValue());
 	}
 
 	@Test
 	public void findUserInfoByNullAge() {
 		// 查询age为null的UserInfo
-		List<UserInfo> us = userInfoDBService.findUserInfoByNullAge(null);
+		List<UserInfo> us = db.findUserInfoByNullAge(null);
 		assertThat(us.size(), greaterThanOrEqualTo(1));
 		us.forEach(u -> assertThat(u.getAge(), nullValue()));
 	}
 
 	@Test
 	public void findNames() {
-		String[] names = userInfoDBService.findNames();
+		String[] names = db.findNames();
 		assertThat(names.length, is(3));
 		for (String name : names) {
 			assertThat(Pattern.matches("\\{\".+\":\".+\"\\}", name), is(false));
@@ -436,7 +436,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void findAges1() {
-		String[] ages = userInfoDBService.findAges();
+		String[] ages = db.findAges();
 		assertThat(ages.length, is(3));
 		for (String age : ages) {
 			if (age != null) {
@@ -447,7 +447,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void findAges2() {
-		Integer[] ages = userInfoDBService.findAges2();
+		Integer[] ages = db.findAges2();
 		assertThat(ages.length, is(3));
 		for (Integer age : ages) {
 			assertThat(age, notNullValue());
@@ -458,7 +458,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	public void findUserSome2() {
 		String name = null;
 		Integer age = null;
-		List<Map<String, Object>> maps = userInfoDBService.findUserSome2(age, name);
+		List<Map<String, Object>> maps = db.findUserSome2(age, name);
 		maps.forEach(m -> {
 			m.forEach((k, v) -> {
 				if ("age".equals(k))
@@ -475,12 +475,18 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void findNamesToSmile() {
 		String name = "Smile";
-		userInfoDBService.findNamesToSmile(name);
+		db.findNamesToSmile(name);
 		SQLValue sqlValue = rule.getSQLValue();
 		assertThat(sqlValue.getSql(), equalTo("select name from UserInfo where name = ? limit 1"));
 		List<Object> vals = sqlValue.getValues();
 		assertThat(vals.size(), is(1));
 		assertThat(vals.get(0).toString(), equalTo(" %Smile% "));
+	}
+	
+	@Test
+	public void findContainColon() {
+		String name = db.findContainColon();
+		assertThat(name, containsString(":x"));
 	}
 
 }

@@ -127,7 +127,7 @@ class MarkFilter implements MethodFilter {
 
 	private void checkColon(Method method, Set<String> params, String slreg, String p) {
 		String s = Pattern.matches(slreg, p) ? p.replaceFirst(":", "") : p.replace("${", "").replace("}", "").replace("$", "");
-		if (!params.contains(s)) {
+		if (!params.contains(s) && s.indexOf(':') == -1) {
 			this.abortWith(method, String.format("发现存在%s,而从参数中没有找到@Param(\"%s\"),这种语法是不被允许的.", p, s));
 		}
 	}

@@ -388,7 +388,7 @@ public class TypeUtil {
 	 * @return sql
 	 */
 	static String paramFilter(MethodInfo method, Object[] args, String sql) {
-		String s = sql;
+		String s = sql.replace("::", ":");
 		// 替换@Param
 		Annotation[][] annotations = method.getParameterAnnotations();
 		QueryByNamed queryByNamed = method.getQueryByNamed();

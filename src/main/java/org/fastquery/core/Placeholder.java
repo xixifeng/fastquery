@@ -64,7 +64,7 @@ public final class Placeholder {
 	/**
 	 * 匹配冒号表达式
 	 */
-	public static final String COLON_REG = ":[A-Za-z0-9]+";
+	public static final String COLON_REG = ":+[A-Za-z0-9]+";
 
 	/**
 	 * 匹配EL表达式,可能包含有_ . ( ) 如: 在模板中调用 ${_method.getString()} 

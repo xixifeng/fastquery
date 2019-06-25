@@ -5,13 +5,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.75</version> <!-- fastquery.version -->
+    <version>1.0.76</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.75'
+compile 'org.fastquery:fastquery:1.0.76'
 ```
 
 # FastQuery 数据持久层框架
@@ -750,6 +750,7 @@ UserInfo[] findUserInfoByNameOrAge(@Param("name") String name, @Param("age")Inte
 其中`:name`对应`@Param("name")`所指定的方法变量值;`:age`对应`@Param("age")`所指定的方法变量值.当然SQL中的变量也可以用`?N`(N={正整数})的形式来表达,且不用标识`@Param`.  
 如:`select name,age from UserInfo u where u.name = :name or u.age = :age`以防SQL注入问题,在执行语句之前,最终会被编译成`select name,age from UserInfo u where u.name=? or u.age=?`
 
+> **注意**: 有时候在`@Query`中使用`:`不一定是表达式,而是字面字符.为了避开跟冒号表达式冲突,请额外加一个`:`以起到转义作用.
 
 **SQL中的变量采用${name}表达式**  
 实现原样替换,当然,也可以写成`$name`.不过请注意避免SQL注入问题.   

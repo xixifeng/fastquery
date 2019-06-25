@@ -208,4 +208,7 @@ public interface UserInfoDBService extends QueryRepository {
 	
 	@Query("select name from UserInfo where name = `- %:name% -` limit 1")
 	String[] findNamesToSmile(@Param("name")String name);
+	
+	@Query("select name from `userinfo` where name like '%::x%' limit 1")
+	String findContainColon();
 }
