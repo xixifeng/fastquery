@@ -211,9 +211,11 @@ public class QueryHandler {
 			if (keyvals.size() == 1) {
 				Map<String, Object> map = keyvals.get(0);
 				Object val = map.values().iterator().next();
-				if(returnType == String.class) {
+				if(val==null) {
+					return null;
+				} else if(returnType == String.class) {
 					return String.valueOf(val);
-				} else if(val !=null && returnType != val.getClass()) {
+				} else if(returnType != val.getClass()) {
 					String methodLongName = method.getClass().getName()+"."+method.getName();
 					String key = map.keySet().iterator().next();
 					String typeName = val.getClass().getName();
