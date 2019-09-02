@@ -105,7 +105,7 @@ public class TxTest extends FastQueryTest {
 		Integer num = 800;
 		
 		assertThat(aa.findDatabaseName(), equalTo("aa"));
-		assertThat(aa.findDatabasePort().get("Value"), equalTo("3305"));
+		assertThat(aa.findDatabasePort().get("Value"), equalTo("3306"));
 		aa.delete("Fish", "id", 4);
 		Fish fish = aa.save(new Fish(id, name, num));
 		assertThat(fish.getId(), equalTo(id));
@@ -121,7 +121,7 @@ public class TxTest extends FastQueryTest {
 		assertThat(fish.getNum(), equalTo(num));
 		
 		assertThat(cc.findDatabaseName(), equalTo("cc"));
-		assertThat(cc.findDatabasePort().get("Value"), equalTo("3307"));
+		assertThat(cc.findDatabasePort().get("Value"), equalTo("3306"));
 		cc.delete("Fish", "id", 4);
 		fish = cc.save(new Fish(id, name, num));
 		assertThat(fish.getId(), equalTo(id));
@@ -186,7 +186,7 @@ public class TxTest extends FastQueryTest {
 				assertThat(fish.getName(), equalTo(name));
 				assertThat(fish.getNum(), equalTo(num));
 				assertThat(aa.findDatabaseName(), equalTo("aa"));
-				assertThat(aa.findDatabasePort().get("Value"), equalTo("3305"));
+				assertThat(aa.findDatabasePort().get("Value"), equalTo("3306"));
 				
 				fish = bb.update(new Fish(id, name, num));
 				assertThat(fish.getId(), equalTo(id));

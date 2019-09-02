@@ -109,7 +109,7 @@ public final class ModifyingHandler {
 
 		if (keyval != null && convertType == String.class) {
 			Map<String, Object> map2 = new HashMap<>();
-			keyval.forEach((k, v) -> map2.put(k, v.toString()));
+			keyval.forEach((k, v) -> map2.put(k, v != null ? v.toString() : null));
 			return map2;
 		}
 

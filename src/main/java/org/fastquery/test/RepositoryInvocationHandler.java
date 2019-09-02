@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
+import org.fastquery.core.QueryBuilder;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.QueryParser;
@@ -41,6 +42,7 @@ import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.filter.SkipFilter;
 import org.fastquery.page.Page;
+import org.fastquery.util.TypeUtil;
 import org.junit.runner.Description;
 
 /**
@@ -96,15 +98,30 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 		Field sqlValuesField = qcclazz.getDeclaredField("sqlValues");
 		sqlValueField.setAccessible(true);
 		sqlValuesField.setAccessible(true);
+		QueryBuilder queryBuilder = TypeUtil.getQueryBuilder();
 		if (modifying != null) {
 			// 改操作涉及多条sql语句
-			sqlValuesField.set(rule, modifyParserMethod.invoke(null));
-		} else if (returnType == Page.class && queryById != null) {
-			sqlValuesField.set(rule, QueryParser.pageParserByNamed());
+			if(currentMethod.isContainQueryBuilderParam()) {
+				sqlValuesField.set(rule, queryBuilder.getQuerySQLValues());
+			} else {
+				sqlValuesField.set(rule, modifyParserMethod.invoke(null));
+			}
 		} else if (returnType == Page.class) {
-			sqlValuesField.set(rule, QueryParser.pageParser());
-		} else if (queryById != null || query != null) {
-			sqlValueField.set(rule, queryParserMethod.invoke(null));
+			if(queryById != null) {
+				sqlValuesField.set(rule, QueryParser.pageParserByNamed());	
+			} else if(query != null) {
+				if(currentMethod.isContainQueryBuilderParam()) {
+					sqlValuesField.set(rule, queryBuilder.getPageQuerySQLValue());
+				} else {
+					sqlValuesField.set(rule, QueryParser.pageParser());
+				}
+			}
+		}else if (queryById != null || query != null) {
+			if(currentMethod.isContainQueryBuilderParam()) {
+				sqlValueField.set(rule, queryBuilder.getQuerySQLValue());
+			} else {
+				sqlValueField.set(rule, queryParserMethod.invoke(null));
+			}
 		} else {
 			LOG.error("暂时没考虑");
 		}

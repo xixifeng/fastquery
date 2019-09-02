@@ -113,15 +113,6 @@ public class QueryParser {
 			Query query = querys[0];
 			String countField = query.countField();
 			String countQuery = query.countQuery();
-
-			// isBuilderQuery
-			if (QueryContext.isBuilderQuery()) {
-				countField = QueryContext.getCountField();
-				countQuery = QueryContext.getCountQuery();
-				countQuery = TypeUtil.paramNameFilter(method, countQuery);
-			}
-			// end
-
 			String countPageSQL;
 			if (countQuery == null || "".equals(countQuery)) { // 表明在声明时没有指定求和语句
 				// 那么通过主体查询语句算出count语句,querySQL的where问题已经处理好

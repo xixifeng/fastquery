@@ -54,7 +54,7 @@ public class UserInfoDBServiceTest2 extends FastQueryTest  {
 		// 连接池配置
 		Properties properties = new Properties();
 		properties.setProperty("driverClass", "com.mysql.cj.jdbc.Driver");
-		properties.setProperty("jdbcUrl", "jdbc:mysql://192.168.8.10:3305/xk1");
+		properties.setProperty("jdbcUrl", "jdbc:mysql://db.fastquery.org:3306/xk1");
 		properties.setProperty("user", "xk1");
 		properties.setProperty("password", "abc1");
 

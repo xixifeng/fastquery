@@ -9,7 +9,7 @@
 <beans>
 	 <bean name="xkdb1" id="xkdb1" class="com.alibaba.druid.pool.DruidDataSource" 
                   init-method="init" destroy-method="close">
-	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/xk" />
+	     <property name="url" value="jdbc:mysql://db.fastquery.org:3306/xk" />
 	     <property name="username" value="xk" />
 	     <property name="password" value="abc123" />
 	
@@ -33,14 +33,14 @@
 	 
 	  <bean name="xkdb2" id="xkdb2" class="com.alibaba.druid.pool.DruidDataSource" 
                   init-method="init" destroy-method="close">
-	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/xk" />
+	     <property name="url" value="jdbc:mysql://db.fastquery.org:3306/xk" />
 	     <property name="username" value="xk" />
 	     <property name="password" value="abc123" />
 	 </bean>
 	 
 	<bean name="aa" id="aa" class="com.alibaba.druid.pool.DruidDataSource" 
                   init-method="init" destroy-method="close">
-	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/aa" />
+	     <property name="url" value="jdbc:mysql://db.fastquery.org:3306/aa" />
 	     <property name="username" value="aa" />
 	     <property name="password" value="aa123456" />
 	 </bean>

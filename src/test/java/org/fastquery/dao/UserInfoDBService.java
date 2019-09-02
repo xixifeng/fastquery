@@ -32,6 +32,7 @@ import org.fastquery.core.Id;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;
+import org.fastquery.core.QueryBuilder;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Transactional;
@@ -56,6 +57,9 @@ public interface UserInfoDBService extends QueryRepository {
 
 	@Query("select id,name,age from UserInfo where id = :id")
 	UserInfo findById(@Param("id") Integer id);
+	
+	@Query("select id from xk.userinfo where id = (select max(id) from xk.userinfo);")
+	Integer findByMaxId();
 
 	@Query("${sql}")
 	UserInfo findById(@Param("sql") String sql, @Param("id") Integer id);
@@ -168,6 +172,9 @@ public interface UserInfoDBService extends QueryRepository {
 	@Modifying(table = "UserInfo")
 	@Query("insert into UserInfo(id,name,age) values(:id,:name,:age)")
 	UserInfo insert(@Param("id") Integer id, @Param("name") String name, @Param("age") Integer age);
+	
+	@Modifying(table = "UserInfo")
+	UserInfo insert(QueryBuilder queryBuilder);
 
 	// 这行SQL参数完全可以用?或:name表达式,在此仅用来测试语法特性
 	@Modifying
@@ -211,4 +218,32 @@ public interface UserInfoDBService extends QueryRepository {
 	
 	@Query("select name from `userinfo` where name like '%::x%' limit 1")
 	String findContainColon();
+	
+	@Query("select t.A from (select 11 as A,22 as B,33 as C) as T where if(?1 > 10,t.B>10,t.C>100)")
+	List<Map<String, Object>> findLogic(Integer i);
+	
+	@Query("select if(?1 > 10,'大于10','不大于10') as msg")
+	String findLogic2(Integer i);
+	
+	@Query("select t.A from (select 11 as A,22 as B,33 as C) as T where if(:number > 10,t.B>10,t.C>100)")
+	List<Map<String, Object>> findLogic3(@Param("number") Integer number);
+	
+	@Query("SELECT if(:number > 10,'大于10','不大于10') as msg")
+	String findLogic4(@Param("number") Integer number);
+	
+	@Query("select name from UserInfo where if(:predicate,name like '%三',1)")
+	List<String> findLogic5(@Param("predicate") boolean predicate);
+	
+	@Query
+	Page<Map<String, Object>> pageByQueryBuilder(QueryBuilder queryBuilder,Pageable pageable);
+	
+	@Query
+	@NotCount
+	Page<Map<String, Object>> pageByQueryBuilderNotCount(QueryBuilder queryBuilder,Pageable pageable);
+	
+	@Query
+	UserInfo findByIdWithQueryBuilder(QueryBuilder queryBuilder);
+
+	@Query("select name,age from UserInfo u where u.name=:name or u.age=:age")
+	UserInfo[] findUserInfoWithQueryBuilder(@Param("name") String name, @Param("age") Integer age,QueryBuilder queryBuilder);	
 }

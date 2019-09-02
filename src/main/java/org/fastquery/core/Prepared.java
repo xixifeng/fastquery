@@ -31,7 +31,9 @@ import org.slf4j.Logger;
 import org.fastquery.filter.FilterChainHandler;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.Page;
+import org.fastquery.struct.SQLValue;
 import org.fastquery.util.FastQueryJSONObject;
+import org.fastquery.util.TypeUtil;
 
 /**
  * 
@@ -127,10 +129,16 @@ public class Prepared { // NO_UCD
 		Modifying modifying = methodInfo.getModifying();
 		QueryByNamed queryById = methodInfo.getQueryByNamed();
 
-		boolean hasVehicle = querys.length > 0 || queryById != null; // 有SQL模板吗?
+		boolean hasVehicle = querys.length > 0 || queryById != null || methodInfo.isContainQueryBuilderParam(); // 有SQL模板吗?
 		if (hasVehicle) {
 			if (returnType == Page.class) { // 分页
-				return QueryProcess.getInstance().queryPage(queryById);
+				if(methodInfo.isContainQueryBuilderParam()) {
+					QueryBuilder queryBuilder = TypeUtil.getQueryBuilder();
+					return QueryProcess.getInstance().queryPage(queryBuilder.getPageQuerySQLValue());
+				} else {
+					List<SQLValue> sqlValues = queryById == null ? QueryParser.pageParser() : QueryParser.pageParserByNamed();
+					return QueryProcess.getInstance().queryPage(sqlValues);	
+				}
 			} else if (modifying != null) { // 改
 				return QueryProcess.getInstance().modifying();
 			} else { // 查

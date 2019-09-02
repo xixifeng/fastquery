@@ -28,6 +28,7 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 
 import org.fastquery.page.NotCount;
+import org.fastquery.util.TypeUtil;
 import org.fastquery.where.Condition;
 import org.fastquery.where.Set;
 
@@ -41,6 +42,7 @@ public class MethodInfo {
 	private Modifying modifying;
 	private Query[] queries;
 	private Parameter[] parameters;
+	private boolean containQueryBuilderParam;
 	private Class<?> returnType;
 	private Id id;
 	private Transactional t;
@@ -72,6 +74,7 @@ public class MethodInfo {
 		this.name = method.getName();
 		this.query = method.getAnnotation(Query.class);
 		this.sets = method.getAnnotationsByType(Set.class);
+		this.containQueryBuilderParam = TypeUtil.hasType(QueryBuilder.class, this.parameters);
 	}
 	Method getMethod() {
 		return method;
@@ -84,6 +87,9 @@ public class MethodInfo {
 	}
 	public Parameter[] getParameters() {
 		return parameters;
+	}
+	public boolean isContainQueryBuilderParam() {
+		return containQueryBuilderParam;
 	}
 	public Class<?> getReturnType() {
 	        return returnType;

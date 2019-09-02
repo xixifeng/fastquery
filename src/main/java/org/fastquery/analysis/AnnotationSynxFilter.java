@@ -63,12 +63,12 @@ class AnnotationSynxFilter implements MethodFilter {
 			if ((sql.indexOf(Placeholder.ID) != -1) && "".equals(id)) {
 				this.abortWith(method, sql + "中存在" + Placeholder.ID + ", 那么,@Modifying中的id属性为不能为空");
 			}
-
-			// 当返回值为Map 或 JSONObject 或 bean时, Modifying中的id和table值是必选的
-			if (dependentId(returnType) && ("".equals(id) || "".equals(table))) { // 依赖主键吗?
-				// 1). id 或 table 不能为""
-				this.abortWith(method, String.format("返回值是:%s 因此要求:%s中的id或table的值不能为空字符串.", returnType, modifying));
-			}
+		}
+	
+		// 当返回值为Map 或 JSONObject 或 bean时, Modifying中的id和table值是必选的
+		if (dependentId(returnType) && ("".equals(id) || "".equals(table))) { // 依赖主键吗?
+			// 1). id 或 table 不能为""
+			this.abortWith(method, String.format("返回值是:%s 因此要求:%s中的id或table的值不能为空字符串.", returnType, modifying));
 		}
 
 	}

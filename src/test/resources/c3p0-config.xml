@@ -21,7 +21,7 @@
         <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
         <!-- 在这里需要把 & 替换成 &amp; 不然会报错: XML configuration disabled! Verify that standard XML libs are available-->
         <!-- 如果前后台数据库编码一致,不必加?useUnicode=true&amp;characterEncoding=UTF-8 -->
-        <property name="jdbcUrl">jdbc:mysql://192.168.8.10:3305/xk</property>  
+        <property name="jdbcUrl">jdbc:mysql://db.fastquery.org:3306/xk</property>  
         <property name="user">xk</property>  
         <property name="password">abc123</property>  
         <property name="idleConnectionTestPeriod">3</property>
@@ -37,7 +37,7 @@
         
         <named-config name="sunnydb">  
         <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
-        <property name="jdbcUrl">jdbc:mysql://192.168.8.10:3305/sunny</property>  
+        <property name="jdbcUrl">jdbc:mysql://db.fastquery.org:3306/sunny</property>  
         <property name="user">sunny</property>  
         <property name="password">abc123</property>  
         <property name="idleConnectionTestPeriod">3</property>
@@ -53,7 +53,7 @@
         
         <named-config name="bb">  
         <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
-        <property name="jdbcUrl">jdbc:mysql://192.168.8.10:3306/bb</property>  
+        <property name="jdbcUrl">jdbc:mysql://db.fastquery.org:3306/bb</property>  
         <property name="user">bb</property>  
         <property name="password">bb123456</property>  
         <property name="idleConnectionTestPeriod">3</property>

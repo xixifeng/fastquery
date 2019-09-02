@@ -46,6 +46,9 @@ public class SQLValue {
 	private String sql; // 待执行的sql
 	private List<Object> values;// sql语言中"?"对应的实参
 
+	public SQLValue() {
+	}
+	
 	public SQLValue(String sql, List<Object> values) {
 
 		LOG.info("SQL扩展之前:{}", sql);
@@ -103,5 +106,11 @@ public class SQLValue {
 
 	public List<Object> getValues() {
 		return values;
+	}
+	public void setSql(String sql) {
+		this.sql = sql;
+	}
+	public void setValues(List<Object> values) {
+		this.values = values;
 	}
 }

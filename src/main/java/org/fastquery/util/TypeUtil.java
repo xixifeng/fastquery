@@ -47,8 +47,10 @@ import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
+import org.fastquery.core.QueryBuilder;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryContext;
+import org.fastquery.core.RepositoryException;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.PageIndex;
 import org.fastquery.page.PageSize;
@@ -638,14 +640,7 @@ public class TypeUtil {
 			sqls.add(s);
 			return sqls;
 		}
-
-		if (QueryContext.isBuilderQuery()) {
-			String s = QueryContext.getQuery();
-			s = paramFilter(method, args, s);
-			sqls.add(s);
-			return sqls;
-		}
-
+		
 		for (Query query : queries) {
 			String sql = query.value();
 			sql = paramFilter(method, args, sql);
@@ -867,7 +862,7 @@ public class TypeUtil {
 	 * @param array 数组
 	 * @return 数组
 	 */
-	private static List<Object> toList(Object array) {
+	public static List<Object> toList(Object array) {
 		Objects.requireNonNull(array);
 		if (array.getClass().isArray()) {
 			int len = Array.getLength(array);
@@ -879,5 +874,24 @@ public class TypeUtil {
 		} else {
 			throw new ClassCastException("你传递的不是一个数组");
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static <T> T findCurrentMethodParameter(Class<T> clazz) {
+		Object[] args = QueryContext.getArgs();
+		for (Object arg : args) {
+			if(arg !=null && arg.getClass() == clazz) {
+				return (T)arg;
+			}
+		}
+		return null;
+	} 
+	public static QueryBuilder getQueryBuilder() {
+		MethodInfo methodInfo = QueryContext.getMethodInfo();
+		QueryBuilder queryBuilder = findCurrentMethodParameter(QueryBuilder.class);
+		if(methodInfo.isContainQueryBuilderParam() && queryBuilder == null) {
+			throw new RepositoryException("传递的QueryBuilder不能为null");
+		}
+		return queryBuilder;
 	}
 }

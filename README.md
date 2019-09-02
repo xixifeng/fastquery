@@ -5,13 +5,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.77</version> <!-- fastquery.version -->
+    <version>1.0.79</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```xml
-compile 'org.fastquery:fastquery:1.0.77'
+compile 'org.fastquery:fastquery:1.0.79'
 ```
 
 # FastQuery 数据持久层框架
@@ -71,7 +71,7 @@ JRE 8+
 <beans>
 	 <bean name="xkdb1" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" 
                                         init-method="init" destroy-method="close"> 
-	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/xk" />
+	     <property name="url" value="jdbc:mysql://db.fastquery.org:3305/xk" />
 	     <property name="username" value="xk" />
 	     <property name="password" value="abc123" />
 	     <property name="filters" value="stat" />
@@ -90,7 +90,7 @@ JRE 8+
 	 <!-- 再配置一个数据源 --> 
 	 <bean name="xkdb2" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" 
                                         init-method="init" destroy-method="close"> 
-	     <property name="url" value="jdbc:mysql://192.168.8.10:3305/xk" />
+	     <property name="url" value="jdbc:mysql://db.fastquery.org:3305/xk" />
 	     <property name="username" value="xk" />
 	     <property name="password" value="abc123" />
 	 </bean>
@@ -325,7 +325,7 @@ UserInformation findUserInfoById(Integer id);
 ## 动态条件查询
 
 ### 采用`Annotation`实现简单动态条件  
-看到这里,可别认为`SQL`只能写在Annotation(注解)里.`FastQuery`还提供了另二种方案: ① 采用`@QueryByNamed`(命名式查询),将`SQL`写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活. ② 通过`BuilderQuery`函数式接口构建`SQL`.下面章节有详细描述. 
+看到这里,可别认为`SQL`只能写在Annotation(注解)里.`FastQuery`还提供了另二种方案: ① 采用`@QueryByNamed`(命名式查询),将`SQL`写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活. ② 通过`QueryBuilder`构建`SQL`.下面章节有详细描述. 
 
 ```java
 @Query("select no, name, sex from Student #{#where} order by age desc")
@@ -690,7 +690,7 @@ int updateCourse(@Param("name") String name,@Param("credit") Integer credit,Stri
 ```
 关于修改`name`的那个设置项, 有三种可能使它作废: ① name的值是null; ② name的值是""; ③ NameJudge类的ignore方法返回了`true`.
 
-根据参数动态增减set不同字段,除了用`@Set`实现之外,别忘了还有其他几种解决办法: a.调用内置方法`int executeUpdate(E entity)`,实体的字段若是`null`值,那么,该字段将不会参与set运算; b.使用SQL模版,在里头做逻辑判断; c.采用`BuilderQuery`; d.采用`$表达式`. 开发者将会发现很难不能选择出适合的解决方式.
+根据参数动态增减set不同字段,除了用`@Set`实现之外,别忘了还有其他几种解决办法: a.调用内置方法`int executeUpdate(E entity)`,实体的字段若是`null`值,那么,该字段将不会参与set运算; b.使用SQL模版,在里头做逻辑判断; c.采用`QueryBuilder`; d.采用`$表达式`. 开发者将会发现很难不能选择出适合的解决方式.
  
 ## 事务
 
@@ -936,6 +936,19 @@ public List<Student> findSomeStudent();
 
 **注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,可用于在模板中做逻辑判断,而`:name`用于标记参数位,SQL解析器会将其翻译成`?`号.  
 
+在模板中`:expression`表达式或`?N`表达式可以作为`SQL`函数的逻辑判断表达式,如跟这些函数一起参与运算:`IF(expr1,expr2,expr3)`,`IFNULL(expr1,expr2)`,`NULLIF(expr1,expr2)`,`ISNULL(expr)`.  
+
+```sql
+-- 方法的第1个参数的值可以影响where的条件
+select t.A from (select 11 as A,22 as B,33 as C) as T where if(?1 > 10,t.B>10,t.C>100)
+-- 方法的第2个参数的值可以影响查询集
+select if(?2 > 10,'大于10','不大于10') as msg
+-- 名称为"number"的参数，其值可以影响where条件
+select t.A from (select 11 as A,22 as B,33 as C) as T where if(:number > 10,t.B>10,t.C>100)
+-- 名称为"number"的参数，其值可以影响查询集
+select if(:number > 10,'大于10','不大于10') as msg
+```
+
 允许多个方法绑定同一个模板id. 在模板中使用`${_method}`可以引用到当前方法的`org.fastquery.core.MethodInfo`对象,该对象是反射`java.lang.reflect.Method`的缓存.  
 例: 根据当前方法名称的不同取不同的`SQL`语句
 
@@ -982,16 +995,13 @@ org.fastquery.dao.QueryByNamedDBExtend.queries.xml 模板文件的内容:
 
 其中 `${_method.getName()}` 可简写成 `${_method.name}`. 在`Velocity`里调用对象或方法,不是本文的重点,点到为止.
 
-## BuilderQuery
-上面介绍了`SQL`不仅可以绑定在`@Query`里, 也可以写到`XML`里. 还有另一种方式,**通过函数式构建SQL语句**.  
+## QueryBuilder
+上面介绍了`SQL`不仅可以绑定在`@Query`里, 也可以写到`XML`里. 还有另一种方式,**通过构造QueryBuilder对象**构建`Query`语句.  
 用法举例:
 
 ```java
-public interface DefaultDBService extends QueryRepository {
-   // 分页, 查询语句 和 count语句 通过 builderQuery 构建出来
-   @Query
-   Page<Map<String,Object>> findPage(Integer id,@Param("age")Integer age,Pageable p,BuilderQuery builder);
-}
+@Query
+Page<Map<String, Object>> pageByQueryBuilder(QueryBuilder queryBuilder,Pageable pageable);
 ```
 
 如果分页不要求得到总页数,在接口的方法上加`@NotCount`便可(谁说分页一定要执行count语句?).
@@ -999,15 +1009,30 @@ public interface DefaultDBService extends QueryRepository {
 不用去实现那个接口,直接调用:
 
 ```java
-DefaultDBService db = FQuery.getRepository(DefaultDBService.class);
-Pageable pageable = new PageableImpl(1, 3);
-Integer id = 500;
-Integer age = 18;
-Page<Map<String, Object>> page = db.findPage(id, age, pageable, m -> {
-	m.setQuery("select id,name,age from `userinfo`");// 设置查询语句
-	m.setWhere("where id < ?1 and age > :age");// 设置条件(这样设计可以让条件复用)
-	m.setCountQuery("select count(`id`) from `userinfo`");// 设置count语句
+// 获取Repository实例
+UserInfoDBService db = FQuery.getRepository(UserInfoDBService.class);
+
+String query = "select id,name,age from userinfo #{#where}";
+String countQuery = "select count(name) from userinfo #{#where}";
+ConditionList conditions = ConditionList.of("age > :age","and id < :id");
+Map<String, Object> parameters = new HashMap<>();
+parameters.put("age", 18);
+parameters.put("id", 50);
+
+QueryBuilder queryBuilder = new QueryBuilder(query, countQuery, conditions, parameters);
+Page<Map<String, Object>> page = db.pageByQueryBuilder(queryBuilder,new PageableImpl(1, 3));
+List<Map<String, Object>> content = page.getContent();
+content.forEach(map -> {
+	Integer age = (Integer) map.get("age");
+	Integer id = (Integer) map.get("id");
+	assertThat(age, greaterThan(18));
+	assertThat(id, lessThan(50));
 });
+
+List<String> executedSQLs = rule.getExecutedSQLs();
+assertThat("断言：执行过的sql有两条",executedSQLs.size(), is(2));
+assertThat(executedSQLs.get(0), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 0,3"));
+assertThat(executedSQLs.get(1), equalTo("select count(name) from userinfo where age > ? and id < ?"));
 ```
 
 引用问号表达式(?expression) , 冒号表达式(:expression), 其中?1表示方法的第一个参数,`:age`表示匹配`@Param("age")`那个参数,采用问号或冒号表达式不会有注入问题.
@@ -1048,7 +1073,7 @@ JSONObject callProcedure(String no,@Param("name")String name,String sex,int age,
 ```
 
 ## 分页
-要处理查询语句的参数,只需定义方法参数,为了在运行时对参数名称可见就额外加上`@Param`,上面有很多示例.另外,方法的设计还能识别某些特殊的类型,如`BuilderQuery`,`Pageable`,以便核心能智能地将动态构建查询和分页应用于查询中.
+要处理查询语句的参数,只需定义方法参数,为了在运行时对参数名称可见就额外加上`@Param`,上面有很多示例.另外,方法的设计还能识别某些特殊的类型,如`QueryBuilder`,`Pageable`,以便核心能智能地将动态构建查询和分页应用于查询中.
 
 - 通过`@QueryByNamed`实现分页
 
@@ -1243,7 +1268,7 @@ String dataSourceName = "xk1";
 // 连接池配置
 Properties properties = new Properties();
 properties.setProperty("driverClass", "com.mysql.cj.jdbc.Driver");
-properties.setProperty("jdbcUrl", "jdbc:mysql://192.168.8.10:3306/xk1");
+properties.setProperty("jdbcUrl", "jdbc:mysql://db.fastquery.org:3306/xk1");
 properties.setProperty("user", "xk1");
 properties.setProperty("password", "abc1");
 

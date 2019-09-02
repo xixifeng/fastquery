@@ -167,7 +167,7 @@ public class QueryPoolTest extends FastQueryTest  {
 		Set<String> keys = map.keySet();
 		int len = keys.size();
 		assertThat(len, is(15));
-		assertThat(map.get("url"), equalTo("jdbc:mysql://192.168.8.10:3305/xk"));
+		assertThat(map.get("url"), equalTo("jdbc:mysql://db.fastquery.org:3306/xk"));
 		assertThat(map.get("username"), equalTo("xk"));
 		assertThat(map.get("password"), equalTo("abc123"));
 		assertThat(map.get("filters"), equalTo("stat"));
@@ -190,7 +190,7 @@ public class QueryPoolTest extends FastQueryTest  {
 		Set<String> keys = map.keySet();
 		int len = keys.size();
 		assertThat(len, is(3));
-		assertThat(map.get("url"), equalTo("jdbc:mysql://192.168.8.10:3305/xk"));
+		assertThat(map.get("url"), equalTo("jdbc:mysql://db.fastquery.org:3306/xk"));
 		assertThat(map.get("username"), equalTo("xk"));
 		assertThat(map.get("password"), equalTo("abc123"));
 	}

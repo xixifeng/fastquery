@@ -414,7 +414,11 @@ public class StudentDBServiceTest extends FastQueryTest  {
 	@Test
 	public void findTop1Student() {
 		Map<String, String> map = studentDBService.findTop1Student();
-		map.forEach((k, v) -> assertThat(v, is(instanceOf(String.class))));
+		map.forEach((k, v) -> {
+			if(v!=null) {
+				assertThat(v, is(instanceOf(String.class)));
+			}
+		});
 		JSONObject json = (JSONObject) JSONObject.toJSON(map);
 		LOG.debug(json.toJSONString());
 	}

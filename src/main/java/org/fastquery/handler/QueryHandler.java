@@ -129,7 +129,7 @@ public class QueryHandler {
 		Map<String, Object> map = keyvals.get(0);
 		if (convertType == String.class) {
 			Map<String, Object> map2 = new HashMap<>();
-			map.forEach((k, v) -> map2.put(k, v.toString()));
+			map.forEach((k, v) -> map2.put(k, v != null ? v.toString() : null));
 			return map2;
 		}
 		return map;

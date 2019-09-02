@@ -38,8 +38,6 @@ public final class QueryContext {
 	private Class<?> iclass;// 当前拦截到的接口
 	private Object[] args; // 当前方法的实参
 	private List<String> sqls = new ArrayList<>(); // 当前method所执行的SQL集合
-	private MetaData metaData; // 当前上下文元数据
-	private boolean builderQuery;
 	private Pageable pageable;
 		
 	// 作用于调式
@@ -83,8 +81,6 @@ public final class QueryContext {
 
 		setRequirePk(context);
 		
-		setBQMetaData(args, context);
-		
 		setPageable(methodInfo.getParameters(), args, context);
 	}
 
@@ -108,22 +104,7 @@ public final class QueryContext {
 			context.requirePk = true;
 		}
 	}
-
-	private static void setBQMetaData(Object[] args, QueryContext context) {
-		BuilderQuery bq = null;
-		for (Object arg : args) {
-			if (arg instanceof BuilderQuery) {
-				bq = (BuilderQuery) arg;
-				break;
-			}
-		}
-		if (bq != null) {
-			context.builderQuery = true;
-			context.metaData = new MetaData();
-			bq.accept(context.metaData);
-		}
-	}
-
+	
 	private static void setPageable(Parameter[] parameters, Object[] args, QueryContext context) {
 		context.pageable = null;
 		for (Object arg : args) {
@@ -176,10 +157,6 @@ public final class QueryContext {
 		QueryContext context = getQueryContext();
 		if (!debug && context != null) {
 			context.pageable = null;
-			if (context.metaData != null) {
-				context.metaData.clear();
-				context.metaData = null;
-			}
 			context.methodInfo = null;
 			context.sqls.clear();
 			context.sqls = null;
@@ -284,32 +261,6 @@ public final class QueryContext {
 
 	static boolean isRequirePk() {
 		return getQueryContext().requirePk;
-	}
-
-	/**
-	 * 获取query语句
-	 * 
-	 * @return 查询语句
-	 */
-	public static String getQuery() {
-		return getQueryContext().metaData.getQuery();
-	}
-
-	/**
-	 * 获取countQuery
-	 * 
-	 * @return count语句
-	 */
-	static String getCountQuery() {
-		return getQueryContext().metaData.getCountQuery();
-	}
-
-	public static boolean isBuilderQuery() {
-		return getQueryContext().builderQuery;
-	}
-
-	static String getCountField() {
-		return getQueryContext().metaData.getCountField();
 	}
 }
 

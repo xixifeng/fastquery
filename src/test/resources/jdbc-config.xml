@@ -16,8 +16,8 @@
 		<property name="databaseName">xk3</property>                      <!-- 数据库的名称 -->
 		<property name="user">xk3</property>                              <!-- 数据库用户名称 -->
 		<property name="password">abc3</property>                         <!-- 数据库用户的密码 -->
-		<property name="portNumber">3305</property>                       <!-- 端口 -->
-		<property name="serverName">192.168.8.10</property>               <!-- 数据库主机地址 -->
+		<property name="portNumber">3306</property>                       <!-- 端口 -->
+		<property name="serverName">db.fastquery.org</property>               <!-- 数据库主机地址 -->
 	</named-config>
 	
 	<named-config name="world">
@@ -32,8 +32,8 @@
 		<property name="databaseName">world</property>                    
 		<property name="user">sa</property>                             
 		<property name="password">123456</property>                        
-		<property name="portNumber">3305</property>                      
-		<property name="serverName">192.168.8.10</property>          
+		<property name="portNumber">3306</property>                      
+		<property name="serverName">db.fastquery.org</property>          
 	</named-config>
 	
 	<named-config name="world-pgsql">
@@ -65,8 +65,8 @@
 		<property name="databaseName">cc</property>                      
 		<property name="user">cc</property>                              
 		<property name="password">cc123456</property>                         
-		<property name="portNumber">3307</property>                      
-		<property name="serverName">192.168.8.10</property>              
+		<property name="portNumber">3306</property>                      
+		<property name="serverName">db.fastquery.org</property>              
 	</named-config>
 	
 </jdbc-config>

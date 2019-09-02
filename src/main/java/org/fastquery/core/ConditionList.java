@@ -20,28 +20,24 @@
  * 
  */
 
-package org.fastquery.example;
+package org.fastquery.core;
 
-import java.util.Map;
-
-import org.fastquery.core.BuilderQuery;
-import org.fastquery.core.Param;
-import org.fastquery.core.Query;
-import org.fastquery.core.QueryByNamed;
-import org.fastquery.core.QueryRepository;
-import org.fastquery.page.Page;
-import org.fastquery.page.Pageable;
+import java.util.ArrayList;
 
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
-public interface DeliyunDBService extends QueryRepository {
-
-	@QueryByNamed
-	Page<Map<String, Object>> findPunitFeeStateByFeetermPage(@Param("punitId") long punitId,Pageable pageable);
-
-	@Query
-	Page<Map<String, Object>> findPunitFeeStateByFeetermPage(@Param("punitId") long punitId,Pageable pageable,BuilderQuery builderQuery);
+public class ConditionList extends ArrayList<String> {
+	
+	private static final long serialVersionUID = 1L;
+	
+	public static ConditionList of(String...conditions) {
+		ConditionList conditionList = new ConditionList();
+		for (String condition : conditions) {
+			conditionList.add(condition);
+		}
+		return conditionList;
+	}
 	
 }

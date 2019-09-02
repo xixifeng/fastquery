@@ -22,23 +22,15 @@
 
 package org.fastquery.dao2;
 
-import java.util.Map;
-
-import org.fastquery.core.BuilderQuery;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
-import org.fastquery.page.Page;
-import org.fastquery.page.Pageable;
 
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
 public interface DefaultDBService extends QueryRepository {
-
-	@Query
-	Page<Map<String, Object>> findPage(@Param("id") Integer id, @Param("age") Integer age, Pageable pageable, BuilderQuery builderQuery);
 	
 	@Query("$s")
 	String sqlFun(@Param("s") String sql);

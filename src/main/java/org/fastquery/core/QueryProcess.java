@@ -87,7 +87,13 @@ class QueryProcess {
 		Class<?> returnType = QueryContext.getReturnType();
 
 		// 获取待执行的sql
-		List<SQLValue> sqlValues = QueryParser.modifyParser();
+		List<SQLValue> sqlValues;
+		if(method.isContainQueryBuilderParam()) {
+			QueryBuilder queryBuilder = TypeUtil.getQueryBuilder();
+			sqlValues = queryBuilder.getQuerySQLValues();
+		} else {
+			sqlValues = QueryParser.modifyParser();
+		}
 
 		// 执行
 		List<RespUpdate> respUpdates = DB.modify(sqlValues, QueryContext.isRequirePk());
@@ -125,7 +131,13 @@ class QueryProcess {
 
 		MethodInfo method = QueryContext.getMethodInfo();
 		Class<?> returnType = QueryContext.getReturnType();
-		SQLValue sqlValue = QueryParser.queryParser();
+		SQLValue sqlValue;
+		if(method.isContainQueryBuilderParam()) {
+			QueryBuilder queryBuilder = TypeUtil.getQueryBuilder();
+			sqlValue = queryBuilder.getQuerySQLValue();
+		} else {
+			 sqlValue = QueryParser.queryParser();
+		}
 		List<Map<String, Object>> keyvals = DB.find(sqlValue);
 
 		// 上面的try发生异常了,才会导致keyvals为null, 不过异常一旦捕获到就throw了,因此,程序执行到这里keyvals不可能为null.
@@ -157,10 +169,7 @@ class QueryProcess {
 	}
 
 	// 分页查询
-	Object queryPage(QueryByNamed queryByNamed) {
-		
-		List<SQLValue> sqlValues = queryByNamed == null ? QueryParser.pageParser() : QueryParser.pageParserByNamed();
-		
+	Object queryPage(List<SQLValue> sqlValues) {
 		List<Map<String, Object>> keyvals = DB.find(sqlValues.get(0));
 		Pageable pageable = QueryContext.getPageable();
 		int size = pageable.getPageSize(); // 每页多少条数据

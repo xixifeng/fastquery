@@ -24,8 +24,6 @@ package org.fastquery.test;
 
 import static org.junit.Assert.assertThat;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -33,9 +31,6 @@ import static org.hamcrest.Matchers.*;
 
 import org.fastquery.bean.UserInfo;
 import org.fastquery.dao2.DefaultDBService;
-import org.fastquery.page.Page;
-import org.fastquery.page.Pageable;
-import org.fastquery.page.PageableImpl;
 import org.fastquery.service.FQuery;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -102,75 +97,6 @@ public class DefaultMethodTest extends FastQueryTest {
 
 		int effect = db.delete("UserInfo", "id", id);
 		assertThat(effect, is(1));
-	}
-
-	@Test
-	public void findPage1() {
-		Pageable pageable = new PageableImpl(1, 3);
-		Integer id = 500;
-		Integer age = 18;
-		Page<Map<String, Object>> page = db.findPage(id, age, pageable, m -> {
-			m.setQuery("select id,name,age from `userinfo`");
-			m.setWhere("where id < ?1 and age > :age");// 引用问号表达式(?expression) , 冒号表达式(:expression)
-			m.setCountQuery("select count(`id`) from `userinfo`");
-		});
-
-		assertThat(page.isFirst(), is(true));
-		assertThat(page.getSize(), is(3));
-
-		List<Map<String, Object>> list = page.getContent();
-		list.forEach(m -> m.forEach((k, v) -> {
-			if ("id".equals(k)) {
-				assertThat((Integer) v, lessThan(id));
-			} else if ("age".equals(k)) {
-				assertThat((Integer) v, greaterThan(age));
-			}
-		}));
-	}
-
-	// 测试 函数式什么都不干
-	@Test
-	public void findPage2() {
-		Pageable pageable = new PageableImpl(1, 3);
-		Integer id = 500;
-		Integer age = 18;
-		try {
-			db.findPage(id, age, pageable, m -> {
-			});
-		} catch (Exception e) {
-			String msg = e.getMessage();
-			assertThat(msg, containsString("query 语句必须设置正确"));
-		}
-	}
-
-	// 测试给 query 设置 null
-	@Test
-	public void findPage3() {
-		Pageable pageable = new PageableImpl(1, 3);
-		Integer id = 500;
-		Integer age = 18;
-		try {
-			db.findPage(id, age, pageable, m -> m.setQuery(null));
-		} catch (Exception e) {
-			String msg = e.getMessage();
-			assertThat(msg, containsString("query 语句必须设置正确"));
-		}
-	}
-
-	@Test
-	public void findPage4() {
-		Pageable pageable = new PageableImpl(1, 3);
-		Integer id = 500;
-		Integer age = 18;
-		try {
-			db.findPage(id, age, pageable, m -> {
-				m.setQuery("select id,name,age from `userinfo`");
-				m.setCountQuery("");
-			});
-		} catch (Exception e) {
-			String msg = e.getMessage();
-			assertThat(msg, containsString("query 语句必须设置正确"));
-		}
 	}
 	
 	@Test
