@@ -1211,17 +1211,17 @@ int number = page.getNumber();                // 当前页数(当前是第几页
     "hasNext": true,         	// 是否有下一页
     "hasPrevious": false,    	// 是否有上一页
     "last": false,           	// 是否是最后一页
-    "nextPageable": {        	// 下一页的基本属性
-        "number": 1,         	// 定位的页码
-        "size": 15           	// 每页多少条数据
-    },
-    "number": 1,             	// 当前页码,从1开始
-    "numberOfElements": 6,  	// 当前页的真实记录行数
     "previousPageable": {    	// 上一页的基本属性
         "number": 0,         	// 定位的页码
-        "size": 15           	// 每页多少条数据
+        "size": 15           	// 期望每页多少条数据
     },
-    "size": 15,              	// 每页行数
+    "nextPageable": {        	// 下一页的基本属性
+        "number": 1,         	// 定位的页码
+        "size": 15           	// 期望每页多少条数据
+    },
+    "number": 1,             	// 当前页码,从1开始
+    "size": 15,              	// 期望每页行数(numberOfElements表示真正查出的条数)
+    "numberOfElements": 6,  	// 当前页的真实记录行数
     "totalElements": 188,    	// 总行数
     "totalPages": 13         	// 总页数
 }
