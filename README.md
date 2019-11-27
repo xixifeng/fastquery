@@ -1186,7 +1186,7 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 
 ```js
 {
-	"content":[                  // 这页的数据
+    "content":[                 // 这页的数据
 		{
 			"name":"查尔斯·巴贝奇","id":2,"year":1792
 		},
@@ -1205,7 +1205,7 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 		{
 			"name":"蒂姆·伯纳斯·李","id":6,"year":1955
 		}
-	],
+    ],
     "first": true,           	// 是否是第一页
     "hasContent": true,      	// 这页是否有数据
     "hasNext": true,         	// 是否有下一页
