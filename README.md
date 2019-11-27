@@ -1,4 +1,5 @@
 <p align="center"><img src="file/logo.png" alt="FastQuery logo"></p>
+
 ### Apache Maven
 ```xml
 <dependency>
