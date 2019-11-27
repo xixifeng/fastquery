@@ -156,8 +156,8 @@ public class QueryParser {
 		} else {
 			// 获取sql
 			offset = offset + pageSize;
-			String nextPageQuery =  pageDialect.getCurrentPageSQL(querySQL, offset, pageSize); 
-			sqlValues.add(inParser(nextPageQuery));
+			String nextRecordSQL =  pageDialect.getCurrentPageSQL(querySQL, offset, 1); 
+			sqlValues.add(inParser(nextRecordSQL));
 		}
 
 		return sqlValues;
