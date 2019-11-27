@@ -70,20 +70,19 @@ class GenerateRepositoryImpl {
 		List<Class<?>> clses = new ArrayList<>();
 
 		// 3). 批量生成 Repository 的实现类
-		Set<String> basePackages;
-		for (FastQueryJson fQueryPropertie : fqPropertie) {
-			basePackages = fQueryPropertie.getBasePackages();
-			for (String basePackage : basePackages) {
+		fqPropertie.stream().forEach(fQueryPropertie -> {
+			Set<String> basePackages = fQueryPropertie.getBasePackages();
+			basePackages.stream().forEach(basePackage -> {
 				List<Class<?>> classes = ClassUtil.getClasses(basePackage);
 				clses.addAll(classes);
 				// classes.forEach(this::generate)
-				for (Class<?> rcls : classes) {
+				classes.stream().forEach(rcls -> {
 					generate(rcls); // 生成
 					QueryPool.put(rcls.getName(), resource);
-				}
-			}
-		}
-
+				});
+			});
+		});
+		
 		// 3). 生成 Repository之后的检测
 		AsmRepository.after(clses);
 	}

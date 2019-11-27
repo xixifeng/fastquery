@@ -1,5 +1,4 @@
-<p align="center"><img src="logo.png" alt="FastQuery logo"></p>
-
+<p align="center"><img src="file/logo.png" alt="FastQuery logo"></p>
 ### Apache Maven
 ```xml
 <dependency>
@@ -628,7 +627,7 @@ where id in (77, 88, 99)
 @Set("`period` = ?4")
 int updateCourse(String name,Integer credit, Integer semester, Integer period, String no);
 ```
-	
+
 `#{#sets}` 用于引用设置选项. `@Set(value="name = ?1" , ignoreNull=true , ignoreEmpty=true)` 中的可选配置项,顾名思义.    
 
 方法上的所有`@Set`有可能全部被移除,那么就会得到一个错误的SQL`update Course set where no = ?5`,避免此错误有两个方法: 1). 加一条不含有SQL参数的`@set`,如: `@set("name = name")`,它永远不会被删除,并且不会对原有数据造成任何影响; 2).调用方法前对参数做校验,以排除因为参数导致全部`@set`被丢弃的可能.  
@@ -691,7 +690,7 @@ int updateCourse(@Param("name") String name,@Param("credit") Integer credit,Stri
 关于修改`name`的那个设置项, 有三种可能使它作废: ① name的值是null; ② name的值是""; ③ NameJudge类的ignore方法返回了`true`.
 
 根据参数动态增减set不同字段,除了用`@Set`实现之外,别忘了还有其他几种解决办法: a.调用内置方法`int executeUpdate(E entity)`,实体的字段若是`null`值,那么,该字段将不会参与set运算; b.使用SQL模版,在里头做逻辑判断; c.采用`QueryBuilder`; d.采用`$表达式`. 开发者将会发现很难不能选择出适合的解决方式.
- 
+
 ## 事务
 
 ### 用`@Transactional`实现简单事务
@@ -725,7 +724,7 @@ int effect = userInfoDBService.tx(() -> {
 });
 ```
 
-以上`Lambda`表达式,`()->{}`中的`{}`里的所有操作是原子性的,要么统统成功，要么全部失败回滚.在`{}`里抛出异常或`return null`或返回-1,都会导致`{}`全体回滚并返回-1.`Lambda`表达式对**值**封闭,对**变量**开放(Lambda expressions close over values,not variables),正因为这个特性,不能在`{}`中修改外界的值,但是可以给外界的对象设置值. 
+以上`Lambda`表达式,`()->{}`中的`{}`里的所有操作是原子性的,要么统统成功,要么全部失败回滚.在`{}`里抛出异常或`return null`或返回-1,都会导致`{}`全体回滚并返回-1.`Lambda`表达式对**值**封闭,对**变量**开放(Lambda expressions close over values,not variables),正因为这个特性,不能在`{}`中修改外界的值,但是可以给外界的对象设置值. 
 
 ```java
 ... ...
@@ -741,7 +740,7 @@ tx(() -> {
 ## @Param参数
 
 **SQL中使用冒号表达式**
- 
+
 ```java
 @Query("select name,age from UserInfo u where u.name = :name or u.age = :age")
 UserInfo[] findUserInfoByNameOrAge(@Param("name") String name, @Param("age")Integer age);
@@ -782,7 +781,7 @@ JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") St
 
 ## 微笑表达式
 定义: **以<code>\`-</code> 作为开始,以<code>-\`</code>作为结尾,包裹着若干字符,因为<code>\`- -\`</code>酷似微笑表情,因此将这样的表达式称之为`微笑表达式`.** <br>例如: <code> \`-%${name}%-\` </code>. **\`** 反撇号的位置如下图所示:<br>
-![反撇号示意图](https://xixifeng.github.io/pjaxpage/example/img/fanpie.png "反撇号示意图")    
+![反撇号示意图](file/fanpie.png "反撇号示意图")    
 作用:  
 1.可以作为实参的模板,举例: 查询出姓"张"的用户.没有`微笑表达式`时的写法:
 ```java
@@ -943,9 +942,9 @@ public List<Student> findSomeStudent();
 select t.A from (select 11 as A,22 as B,33 as C) as T where if(?1 > 10,t.B>10,t.C>100)
 -- 方法的第2个参数的值可以影响查询集
 select if(?2 > 10,'大于10','不大于10') as msg
--- 名称为"number"的参数，其值可以影响where条件
+-- 名称为"number"的参数,其值可以影响where条件
 select t.A from (select 11 as A,22 as B,33 as C) as T where if(:number > 10,t.B>10,t.C>100)
--- 名称为"number"的参数，其值可以影响查询集
+-- 名称为"number"的参数,其值可以影响查询集
 select if(:number > 10,'大于10','不大于10') as msg
 ```
 
@@ -1037,11 +1036,13 @@ assertThat(executedSQLs.get(1), equalTo("select count(name) from userinfo where 
 
 引用问号表达式(?expression) , 冒号表达式(:expression), 其中?1表示方法的第一个参数,`:age`表示匹配`@Param("age")`那个参数,采用问号或冒号表达式不会有注入问题.
 
+**如果要查的表是一个变量(甚至表是自动生成的),要查的字段也是变量,条件单元的可选范围也是个变量,整个 SQL 都是动态生成的,在这种情形就只能用 `QueryBuilder`, 使用`@Query`模板,就无能为力了,`QueryBuilder`有不可取代的功能**.不过,能用`@Query`模板解决问题,就尽量使用它,因为它的设计,只用写一个抽象方法,零实现,让你没办法去写第二行 Java 代码,从设计上让你无法犯错.
+
 ## 支持存储过程
 
 只支持in(输入)参数,不支持out(输出参数), 如果想输出存储过程的处理结果,在过程内部使用`select`查询输出.  
 举例:  
-插入一条学生，返回学生的总记录数和当前编码,存储过程语句:
+插入一条学生,返回学生的总记录数和当前编码,存储过程语句:
 
 ```sql
 delimiter $$
@@ -1180,7 +1181,7 @@ List<UserInfo> userInfos = page.getContent(); // 获取这页的数据
 Slice slice = page.getNextPageable();         // 下一页
 int number = page.getNumber();                // 当前页数(当前是第几页)
 // 更多 page.? 不妨亲自去试试看
-``` 
+```
 
 `Page`转换成`JSON`后的结构如下:
 
@@ -1274,7 +1275,7 @@ properties.setProperty("password", "abc1");
 
 // 创建数据源
 FQuery.createDataSource(dataSourceName, properties);
-```   
+```
 
 ### 适配数据源
 使用`@Source`动态适配当前`Repository`的方法应该采用哪个数据源. 显然这个功能很有用.      
@@ -1510,7 +1511,7 @@ public interface UserInfoDBService extends QueryRepository {
 @Query("select id,name,age from UserInfo where id = :id")
 JSONObject findById(@QueryParam("id") @Param("id") Integer id);
 ```
- 
+
 当然,如果不喜欢太简单,可以把DB接口注入到JAX-RS Resource类中:
 
 ```java
@@ -1613,7 +1614,7 @@ assertThat(executedSQLs.get(0), not(containsString("count")));
 build: maven 
 
 ## 微信交流
-![FastQuery 微信交流](https://images.gitee.com/uploads/images/2019/0520/160223_39815e8e_788636.png "微信交流群,与作者交流FastQuery.")  
+![FastQuery 微信交流](file/wx.png "微信交流群,与作者交流FastQuery.")  
 与作者一起探讨FastQuery(加入时请标注java,谢谢).
 
 ## 反馈问题

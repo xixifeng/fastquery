@@ -26,6 +26,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.function.Supplier;
 
+import org.fastquery.page.Page;
 import org.fastquery.util.BeanUtil;
 
 /**
@@ -374,6 +375,17 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 */
 	@Id(MethodId.QUERY7)
 	<E> E find(Class<E> entityClass, long id, @Source String dataSourceName, String dbName);
+	
+	/**
+	 * 查找存储的实体集并进行分页
+	 * @param <E> 实体
+	 * @param entityClass 实体的class
+	 * @param count 分页是否去执行 count 语句
+	 * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
+	 * @param pageSize 用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
+	 * @return 分页结构对象
+	 */
+	<E> Page<E> findPage(Class<E> entityClass, boolean count, int pageIndex, int pageSize);
 
 	/**
 	 * 根据主键删除实体

@@ -52,12 +52,12 @@ public class AsmRest {
 	}
 
 	/**
-	 * 自动生成Repository接口的实现类并以字节的形式返回, 该方法是线程安全的.
+	 * 自动生成Repository接口的实现类并以字节的形式返回.
 	 * 
 	 * @param repositoryClazz repository class
 	 * @return 生成的类字节码
 	 */
-	public static synchronized byte[] generateBytes(Class<?> repositoryClazz) {
+	public static byte[] generateBytes(Class<?> repositoryClazz) {
 
 		// 生成类
 		ClassPool pool = ClassPool.getDefault();

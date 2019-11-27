@@ -40,4 +40,11 @@ public class ConditionList extends ArrayList<String> {
 		return conditionList;
 	}
 	
+	public ConditionList add(String...conditions) {
+		for (String condition : conditions) {
+			this.add(condition);
+		}
+		return this;
+	}
+	
 }

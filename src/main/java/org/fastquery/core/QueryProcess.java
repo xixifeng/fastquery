@@ -275,6 +275,16 @@ class QueryProcess {
 	}
 
 	Object methodQuery() {
+		MethodInfo method = QueryContext.getMethodInfo();
+		Object[] iargs = QueryContext.getArgs();
+		if("findPage".equals(method.getName())) {
+			Class<?> entityClass = (Class<?>) iargs[0];
+			boolean count = (boolean) iargs[1];
+			int pageIndex = (int) iargs[2];
+			int pageSize = (int) iargs[3];
+			// BeanUtil. 待续...
+			
+		}
 		return null;
 	}
 
