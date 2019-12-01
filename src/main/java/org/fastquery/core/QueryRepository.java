@@ -24,9 +24,13 @@ package org.fastquery.core;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.Supplier;
 
+import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
+import org.fastquery.page.PageIndex;
+import org.fastquery.page.PageSize;
 import org.fastquery.util.BeanUtil;
 
 /**
@@ -204,22 +208,22 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * 更新实体
 	 * 
 	 * @param entity 实体
-	 * @param where 自定义条件,若传递null或"",默认将主健作为条件进行修改
+	 * @param attachCondition 附加条件,若传递null或"",默认将主健作为条件进行修改
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY3)
-	int update(Object entity, String where);
+	int update(Object entity, String attachCondition);
 
 	/**
 	 * 更新实体
 	 * 
 	 * @param dataSourceName 数据源名称
 	 * @param entity 实体
-	 * @param where 自定义条件
+	 * @param attachCondition 附加条件
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY3)
-	int update(@Source String dataSourceName, Object entity, String where);
+	int update(@Source String dataSourceName, Object entity, String attachCondition);
 
 	/**
 	 * 更新实体
@@ -227,11 +231,11 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
 	 * @param entity 实体
-	 * @param where 自定义条件
+	 * @param attachCondition 附加条件
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY3)
-	int update(@Source String dataSourceName, String dbName, Object entity, String where);
+	int update(@Source String dataSourceName, String dbName, Object entity, String attachCondition);
 
 	/**
 	 * 保存或者更新实体,实体需要包含主键值否则报错 (如果不存在就存储,存在就更新)
@@ -376,17 +380,6 @@ public interface QueryRepository extends Repository { // NO_UCD
 	@Id(MethodId.QUERY7)
 	<E> E find(Class<E> entityClass, long id, @Source String dataSourceName, String dbName);
 	
-	/**
-	 * 查找存储的实体集并进行分页
-	 * @param <E> 实体
-	 * @param entityClass 实体的class
-	 * @param count 分页是否去执行 count 语句
-	 * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
-	 * @param pageSize 用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
-	 * @return 分页结构对象
-	 */
-	<E> Page<E> findPage(Class<E> entityClass, boolean count, int pageIndex, int pageSize);
-
 	/**
 	 * 根据主键删除实体
 	 * 
@@ -587,4 +580,66 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 */
 	@Id(MethodId.QUERY9)
 	int tx(Supplier<Integer> fun);
+	
+	/**
+	 * 查询分页
+	 * @param builder 查询构造器
+	 * @param notCount ture:表示分页时不执行 count 语句.反之,执行 count 语句.
+	 * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
+	 * @param pageSize 用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
+	 * @return 分页结构对象
+	 */
+	Page<Map<String, Object>> findPage(QueryBuilder builder, @NotCount boolean notCount, @PageIndex int pageIndex, @PageSize int pageSize);
+
+	/**
+	 * 查找存储的实体集并进行分页
+	 * @param <E> 实体类型
+	 * @param entity 实体实例,用于作为查询条件,条件之间是 and 关系.举例说明,若传递的实体为:<br>
+	 * <pre>
+	 * Student student = new Student();
+	 * student.setDept("计算机");
+	 * student.setName("海猫");
+	 * 那么会推导出 SQL 语句的查询条件为:
+	 * where dept = ? and name = ?
+	 * 占位符?问号的值通过 PreparedStatement 设置
+	 * 注意: 实体的属性若为 null 该属性将不参与任何运算.
+	 * </pre>
+	 * @param attachConditions 附加条件,比如增加 or 运算,自定义排序
+	 * @param attachParameters 附加条件的参数值
+	 * @param notCount ture:表示分页时不执行 count 语句.反之,执行 count 语句.
+	 * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
+	 * @param pageSize 用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
+	 * @param excludeColumns 查询排除哪些字段
+	 * @see #findPage(QueryBuilder, boolean, int, int)
+	 * @return 分页结构对象
+	 */
+	@SuppressWarnings("unchecked")
+	default <E> Page<E> findPage(E entity, ConditionList attachConditions, Map<String, Object> attachParameters, @NotCount boolean notCount, @PageIndex int pageIndex, @PageSize int pageSize,String...excludeColumns) {
+		String query = BeanUtil.toSelectSQL(entity, attachConditions, attachParameters, null, excludeColumns);
+		QueryBuilder builder = new QueryBuilder(query, attachConditions, attachParameters);
+		Page<Map<String, Object>> page = this.findPage(builder, notCount, pageIndex, pageSize);
+		return (Page<E>) page.convert(entity.getClass());
+	}
+	
+	/**
+	 * 查找存储的实体集并进行分页
+	 * @param <E> 实体类型
+	 * @param entity 实体实例,用于作为查询条件,条件之间是 and 关系.举例说明,若传递的实体为:<br>
+	 * <pre>
+	 * Student student = new Student();
+	 * student.setDept("计算机");
+	 * student.setName("海猫");
+	 * 那么会推导出 SQL 语句的查询条件为:
+	 * where dept = ? and name = ?
+	 * 占位符?问号的值通过 PreparedStatement 设置
+	 * 注意: 实体的属性若为 null 该属性将不参与任何运算
+	 * </pre>
+	 * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
+	 * @param pageSize 用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
+	 * @see QueryRepository#findPage(Object, ConditionList, Map, boolean, int, int, String...)
+	 * @return 分页结构对象
+	 */
+	default <E> Page<E> findPage(E entity,int pageIndex, int pageSize) {
+		return this.findPage(entity, null,null, true, pageIndex, pageSize);
+	}
 }

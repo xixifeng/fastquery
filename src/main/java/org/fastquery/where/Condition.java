@@ -49,14 +49,14 @@ public @interface Condition {
 	 * 当前条件所包含的变量值跟allowRule所指定的正则表达式逐个进行匹配,如果其中一个能匹配上就追加这个条件. <br>
 	 * 注意: 先 allowRule(允许) 后 ignoreRule(忽略)
 	 * 
-	 * @return String
+	 * @return String[]
 	 */
 	String[] allowRule() default {};
 
 	/**
 	 * 当前条件所包含的变量值跟ignoreRule所指定的正则表达式逐个进行匹配,如果其中一个能匹配上就忽略该条件
 	 * 
-	 * @return String
+	 * @return String[]
 	 */
 	String[] ignoreRule() default {};
 

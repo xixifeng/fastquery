@@ -28,12 +28,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.fastquery.core.ConditionList;
 import org.fastquery.core.Id;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.RepositoryException;
@@ -71,7 +73,7 @@ public final class BeanUtil {
 	 * @return insert 语句
 	 */
 	public static String toInsertSQL(Object bean) {
-		String values = toValue(getFields(bean.getClass()), bean, true);
+		String values = toValue(getFields(bean.getClass()), bean, true);		
 		return bean2InsertSQL(bean, null, values, false);
 	}
 
@@ -281,6 +283,36 @@ public final class BeanUtil {
 				return String.format("select %s from %s where %s = %s", keyFeild, tableName, keyFeild, key.toString());
 			}
 		}
+	}
+	
+	public static String toSelectSQL(Object bean, ConditionList attachConditions, Map<String, Object> attachParameters, String dbName,
+			String... excludeColumns) {
+		Class<?> cls = bean.getClass();
+		// 表名称
+		String tableName = getTableName(dbName, cls);
+		Field[] fields = cls.getDeclaredFields();
+		for (Field field : fields) {
+			if (allowField(field)) {
+				field.setAccessible(true);
+				Object fv;
+				try {
+					fv = field.get(bean);
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					throw new RepositoryException(e);
+				}
+				if (fv != null) {
+					attachConditions.add(field.getName() + " = ? and");
+					attachParameters.put(field.getName(), fv);// 同时把这个?号的值记下来
+				}
+			}
+		}
+		// 取出最后一个,去掉"and"
+		int lastIndex = attachParameters.size() - 1;
+		String lastCondition = attachConditions.get(lastIndex);
+		lastCondition = lastCondition.substring(0, lastIndex-3);
+		attachConditions.set(lastIndex,lastCondition);
+		
+		return String.format("select %s from %s", selectFields(cls,excludeColumns), tableName);
 	}
 
 	public static Field[] getFields(Class<?> cls) {
@@ -660,13 +692,16 @@ public final class BeanUtil {
 		return list;
 	}
 
-	private static String selectFields(Object bean) {
+	private static String selectFields(Object bean,String...excludeColumns) {
 		Objects.requireNonNull(bean);
 		List<Field> fields = mapFields(bean);
 		StringBuilder sb = new StringBuilder(6 * fields.size());
 		fields.forEach(f -> {
-			sb.append(',');
-			sb.append(f.getName());
+			String fieldName = f.getName();
+			if(excludeColumns == null || excludeColumns.length == 0 || ArrayUtils.contains(excludeColumns, fieldName)) {
+				sb.append(',');
+				sb.append(f.getName());
+			}
 		});
 		int len = sb.length();
 		if (len > 0) {

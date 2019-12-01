@@ -100,8 +100,17 @@ public class MethodInfo {
 	public QueryByNamed getQueryByNamed() {
 		return queryByNamed;
 	}
-	public NotCount getNotCount() {
-		return notCount;
+	public boolean isCount() { // 检测到需要分页了，才会执行这个方法
+		if(notCount != null) {
+			return false;
+		} else {
+			Boolean nc = (Boolean) TypeUtil.findAnnotationParameterVal(NotCount.class, parameters, QueryContext.getArgs());
+			if(nc!=null) {
+				return !nc.booleanValue();
+			} else {
+				return true;
+			}
+		}
 	}
 	public Condition[] getConditions() {
 		return conditions;

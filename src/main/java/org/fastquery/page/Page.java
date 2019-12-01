@@ -121,4 +121,12 @@ public interface Page<E> {
 	 * @return 上一页的 {@link Slice}
 	 */
 	public Slice getPreviousPageable();
+	
+	/**
+	 * 将当前 Page<E> 转换成 Page<T>
+	 * @param <T> 另一个类型
+	 * @param clazz 类型
+	 * @return 一个新的 Page<T> 实例
+	 */
+	public <T> Page<T> convert(Class<T> clazz);
 }

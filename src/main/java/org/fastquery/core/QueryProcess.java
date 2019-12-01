@@ -31,6 +31,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.math.BigInteger;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ import org.fastquery.util.BeanUtil;
 import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -182,7 +184,7 @@ class QueryProcess {
 
 		MethodInfo method = QueryContext.getMethodInfo();
 		if (hasContent) {
-			if (method.getNotCount() == null) { // 需要求和
+			if (method.isCount()) { // 需要求和
 				List<Map<String, Object>> results = DB.find(sqlValues.get(1));
 				totalElements = !results.isEmpty() ? ((Number) results.get(0).values().iterator().next()).longValue() : 0;
 
@@ -275,16 +277,6 @@ class QueryProcess {
 	}
 
 	Object methodQuery() {
-		MethodInfo method = QueryContext.getMethodInfo();
-		Object[] iargs = QueryContext.getArgs();
-		if("findPage".equals(method.getName())) {
-			Class<?> entityClass = (Class<?>) iargs[0];
-			boolean count = (boolean) iargs[1];
-			int pageIndex = (int) iargs[2];
-			int pageSize = (int) iargs[3];
-			// BeanUtil. 待续...
-			
-		}
 		return null;
 	}
 
@@ -523,7 +515,10 @@ class QueryProcess {
 		private Slice nextPageable; // 下一页的Pageable对象
 		private Slice previousPageable; // 上一页的Pageable对象
 
-		public PageImpl(int size, int number, List<?> content, long totalElements, int totalPages, boolean hasNext, boolean isLast) {
+		private PageImpl() {
+		}
+		
+		private PageImpl(int size, int number, List<?> content, long totalElements, int totalPages, boolean hasNext, boolean isLast) {
 			this.size = size;
 			this.numberOfElements = content.size();
 			this.number = number;
@@ -603,5 +598,33 @@ class QueryProcess {
 		public Slice getPreviousPageable() {
 			return previousPageable;
 		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public Page convert(Class clazz) {
+			PageImpl page = new PageImpl();
+			page.size = this.size;
+			page.number = this.number;
+			page.numberOfElements = this.numberOfElements;
+			
+			List bs = new ArrayList<>();
+			this.content.forEach(map -> bs.add(JSON.toJavaObject(new JSONObject((Map<String, Object>) map), clazz)));
+			page.content = bs;
+
+			page.totalElements = this.totalElements;
+			page.totalPages = this.totalPages;
+			page.hasContent = this.hasContent;
+
+			page.isFirst = this.isFirst;
+			page.isLast = this.isLast;
+
+			page.hasNext = this.hasNext;
+			page.hasPrevious = this.hasPrevious;
+
+			page.nextPageable = new Slice(this.getNextPageable().getNumber(), this.getNextPageable().getSize());
+			page.previousPageable = new Slice(this.getPreviousPageable().getNumber(), this.getPreviousPageable().getSize());
+			return page;
+		}
+		
 	}
 }

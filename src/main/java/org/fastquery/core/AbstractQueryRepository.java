@@ -25,7 +25,10 @@ package org.fastquery.core;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.Supplier;
+
+import org.fastquery.page.Page;
 
 /**
  * 
@@ -53,7 +56,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 
 	private Class<QueryRepository> c = QueryRepository.class;
 
-	private static final MethodInfo[] m = new MethodInfo[34];
+	private static final MethodInfo[] m = new MethodInfo[35];
 
 	private void cache(int j, String name, Class<?>... parameterTypes) {
 		Method localMethod;
@@ -379,4 +382,15 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		}
 		return ((Integer) Prepared.excute(m[j], new Object[] { paramObject }, this)).intValue();
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Page<Map<String, Object>> findPage(QueryBuilder builder, boolean count, int pageIndex, int pageSize) {
+		int j = 34;
+		if (m[j] == null) {
+			cache(j, "findPage", QueryBuilder.class,boolean.class,int.class,int.class);
+		}
+		return (Page<Map<String, Object>>) Prepared.excute(m[j], new Object[] { builder, Boolean.valueOf(count), Integer.valueOf(pageIndex), Integer.valueOf(pageSize) }, this);
+	}
+	
 }

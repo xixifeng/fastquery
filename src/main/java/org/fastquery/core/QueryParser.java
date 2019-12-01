@@ -109,7 +109,7 @@ public class QueryParser {
 		List<SQLValue> sqlValues = new ArrayList<>(2);// 有3条记录 0.当前页query,1.求和query,2.下一页query
 		sqlValues.add(inParser(currentPageSQL));
 
-		if (method.getNotCount() == null) { // 表明需要求和
+		if (method.isCount()) { // 表明需要求和
 			Query query = querys[0];
 			String countField = query.countField();
 			String countQuery = query.countQuery();
@@ -124,8 +124,8 @@ public class QueryParser {
 			sqlValues.add(inParser(countPageSQL));
 		} else {
 			offset = offset + pageSize;
-			String nextPageSQL =  pageDialect.getCurrentPageSQL(querySQL, offset, pageSize); 
-			sqlValues.add(inParser(nextPageSQL));
+			String nextRecordSQL =  pageDialect.getCurrentPageSQL(querySQL, offset, 1); 
+			sqlValues.add(inParser(nextRecordSQL));
 		}
 
 		return sqlValues;
@@ -149,7 +149,7 @@ public class QueryParser {
 		String currentPageSQL = pageDialect.getCurrentPageSQL(querySQL, offset, pageSize);
 		sqlValues.add(inParser(currentPageSQL));
 
-		if (method.getNotCount() == null) { // 需要求和
+		if (method.isCount()) { // 需要求和
 			String countPageSQL = QueryPool.render(false);
 			countPageSQL = TypeUtil.paramNameFilter(method, countPageSQL);
 			sqlValues.add(inParser(countPageSQL));

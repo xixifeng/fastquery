@@ -153,10 +153,10 @@ public class BeanUtilTest {
 		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values('牵牛花','3'),('10','松''鼠','5')"));
 	}
 	
-	private static String selectFields(Object bean) throws Exception {
-		Method method = BeanUtil.class.getDeclaredMethod("selectFields", Object.class);
+	private static String selectFields(Object bean,String...excludeColumns) throws Exception {
+		Method method = BeanUtil.class.getDeclaredMethod("selectFields", Object.class, String[].class);
 		method.setAccessible(true);
-		return (String) method.invoke(null, bean);
+		return (String) method.invoke(null, bean, excludeColumns);
 	}
 	
 	@Test

@@ -20,20 +20,40 @@
  * 
  */
 
-package org.fastquery.page;
+package org.fastquery.where;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
  * 
- * 标识分页不统计总行数.
- * 
  * @author xixifeng (fastquery@126.com)
  */
+@Repeatable(Columns.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD,ElementType.PARAMETER })
-public @interface NotCount {
+@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
+public @interface Column {
+	/**
+	 * id标识
+	 * 
+	 * @return String 
+	 */
+	String value();
+	
+	/**
+	 * 类
+	 * 
+	 * @return Class
+	 */
+	Class<?> clazz();
+	
+	/**
+	 * 指定查询排除的字段集
+	 * 
+	 * @return String[]
+	 */
+	String[] excludes() default {};
 }

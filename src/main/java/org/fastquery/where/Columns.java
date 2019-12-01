@@ -20,7 +20,7 @@
  * 
  */
 
-package org.fastquery.page;
+package org.fastquery.where;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,11 +29,10 @@ import java.lang.annotation.Target;
 
 /**
  * 
- * 标识分页不统计总行数.
- * 
  * @author xixifeng (fastquery@126.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD,ElementType.PARAMETER })
-public @interface NotCount {
+@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
+public @interface Columns {
+	Column[] value() default {};
 }

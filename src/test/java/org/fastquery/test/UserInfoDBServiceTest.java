@@ -616,7 +616,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		List<String> executedSQLs = rule.getExecutedSQLs();
 		assertThat("断言：执行过的sql有两条",executedSQLs.size(), is(2));
 		assertThat(executedSQLs.get(0), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 0,3"));
-		assertThat(executedSQLs.get(1), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 3,3"));
+		assertThat(executedSQLs.get(1), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 3,1"));
 	}
 	
 	@Test
@@ -628,7 +628,6 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		UserInfo userInfo = db.findByIdWithQueryBuilder(queryBuilder);
 		assertThat(userInfo.getId(), is(3));
 	}
-
 }
 
 

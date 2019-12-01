@@ -23,10 +23,13 @@
 package org.fastquery.test;
 
 import org.fastquery.bean.UserInfo;
+import org.fastquery.core.ConditionList;
+import org.fastquery.core.QueryBuilder;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.example.StudentDBService;
+import org.fastquery.page.Page;
 import org.fastquery.service.FQuery;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,7 +44,9 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -362,6 +367,48 @@ public class MethodQueryTest extends FastQueryTest {
 	public void delete3(@FromDataPoints("emptyNull") String tableName,@FromDataPoints("emptyNull") String primaryKeyName,@FromDataPoints("emptyNull")  String dataSourceName) {
 		int effect = userInfoDBService.delete(tableName, primaryKeyName, 1,dataSourceName);
 		assertThat(effect, is(0));
+	}
+	
+	@Test
+	public void findPage() {
+		String query = "select id,name,age from userinfo #{#where}";
+		String countQuery = "select count(name) from userinfo #{#where}";
+		ConditionList conditions = ConditionList.of("age > :age","and id < :id");
+		Map<String, Object> parameters = new HashMap<>();
+		parameters.put("age", 18);
+		parameters.put("id", 50);
+
+		QueryBuilder queryBuilder = new QueryBuilder(query, countQuery, conditions, parameters);
+		Page<Map<String, Object>> page = userInfoDBService.findPage(queryBuilder,true,1, 3);
+		List<Map<String, Object>> content = page.getContent();
+		content.forEach(map -> {
+			Integer age = (Integer) map.get("age");
+			Integer id = (Integer) map.get("id");
+			assertThat(age, greaterThan(18));
+			assertThat(id, lessThan(50));
+		});
+		assertThat(page.getTotalElements(), is(-1l));
+		assertThat(page.getTotalPages(), is(-1));
+		List<String> executedSQLs = rule.getExecutedSQLs();
+		assertThat("断言：执行过的sql有两条",executedSQLs.size(), is(2));
+		assertThat(executedSQLs.get(0), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 0,3"));
+		assertThat(executedSQLs.get(1), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 3,1"));
+		
+		page = userInfoDBService.findPage(queryBuilder,false,1, 3);
+		content = page.getContent();
+		content.forEach(map -> {
+			Integer age = (Integer) map.get("age");
+			Integer id = (Integer) map.get("id");
+			assertThat(age, greaterThan(18));
+			assertThat(id, lessThan(50));
+		});
+		assertThat(page.getTotalElements(),greaterThan(1l));
+		assertThat(page.getTotalPages(),greaterThan(1));
+		assertThat(page.getSize(), is(3));
+		executedSQLs = rule.getExecutedSQLs();
+		assertThat("断言：执行过的sql有两条",executedSQLs.size(), is(2));
+		assertThat(executedSQLs.get(0), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 0,3"));
+		assertThat(executedSQLs.get(1), equalTo("select count(name) from userinfo where age > ? and id < ?"));
 	}
 }
 

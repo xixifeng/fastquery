@@ -98,16 +98,16 @@ public class QueryBuilder {
 		list.add(querySQLValue);
 
 		MethodInfo method = QueryContext.getMethodInfo();
-		if (method.getNotCount() == null) { // 表明需要求和
+		if (method.isCount()) { // 表明需要求和
 			StringBuilder conditionsBuilder = conditionBuilder();
 			String countQuerySQL = countQuery.replaceFirst(Placeholder.WHERE_REG, conditionsBuilder.toString());
 			SQLValue countQuerySQLValue = colonProcess(countQuerySQL);
 			list.add(countQuerySQLValue);
-		} else { // 不求和那么计算出下一页SQL
+		} else { // 不求和那么计算出下一页的第一条记录
 			offset = offset + pageSize;
-			String nextPageSQL = pageDialect.getCurrentPageSQL(sql, offset, pageSize);
+			String nextRecordSQL = pageDialect.getCurrentPageSQL(sql, offset, 1);
 			SQLValue nextPageSQLValue = new SQLValue();
-			nextPageSQLValue.setSql(nextPageSQL);
+			nextPageSQLValue.setSql(nextRecordSQL);
 			nextPageSQLValue.setValues(querySQLValue.getValues());
 			list.add(nextPageSQLValue);
 		}
