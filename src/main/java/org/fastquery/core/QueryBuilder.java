@@ -46,6 +46,9 @@ public class QueryBuilder {
 	
 	private ConditionList conditions;
 	private Map<String, Object> parameters;
+	
+	private QueryBuilder(){
+	}
 
 	public QueryBuilder(String query, Map<String, Object> parameters) {
 		this.query = query;
