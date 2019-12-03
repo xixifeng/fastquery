@@ -26,6 +26,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ import org.slf4j.Logger;
 import org.fastquery.core.ConditionList;
 import org.fastquery.core.Id;
 import org.fastquery.core.Placeholder;
+import org.fastquery.core.QueryBuilder;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Table;
 import org.fastquery.core.Transient;
@@ -285,9 +287,10 @@ public final class BeanUtil {
 		}
 	}
 	
-	public static String toSelectSQL(Object bean, ConditionList attachConditions, Map<String, Object> attachParameters, String dbName,
-			String... excludeColumns) {
+	public static QueryBuilder toSelectSQL(Object bean, String dbName, String... excludeColumns) {
 		Class<?> cls = bean.getClass();
+		ConditionList conditions = new ConditionList();
+		Map<String, Object> parameters = new HashMap<>();
 		// 表名称
 		String tableName = getTableName(dbName, cls);
 		Field[] fields = cls.getDeclaredFields();
@@ -301,18 +304,18 @@ public final class BeanUtil {
 					throw new RepositoryException(e);
 				}
 				if (fv != null) {
-					attachConditions.add(field.getName() + " = ? and");
-					attachParameters.put(field.getName(), fv);// 同时把这个?号的值记下来
+					conditions.add(field.getName() + " = :" + field.getName() + " and");
+					parameters.put(field.getName(), fv);// 同时把这个?号的值记下来
 				}
 			}
 		}
 		// 取出最后一个,去掉"and"
-		int lastIndex = attachParameters.size() - 1;
-		String lastCondition = attachConditions.get(lastIndex);
-		lastCondition = lastCondition.substring(0, lastIndex-3);
-		attachConditions.set(lastIndex,lastCondition);
-		
-		return String.format("select %s from %s", selectFields(cls,excludeColumns), tableName);
+		int lastIndex = conditions.size() - 1;
+		String lastCondition = conditions.get(lastIndex);
+		lastCondition = lastCondition.substring(0, lastCondition.length() - 3);
+		conditions.set(lastIndex,lastCondition);
+		String query = String.format("select %s from %s #{#where}", selectFields(cls,excludeColumns), tableName);
+		return new QueryBuilder(query, conditions, parameters);
 	}
 
 	public static Field[] getFields(Class<?> cls) {

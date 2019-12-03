@@ -614,9 +614,10 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @return 分页结构对象
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> Page<E> findPage(E entity, ConditionList attachConditions, Map<String, Object> attachParameters, @NotCount boolean notCount, @PageIndex int pageIndex, @PageSize int pageSize,String...excludeColumns) {
-		String query = BeanUtil.toSelectSQL(entity, attachConditions, attachParameters, null, excludeColumns);
-		QueryBuilder builder = new QueryBuilder(query, attachConditions, attachParameters);
+	default <E> Page<E> findPage(E entity, ConditionList attachConditions, Map<String, Object> attachParameters, boolean notCount, int pageIndex, int pageSize,String...excludeColumns) {
+		QueryBuilder builder = BeanUtil.toSelectSQL(entity, null, excludeColumns);
+		builder.addCondition(attachConditions);
+		builder.addParameter(attachParameters);
 		Page<Map<String, Object>> page = this.findPage(builder, notCount, pageIndex, pageSize);
 		return (Page<E>) page.convert(entity.getClass());
 	}
@@ -634,12 +635,16 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * 占位符?问号的值通过 PreparedStatement 设置
 	 * 注意: 实体的属性若为 null 该属性将不参与任何运算
 	 * </pre>
+	 * @param sort 排序语句，如,设置"order by id desc". 传递null,则采取默认排序
+	 * @param notCount ture:表示分页时不执行 count 语句.反之,执行 count 语句.
 	 * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
 	 * @param pageSize 用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
-	 * @see QueryRepository#findPage(Object, ConditionList, Map, boolean, int, int, String...)
+	 * @see #findPage(Object, ConditionList, Map, boolean, int, int, String...)
+	 * @see #findPage(QueryBuilder, boolean, int, int)
 	 * @return 分页结构对象
 	 */
-	default <E> Page<E> findPage(E entity,int pageIndex, int pageSize) {
-		return this.findPage(entity, null,null, true, pageIndex, pageSize);
+	default <E> Page<E> findPage(E entity, String sort, boolean notCount, int pageIndex, int pageSize) {
+		ConditionList attachConditions = ConditionList.of(sort);
+		return this.findPage(entity, attachConditions,null, notCount, pageIndex, pageSize);
 	}
 }

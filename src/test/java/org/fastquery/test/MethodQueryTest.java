@@ -370,7 +370,7 @@ public class MethodQueryTest extends FastQueryTest {
 	}
 	
 	@Test
-	public void findPage() {
+	public void findPage1() {
 		String query = "select id,name,age from userinfo #{#where}";
 		String countQuery = "select count(name) from userinfo #{#where}";
 		ConditionList conditions = ConditionList.of("age > :age","and id < :id");
@@ -409,6 +409,17 @@ public class MethodQueryTest extends FastQueryTest {
 		assertThat("断言：执行过的sql有两条",executedSQLs.size(), is(2));
 		assertThat(executedSQLs.get(0), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 0,3"));
 		assertThat(executedSQLs.get(1), equalTo("select count(name) from userinfo where age > ? and id < ?"));
+	}
+	
+	@Test
+	public void findPage() {
+		UserInfo userInfo = new UserInfo();
+		userInfo.setDescription("小说");
+		userInfo.setName("张三");
+		userInfo.setAge(18);
+		Page<UserInfo> page = userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3);
+		assertThat(page.getNumber(), is(1));
+		assertThat(page.getSize(), is(3));
 	}
 }
 

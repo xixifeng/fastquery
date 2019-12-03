@@ -46,7 +46,7 @@ public class QueryBuilder {
 	
 	private ConditionList conditions;
 	private Map<String, Object> parameters;
-
+	
 	public QueryBuilder(String query, Map<String, Object> parameters) {
 		this.query = query;
 		this.parameters = parameters;
@@ -65,6 +65,17 @@ public class QueryBuilder {
 		this.parameters = parameters;
 	}
 
+	public void addCondition(ConditionList attachConditions) {
+		if(attachConditions!=null && !attachConditions.isEmpty()) {
+			conditions.addAll(attachConditions);
+		}
+	}
+	public void addParameter(Map<String, Object> attachParameters){
+		if(attachParameters!=null && !attachParameters.isEmpty()) {
+			parameters.putAll(attachParameters);
+		}
+	}
+	
 	public SQLValue getQuerySQLValue() {
 		if(conditions !=null) {
 			StringBuilder conditionsBuilder = conditionBuilder();
