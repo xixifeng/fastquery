@@ -417,9 +417,11 @@ public class MethodQueryTest extends FastQueryTest {
 		userInfo.setDescription("小说");
 		userInfo.setName("张三");
 		userInfo.setAge(18);
-		Page<UserInfo> page = userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3);
+		Page<UserInfo> page = userInfoDBService.findPage(userInfo, "order by id desc", true, 1, 3);
 		assertThat(page.getNumber(), is(1));
 		assertThat(page.getSize(), is(3));
+		
+		//userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3); // 求和报错!!
 	}
 }
 

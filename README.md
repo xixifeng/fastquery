@@ -345,7 +345,9 @@ Student[] findAllStudent(... args ...);
 - `ignoreEmpty=false` : 参数值即使为"",条件也保留
 
 `@Condition(value="name = ?1",ignoreNull=false)`表示`?1`接受到的值若是`null`,该条件也参与运算,最终会翻译成`name is null`.`SQL`中的`null`无法跟比较运算符(如`=`,`<`,或者`<>`)一起运算,但允许跟`is null`,`is not null`,`<=>`操作符一起运算,故,将`name = null`想表达的意思,解释成`name is null`.  
-`@Condition(value="name != ?1",ignoreNull=false)` 若`?1`的值为`null`,最终会解释成`name is not null`.  
+`@Condition(value="name != ?1",ignoreNull=false)` 若`?1`的值为`null`,最终会解释成`name is not null`. 
+
+在`In`查询作为一个条件单元时,请忽略null判断,如`@Condition("or dept in(?4,?5,?6)"`其中的一个参数为`null`就将条件移除显然不太合理.
 
 ### 通过JAVA脚本控制条件增减
 `@Condition`中的`ignoreScript`属性可以绑定一个JAVA脚本(不是JS),根据脚本运行后的布尔结果,来决定是否保留条件项.脚本运行后的结果如果是`true`,那么就删除该条件项,反之,保留条件项,默认脚本是`false`,表示保留该条件项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
@@ -823,7 +825,8 @@ List<UserInfo> findByNameListIn(List<String> names,Integer id);
 参数如果是一个空集合或空数组,那么`in`中的`?`所对应的值是`null`. `not in`结果集中若含有`null`,则,查询结果为`null`. `in` 结果集含有`null`不会影响正常查询.
 
 ```sql
-id not in (1,2,null) -- 结果会为null
+id not in (1,2,null) -- 查不出
+id in (null)         -- 并不会把id为null的记录查出来,id是null与否,最终查不出.
 id in(1,2,null)      -- id为1或为2的结果会被查询出来
 ```
 

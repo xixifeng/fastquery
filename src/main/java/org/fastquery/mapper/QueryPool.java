@@ -173,7 +173,7 @@ public class QueryPool {
 
 	// 判断是否是<nodeName> ELEMENT_NODE 节点
 	private static boolean isElementNode(Node node,String nodeName) {
-		return node.getNodeType() == Document.ELEMENT_NODE && nodeName.equals(node.getNodeName());
+		return node.getNodeType() == Node.ELEMENT_NODE && nodeName.equals(node.getNodeName());
 	}
 
 	/**

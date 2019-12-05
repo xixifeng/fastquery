@@ -24,7 +24,6 @@ package org.fastquery.test;
 
 import org.fastquery.util.BeanUtilTest;
 import org.fastquery.util.TypeUtilTest;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -41,11 +40,6 @@ import org.junit.runners.Suite.SuiteClasses;
 		FQueryResourceImplTest.class, SunnyDBServiceTest.class, SaveToIdTest.class, PlaceholderTest.class, DBTest.class, ProductDBServiceTest.class,
 		FQueryPropertiesTest.class, QueryPoolTest.class, ParamFilterTest.class, ConditionTest.class, MySQLPageDialectTest.class, DefaultMethodTest.class,
 		RepVersion.class,SetDBServiceTest.class, SetDBServiceTest2.class, SharpExprParserTest.class,
-		TransactionalTest.class,QueryByNamedDBExtendTest.class,JudgeTest.class,Script2ClassTest.class,TxTest.class,WorldDBTest.class,PostgreSQLPageDialectTest.class})
+		TransactionalTest.class,QueryByNamedDBExtendTest.class,JudgeTest.class,Script2ClassTest.class,TxTest.class,WorldDBTest.class,TreeStructureTest.class})
 public class AllRuleTest {
-	
-	@Test
-	public void todo() {
-	}
-
 }

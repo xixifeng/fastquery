@@ -38,7 +38,7 @@ import org.fastquery.core.Repository;
  */
 class BeforeFilterChain<R extends Repository> extends BeforeFilter<R> {
 
-	private static ThreadLocal<Object> threadLocal = new ThreadLocal<>(); // 存储:中断时留下的返回值
+	private static final ThreadLocal<Object> THREADLOCAL = new ThreadLocal<>(); // 存储:中断时留下的返回值
 
 	// 在此用map 主要目的是为了去重,相同的class后面覆盖前面的.
 	// 用LinkedHashMap而不用hashMap 是为了有顺序
@@ -56,7 +56,7 @@ class BeforeFilterChain<R extends Repository> extends BeforeFilter<R> {
 
 		Set<Entry<Class<?>, BeforeFilter<R>>> entries = beforeFilters.entrySet();
 		for (Entry<Class<?>, BeforeFilter<R>> entry : entries) {
-			if (threadLocal.get() != void.class) { // 如果是非void.class 表明中断啦
+			if (THREADLOCAL.get() != void.class) { // 如果是非void.class 表明中断啦
 				break;
 			}
 			entry.getValue().doFilter(repository, method, args);
@@ -72,8 +72,8 @@ class BeforeFilterChain<R extends Repository> extends BeforeFilter<R> {
 	 */
 	public Object start(R repository, Method method, Object[] args) {
 		// 设置初始值
-		threadLocal.set(void.class);
+		THREADLOCAL.set(void.class);
 		this.doFilter(repository, method, args);
-		return threadLocal.get();
+		return THREADLOCAL.get();
 	}
 }

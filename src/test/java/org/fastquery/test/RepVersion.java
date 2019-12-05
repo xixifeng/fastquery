@@ -22,6 +22,9 @@
 
 package org.fastquery.test;
 
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -118,7 +121,7 @@ public class RepVersion extends FastQueryTest  {
 					}
 				}
 				bw.flush();
-				f.delete();
+				assertThat(f.delete(), is(true));
 				Files.move(tmp.toPath(), f.toPath());
 			} catch (IOException e) {
 				throw e;

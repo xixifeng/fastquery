@@ -157,11 +157,13 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		String orderby = "order by age desc";
 		int i = 1;
 		db.findUserInfo(orderby, i);
+		assertThat(rule.getSQLValue().getSql(), equalTo("select * from `userinfo` where 1 order by age desc")); 
 	}
 
 	@Test
 	public void findUserInfoById() {
 		UserInformation userInformation = db.findUserInfoById(1);
+		assertThat(userInformation, notNullValue());
 		LOG.debug(userInformation.toString());
 	}
 
@@ -355,9 +357,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void countDouble() {
 		Double d = db.countDouble(2100, 2308);
-		if (d != null) {
-			LOG.debug(d.toString());
-		}
+		assertThat(d, nullValue());
 	}
 
 	@Test

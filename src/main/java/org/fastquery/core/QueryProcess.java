@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.IntSupplier;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -476,7 +476,7 @@ class QueryProcess {
 	private Object q9() {
 		try {
 			TxContext.start();
-			Object obj = ((Supplier<?>) (QueryContext.getArgs()[0])).get();
+			Object obj = ((IntSupplier) (QueryContext.getArgs()[0])).getAsInt();
 			if (obj == null || obj.equals(-1)) {
 				LOG.info("tx中的函数式返回了null或-1,导致tx中的所有操作回滚");
 				TxContext.getTxContext().rollback();

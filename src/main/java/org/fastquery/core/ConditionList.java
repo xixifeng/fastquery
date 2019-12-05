@@ -23,6 +23,7 @@
 package org.fastquery.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * 
@@ -34,16 +35,12 @@ public class ConditionList extends ArrayList<String> {
 	
 	public static ConditionList of(String...conditions) {
 		ConditionList conditionList = new ConditionList();
-		for (String condition : conditions) {
-			conditionList.add(condition);
-		}
+		Collections.addAll(conditionList, conditions);
 		return conditionList;
 	}
 	
 	public ConditionList add(String...conditions) {
-		for (String condition : conditions) {
-			this.add(condition);
-		}
+		Collections.addAll(this, conditions);
 		return this;
 	}
 	

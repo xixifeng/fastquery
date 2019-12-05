@@ -193,7 +193,7 @@ public interface StudentDBService extends QueryRepository {
 	@Condition("and name like ?2") // 参数 ?2,如果接收到的值为null,该条件不参与运算
 	// 通过 ignoreNull=false 开启条件值即使是null也参与运算
 	@Condition(value = "and age > ?3") // ?3接收到的值若为null,该条件也参与运算.
-	@Condition("or dept in(?4,?5,?6)")
+	@Condition(value="or dept in(?4,?5,?6)", ignoreNull = false)
 	@Condition("and name not like ?7")
 	@Condition("or age between ?8 and ?9")
 	Student[] findAllStudent(String no, String name, Integer age, String dept1, String dept2, String dept3, String name2, Integer age2, Integer age3);

@@ -44,7 +44,7 @@ import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Table;
 import org.fastquery.core.Transient;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSON;
 
 /**
  * 
@@ -326,9 +326,7 @@ public final class BeanUtil {
 		int l2 = superFields.length;
 
 		Field[] nf = new Field[l1 + l2];
-		for (int i = 0; i < l1; i++) {
-			nf[i] = selfFields[i];
-		}
+		System.arraycopy(selfFields, 0, nf, 0, l1);
 		for (int i = 0; i < l2; i++) {
 			nf[l1 + i] = superFields[i];
 		}
@@ -614,7 +612,7 @@ public final class BeanUtil {
 		} else {
 			Class<?> cls = obj.getClass();
 			if (cls.isArray() || obj instanceof Iterable) {
-				String strs = JSONArray.toJSONString(obj);
+				String strs = JSON.toJSONString(obj);
 				return strs.substring(1, strs.length() - 1);
 			}
 		}

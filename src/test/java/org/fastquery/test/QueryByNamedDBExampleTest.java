@@ -277,7 +277,7 @@ public class QueryByNamedDBExampleTest extends FastQueryTest {
 	public void findCon1() {
 		Integer id = 1;
 		Integer age = 19;
-		db.findCon1(id, age);
+		assertThat(db.findCon1(id, age), notNullValue());
 	}
 
 }

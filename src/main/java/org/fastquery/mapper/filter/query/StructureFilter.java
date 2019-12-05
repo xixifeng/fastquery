@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.fastquery.mapper.filter.Filter;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -52,7 +51,7 @@ public class StructureFilter implements Filter {
 		for (int j = 0; j < partNodes.getLength(); j++) {
 			Node partNode = partNodes.item(j);
 			short nodeType = partNode.getNodeType();
-			if (nodeType == Document.ELEMENT_NODE) {
+			if (nodeType == Node.ELEMENT_NODE) {
 				elementNames.add(partNode.getNodeName());
 			}
 		}

@@ -26,8 +26,7 @@ import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Supplier;
-
+import java.util.function.IntSupplier;
 import org.fastquery.page.Page;
 
 /**
@@ -97,10 +96,10 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 	}
 
 	@Override
-	public int tx(Supplier<Integer> paramSupplier) {
+	public int tx(IntSupplier paramSupplier) {
 		int j = 3;
 		if (m[j] == null) {
-			cache(j, "tx", Supplier.class);
+			cache(j, "tx", IntSupplier.class);
 		}
 		return ((Integer) Prepared.excute(m[j], new Object[] { paramSupplier }, this)).intValue();
 	}

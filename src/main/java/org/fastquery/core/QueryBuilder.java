@@ -65,12 +65,12 @@ public class QueryBuilder {
 		this.parameters = parameters;
 	}
 
-	public void addCondition(ConditionList attachConditions) {
+	void addCondition(ConditionList attachConditions) {
 		if(attachConditions!=null && !attachConditions.isEmpty()) {
 			conditions.addAll(attachConditions);
 		}
 	}
-	public void addParameter(Map<String, Object> attachParameters){
+	void addParameter(Map<String, Object> attachParameters){
 		if(attachParameters!=null && !attachParameters.isEmpty()) {
 			parameters.putAll(attachParameters);
 		}

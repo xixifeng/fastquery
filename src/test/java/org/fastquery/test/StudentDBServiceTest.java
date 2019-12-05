@@ -190,6 +190,7 @@ public class StudentDBServiceTest extends FastQueryTest  {
 	public void testRows() {
 		JSONObject jsonObject = studentDBService.rows();
 		LOG.debug(jsonObject.toJSONString());
+		assertThat(jsonObject.keySet().size(), is(1));
 	}
 
 	// 测试 add 和 delete
@@ -221,12 +222,19 @@ public class StudentDBServiceTest extends FastQueryTest  {
 		Student[] students = studentDBService.findBySex(10, "男");
 		int len = students.length;
 		if (len >= 3) {
-			len = 3;
+			// 输出前面三条看看
+			for (int i = 0; i < 3; i++) {
+				LOG.debug(students[i].toString());
+			}
 		}
-		// 输出前面三条看看
-		for (int i = 0; i < len; i++) {
-			LOG.debug(students[i].toString());
-		}
+		List<String> sqls = rule.getExecutedSQLs();
+		assertThat(sqls.size(), is(1));
+		assertThat(sqls.get(0), equalTo("select no as no,name,sex,age,dept from student s where s.sex=? and s.age > ?"));
+		List<Object> values = rule.getSQLValue().getValues();
+		assertThat(values.size(), is(2));
+		// 估计?2 放在前面 ?1 放在后面
+		assertThat(values.get(0), equalTo("男"));
+		assertThat(values.get(1), equalTo(10));
 	}
 
 	@Test
@@ -238,6 +246,13 @@ public class StudentDBServiceTest extends FastQueryTest  {
 			LOG.debug(JSON.toJSONString(students.subList(0, students.size()), true));
 		}
 		LOG.debug(studentDBService.toString());
+		
+		String sql = rule.getSQLValue().getSql();
+		assertThat(sql, equalTo("select * from student s where s.sex=? and s.age > ?"));
+		List<Object> values = rule.getSQLValue().getValues();
+		assertThat(values.size(), is(2));
+		assertThat(values.get(0), equalTo("男"));
+		assertThat(values.get(1), equalTo(18));
 	}
 
 	@Test
@@ -319,39 +334,132 @@ public class StudentDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void findOneCourse() {
-		LOG.debug("xxx:" + studentDBService.findOneCourse());
+		String str = studentDBService.findOneCourse();
+		assertThat(str, notNullValue());
 	}
 
 	@Test
 	public void findStudentByAge() {
 		Integer age = studentDBService.findAgeByStudent();
-		LOG.debug("age: " + age);
+		assertThat(age, notNullValue());
 	}
 
 	@Test
 	public void findAllStudent() {
 		Student[] students = studentDBService.findAllStudent("9921103", "张", 16, "化学系", "数学系", "无派系", null, null, null);
-		// select no, name, sex from Student where no LIKE '9921103' AND name
-		// LIKE '张' AND age > 16 OR dept IN ('化学系', '数学系', '无派系') order by age
-		// desc
-		if (students != null) {
-			for (int i = 0; i < students.length; i++) {
-				LOG.debug(students[i].toString());
-			}
-		}
+		assertThat(students.length,greaterThanOrEqualTo(0));
+		SQLValue sqlValue = rule.getSQLValue();
+		String sql = sqlValue.getSql();
+		assertThat(sql, equalTo("select * from Student where no like ? and name like ? and age > ? or dept in(?,?,?) order by age desc"));
+		List<Object> values = sqlValue.getValues();
+		assertThat(values.size(), is(6));
+		assertThat(values.get(0), equalTo("9921103"));
+		assertThat(values.get(1), equalTo("张"));
+		assertThat(values.get(2), equalTo(16));
+		assertThat(values.get(3), equalTo("化学系"));
+		assertThat(values.get(4), equalTo("数学系"));
+		assertThat(values.get(5), equalTo("无派系"));
 	}
 
 	@Test
 	public void findAllStudent2() {
 		studentDBService.findAllStudent(null, "张", 16, "化学系", "数学系", "无派系", null, null, null);
+		SQLValue sqlValue = rule.getSQLValue();
+		String sql = sqlValue.getSql();
+		assertThat(sql, equalTo("select * from Student where name like ? and age > ? or dept in(?,?,?) order by age desc"));
+		List<Object> values = sqlValue.getValues();
+		assertThat(values.size(), is(5));
+		assertThat(values.get(0), equalTo("张"));
+		assertThat(values.get(1), equalTo(16));
+		assertThat(values.get(2), equalTo("化学系"));
+		assertThat(values.get(3), equalTo("数学系"));
+		assertThat(values.get(4), equalTo("无派系"));
+		
+		
 		studentDBService.findAllStudent(null, null, 16, "化学系", "数学系", "无派系", null, null, null);
+		sqlValue = rule.getSQLValue();
+		sql = sqlValue.getSql();
+		assertThat(sql, equalTo("select * from Student where age > ? or dept in(?,?,?) order by age desc"));
+		values = sqlValue.getValues();
+		assertThat(values.size(), is(4));
+		assertThat(values.get(0), equalTo(16));
+		assertThat(values.get(1), equalTo("化学系"));
+		assertThat(values.get(2), equalTo("数学系"));
+		assertThat(values.get(3), equalTo("无派系"));
+		
+		
 		studentDBService.findAllStudent(null, null, null, "化学系", "数学系", "无派系", null, null, null);
+		sqlValue = rule.getSQLValue();
+		sql = sqlValue.getSql();
+		assertThat(sql, equalTo("select * from Student where dept in(?,?,?) order by age desc"));
+		values = sqlValue.getValues();
+		assertThat(values.size(), is(3));
+		assertThat(values.get(0), equalTo("化学系"));
+		assertThat(values.get(1), equalTo("数学系"));
+		assertThat(values.get(2), equalTo("无派系"));
+
 		studentDBService.findAllStudent(null, null, null, null, "数学系", "无派系", null, null, null);
+		sqlValue = rule.getSQLValue();
+		sql = sqlValue.getSql();
+		assertThat(sql, equalTo("select * from Student where dept in(?,?,?) order by age desc"));
+		values = sqlValue.getValues();
+		assertThat(values.size(), is(3));
+		assertThat(values.get(0), nullValue());
+		assertThat(values.get(1), equalTo("数学系"));
+		assertThat(values.get(2), equalTo("无派系"));
+		
 		studentDBService.findAllStudent(null, null, null, null, null, "无派系", null, null, null);
+		sqlValue = rule.getSQLValue();
+		sql = sqlValue.getSql();
+		assertThat(sql, equalTo("select * from Student where dept in(?,?,?) order by age desc"));
+		values = sqlValue.getValues();
+		assertThat(values.size(), is(3));
+		assertThat(values.get(0), nullValue());
+		assertThat(values.get(1), nullValue());
+		assertThat(values.get(2), equalTo("无派系"));
+		
 		studentDBService.findAllStudent(null, null, null, null, null, null, null, null, null);
+		sqlValue = rule.getSQLValue();
+		sql = sqlValue.getSql();
+		assertThat(sql, equalTo("select * from Student where dept in(?,?,?) order by age desc"));
+		values = sqlValue.getValues();
+		assertThat(values.size(), is(3));
+		assertThat(values.get(0), nullValue());
+		assertThat(values.get(1), nullValue());
+		assertThat(values.get(2), nullValue());
+
 		studentDBService.findAllStudent(null, "张", 16, null, "数学系", "无派系", null, null, null);
+		sqlValue = rule.getSQLValue();
+		sql = sqlValue.getSql();
+		assertThat(sql, equalTo("select * from Student where name like ? and age > ? or dept in(?,?,?) order by age desc"));
+		values = sqlValue.getValues();
+		assertThat(values.size(), is(5));
+		assertThat(values.get(0), equalTo("张"));
+		assertThat(values.get(1), equalTo(16));
+		assertThat(values.get(2), nullValue());
+		assertThat(values.get(3), equalTo("数学系"));
+		assertThat(values.get(4), equalTo("无派系"));
+		
 		studentDBService.findAllStudent(null, null, 16, "化学系", null, "无派系", null, null, null);
+		sqlValue = rule.getSQLValue();
+		sql = sqlValue.getSql();
+		assertThat(sql, equalTo("select * from Student where age > ? or dept in(?,?,?) order by age desc"));
+		values = sqlValue.getValues();
+		assertThat(values.size(), is(4));
+		assertThat(values.get(0), equalTo(16));
+		assertThat(values.get(1), equalTo("化学系"));
+		assertThat(values.get(2), nullValue());
+		assertThat(values.get(3), equalTo("无派系"));
+		
 		studentDBService.findAllStudent(null, null, null, "化学系", "数学系", null, null, null, null);
+		sqlValue = rule.getSQLValue();
+		sql = sqlValue.getSql();
+		assertThat(sql, equalTo("select * from Student where dept in(?,?,?) order by age desc"));
+		values = sqlValue.getValues();
+		assertThat(values.size(), is(3));
+		assertThat(values.get(0), equalTo("化学系"));
+		assertThat(values.get(1), equalTo("数学系"));
+		assertThat(values.get(2), nullValue());
 	}
 
 	@Test

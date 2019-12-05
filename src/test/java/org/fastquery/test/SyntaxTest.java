@@ -27,18 +27,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Param;
 import org.junit.Test;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -90,27 +85,5 @@ public class SyntaxTest extends FastQueryTest  {
 		assertThat(":name22".replaceAll("\\:name\\b", "?"), equalTo(":name22"));
 		assertThat(":name22 ".replaceAll("\\:name\\b", "?"), equalTo(":name22 "));
 		assertThat(":name,".replaceAll("\\:name\\b", "?"), equalTo("?,"));
-
 	}
-
-	@Test
-	public void fastjson() {
-		UserInfo userInfo = new UserInfo(1, null, null);
-		LOG.debug(JSON.toJSONString(userInfo, SerializerFeature.WriteMapNullValue));
-		Boolean b = false;
-		LOG.debug(JSON.toJSONString(b, SerializerFeature.WriteNullBooleanAsFalse));
-		LOG.debug("基本类型:" + boolean.class.isPrimitive());
-
-		StringBuilder sb = new StringBuilder("abc");
-		sb.insert(3, "d");
-		LOG.debug(sb.toString());
-	}
-
-	@Test
-	public void local() {
-		Locale locale = Locale.getDefault();
-		LOG.debug("Language:" + locale.getLanguage());
-		LOG.debug("Country:" + locale.getCountry());
-	}
-	
 }

@@ -25,7 +25,6 @@ package org.fastquery.mapper;
 import org.fastquery.mapper.filter.FilterChain;
 import org.fastquery.mapper.filter.part.PartSyntaxFilter;
 import org.fastquery.mapper.filter.query.StructureFilter;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -79,7 +78,7 @@ class Allocation {
 			for (int j = 0; j < partNodes.getLength(); j++) {
 				Node partNode = partNodes.item(j);
 				short nodeType = partNode.getNodeType();
-				final short elementNode = Document.ELEMENT_NODE;
+				final short elementNode = Node.ELEMENT_NODE;
 				final String partNodeName = partNode.getNodeName();
 				if (nodeType == elementNode) {
 					switch (partNodeName) {
@@ -104,7 +103,7 @@ class Allocation {
 		NodeList partNodes = element.getChildNodes();
 		for (int j = 0; j < partNodes.getLength(); j++) {
 			Node partNode = partNodes.item(j);
-			if (partNode.getNodeType() == Document.ELEMENT_NODE && "part".equals(partNode.getNodeName())) {
+			if (partNode.getNodeType() == Node.ELEMENT_NODE && "part".equals(partNode.getNodeName())) {
 				doPart(xmlName, (Element) partNode);
 			}
 		}

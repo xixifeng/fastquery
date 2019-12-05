@@ -25,7 +25,7 @@ package org.fastquery.core;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.IntSupplier;
 
 import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
@@ -579,7 +579,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @return fun函数体中有任何没被捕获的异常或fun函数体返回null或返回-1,就会导致fun里面的全部操作回滚,被回滚后的tx最后会返回-1,除此之外,tx的返回值等于fun的返回值.
 	 */
 	@Id(MethodId.QUERY9)
-	int tx(Supplier<Integer> fun);
+	int tx(IntSupplier fun);
 	
 	/**
 	 * 查询分页

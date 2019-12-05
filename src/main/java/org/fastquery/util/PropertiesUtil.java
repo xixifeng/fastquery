@@ -139,7 +139,7 @@ class PropertiesUtil {
 				byteArrayOutputStream.write(b);
 			}
 			
-			return JSONObject.parseObject(TypeUtil.filterComments(byteArrayOutputStream.toString()));
+			return JSON.parseObject(TypeUtil.filterComments(byteArrayOutputStream.toString()));
 			
 		} catch (IOException e) {
 			throw new RepositoryException(e.getMessage(), e);

@@ -32,8 +32,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.fastquery.core.Id;
 import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Param;
@@ -49,9 +47,6 @@ import static org.hamcrest.Matchers.*;
  * @author xixifeng (fastquery@126.com)
  */
 public class TypeUtilTest {
-
-	private static final Logger LOG = LoggerFactory.getLogger(TypeUtilTest.class);
-
 	@Test
 	public void testMatches() throws ClassNotFoundException {
 		String sql = "select id,name,age from #{#limit} `userinfo` #{#where}";
@@ -59,27 +54,7 @@ public class TypeUtilTest {
 		assertThat(strs.size(), equalTo(1));
 		assertThat(strs.get(0), equalTo("#{#limit}"));
 	}
-
-	@Test
-	public void testMatchesNotrepeat() {
-	}
-
-	@Test
-	public void testMatcheAll() {
-	}
-
-	@Test
-	public void testGetSQLParameter() {
-	}
-
-	@Test
-	public void testContainsIgnoreCase() {
-	}
-
-	@Test
-	public void testHasDefaultConstructor() {
-	}
-
+	
 	public void todo(@Id Integer page, Integer size) {
 	}
 
@@ -89,11 +64,7 @@ public class TypeUtilTest {
 		Parameter[] parameters = method.getParameters();
 		assertThat(TypeUtil.findAnnotationIndex(Id.class, parameters), is(0));
 	}
-
-	@Test
-	public void testFindId() {
-	}
-
+	
 	// 别删除用做测试用
 	@Query("select * from Student #{#where} order by desc")
 	public void method01() {
@@ -212,9 +183,10 @@ public class TypeUtilTest {
 	public void matches() {
 		String where = "name=:name and age = :age or sex = :sex";
 		List<String> strs = TypeUtil.matches(where, ":\\S+\\b");
-		for (String str : strs) {
-			LOG.debug(str);
-		}
+		assertThat(strs.size(), is(3));
+		assertThat(strs.get(0), equalTo(":name"));
+		assertThat(strs.get(1), equalTo(":age"));
+		assertThat(strs.get(2), equalTo(":sex"));
 	}
 
 	public void m1(@Param("i") int i, @Param("i1") int i1, @Param("i2") int i2) {
