@@ -89,8 +89,7 @@ public class TypeUtil {
 		return matcheAll(regex, str, empty);
 	}
 
-	@SuppressWarnings("unchecked")
-	private static <E> E matcheAll(String regex, String str, Collection<String> collection) {
+	private static <E extends Collection<String>> E matcheAll(String regex, String str, E collection) {
 		// 将给定的正则表达式编译到模式中。
 		Pattern p = Pattern.compile(regex);
 		// 创建匹配给定输入与此模式的匹配器。
@@ -102,7 +101,7 @@ public class TypeUtil {
 			val = m.group();
 			collection.add(val);
 		}
-		return (E) collection;
+		return collection;
 	}
 
 	/**
