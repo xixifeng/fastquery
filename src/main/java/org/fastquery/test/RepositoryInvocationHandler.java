@@ -100,28 +100,11 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 		sqlValuesField.setAccessible(true);
 		QueryBuilder queryBuilder = TypeUtil.getQueryBuilder();
 		if (modifying != null) {
-			// 改操作涉及多条sql语句
-			if(currentMethod.isContainQueryBuilderParam()) {
-				sqlValuesField.set(rule, queryBuilder.getQuerySQLValues());
-			} else {
-				sqlValuesField.set(rule, modifyParserMethod.invoke(null));
-			}
+			modifyingRule(currentMethod, modifyParserMethod, sqlValuesField, queryBuilder);
 		} else if (returnType == Page.class) {
-			if(queryById != null) {
-				sqlValuesField.set(rule, QueryParser.pageParserByNamed());	
-			} else if(query != null) {
-				if(currentMethod.isContainQueryBuilderParam()) {
-					sqlValuesField.set(rule, queryBuilder.getPageQuerySQLValue());
-				} else {
-					sqlValuesField.set(rule, QueryParser.pageParser());
-				}
-			}
+			pageRule(currentMethod, queryById, query, sqlValuesField, queryBuilder);
 		}else if (queryById != null || query != null) {
-			if(currentMethod.isContainQueryBuilderParam()) {
-				sqlValueField.set(rule, queryBuilder.getQuerySQLValue());
-			} else {
-				sqlValueField.set(rule, queryParserMethod.invoke(null));
-			}
+			queryAndByIdRule(currentMethod, queryParserMethod, sqlValueField, queryBuilder);
 		} else {
 			LOG.error("暂时没考虑");
 		}
@@ -138,6 +121,38 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 		list.addAll(currSQLS);
 		currSQLS.clear(); // 被人赋值之后就clear
 		executedSQLsField.set(rule, list);
+	}
+
+	private void queryAndByIdRule(MethodInfo currentMethod, Method queryParserMethod, Field sqlValueField, QueryBuilder queryBuilder)
+			throws IllegalAccessException, InvocationTargetException {
+		if(currentMethod.isContainQueryBuilderParam()) {
+			sqlValueField.set(rule, queryBuilder.getQuerySQLValue());
+		} else {
+			sqlValueField.set(rule, queryParserMethod.invoke(null));
+		}
+	}
+
+	private void pageRule(MethodInfo currentMethod, QueryByNamed queryById, Query query, Field sqlValuesField, QueryBuilder queryBuilder)
+			throws IllegalAccessException {
+		if(queryById != null) {
+			sqlValuesField.set(rule, QueryParser.pageParserByNamed());	
+		} else if(query != null) {
+			if(currentMethod.isContainQueryBuilderParam()) {
+				sqlValuesField.set(rule, queryBuilder.getPageQuerySQLValue());
+			} else {
+				sqlValuesField.set(rule, QueryParser.pageParser());
+			}
+		}
+	}
+
+	private void modifyingRule(MethodInfo currentMethod, Method modifyParserMethod, Field sqlValuesField, QueryBuilder queryBuilder)
+			throws IllegalAccessException, InvocationTargetException {
+		// 改操作涉及多条sql语句
+		if(currentMethod.isContainQueryBuilderParam()) {
+			sqlValuesField.set(rule, queryBuilder.getQuerySQLValues());
+		} else {
+			sqlValuesField.set(rule, modifyParserMethod.invoke(null));
+		}
 	}
 
 	@Override

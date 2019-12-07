@@ -127,16 +127,11 @@ public class Prepared { // NO_UCD
 		Modifying modifying = methodInfo.getModifying();
 		QueryByNamed queryById = methodInfo.getQueryByNamed();
 
-		boolean hasVehicle = querys.length > 0 || queryById != null || methodInfo.isContainQueryBuilderParam(); // 有SQL模板吗?
-		if (hasVehicle) {
+		boolean hasSQLTpl = hasSQLTpl(methodInfo, querys, queryById); // 有SQL模板吗?
+		
+		if (hasSQLTpl) {
 			if (returnType == Page.class) { // 分页
-				if(methodInfo.isContainQueryBuilderParam()) {
-					QueryBuilder queryBuilder = TypeUtil.getQueryBuilder();
-					return QueryProcess.getInstance().queryPage(queryBuilder.getPageQuerySQLValue());
-				} else {
-					List<SQLValue> sqlValues = queryById == null ? QueryParser.pageParser() : QueryParser.pageParserByNamed();
-					return QueryProcess.getInstance().queryPage(sqlValues);	
-				}
+				return pagePro(methodInfo, queryById);
 			} else if (modifying != null) { // 改
 				return QueryProcess.getInstance().modifying();
 			} else { // 查
@@ -150,5 +145,19 @@ public class Prepared { // NO_UCD
 				return QueryProcess.getInstance().methodQuery();
 			}
 		}
+	}
+
+	private static Object pagePro(MethodInfo methodInfo, QueryByNamed queryById) {
+		if(methodInfo.isContainQueryBuilderParam()) {
+			QueryBuilder queryBuilder = TypeUtil.getQueryBuilder();
+			return QueryProcess.getInstance().queryPage(queryBuilder.getPageQuerySQLValue());
+		} else {
+			List<SQLValue> sqlValues = queryById == null ? QueryParser.pageParser() : QueryParser.pageParserByNamed();
+			return QueryProcess.getInstance().queryPage(sqlValues);	
+		}
+	}
+
+	private static boolean hasSQLTpl(MethodInfo methodInfo, Query[] querys, QueryByNamed queryById) {
+		return querys.length > 0 || queryById != null || methodInfo.isContainQueryBuilderParam();
 	}
 }
