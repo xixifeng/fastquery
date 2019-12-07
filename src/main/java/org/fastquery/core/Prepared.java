@@ -84,25 +84,23 @@ public class Prepared { // NO_UCD
 
 			return object;
 		} catch (Exception e) {
-			LOG.error("执行出错: " + method.getName(), e);
 			StringBuilder sb = new StringBuilder();
 			String msg = e.getMessage();
 			if (msg != null) {
 				sb.append(msg);
 			}
 
-			sb.append('\n');
-			sb.append("发生方法:" + QueryContext.getMethodInfo());
-			sb.append('\n');
-			sb.append("执行过的sql:");
+			sb.append("\n发生方法:" + QueryContext.getMethodInfo());
+			sb.append("\n执行过的sql:");
 
 			List<String> sqls = QueryContext.getSqls();
-			sqls.forEach(sql -> {
-				sb.append(sql);
-				sb.append('\n');
-			});
-			LOG.error(sb.toString());
-			throw new RepositoryException(e);
+			if(sqls != null) {
+				sqls.forEach(sql -> {
+					sb.append(sql);
+					sb.append('\n');
+				});
+			}
+			throw new RepositoryException(sb.toString());
 		} finally {
 			// QueryContext 生命终止
 			try {

@@ -169,7 +169,6 @@ public final class QueryContext {
 					context.connection.close();
 				}
 			} catch (Exception e) {
-				LOG.warn(e.getMessage(), e);
 				throw new SQLException(e);
 			} finally {
 				threadLocal.remove();

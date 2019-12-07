@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -96,6 +97,8 @@ public class XMLParse {
 			try (InputStream inputStream = resource.getResourceAsStream(resourceName)) {
 
 				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+				// 如下设置可禁用外部实体处理
+				factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 				DocumentBuilder builder = null;
 				Document document = null;
 

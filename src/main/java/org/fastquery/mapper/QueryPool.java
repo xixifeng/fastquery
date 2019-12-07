@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -123,6 +124,8 @@ public class QueryPool {
 
 		try (InputStream inputStream = resource.getResourceAsStream(xmlName)) {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			// 如下设置可禁用外部实体处理
+			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document document = builder.parse(inputStream);
 			Element element = document.getDocumentElement();
@@ -165,7 +168,6 @@ public class QueryPool {
 				}
 			}
 		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
 			throw new RepositoryException(e.getMessage(), e);
 		}
 		return queryMappers;
