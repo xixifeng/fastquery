@@ -72,7 +72,11 @@ public class FilterChainHandler {
 				}
 			}
 		}
-		return beforeFilterChain.start(repository, method, args);
+		try {
+			return beforeFilterChain.start(repository, method, args);
+		} finally {
+			beforeFilterChain.unload();
+		}
 	}
 
 	public static <R extends Repository> Object bindAfterFilterChain(Class<?> iclazz, R repository, Method method, Object[] args, Object object) {

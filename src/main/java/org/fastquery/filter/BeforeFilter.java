@@ -39,4 +39,12 @@ public abstract class BeforeFilter<R extends Repository> {
 	 * @param args 客户传递进来的参数
 	 */
 	protected abstract void doFilter(R repository, Method method, Object[] args);
+	
+	/**
+	 * 中断 Filter 链条并返回值
+	 * @param returnVal 返回的值
+	 */
+	public void abortWith(Object returnVal) {
+		BeforeFilterChain.set(returnVal);
+	}
 }

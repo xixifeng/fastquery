@@ -64,6 +64,14 @@ class BeforeFilterChain<R extends Repository> extends BeforeFilter<R> {
 
 	}
 
+	static void set(Object returnVal) {
+		THREADLOCAL.set(returnVal);
+	}
+	
+	void unload() {
+		THREADLOCAL.remove();
+	}
+	
 	/**
 	 * 开始链条
 	 * 
