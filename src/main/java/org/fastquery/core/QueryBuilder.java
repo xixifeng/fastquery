@@ -64,17 +64,6 @@ public class QueryBuilder {
 		this.conditions = conditions;
 		this.parameters = parameters;
 	}
-
-	void addCondition(ConditionList attachConditions) {
-		if(attachConditions!=null && !attachConditions.isEmpty()) {
-			conditions.addAll(attachConditions);
-		}
-	}
-	void addParameter(Map<String, Object> attachParameters){
-		if(attachParameters!=null && !attachParameters.isEmpty()) {
-			parameters.putAll(attachParameters);
-		}
-	}
 	
 	public SQLValue getQuerySQLValue() {
 		if(conditions !=null) {
@@ -110,9 +99,11 @@ public class QueryBuilder {
 
 		MethodInfo method = QueryContext.getMethodInfo();
 		if (method.isCount()) { // 表明需要求和
-			StringBuilder conditionsBuilder = conditionBuilder();
-			String countQuerySQL = countQuery.replaceFirst(Placeholder.WHERE_REG, conditionsBuilder.toString());
-			SQLValue countQuerySQLValue = colonProcess(countQuerySQL);
+			if(conditions != null) {
+				StringBuilder conditionsBuilder = conditionBuilder();
+				countQuery = countQuery.replaceFirst(Placeholder.WHERE_REG, conditionsBuilder.toString());
+			}
+			SQLValue countQuerySQLValue = colonProcess(countQuery);
 			list.add(countQuerySQLValue);
 		} else { // 不求和那么计算出下一页的第一条记录
 			offset = offset + pageSize;

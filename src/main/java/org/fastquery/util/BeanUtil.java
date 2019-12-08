@@ -287,7 +287,7 @@ public final class BeanUtil {
 		}
 	}
 	
-	public static QueryBuilder toSelectSQL(Object bean, String dbName, String... excludeColumns) {
+	public static QueryBuilder toSelectSQL(Object bean, String dbName, String sort, String... excludeColumns) {
 		Class<?> cls = bean.getClass();
 		ConditionList conditions = new ConditionList();
 		Map<String, Object> parameters = new HashMap<>();
@@ -309,13 +309,22 @@ public final class BeanUtil {
 				}
 			}
 		}
+		String query;
+		String countQuery;
 		// 取出最后一个,去掉"and"
-		int lastIndex = conditions.size() - 1;
-		String lastCondition = conditions.get(lastIndex);
-		lastCondition = lastCondition.substring(0, lastCondition.length() - 3);
-		conditions.set(lastIndex,lastCondition);
-		String query = String.format("select %s from %s #{#where}", selectFields(cls,excludeColumns), tableName);
-		return new QueryBuilder(query, conditions, parameters);
+		if(!conditions.isEmpty()) {
+			int lastIndex = conditions.size() - 1;
+			String lastCondition = conditions.get(lastIndex);
+			lastCondition = lastCondition.substring(0, lastCondition.length() - 3);
+			conditions.set(lastIndex,lastCondition);
+			query = String.format("select %s from %s #{#where} %s", selectFields(cls,excludeColumns), tableName, sort);
+			countQuery = String.format("select count(id) from %s #{#where}", tableName);
+		} else {
+			query = String.format("select %s from %s %s", selectFields(cls,excludeColumns), tableName, sort);
+			countQuery = String.format("select count(id) from %s", tableName);
+		}
+		
+		return new QueryBuilder(query, countQuery, conditions, parameters);
 	}
 
 	public static Field[] getFields(Class<?> cls) {

@@ -604,8 +604,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * 占位符?问号的值通过 PreparedStatement 设置
 	 * 注意: 实体的属性若为 null 该属性将不参与任何运算.
 	 * </pre>
-	 * @param attachConditions 附加条件,比如增加 or 运算,自定义排序
-	 * @param attachParameters 附加条件的参数值
+	 * @param sort 排序语句，如,设置"order by id desc". 传递null,则采取默认排序
 	 * @param notCount ture:表示分页时不执行 count 语句.反之,执行 count 语句.
 	 * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
 	 * @param pageSize 用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
@@ -614,37 +613,9 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @return 分页结构对象
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> Page<E> findPage(E entity, ConditionList attachConditions, Map<String, Object> attachParameters, boolean notCount, int pageIndex, int pageSize,String...excludeColumns) {
-		QueryBuilder builder = BeanUtil.toSelectSQL(entity, null, excludeColumns);
-		builder.addCondition(attachConditions);
-		builder.addParameter(attachParameters);
+	default <E> Page<E> findPage(E entity, String sort, boolean notCount, int pageIndex, int pageSize,String...excludeColumns) {
+		QueryBuilder builder = BeanUtil.toSelectSQL(entity, null, sort, excludeColumns);
 		Page<Map<String, Object>> page = this.findPage(builder, notCount, pageIndex, pageSize);
 		return (Page<E>) page.convert(entity.getClass());
-	}
-	
-	/**
-	 * 查找存储的实体集并进行分页
-	 * @param <E> 实体类型
-	 * @param entity 实体实例,用于作为查询条件,条件之间是 and 关系.举例说明,若传递的实体为:<br>
-	 * <pre>
-	 * Student student = new Student();
-	 * student.setDept("计算机");
-	 * student.setName("海猫");
-	 * 那么会推导出 SQL 语句的查询条件为:
-	 * where dept = ? and name = ?
-	 * 占位符?问号的值通过 PreparedStatement 设置
-	 * 注意: 实体的属性若为 null 该属性将不参与任何运算
-	 * </pre>
-	 * @param sort 排序语句，如,设置"order by id desc". 传递null,则采取默认排序
-	 * @param notCount ture:表示分页时不执行 count 语句.反之,执行 count 语句.
-	 * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
-	 * @param pageSize 用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
-	 * @see #findPage(Object, ConditionList, Map, boolean, int, int, String...)
-	 * @see #findPage(QueryBuilder, boolean, int, int)
-	 * @return 分页结构对象
-	 */
-	default <E> Page<E> findPage(E entity, String sort, boolean notCount, int pageIndex, int pageSize) {
-		ConditionList attachConditions = ConditionList.of(sort);
-		return this.findPage(entity, attachConditions,null, notCount, pageIndex, pageSize);
 	}
 }

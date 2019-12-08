@@ -415,13 +415,42 @@ public class MethodQueryTest extends FastQueryTest {
 	public void findPage() {
 		UserInfo userInfo = new UserInfo();
 		userInfo.setDescription("小说");
-		userInfo.setName("张三");
 		userInfo.setAge(18);
 		Page<UserInfo> page = userInfoDBService.findPage(userInfo, "order by id desc", true, 1, 3);
 		assertThat(page.getNumber(), is(1));
 		assertThat(page.getSize(), is(3));
+		assertThat(page.getTotalElements(), is(-1L));
+		assertThat(page.getTotalPages(), is(-1));
+		List<String> sqlValues = rule.getExecutedSQLs();
+		assertThat(sqlValues.size(), is(2));
+		assertThat(sqlValues.get(0), equalTo("select id,name,age from UserInfo where age = ?  order by id desc limit 0,3"));
 		
-		//userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3); // 求和报错!!
+		userInfo.setAge(null);
+		userInfo.setName("张三");
+		page = userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3);
+		assertThat(page.getTotalElements(), not(-1L));
+		assertThat(page.getTotalPages(), not(-1));
+		sqlValues = rule.getExecutedSQLs();
+		assertThat(sqlValues.size(), is(2));
+		assertThat(sqlValues.get(0), equalTo("select id,name,age from UserInfo where name = ?  order by id desc limit 0,3"));
+
+		userInfo.setAge(18);
+		userInfo.setName("张三gewgewkljgklwjgxx"); // 没有这条数据
+		page = userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3);
+		assertThat(page.getTotalElements(), is(0L));
+		assertThat(page.getTotalPages(), is(0));
+		sqlValues = rule.getExecutedSQLs();
+		assertThat(sqlValues.size(), is(1));
+		assertThat(sqlValues.get(0), equalTo("select id,name,age from UserInfo where name = ? and age = ?  order by id desc limit 0,3"));
+		
+		userInfo.setAge(null);
+		userInfo.setName(null); // 没有这条数据
+		page = userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3);
+		sqlValues = rule.getExecutedSQLs();
+		assertThat(sqlValues.size(), is(2));
+		assertThat(sqlValues.get(0), equalTo("select id,name,age from UserInfo order by id desc limit 0,3"));
+		assertThat(sqlValues.get(1), equalTo("select count(id) from UserInfo"));
+		
 	}
 }
 

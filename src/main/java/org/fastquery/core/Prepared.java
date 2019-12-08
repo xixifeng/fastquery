@@ -100,7 +100,7 @@ public class Prepared { // NO_UCD
 					sb.append('\n');
 				});
 			}
-			throw new RepositoryException(sb.toString());
+			throw new RepositoryException(sb.toString(),e);
 		} finally {
 			// QueryContext 生命终止
 			try {
