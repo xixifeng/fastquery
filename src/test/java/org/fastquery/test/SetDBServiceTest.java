@@ -143,7 +143,7 @@ public class SetDBServiceTest extends FastQueryTest  {
 		String name = null;
 		Integer credit = 4;
 		String no = "c08";
-		int effect = db.updateCourse2(name, credit, 9, 5, no);
+		int effect = db.updateCourse2(null, credit, 9, 5, no);
 		assertThat(effect, is(1));
 		assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `credit` = ?,`semester` = ?,`period` = ?  where no = ?"));
 	}

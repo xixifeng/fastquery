@@ -44,7 +44,7 @@ import static org.hamcrest.Matchers.*;
  */
 public class SQLInExampleTest extends FastQueryTest  {
 
-	private SQLInExample db = FQuery.getRepository(SQLInExample.class);
+	private final SQLInExample db = FQuery.getRepository(SQLInExample.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
@@ -86,7 +86,7 @@ public class SQLInExampleTest extends FastQueryTest  {
 		userinfos.forEach(u -> {
 			assertThat(u.getName().equals(name1) || u.getName().equals(name2), is(true));
 			assertThat(u.getName(), not(is(name3)));
-			assertThat(u.getId().intValue(), greaterThan(id));
+			assertThat(u.getId(), greaterThan(id));
 		});
 	}
 
@@ -95,7 +95,7 @@ public class SQLInExampleTest extends FastQueryTest  {
 		int[] ids = { 1, 2, 3 };
 		UserInfo[] userInfos = db.findByIn(ids);
 		for (UserInfo u : userInfos) {
-			assertThat(u.getId().intValue(), either(is(1)).or(is(2)).or(is(3)));
+			assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
 		}
 	}
 
@@ -125,7 +125,7 @@ public class SQLInExampleTest extends FastQueryTest  {
 		int[] ids = null;
 		UserInfo[] userInfos = db.findByIn(ids);
 		for (UserInfo u : userInfos) {
-			assertThat(u.getId().intValue(), either(is(1)).or(is(2)).or(is(3)));
+			assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
 		}
 	}
 	
@@ -134,7 +134,7 @@ public class SQLInExampleTest extends FastQueryTest  {
 		int[] ids = {};
 		UserInfo[] userInfos = db.findByIn(ids);
 		for (UserInfo u : userInfos) {
-			assertThat(u.getId().intValue(), either(is(1)).or(is(2)).or(is(3)));
+			assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
 		}
 	}
 	
@@ -143,7 +143,7 @@ public class SQLInExampleTest extends FastQueryTest  {
 		List<Integer> ids = new ArrayList<>();
 		UserInfo[] userInfos = db.findByIn(ids);
 		for (UserInfo u : userInfos) {
-			assertThat(u.getId().intValue(), either(is(1)).or(is(2)).or(is(3)));
+			assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
 		}
 	}
 	
@@ -152,7 +152,7 @@ public class SQLInExampleTest extends FastQueryTest  {
 		String[] ids = {};
 		UserInfo[] userInfos = db.findByIn(ids);
 		for (UserInfo u : userInfos) {
-			assertThat(u.getId().intValue(), either(is(1)).or(is(2)).or(is(3)));
+			assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
 		}
 	}
 

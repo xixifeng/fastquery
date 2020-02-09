@@ -33,7 +33,7 @@ import java.util.List;
  */
 class MethodFilterChain implements MethodFilter {
 
-	private List<MethodFilter> methodFilters = new ArrayList<>();
+	private final List<MethodFilter> methodFilters = new ArrayList<>();
 
 	MethodFilterChain addFilter(MethodFilter methodFilter) {
 		methodFilters.add(methodFilter);

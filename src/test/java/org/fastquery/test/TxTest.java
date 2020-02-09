@@ -53,8 +53,8 @@ import com.mysql.cj.jdbc.MysqlDataSource;
  */
 public class TxTest extends FastQueryTest {
 	
-	private StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
-	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
+	private final StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
+	private final UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 	
 	@Test
 	public void updateTx1() {
@@ -94,9 +94,9 @@ public class TxTest extends FastQueryTest {
 		}
 	}
 	
-	private AA aa = FQuery.getRepository(AA.class);
-	private BB bb = FQuery.getRepository(BB.class);
-	private CC cc = FQuery.getRepository(CC.class);
+	private final AA aa = FQuery.getRepository(AA.class);
+	private final BB bb = FQuery.getRepository(BB.class);
+	private final CC cc = FQuery.getRepository(CC.class);
 	
 	@Test
 	public void save() {		

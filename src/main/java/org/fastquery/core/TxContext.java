@@ -30,19 +30,20 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.fastquery.struct.DC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * tx 上下文
  * @author mei.sir@aliyun.cn
  */
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 class TxContext {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TxContext.class);
 	
-	private static ThreadLocal<TxContext> threadLocal = new ThreadLocal<>();
+	private static final ThreadLocal<TxContext> threadLocal = new ThreadLocal<>();
 	
-	private List<DC> dclist = new ArrayList<>();
+	private final List<DC> dclist = new ArrayList<>();
 	
 	static void start() {
 		threadLocal.set(new TxContext());

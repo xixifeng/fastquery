@@ -129,7 +129,7 @@ public final class BeanUtil {
 		sb.append('(');
 		for (Field field : fields) {
 			if (allowField(field)) {
-				Object val = null;
+				Object val;
 				try {
 					field.setAccessible(true);
 					val = field.get(bean);
@@ -150,12 +150,20 @@ public final class BeanUtil {
 	}
 
 	/**
-	 * 把实体集合转换成sql中的values部分
+	 *
 	 * 
 	 * @param clazz 实体class
 	 * @param fields 实体的字段
 	 * @param beans 实体集
 	 * @return sql 中的 values 部分
+	 */
+	/**
+	 * 把实体集合转换成sql中的values部分
+	 *
+	 * @param fields field数组
+	 * @param beans 实体集合
+	 * @param <B> 实体类型
+	 * @return values部分
 	 */
 	private static <B> String toValues(Field[] fields, Iterable<B> beans) {
 		StringBuilder sbValues = new StringBuilder();
@@ -336,9 +344,7 @@ public final class BeanUtil {
 
 		Field[] nf = new Field[l1 + l2];
 		System.arraycopy(selfFields, 0, nf, 0, l1);
-		for (int i = 0; i < l2; i++) {
-			nf[l1 + i] = superFields[i];
-		}
+		System.arraycopy(superFields, 0, nf, l1, l2);
 		return nf;
 	}
 
@@ -602,9 +608,9 @@ public final class BeanUtil {
 		StringBuilder sq = new StringBuilder();
 		sq.append("delete from ");
 		if (dbName != null) {
-			sq.append(dbName).append('.').append(tableName).toString();
+			sq.append(dbName).append('.').append(tableName);
 		} else {
-			sq.append(tableName).toString();
+			sq.append(tableName);
 		}
 		sq.append(WHERE);
 		sq.append(keyName);
@@ -681,7 +687,7 @@ public final class BeanUtil {
 		if (key == null) {
 			throw new RepositoryException(cls + NOT_ID);
 		} else {
-			return Long.valueOf(key.toString());
+			return Long.parseLong(key.toString());
 		}
 	}
 

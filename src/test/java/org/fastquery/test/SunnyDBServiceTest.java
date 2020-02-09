@@ -45,7 +45,7 @@ public class SunnyDBServiceTest extends FastQueryTest  {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SunnyDBServiceTest.class);
 
-	private SunnyDBService sunnyDBService = FQuery.getRepository(SunnyDBService.class);
+	private final SunnyDBService sunnyDBService = FQuery.getRepository(SunnyDBService.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
@@ -83,7 +83,7 @@ public class SunnyDBServiceTest extends FastQueryTest  {
 	@Test
 	public void saveTenant() {
 		LOG.debug(String.valueOf(Integer.MAX_VALUE));
-		long id = new Long(Integer.MAX_VALUE) + 10;
+		long id = (long) Integer.MAX_VALUE + 10;
 		while (sunnyDBService.existsTenant(id)) {
 			id = id + 1;
 		}

@@ -36,8 +36,8 @@ import org.fastquery.core.RepositoryException;
  */
 class FqClassLoader extends ClassLoader {
 
-	private FQueryBinder binder;
-	private List<String> resourceNames = new ArrayList<>();
+	private final FQueryBinder binder;
+	private final List<String> resourceNames = new ArrayList<>();
 
 	FqClassLoader(ClassLoader webClassLoader, FQueryBinder binder) {
 		super(webClassLoader);

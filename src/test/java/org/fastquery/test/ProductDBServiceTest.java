@@ -40,7 +40,7 @@ import org.junit.Test;
  */
 public class ProductDBServiceTest extends FastQueryTest  {
 
-	private ProductDBService pdbs = FQuery.getRepository(ProductDBService.class);
+	private final ProductDBService pdbs = FQuery.getRepository(ProductDBService.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();

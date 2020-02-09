@@ -89,9 +89,7 @@ public class FQueryPropertiesTest extends FastQueryTest  {
 	public void testGetDataSources() throws SQLException {
 
 		Map<String, DataSource> maps = getDataSources();
-		maps.forEach((k, v) -> {
-			LOG.debug(k + ":" + v);
-		});
+		maps.forEach((k, v) -> LOG.debug(k + ":" + v));
 		assertThat(maps.size(), either(is(6)).or(is(10)).or(is(11)));
 		Set<String> keys = maps.keySet();
 		assertThat(keys, hasItems("sunnydb", "xkdb2", "xk3", "s1", "s2"));
@@ -100,15 +98,6 @@ public class FQueryPropertiesTest extends FastQueryTest  {
 		DataSource d2 =  maps.get("xkdb2");
 		assertThat(d1, notNullValue());
 		assertThat(d1==d2, is(true));
-		
-		Connection con1 = d1.getConnection();
-		Connection con2 = con1;
-		assertThat(con1 == con2, is(true));
-		Connection con3 = con2;
-		con1.close();
-		assertThat(con1.isClosed(), is(true));
-		assertThat(con2.isClosed(), is(true));
-		assertThat(con3.isClosed(), is(true));
 	}
 
 	@Test

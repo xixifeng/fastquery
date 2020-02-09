@@ -35,7 +35,7 @@ import org.junit.rules.ExpectedException;
  */
 public class TransactionalTest extends FastQueryTest  {
 	
-	private ProductDBService pdbs = FQuery.getRepository(ProductDBService.class);
+	private final ProductDBService pdbs = FQuery.getRepository(ProductDBService.class);
 	
 	@Rule
 	public ExpectedException exception = ExpectedException.none();

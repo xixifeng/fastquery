@@ -53,9 +53,9 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RepositoryInvocationHandler.class);
 
-	private Repository repository;
-	private FastQueryTestRule rule;
-	private Description description;
+	private final Repository repository;
+	private final FastQueryTestRule rule;
+	private final Description description;
 
 	public RepositoryInvocationHandler(Repository repository, FastQueryTestRule rule, Description description) {
 		this.repository = repository;
@@ -117,8 +117,7 @@ public class RepositoryInvocationHandler implements InvocationHandler {
 		sqlsField.setAccessible(true);
 		@SuppressWarnings("unchecked")
 		List<String> currSQLS = (List<String>) sqlsField.get(QueryContextHelper.getQueryContext());
-		List<String> list = new ArrayList<>();
-		list.addAll(currSQLS);
+		List<String> list = new ArrayList<>(currSQLS);
 		currSQLS.clear(); // 被人赋值之后就clear
 		executedSQLsField.set(rule, list);
 	}

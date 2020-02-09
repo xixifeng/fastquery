@@ -41,11 +41,11 @@ public class QueryBuilder {
 
 	private static final String COLON_REG = ":[A-Za-z0-9]+";
 
-	private String query;
+	private final String query;
 	private String countQuery;
 	
 	private ConditionList conditions;
-	private Map<String, Object> parameters;
+	private final Map<String, Object> parameters;
 	
 	public QueryBuilder(String query, Map<String, Object> parameters) {
 		this.query = query;

@@ -57,7 +57,7 @@ public class StudentDBServiceTest extends FastQueryTest  {
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
 
-	private StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
+	private final StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
 
 	@Test
 	public void testNull() {

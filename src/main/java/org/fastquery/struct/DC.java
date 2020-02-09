@@ -32,8 +32,8 @@ import javax.sql.DataSource;
  */
 public class DC {
 
-	private DataSource ds;
-	private Connection conn;
+	private final DataSource ds;
+	private final Connection conn;
 	
 	public DC(DataSource ds, Connection conn) {
 		this.ds = ds;

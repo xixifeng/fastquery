@@ -38,22 +38,22 @@ import org.fastquery.where.Set;
  */
 public class MethodInfo {
 	
-	private Method method;
-	private Modifying modifying;
-	private Query[] queries;
-	private Parameter[] parameters;
-	private boolean containQueryBuilderParam;
-	private Class<?> returnType;
-	private Id id;
-	private Transactional t;
-	private QueryByNamed queryByNamed;
-	private NotCount notCount;
-	private Condition[] conditions;
-	private Annotation[][] parameterAnnotations;
-	private Type genericReturnType;
-	private String name;
-	private Query query;
-	private Set[] sets;
+	private final Method method;
+	private final Modifying modifying;
+	private final Query[] queries;
+	private final Parameter[] parameters;
+	private final boolean containQueryBuilderParam;
+	private final Class<?> returnType;
+	private final Id id;
+	private final Transactional t;
+	private final QueryByNamed queryByNamed;
+	private final NotCount notCount;
+	private final Condition[] conditions;
+	private final Annotation[][] parameterAnnotations;
+	private final Type genericReturnType;
+	private final String name;
+	private final Query query;
+	private final Set[] sets;
 
 	public Transactional getT() {
 		return t;

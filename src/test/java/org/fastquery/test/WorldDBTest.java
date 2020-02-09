@@ -47,7 +47,7 @@ public class WorldDBTest extends FastQueryTest  {
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
 	
-	private WorldDB db = FQuery.getRepository(WorldDB.class);
+	private final WorldDB db = FQuery.getRepository(WorldDB.class);
 	
 	@Test
 	public void findCityById() {
@@ -118,7 +118,7 @@ public class WorldDBTest extends FastQueryTest  {
 		assertThat(page.getTotalPages(), is(3));
 		checkPage(page, group2);
 		
-		page = db.findPage(id, cityAbb, new PageableImpl(60,pageSize));
+		db.findPage(id, cityAbb, new PageableImpl(60,pageSize));
 		List<String> executedSQLs = rule.getExecutedSQLs();
 		assertThat(executedSQLs.size(), is(1));
 		assertThat(executedSQLs.get(0), not(containsString("count")));

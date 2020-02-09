@@ -42,12 +42,12 @@ import org.junit.runner.RunWith;
 @RunWith(Theories.class)
 public class SetDBServiceTest2 extends FastQueryTest  {
 
-	private SetDBService db = FQuery.getRepository(SetDBService.class);
+	private final SetDBService db = FQuery.getRepository(SetDBService.class);
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private String no = "c03";
+	private final String no = "c03";
 	
 	@Test
 	public void testUpdateCourse1() {

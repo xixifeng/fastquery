@@ -63,7 +63,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserInfoDBServiceTest.class);
 
-	private UserInfoDBService db = FQuery.getRepository(UserInfoDBService.class);
+	private final UserInfoDBService db = FQuery.getRepository(UserInfoDBService.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
@@ -127,10 +127,10 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void findUserInfoByNameOrAge() {
 		String name = "王五";
-		Integer age = 8;
+		int age = 8;
 		UserInfo[] userInfos = db.findUserInfoByNameOrAge(name, age);
 		for (UserInfo userInfo : userInfos) {
-			assertThat((userInfo.getName().equals(name) || userInfo.getAge().intValue() == age), is(true));
+			assertThat((userInfo.getName().equals(name) || userInfo.getAge() == age), is(true));
 		}
 		SQLValue sqlValue = rule.getSQLValue();
 		assertThat(sqlValue.getSql(), equalTo("select name,age from UserInfo u where u.name=? or u.age=?"));
@@ -180,9 +180,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void findSome() {
 		List<UserInfo> userInfos = db.findSome(30);
-		userInfos.forEach(userInfo -> {
-			assertThat(userInfo.getId(), greaterThan(30));
-		});
+		userInfos.forEach(userInfo -> assertThat(userInfo.getId(), greaterThan(30)));
 	}
 
 	@Test
@@ -292,8 +290,8 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		// pageIndex:3 pageSize:49 totalPages:3
 		// pageIndex:4 pageSize:49 totalPages:3
 
-		int pageIndex = 3;
-		int pageSize = 5;
+		int pageIndex;
+		int pageSize;
 
 		int age = 1;
 		int id = 100;
@@ -301,7 +299,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		long totalElements = db.count(age, id);
 		for (int i = 1; i <= totalElements; i++) {
 			pageIndex = i % 10;
-			pageSize = new Random().nextInt(1000) % (int) 10;
+			pageSize = new Random().nextInt(1000) % 10;
 
 			if (pageSize * pageIndex > totalElements) { // 显然是错的
 				pageSize = 1;
@@ -371,7 +369,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void insert() {
-		Integer id = 1950;
+		int id;
 		String name = "香月儿";
 		Integer age = 23;
 
@@ -385,7 +383,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	
 	@Test
 	public void insertByQueryBuilder() {
-		Integer id = 1950;
+		int id;
 		String name = "香月儿";
 		Integer age = 23;
 
@@ -430,7 +428,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		JSONObject userInfo = db.updateAge(null, 3);
 		assertThat(userInfo.getIntValue("id"), is(3));
 		// 断言:包含有age属性 (age即使是null)
-		assertThat(JSON.toJSONString(userInfo, SerializerFeature.WriteMapNullValue).indexOf("\"age\"") != -1, is(true));
+		assertThat(JSON.toJSONString(userInfo, SerializerFeature.WriteMapNullValue).contains("\"age\""), is(true));
 	}
 
 	@Test
@@ -452,7 +450,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		String[] names = db.findNames();
 		assertThat(names.length, is(3));
 		for (String name : names) {
-			assertThat(Pattern.matches("\\{\".+\":\".+\"\\}", name), is(false));
+			assertThat(Pattern.matches("\\{\".+\":\".+\"}", name), is(false));
 			LOG.debug(name);
 		}
 	}
@@ -463,7 +461,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		assertThat(ages.length, is(3));
 		for (String age : ages) {
 			if (age != null) {
-				assertThat(Pattern.matches("\\{\".+\":\".+\"\\}", age), is(false));
+				assertThat(Pattern.matches("\\{\".+\":\".+\"}", age), is(false));
 			}
 		}
 	}
@@ -482,12 +480,10 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		String name = null;
 		Integer age = null;
 		List<Map<String, Object>> maps = db.findUserSome2(age, name);
-		maps.forEach(m -> {
-			m.forEach((k, v) -> {
-				if ("age".equals(k))
-					assertThat(v, nullValue());
-			});
-		});
+		maps.forEach(m -> m.forEach((k, v) -> {
+			if ("age".equals(k))
+				assertThat(v, nullValue());
+		}));
 
 		SQLValue sqlValue = rule.getSQLValue();
 		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo where age is null"));
@@ -563,9 +559,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void findLogic5_1() {
 		List<String> list = db.findLogic5(true);
-		list.forEach(m -> {
-			assertThat(m, endsWith("三"));
-		});
+		list.forEach(m -> assertThat(m, endsWith("三")));
 	}
 	
 	@Test
@@ -611,7 +605,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 			assertThat(age, greaterThan(18));
 			assertThat(id, lessThan(50));
 		});
-		assertThat(page.getTotalElements(), is(-1l));
+		assertThat(page.getTotalElements(), is(-1L));
 		assertThat(page.getTotalPages(), is(-1));
 		List<String> executedSQLs = rule.getExecutedSQLs();
 		assertThat("断言：执行过的sql有两条",executedSQLs.size(), is(2));

@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  */
 public class FilterChain implements Filter {
 
-	private List<Filter> filters = new ArrayList<>();
+	private final List<Filter> filters = new ArrayList<>();
 
 	public FilterChain addFilter(Filter filter) {
 		filters.add(filter);

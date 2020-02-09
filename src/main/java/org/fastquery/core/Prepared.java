@@ -90,7 +90,7 @@ public class Prepared { // NO_UCD
 				sb.append(msg);
 			}
 
-			sb.append("\n发生方法:" + QueryContext.getMethodInfo());
+			sb.append("\n发生方法:").append(QueryContext.getMethodInfo());
 			sb.append("\n执行过的sql:");
 
 			List<String> sqls = QueryContext.getSqls();

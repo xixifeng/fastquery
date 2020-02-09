@@ -42,7 +42,7 @@ import static org.hamcrest.Matchers.*;
  */
 public class ConditionTest extends FastQueryTest {
 
-	private ConditionDBService db = FQuery.getRepository(ConditionDBService.class);
+	private final ConditionDBService db = FQuery.getRepository(ConditionDBService.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
@@ -75,7 +75,7 @@ public class ConditionTest extends FastQueryTest {
 	public void findUserInfo2() {
 		String tname = "from UserInfo";
 		String w1 = null;
-		db.findUserInfo2(w1, "name like ?1", tname);
+		db.findUserInfo2(null, "name like ?1", tname);
 		SQLValue sqlValue = rule.getSQLValue();
 		String sql = sqlValue.getSql();
 		assertThat(sql, equalTo("select * from UserInfo where  name like ?"));
@@ -86,7 +86,7 @@ public class ConditionTest extends FastQueryTest {
 		String tname = "from UserInfo";
 		String w1 = null;
 		String w2 = null;
-		db.findUserInfo(w1, w2, tname);
+		db.findUserInfo(null, null, tname);
 		SQLValue sqlValue = rule.getSQLValue();
 		String sql = sqlValue.getSql();
 		assertThat(sql, equalTo("select * from UserInfo  limit 3"));

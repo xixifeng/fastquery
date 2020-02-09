@@ -41,7 +41,7 @@ import static org.hamcrest.Matchers.*;
  */
 public class UserInfoDBServiceTest2 extends FastQueryTest  {
 
-	private UserInfoDBService2 userInfoDBService = FQuery.getRepository(UserInfoDBService2.class);
+	private final UserInfoDBService2 userInfoDBService = FQuery.getRepository(UserInfoDBService2.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();

@@ -134,7 +134,7 @@ public interface UserInfoDBService extends QueryRepository {
 	int[] deleteByIds(@Source String dsName, @Param("db") String db, @Param("ids") String ids);
 
 	// countField : 明确指定求和字段count(countField),默认值是"id"
-	@Query(value = "select id,name,age from `userinfo` where 1", countField = "id")
+	@Query(value = "select id,name,age from `userinfo` where 1")
 	Page<Map<String, Object>> findAll(Pageable pageable);
 
 	// 如果没有指定求和语句,那么`fastquery`自动为分析出最优的求和语句.

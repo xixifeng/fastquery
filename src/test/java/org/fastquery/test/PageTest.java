@@ -22,7 +22,6 @@
 
 package org.fastquery.test;
 
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
@@ -44,7 +43,7 @@ import static org.hamcrest.Matchers.*;
  */
 public class PageTest extends FastQueryTest  {
 
-	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
+	private final UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();

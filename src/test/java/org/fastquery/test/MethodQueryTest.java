@@ -73,7 +73,7 @@ public class MethodQueryTest extends FastQueryTest {
 	@Test
 	public void testSave() {
 
-		Integer id = 36;
+		int id = 36;
 		String name = "Jsxxv";
 		Integer age = 23;
 		UserInfo u = new UserInfo(id, name, age);
@@ -207,7 +207,7 @@ public class MethodQueryTest extends FastQueryTest {
 		assertThat(u1.getName(), equalTo("小蜜蜂"));
 		assertThat(u1.getAge(), equalTo(5));
 
-		effect = studentDBService.executeSaveOrUpdate(u1);
+		studentDBService.executeSaveOrUpdate(u1);
 		UserInfo u2 = userInfoDBService.findById(id1);
 		Integer id2 = u2.getId();
 		assertThat(id2, equalTo(id1));
@@ -339,9 +339,9 @@ public class MethodQueryTest extends FastQueryTest {
 
 	@Test
 	public void find() {
-		assertThat(userInfoDBService.find(UserInfo.class, 3).getId().intValue(), is(3));
-		assertThat(userInfoDBService.find(UserInfo.class, 3, null).getId().intValue(), is(3)); // 测试数据源传递null
-		assertThat(userInfoDBService.find(UserInfo.class, 3, null, null).getId().intValue(), is(3)); // 测试数据库名称为null
+		assertThat(userInfoDBService.find(UserInfo.class, 3).getId(), is(3));
+		assertThat(userInfoDBService.find(UserInfo.class, 3, null).getId(), is(3)); // 测试数据源传递null
+		assertThat(userInfoDBService.find(UserInfo.class, 3, null, null).getId(), is(3)); // 测试数据库名称为null
 	}
 
 	@Test
@@ -387,7 +387,7 @@ public class MethodQueryTest extends FastQueryTest {
 			assertThat(age, greaterThan(18));
 			assertThat(id, lessThan(50));
 		});
-		assertThat(page.getTotalElements(), is(-1l));
+		assertThat(page.getTotalElements(), is(-1L));
 		assertThat(page.getTotalPages(), is(-1));
 		List<String> executedSQLs = rule.getExecutedSQLs();
 		assertThat("断言：执行过的sql有两条",executedSQLs.size(), is(2));
@@ -402,7 +402,7 @@ public class MethodQueryTest extends FastQueryTest {
 			assertThat(age, greaterThan(18));
 			assertThat(id, lessThan(50));
 		});
-		assertThat(page.getTotalElements(),greaterThan(1l));
+		assertThat(page.getTotalElements(),greaterThan(1L));
 		assertThat(page.getTotalPages(),greaterThan(1));
 		assertThat(page.getSize(), is(3));
 		executedSQLs = rule.getExecutedSQLs();
@@ -445,7 +445,7 @@ public class MethodQueryTest extends FastQueryTest {
 		
 		userInfo.setAge(null);
 		userInfo.setName(null); // 没有这条数据
-		page = userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3);
+		userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3);
 		sqlValues = rule.getExecutedSQLs();
 		assertThat(sqlValues.size(), is(2));
 		assertThat(sqlValues.get(0), equalTo("select id,name,age from UserInfo order by id desc limit 0,3"));

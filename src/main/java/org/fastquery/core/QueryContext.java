@@ -4,6 +4,7 @@ import java.lang.reflect.Parameter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public final class QueryContext {
 
 	private static final Logger LOG = LoggerFactory.getLogger(QueryContext.class);
 
-	private static ThreadLocal<QueryContext> threadLocal = new ThreadLocal<>();
+	private final static ThreadLocal<QueryContext> threadLocal = new ThreadLocal<>();
 
 	private MethodInfo methodInfo; // 当前method
 	private boolean supporTx; // 是否需要事务支持
@@ -127,9 +128,7 @@ public final class QueryContext {
 		if (sqls == null) {
 			return;
 		}
-		for (String sql : sqls) {
-			getQueryContext().sqls.add(sql);
-		}
+		Collections.addAll(getQueryContext().sqls, sqls);
 	}
 
 	public static MethodInfo getMethodInfo() {

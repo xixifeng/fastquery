@@ -31,8 +31,8 @@ import java.util.Map;
  */
 public class ParamMap {
 
-	private Map<Integer, Integer> rps;
-	private List<Object> objs;
+	private final Map<Integer, Integer> rps;
+	private final List<Object> objs;
 
 	public ParamMap(Map<Integer, Integer> rps, List<Object> objs) {
 		this.rps = rps;

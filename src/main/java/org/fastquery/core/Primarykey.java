@@ -29,8 +29,8 @@ package org.fastquery.core;
  */
 public class Primarykey {
 
-	private Long autoIncKey;
-	private String pkey;
+	private final Long autoIncKey;
+	private final String pkey;
 
 	/**
 	 * 主键有2中可能 数字类型(int Integer long Long)可视为long, 另一种是字符串类型

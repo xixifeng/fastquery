@@ -48,7 +48,7 @@ class GenerateRepositoryImpl {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GenerateRepositoryImpl.class);
 
-	private FqClassLoader classLoader;
+	private final FqClassLoader classLoader;
 
 	GenerateRepositoryImpl(FqClassLoader classLoader) {
 		this.classLoader = classLoader;

@@ -56,7 +56,7 @@ public class Script2Class {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(Script2Class.class);
 	
-	private static Map<String, Judge> judges = new HashMap<>();
+	private final static Map<String, Judge> judges = new HashMap<>();
 	
 	private Script2Class() {
 	}
@@ -106,13 +106,6 @@ public class Script2Class {
 		}
 	}
 
-	/**
-	 * 摘取Script
-	 * @param T 注解类型
-	 * @param method 方法
-	 * @param clazz 脚本的所属注解类
-	 * @param sf 函数式表达式: 接受T,返回String.
-	 */
 	private static <T extends Annotation> void pickScript(Method method,Class<T> clazz,Function<T,String> sf,Function<T,String> ifun) {
 		T[] ts = method.getAnnotationsByType(clazz);
 		int len = ts.length;

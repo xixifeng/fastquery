@@ -38,7 +38,7 @@ import static org.junit.Assert.assertThat;
  */
 public class SaveToIdTest extends FastQueryTest  {
 
-	private VisitorDBServcie vdbs = FQuery.getRepository(VisitorDBServcie.class);
+	private final VisitorDBServcie vdbs = FQuery.getRepository(VisitorDBServcie.class);
 
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();

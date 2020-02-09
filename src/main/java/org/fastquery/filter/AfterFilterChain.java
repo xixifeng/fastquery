@@ -39,7 +39,7 @@ class AfterFilterChain<R extends Repository> extends AfterFilter<R> {
 
 	// 在此用map 主要目的是为了去重,相同的class后面覆盖前面的.
 	// 用LinkedHashMap而不用hashMap 是为了有顺序
-	private Map<Class<?>, AfterFilter<R>> afterFilters = new LinkedHashMap<>();
+	private final Map<Class<?>, AfterFilter<R>> afterFilters = new LinkedHashMap<>();
 
 	public AfterFilterChain<R> addFilter(AfterFilter<R> f) {
 		afterFilters.put(f.getClass(), f);

@@ -59,8 +59,8 @@ public class QueryByNamedDBExampleTest extends FastQueryTest {
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();
 
-	private QueryByNamedDBExample db = FQuery.getRepository(QueryByNamedDBExample.class);
-	private UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
+	private final QueryByNamedDBExample db = FQuery.getRepository(QueryByNamedDBExample.class);
+	private final UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 
 	@Test
 	public void findUserInfoAll() {
@@ -80,7 +80,7 @@ public class QueryByNamedDBExampleTest extends FastQueryTest {
 	@Test
 	public void findUserInfoOne() {
 		UserInfo userInfo = db.findUserInfoOne(1);
-		assertThat(userInfo.getId().intValue(), is(1));
+		assertThat(userInfo.getId(), is(1));
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class QueryByNamedDBExampleTest extends FastQueryTest {
 	public void findUserInfoByNameAndAge2() {
 		String name = null;
 		Integer age = 8;
-		JSONArray jsonArray = db.findUserInfoByNameAndAge(name, age);
+		JSONArray jsonArray = db.findUserInfoByNameAndAge(null, age);
 		for (Object object : jsonArray) {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> map = (Map<String, Object>) object;
@@ -134,7 +134,7 @@ public class QueryByNamedDBExampleTest extends FastQueryTest {
 					assertThat(map.get(key).toString().equals(age.toString()), is(true));
 				}
 				if ("name".equals(key)) {
-					assertThat(map.get(key).toString().equals(name.toString()), is(true));
+					assertThat(map.get(key).toString().equals(name), is(true));
 				}
 			}
 		}
@@ -150,10 +150,10 @@ public class QueryByNamedDBExampleTest extends FastQueryTest {
 		String name = null;
 		Integer age = 8;
 
-		Page<Student> pageObj = db.findPage(new PageableImpl(page, size), no, name, age);
+		Page<Student> pageObj = db.findPage(new PageableImpl(page, size), no, null, age);
 		assertThat(pageObj.getContent().size(), lessThanOrEqualTo(size));
 		if (pageObj.getContent().size() > 1) { // 如果当前页有数据,那么总页数肯定不为0l
-			assertThat(pageObj.getTotalElements(), not(0l)); // 总记录数不为0l
+			assertThat(pageObj.getTotalElements(), not(0L)); // 总记录数不为0l
 																// 注意TotalElements是long类型,比较是最好保持类型一致!
 		}
 		LOG.debug(JSON.toJSONString(JSON.toJSON(pageObj), true));
@@ -195,11 +195,11 @@ public class QueryByNamedDBExampleTest extends FastQueryTest {
 		String name = null;
 		Integer age = 8;
 
-		Page<Student> pageObj = db.findPage2(new PageableImpl(page, size), no, name, age);
+		Page<Student> pageObj = db.findPage2(new PageableImpl(page, size), no, null, age);
 		int len = pageObj.getContent().size();
 		assertThat(len, lessThanOrEqualTo(size));
 		if (len > 1) { // 如果当前页有数据,那么总页数肯定不为0l
-			assertThat(pageObj.getTotalElements(), not(0l));
+			assertThat(pageObj.getTotalElements(), not(0L));
 		}
 		assertThat(pageObj.getTotalElements(), is(-1L));
 		assertThat(pageObj.getTotalPages(), is(-1));
@@ -217,7 +217,7 @@ public class QueryByNamedDBExampleTest extends FastQueryTest {
 		// 把改后的数据查询出来进行断言是否改正确
 		UserInfo userInfo = userInfoDBService.findById(id);
 		assertThat(userInfo.getName(), equalTo(name));
-		assertThat(userInfo.getAge().intValue(), is(age));
+		assertThat(userInfo.getAge(), is(age));
 
 	}
 

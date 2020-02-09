@@ -10,7 +10,7 @@
 ```
 
 ### Gradle/Grails
-```xml
+```
 compile 'org.fastquery:fastquery:1.0.80'
 ```
 
@@ -128,7 +128,7 @@ JRE 8+
 ### fastquery.json
 配置数据源的作用范围
 
-```js
+```json
 // @author xixifeng (fastquery@126.com)
 // 配置必须遵循标准的json语法.
 {
@@ -170,7 +170,7 @@ JRE 8+
 
 数据源的初始化是从"fastquery.json"开始的,根据从里面读到"dataSourceName"的值,取相应的配置,继而完成数据源的创建.如,创建一个名为"rex-db"的数据源:
 
-```js   
+```json   
 {
     "config": "c3p0",           
     "dataSourceName": "rex-db"
@@ -677,7 +677,7 @@ public class NameJudge extends Judge {
 		String name = this.getParameter("name", String.class);
 		// 获取方法中名称为"credit"的参数值
 		Integer credit = this.getParameter("credit", Integer.class);
-		return name.startsWith("计算") && credit!=null && credit.intValue() > 2;
+		return name.startsWith("计算") && credit!=null && credit > 2;
 	}
 }
 ```

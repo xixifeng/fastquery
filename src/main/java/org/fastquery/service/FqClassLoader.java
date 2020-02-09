@@ -32,7 +32,7 @@ class FqClassLoader extends ClassLoader {
 		super(parent);
 	}
 
-	final Class<?> defineClassByName(String name, byte[] b, int off, int len) {
-		return defineClass(name, b, off, len);
+	final Class<?> defineClassByName(String name, byte[] b, int len) {
+		return defineClass(name, b, 0, len);
 	}
 }

@@ -30,6 +30,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -119,13 +120,7 @@ public class ClassUtil {
 		return packageName;
 	}
 
-	/**
-	 * 以文件的形式来获取包下的所有Class
-	 * 
-	 * @param packageName
-	 * @param packagePath
-	 * @param classes
-	 */
+	// 以文件的形式来获取包下的所有Class
 	private static void findAndAddClassesInPackageByFile(String packageName, String packagePath,List<Class<?>> classes) {
 		// 获取此包的目录 建立一个File
 		File dir = new File(packagePath);
@@ -134,7 +129,7 @@ public class ClassUtil {
 			// 如果存在 就获取包下的所有文件 包括目录; 自定义过滤规则 如果可以循环(包含子目录) 或则是以.class结尾的文件(编译好的java类文件)
 			File[] dirfiles = dir.listFiles(file -> file.isDirectory() || file.getName().endsWith(".class"));
 			// 循环所有文件
-			for (File file : dirfiles) {
+			for (File file : Objects.requireNonNull(dirfiles)) {
 				// 如果是目录 则继续扫描
 				if (file.isDirectory()) {
 					findAndAddClassesInPackageByFile(packageName + "." + file.getName(), file.getAbsolutePath(),classes);

@@ -38,7 +38,7 @@ import org.junit.Test;
  */
 public class QueryByNamedDBExtendTest extends FastQueryTest {
 	
-	private QueryByNamedDBExtend db = FQuery.getRepository(QueryByNamedDBExtend.class);
+	private final QueryByNamedDBExtend db = FQuery.getRepository(QueryByNamedDBExtend.class);
 	
 	@Rule
 	public FastQueryTestRule rule = new FastQueryTestRule();

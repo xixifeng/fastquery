@@ -79,7 +79,7 @@ public class VelocityTemplateProcessor implements TemplateProcessor<String> { //
 		outputStreamWriter.close(); // 有必要关闭吗? 关闭了是否对jax-rs拦截器,servlet有影响,需要继续学习,参考jsp模板实现
 	}
 
-	private VelocityEngine getVelocityEngine() throws IOException {
+	private VelocityEngine getVelocityEngine() {
 		// 当前servletContext环境有没有
 		Object ve = request.getServletContext().getAttribute("velocityEngine");
 		if (ve != null) {

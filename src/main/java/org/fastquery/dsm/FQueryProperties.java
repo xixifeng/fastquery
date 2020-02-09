@@ -40,10 +40,10 @@ import org.fastquery.core.RepositoryException;
 public class FQueryProperties {
 
 	// <String,String> 第一个参数是basePackage, 第二个参数是数据源的名字
-	private static Map<String, String> dataSourceIndexs = new HashMap<>();
+	private final static Map<String, String> dataSourceIndexs = new HashMap<>();
 
 	// 第一个参数是dataSourceName,在此用Map,是为了查寻方便, 放在这里我们最终是为了查寻.
-	private static Map<String, DataSource> dataSources = new HashMap<>();
+	private final static Map<String, DataSource> dataSources = new HashMap<>();
 
 	private FQueryProperties() {
 	}

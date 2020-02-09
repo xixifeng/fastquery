@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultMethodTest extends FastQueryTest {
 
-	private DefaultDBService db = FQuery.getRepository(DefaultDBService.class);
+	private final DefaultDBService db = FQuery.getRepository(DefaultDBService.class);
 
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultMethodTest.class);
 

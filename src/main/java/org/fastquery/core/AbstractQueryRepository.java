@@ -53,7 +53,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 
 	private static final String INSERT = "insert";
 
-	private Class<QueryRepository> c = QueryRepository.class;
+	private final Class<QueryRepository> c = QueryRepository.class;
 
 	private static final MethodInfo[] m = new MethodInfo[35];
 
@@ -101,7 +101,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, "tx", IntSupplier.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramSupplier }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramSupplier}, this);
 	}
 
 	@Override
@@ -137,8 +137,8 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, SAVE_ARRAY, boolean.class, String.class, String.class, Object[].class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { Boolean.valueOf(paramBoolean), paramString1, paramString2, paramArrayOfObject },
-				this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramBoolean, paramString1, paramString2, paramArrayOfObject},
+				this);
 	}
 
 	@Override
@@ -147,8 +147,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, SAVE_ARRAY, boolean.class, String.class, Object[].class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { Boolean.valueOf(paramBoolean), paramString, paramArrayOfObject }, this))
-				.intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramBoolean, paramString, paramArrayOfObject}, this);
 	}
 
 	@Override
@@ -157,7 +156,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, SAVE_ARRAY, boolean.class, Object[].class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { Boolean.valueOf(paramBoolean), paramArrayOfObject }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramBoolean, paramArrayOfObject}, this);
 	}
 
 	@Override
@@ -166,7 +165,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, EXECUTE_UPDATE, String.class, Object.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramString, paramObject }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramString, paramObject}, this);
 	}
 
 	@Override
@@ -175,7 +174,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, EXECUTE_UPDATE, Object.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramObject }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramObject}, this);
 	}
 
 	@Override
@@ -184,7 +183,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, EXECUTE_UPDATE, String.class, String.class, Object.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramString1, paramString2, paramObject }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramObject}, this);
 	}
 
 	@Override
@@ -193,7 +192,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, EXECUTE_SAVE_OR_UPDATE, String.class, String.class, Object.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramString1, paramString2, paramObject }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramObject}, this);
 	}
 
 	@Override
@@ -202,7 +201,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, EXECUTE_SAVE_OR_UPDATE, String.class, Object.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramString, paramObject }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramString, paramObject}, this);
 	}
 
 	@Override
@@ -211,7 +210,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, EXECUTE_SAVE_OR_UPDATE, Object.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramObject }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramObject}, this);
 	}
 
 	@Override
@@ -220,7 +219,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, UPDATE, String.class, String.class, Object.class, String.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramString1, paramString2, paramObject, paramString3 }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramObject, paramString3}, this);
 	}
 
 	@Override
@@ -229,7 +228,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, UPDATE, String.class, Collection.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramString, paramCollection }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramString, paramCollection}, this);
 	}
 
 	@Override
@@ -238,7 +237,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, UPDATE, String.class, Object.class, String.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramString1, paramObject, paramString2 }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramObject, paramString2}, this);
 	}
 
 	@Override
@@ -247,7 +246,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, UPDATE, Object.class, String.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramObject, paramString }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramObject, paramString}, this);
 	}
 
 	@Override
@@ -256,7 +255,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, UPDATE, String.class, String.class, Collection.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramString1, paramString2, paramCollection }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramCollection}, this);
 	}
 
 	@Override
@@ -265,7 +264,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, UPDATE, Collection.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramCollection }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramCollection}, this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -275,7 +274,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, "find", Class.class, long.class, String.class, String.class);
 		}
-		return (E) Prepared.excute(m[j], new Object[] { paramClass, Long.valueOf(paramLong), paramString1, paramString2 }, this);
+		return (E) Prepared.excute(m[j], new Object[] { paramClass, paramLong, paramString1, paramString2 }, this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -285,7 +284,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, "find", Class.class, long.class);
 		}
-		return (E) Prepared.excute(m[j], new Object[] { paramClass, Long.valueOf(paramLong) }, this);
+		return (E) Prepared.excute(m[j], new Object[] { paramClass, paramLong}, this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -295,7 +294,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, "find", Class.class, long.class, String.class);
 		}
-		return (E) Prepared.excute(m[j], new Object[] { paramClass, Long.valueOf(paramLong), paramString }, this);
+		return (E) Prepared.excute(m[j], new Object[] { paramClass, paramLong, paramString }, this);
 	}
 
 	@Override
@@ -304,8 +303,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, DELETE, String.class, String.class, long.class, String.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramString1, paramString2, Long.valueOf(paramLong), paramString3 }, this))
-				.intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramLong, paramString3}, this);
 	}
 
 	@Override
@@ -314,8 +312,8 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, DELETE, String.class, String.class, long.class, String.class, String.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramString1, paramString2, Long.valueOf(paramLong), paramString3, paramString4 },
-				this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramLong, paramString3, paramString4},
+				this);
 	}
 
 	@Override
@@ -324,7 +322,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, DELETE, String.class, String.class, long.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramString1, paramString2, Long.valueOf(paramLong) }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramLong}, this);
 	}
 
 	@Override
@@ -333,7 +331,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, SAVE, boolean.class, Collection.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { Boolean.valueOf(paramBoolean), paramCollection }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramBoolean, paramCollection}, this);
 	}
 
 	@Override
@@ -342,8 +340,8 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, SAVE, boolean.class, String.class, String.class, Collection.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { Boolean.valueOf(paramBoolean), paramString1, paramString2, paramCollection },
-				this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramBoolean, paramString1, paramString2, paramCollection},
+				this);
 	}
 
 	@Override
@@ -352,7 +350,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, SAVE, boolean.class, String.class, Collection.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { Boolean.valueOf(paramBoolean), paramString, paramCollection }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramBoolean, paramString, paramCollection}, this);
 	}
 
 	@Override
@@ -361,7 +359,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, INSERT, String.class, String.class, Object.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramString1, paramString2, paramObject }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramObject}, this);
 	}
 
 	@Override
@@ -370,7 +368,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, INSERT, Object.class, String.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramObject, paramString }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramObject, paramString}, this);
 	}
 
 	@Override
@@ -379,7 +377,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, INSERT, Object.class);
 		}
-		return ((Integer) Prepared.excute(m[j], new Object[] { paramObject }, this)).intValue();
+		return (Integer) Prepared.excute(m[j], new Object[]{paramObject}, this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -389,7 +387,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		if (m[j] == null) {
 			cache(j, "findPage", QueryBuilder.class,boolean.class,int.class,int.class);
 		}
-		return (Page<Map<String, Object>>) Prepared.excute(m[j], new Object[] { builder, Boolean.valueOf(count), Integer.valueOf(pageIndex), Integer.valueOf(pageSize) }, this);
+		return (Page<Map<String, Object>>) Prepared.excute(m[j], new Object[] { builder, count, pageIndex, pageSize}, this);
 	}
 	
 }

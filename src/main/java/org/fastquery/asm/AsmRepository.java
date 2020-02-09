@@ -194,16 +194,15 @@ public class AsmRepository {
 				Class<?>[] ps = method.getParameterTypes();
 				StringBuilder bodyBuilder = new StringBuilder();
 				bodyBuilder.append('{');
-				bodyBuilder.append("int j = " + (index++) + ";");
+				bodyBuilder.append("int j = ").append(index++).append(';');
 				// 缓存method...
 				bodyBuilder.append("if(this.m[j]==null) {");
 				bodyBuilder.append("java.lang.reflect.Method m;");
-				bodyBuilder.append("try {m = c.getMethod(\"" + method.getName()
-						+ "\", $sig);} catch (Exception e) {throw new org.fastquery.core.RepositoryException(e);}");
+				bodyBuilder.append("try {m = c.getMethod(\"").append(method.getName()).append("\", $sig);} catch (Exception e) {throw new org.fastquery.core.RepositoryException(e);}");
 				bodyBuilder.append("this.m[j] = new org.fastquery.core.MethodInfo(m); ");
 				bodyBuilder.append("}");
 				// 缓存method... End
-				bodyBuilder.append("return ($r) org.fastquery.core.Prepared.excute(this.m[j]," + getParameterNames(ps) + ", this) ;");
+				bodyBuilder.append("return ($r) org.fastquery.core.Prepared.excute(this.m[j],").append(getParameterNames(ps)).append(", this) ;");
 				bodyBuilder.append('}');
 				CtMethod cm = CtMethod.make(getMethodDef(method) + bodyBuilder.toString(), ctClass);
 				ctClass.addMethod(cm);

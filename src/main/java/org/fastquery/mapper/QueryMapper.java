@@ -28,8 +28,8 @@ package org.fastquery.mapper;
  */
 class QueryMapper {
 
-	private String id; // 重写id的hashCode和equals,用它作为唯一标识
-	private String template; // 模板
+	private final String id; // 重写id的hashCode和equals,用它作为唯一标识
+	private final String template; // 模板
 
 	QueryMapper(String id, String template) {
 		this.id = id;

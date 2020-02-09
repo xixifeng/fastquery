@@ -45,7 +45,7 @@ class GenerateRepositoryImpl {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GenerateRepositoryImpl.class);
 
-	private FqClassLoader classLoader = new FqClassLoader(GenerateRepositoryImpl.class.getClassLoader());
+	private final FqClassLoader classLoader = new FqClassLoader(GenerateRepositoryImpl.class.getClassLoader());
 
 	private static class LazyHolder {
 		private static final GenerateRepositoryImpl INSTANCE = new GenerateRepositoryImpl();
@@ -106,7 +106,7 @@ class GenerateRepositoryImpl {
 		 */
 
 
-		return (Class<? extends T>) classLoader.defineClassByName(name, bytes, 0, bytes.length);
+		return (Class<? extends T>) classLoader.defineClassByName(name, bytes, bytes.length);
 	}
 
 	public FqClassLoader getClassLoader() {

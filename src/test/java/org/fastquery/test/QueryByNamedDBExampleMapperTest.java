@@ -45,9 +45,9 @@ import static org.hamcrest.Matchers.*;
  */
 public class QueryByNamedDBExampleMapperTest extends FastQueryTest  {
 
-	private String className = "org.fastquery.dao.QueryByNamedDBExample";
+	private final String className = "org.fastquery.dao.QueryByNamedDBExample";
 
-	private String logTag = "QueryByNamedDBExampleMapperTest";
+	private final String logTag = "QueryByNamedDBExampleMapperTest";
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -84,8 +84,8 @@ public class QueryByNamedDBExampleMapperTest extends FastQueryTest  {
 	@Test
 	public void findUserInfoByNameAndAge() throws Exception {
 		String tpl = getTemplate(className, "findUserInfoByNameAndAge");
-		Map<String, Object> map = null;
-		String str = null;
+		Map<String, Object> map;
+		String str;
 
 		map = new HashMap<>();
 		map.put("name", null);
@@ -114,8 +114,8 @@ public class QueryByNamedDBExampleMapperTest extends FastQueryTest  {
 	@Test
 	public void findPage() throws Exception {
 		String tpl = getTemplate(className, "findPage");
-		Map<String, Object> map = null;
-		String str = null;
+		Map<String, Object> map;
+		String str;
 
 		map = new HashMap<>();
 		str = render(tpl, logTag, map);
@@ -132,7 +132,7 @@ public class QueryByNamedDBExampleMapperTest extends FastQueryTest  {
 	@Test
 	public void updateUserInfoById() throws Exception {
 		String tpl = getTemplate(className, "updateUserInfoById");
-		String str = null;
+		String str;
 		str = render(tpl, logTag, new HashMap<>());
 		assertThat(str, equalToIgnoringWhiteSpace("update UserInfo set name = :name,age = :age where id= :id"));
 	}

@@ -39,7 +39,7 @@ import org.junit.Test;
  */
 public class FQueryResourceImplTest {
 
-	private Resource resource = new FQueryResourceImpl(this.getClass().getClassLoader());
+	private final Resource resource = new FQueryResourceImpl(this.getClass().getClassLoader());
 
 	@Test
 	public void testGetResourceAsStream() {

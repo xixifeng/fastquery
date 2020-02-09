@@ -314,14 +314,12 @@ class QueryProcess {
 		if (iargs.length == 3) {
 			bean = iargs[2];
 			sql = BeanUtil.toInsertSQL((String) iargs[1], bean);
-			LOG.info(sql);
-			return DB.update(sql, true);
 		} else {
 			bean = iargs[0];
 			sql = BeanUtil.toInsertSQL(bean);
-			LOG.info(sql);
-			return DB.update(sql, true);
 		}
+		LOG.info(sql);
+		return DB.update(sql, true);
 	}
 
 	private Object q1() {
@@ -431,7 +429,7 @@ class QueryProcess {
 			if (iargs.length == 3) {
 				quotes = (String[]) iargs[2];
 			}
-			sqlFile = new File(f).isFile() ? f : FastQueryJSONObject.getBasedir() + (String) iargs[0];
+			sqlFile = new File(f).isFile() ? f : FastQueryJSONObject.getBasedir() + iargs[0];
 			return DB.executeBatch(sqlFile, quotes, (stat, s) -> {
 				try {
 					stat.addBatch(s);
@@ -448,7 +446,7 @@ class QueryProcess {
 		String dbName = null;
 		Object[] iargs = QueryContext.getArgs();
 		Class<?> clazz = (Class<?>) iargs[0]; // 类型
-		long i = ((Long) iargs[1]).longValue(); // 主键
+		long i = (Long) iargs[1]; // 主键
 		if (iargs.length == 4) {
 			dbName = (String) iargs[3]; // 数据库名称
 		}
@@ -465,7 +463,7 @@ class QueryProcess {
 				|| StringUtils.isEmpty(name.trim())) {
 			return 0;
 		} else {
-			long key = ((Long) iargs[2]).longValue(); // 主键值
+			long key = (Long) iargs[2]; // 主键值
 			if (iargs.length == 5) {
 				dbName = (String) iargs[4]; // 数据库名称
 			}
@@ -476,14 +474,14 @@ class QueryProcess {
 	private Object q9() {
 		try {
 			TxContext.start();
-			Object obj = ((IntSupplier) (QueryContext.getArgs()[0])).getAsInt();
-			if (obj == null || obj.equals(-1)) {
+			int asInt = ((IntSupplier) (QueryContext.getArgs()[0])).getAsInt();
+			if (asInt == -1) {
 				LOG.info("tx中的函数式返回了null或-1,导致tx中的所有操作回滚");
 				TxContext.getTxContext().rollback();
 				return -1;
 			} else {
 				TxContext.getTxContext().commit();
-				return obj;
+				return asInt;
 			}
 		} catch (Exception e) {
 			TxContext.getTxContext().rollback();

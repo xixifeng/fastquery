@@ -42,7 +42,7 @@ import org.junit.Test;
  */
 public class BeanUtilTest {
 
-	final class T {
+	final static class T {
 		private Integer key;
 
 		public Integer getKey() {
@@ -239,6 +239,9 @@ public class BeanUtilTest {
 		u = new UserInfo(1, "叶'兰", 2);
 		str = toValue(fields, u,false);
 		assertThat(str, equalTo("('1','叶''兰','2')"));
+
+		str = toValue(fields, u,true);
+		assertThat(str, equalTo("values('1','叶''兰','2')"));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -305,7 +308,7 @@ public class BeanUtilTest {
 	}
 
 	@Test
-	public void toUpdateSQL1() throws IllegalAccessException {
+	public void toUpdateSQL1() {
 		List<UserInfo> userInfos = new ArrayList<>();
 		userInfos.add(new UserInfo(77, "茝若", 18));
 		userInfos.add(new UserInfo(88, "芸兮", null));
@@ -318,7 +321,7 @@ public class BeanUtilTest {
 	}
 
 	@Test
-	public void toUpdateSQL2() throws IllegalAccessException {
+	public void toUpdateSQL2() {
 		List<UserInfo> userInfos = new ArrayList<>();
 		userInfos.add(new UserInfo(77, "茝若", 18));
 		userInfos.add(new UserInfo(88, null, null));
@@ -330,7 +333,7 @@ public class BeanUtilTest {
 	}
 
 	@Test
-	public void toUpdateSQL3() throws IllegalAccessException {
+	public void toUpdateSQL3() {
 		List<UserInfo> userInfos = new ArrayList<>();
 		userInfos.add(new UserInfo(77, "茝若", null));
 		userInfos.add(new UserInfo(88, null, null));
@@ -343,7 +346,7 @@ public class BeanUtilTest {
 	}
 
 	@Test
-	public void toUpdateSQL4() throws IllegalAccessException {
+	public void toUpdateSQL4() {
 		List<UserInfo> userInfos = new ArrayList<>();
 		userInfos.add(new UserInfo(77, null, null));
 		userInfos.add(new UserInfo(88, null, null));
@@ -382,7 +385,7 @@ public class BeanUtilTest {
 		return null;
 	}
 	@Test
-	public void feild() throws Exception {
+	public void feild() {
 		Field[] fields = BeanUtil.getFields(Fish.class);
 		assertThat(fields.length, is(3));
 		assertThat(getField("id"), notNullValue());

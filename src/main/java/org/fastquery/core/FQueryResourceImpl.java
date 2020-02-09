@@ -33,7 +33,7 @@ import java.io.InputStream;
  */
 public class FQueryResourceImpl implements Resource {
 
-	private ClassLoader classLoader;
+	private final ClassLoader classLoader;
 
 	public FQueryResourceImpl(ClassLoader classLoader) {
 		this.classLoader = classLoader;

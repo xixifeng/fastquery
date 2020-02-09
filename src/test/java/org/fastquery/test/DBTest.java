@@ -50,7 +50,7 @@ public class DBTest extends FastQueryTest {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DBTest.class);
 
-	private StudentDBService db = FQuery.getRepository(StudentDBService.class);
+	private final StudentDBService db = FQuery.getRepository(StudentDBService.class);
 
 	// 调用: DB.modify
 	@SuppressWarnings("unchecked")
@@ -93,7 +93,7 @@ public class DBTest extends FastQueryTest {
 			assertThat(ru.getEffect(), greaterThanOrEqualTo(1));
 			assertThat(ru.getPk(), greaterThanOrEqualTo(1L));
 			LOG.debug("正在删除:" + ru.getPk());
-			List<RespUpdate> rusx = null;
+			List<RespUpdate> rusx;
 			try {
 				rusx = delete(ru.getPk());
 			} catch (Exception e) {
