@@ -147,24 +147,24 @@ public interface StudentDBService extends QueryRepository {
 	 * @param table_name 表名称
 	 * @param table_schema 所属数据库
 	 */
-	@Query("select * from information_schema.columns where table_name = ?1 and table_schema = ?2 and column_key='pri'")
+	@Query("select * from information_schema.columns where table_name = ?1 and table_schema = ?2 and column_key='PRI'")
 	JSONArray findColumnKey(String table_name, String table_schema);
 
-	@Modifying(id = "id", table = "userinfo")
+	@Modifying(table = "userinfo")
 	@Query("insert into #{#table} (name,age) values (?1, ?2)")
 	Map<String, Object> addUserInfo(String name, Integer age);
 
 	// 把查询出的字段值包装成字符串,而不是Object
-	@Modifying(id = "id", table = "userinfo")
+	@Modifying(table = "userinfo")
 	@Query("insert into #{#table} (name,age) values (?1, ?2)")
 	Map<String, String> addUserInfo2(String name, Integer age);
 
 	// 增加一条数据,返回主键信息.
-	@Modifying(id = "id", table = "userinfo")
+	@Modifying(table = "userinfo")
 	@Query("insert into #{#table} (name,age) values (?1, ?2)")
 	Primarykey saveUserInfo(String name, Integer age);
 
-	@Modifying(id = "id", table = "userinfo",selectFields="`name`,`age`")
+	@Modifying(table = "userinfo",selectFields="`name`,`age`")
 	@Query("insert into #{#table} (name,age) values (?1, ?2)")
 	JSONObject saveUserInfo2(String name, Integer age);
 
@@ -210,12 +210,12 @@ public interface StudentDBService extends QueryRepository {
 	List<String> findNames();
 
 	@QueryByNamed
-	public List<Student> findSomeStudent();
+	List<Student> findSomeStudent();
 
 	@Query("select * from Student limit 1")
 	Map<String, String> findTop1Student();
 
-	public void db();
+	void db();
 
 	@Query("call addStudent(?1,:name,?3,?4,:dept)")
 	JSONObject callProcedure(String no, @Param("name") String name, String sex, int age, @Param("dept") String dept);

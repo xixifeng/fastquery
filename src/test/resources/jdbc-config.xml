@@ -13,11 +13,7 @@
 	<!-- 配置第二个数据源 -->
 	<named-config name="xk3">
 		<property name="driverClass">com.mysql.cj.jdbc.Driver</property>  <!-- jdbc 驱动 -->
-		<property name="databaseName">xk3</property>                      <!-- 数据库的名称 -->
-		<property name="user">xk3</property>                              <!-- 数据库用户名称 -->
-		<property name="password">abc3</property>                         <!-- 数据库用户的密码 -->
-		<property name="portNumber">3306</property>                       <!-- 端口 -->
-		<property name="serverName">db.fastquery.org</property>               <!-- 数据库主机地址 -->
+		<property name="url">jdbc:mysql://db.fastquery.org:3306/xk3?user=xk3&amp;password=abc3&amp;serverTimezone=Asia/Shanghai</property>
 	</named-config>
 	
 	<named-config name="world">
@@ -25,15 +21,11 @@
 		<property name="user">sa</property>                             
 		<property name="password">123456</property>                        
 		<property name="portNumber">1433</property>                      
-		<property name="serverName">192.168.192.129</property>          
+		<property name="serverName">192.168.192.129</property>
 	</named-config>
-	
+
 	<named-config name="world-mysql">
-		<property name="databaseName">world</property>                    
-		<property name="user">sa</property>                             
-		<property name="password">123456</property>                        
-		<property name="portNumber">3306</property>                      
-		<property name="serverName">db.fastquery.org</property>          
+		<property name="url">jdbc:mysql://db.fastquery.org:3306/world?user=sa&amp;password=123456&amp;serverTimezone=Asia/Shanghai</property>
 	</named-config>
 	
 	<named-config name="world-pgsql">
@@ -41,7 +33,7 @@
 		<property name="user">postgres</property>                             
 		<property name="password">123456</property>                        
 		<property name="portNumber">5432</property>                      
-		<property name="serverName">192.168.192.129</property>          
+		<property name="serverName">192.168.192.129</property>
 	</named-config>
 
 	<!-- 测试 -->
@@ -62,11 +54,7 @@
 	
 	<named-config name="cc">
 		<property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
-		<property name="databaseName">cc</property>                      
-		<property name="user">cc</property>                              
-		<property name="password">cc123456</property>                         
-		<property name="portNumber">3306</property>                      
-		<property name="serverName">db.fastquery.org</property>              
+		<property name="url">jdbc:mysql://db.fastquery.org:3306/cc?user=cc&amp;password=cc123456&amp;serverTimezone=Asia/Shanghai</property>
 	</named-config>
 	
 </jdbc-config>

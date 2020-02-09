@@ -64,7 +64,7 @@ public class PlaceholderTest extends FastQueryTest  {
 
 		assertThat(ssms.get(3), equalTo("`-  ?                     -`"));
 
-		ssms.forEach(m -> LOG.debug(m));
+		ssms.forEach(LOG::debug);
 	}
 
 	@Test

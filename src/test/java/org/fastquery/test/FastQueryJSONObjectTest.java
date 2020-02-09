@@ -30,7 +30,9 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertThat;
 
+import java.io.File;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import static org.hamcrest.Matchers.*;
 
@@ -48,7 +50,7 @@ public class FastQueryJSONObjectTest extends FastQueryTest {
 	@Test
 	public void testGetBasedir() {
 		String basedir = FastQueryJSONObject.getBasedir();
-		assertThat(basedir, equalTo(System.getProperty("user.dir") + "/src/test/resources/testFiles/"));
+		assertThat(basedir, equalTo(System.getProperty("user.dir").replaceAll(Matcher.quoteReplacement(String.valueOf(File.separatorChar)),"/") + "/src/test/resources/testFiles/"));
 	}
 
 	@Test

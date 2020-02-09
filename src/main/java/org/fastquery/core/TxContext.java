@@ -31,7 +31,7 @@ import javax.sql.DataSource;
 
 import org.fastquery.struct.DC;
 /**
- * 
+ * tx 上下文
  * @author mei.sir@aliyun.cn
  */
 import org.slf4j.Logger;

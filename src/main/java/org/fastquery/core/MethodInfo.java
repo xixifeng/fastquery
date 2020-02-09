@@ -106,7 +106,7 @@ public class MethodInfo {
 		} else {
 			Boolean nc = (Boolean) TypeUtil.findAnnotationParameterVal(NotCount.class, parameters, QueryContext.getArgs());
 			if(nc!=null) {
-				return !nc.booleanValue();
+				return !nc;
 			} else {
 				return true;
 			}

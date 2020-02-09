@@ -9,8 +9,8 @@ public class Teacher {
 	private String tname;
 
 	private Card card;
-	private Set<Student> students = new HashSet<Student>();
-	private Set<ClassRoom> classRooms = new HashSet<ClassRoom>();
+	private Set<Student> students = new HashSet<>();
+	private Set<ClassRoom> classRooms = new HashSet<>();
 
 	public Teacher() {
 	}
@@ -62,9 +62,7 @@ public class Teacher {
 
 	// 删除一条与ClassRoom的关联
 	public void removeClassRoom(ClassRoom classRoom) {
-		if (classRooms.contains(classRoom)) {
 			classRooms.remove(classRoom);
-		}
 	}
 
 	public void setClassRooms(Set<ClassRoom> classRooms) {

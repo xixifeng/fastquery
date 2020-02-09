@@ -7,7 +7,7 @@
 <beans>
 
 	<bean name="xkdb2">
-		<property name="jdbcUrl" value="jdbc:mysql://db.fastquery.org:3306/xk" />
+		<property name="jdbcUrl" value="jdbc:mysql://db.fastquery.org:3306/xk?serverTimezone=Asia/Shanghai" />
 		<property name="dataSource.user" value="xk" />
 		<property name="dataSource.password" value="abc123" />
 

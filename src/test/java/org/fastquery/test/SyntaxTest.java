@@ -78,12 +78,12 @@ public class SyntaxTest extends FastQueryTest  {
 	@Test
 	public void testReg() {
 		LOG.debug(String.valueOf(Pattern.matches("", "")));
-		// s.replaceAll("\\:"+param.value()+"\\b", "?"+(i+1));
-		assertThat("abckdwgew:name&".replaceAll("\\:name\\b", "?"), equalTo("abckdwgew?&"));
-		assertThat("abckdwgew:name &".replaceAll("\\:name\\b", "?"), equalTo("abckdwgew? &"));
-		LOG.debug("-->: " + ("abckdwgew:name222 &".replaceAll("\\:name\\b", "?")));
-		assertThat(":name22".replaceAll("\\:name\\b", "?"), equalTo(":name22"));
-		assertThat(":name22 ".replaceAll("\\:name\\b", "?"), equalTo(":name22 "));
-		assertThat(":name,".replaceAll("\\:name\\b", "?"), equalTo("?,"));
+		// s.replaceAll(""+param.value()+"\\b", "?"+(i+1));
+		assertThat("abckdwgew:name&".replaceAll(":name\\b", "?"), equalTo("abckdwgew?&"));
+		assertThat("abckdwgew:name &".replaceAll("name\\b", "?"), equalTo("abckdwgew? &"));
+		LOG.debug("-->: " + ("abckdwgew:name222 &".replaceAll("name\\b", "?")));
+		assertThat(":name22".replaceAll("name\\b", "?"), equalTo(":name22"));
+		assertThat(":name22 ".replaceAll("name\\b", "?"), equalTo(":name22 "));
+		assertThat(":name,".replaceAll("name\\b", "?"), equalTo("?,"));
 	}
 }

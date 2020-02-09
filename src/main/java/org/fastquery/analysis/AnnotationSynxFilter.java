@@ -55,12 +55,12 @@ class AnnotationSynxFilter implements MethodFilter {
 			String sql = query.value();
 
 			// 如果SQL中存在 #{#table}, 而@Modifying中的table属性为"",这属于语法错误.
-			if ((sql.indexOf(Placeholder.TABLE) != -1) && "".equals(table)) {
+			if (sql.contains(Placeholder.TABLE) && "".equals(table)) {
 				this.abortWith(method, sql + "中存在" + Placeholder.TABLE + ", 那么,@Modifying中的table属性为不能为空");
 			}
 
 			// 如果SQL中存在 #{#id}, 而@Modifying中的id属性为"",这属于语法错误.
-			if ((sql.indexOf(Placeholder.ID) != -1) && "".equals(id)) {
+			if (sql.contains(Placeholder.ID) && "".equals(id)) {
 				this.abortWith(method, sql + "中存在" + Placeholder.ID + ", 那么,@Modifying中的id属性为不能为空");
 			}
 		}

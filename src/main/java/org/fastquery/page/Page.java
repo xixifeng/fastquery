@@ -35,35 +35,35 @@ public interface Page<E> {
 	 * 
 	 * @return 每页行数
 	 */
-	public int getSize();
+	int getSize();
 
 	/**
 	 * 当前页的真实记录行数
 	 * 
 	 * @return 当前页的真实记录行数
 	 */
-	public int getNumberOfElements();
+	int getNumberOfElements();
 
 	/**
 	 * 当前页码,从1开始
 	 * 
 	 * @return 当前页码,从1开始
 	 */
-	public int getNumber();
+	int getNumber();
 
 	/**
 	 * 当前页的结果集
 	 * 
 	 * @return 当前页的结果集
 	 */
-	public List<E> getContent();
+	List<E> getContent();
 
 	/**
 	 * 总行数,注意:如果在不求和的情况下,返回-1.
 	 * 
 	 * @return 总行数
 	 */
-	public long getTotalElements();
+	long getTotalElements();
 
 	/**
 	 * 总页码,注意:如果在不求和的情况下,返回-1.<br>
@@ -71,56 +71,56 @@ public interface Page<E> {
 	 * 
 	 * @return 总页数
 	 */
-	public int getTotalPages();
+	int getTotalPages();
 
 	/**
 	 * 是否有结果集
 	 * 
 	 * @return 是否有结果集
 	 */
-	public boolean isHasContent();
+	boolean isHasContent();
 
 	/**
 	 * 是否有下一页
 	 * 
 	 * @return 是否有下一页
 	 */
-	public boolean isHasNext();
+	boolean isHasNext();
 
 	/**
 	 * 是否有上一页
 	 * 
 	 * @return 是否有上一页
 	 */
-	public boolean isHasPrevious();
+	boolean isHasPrevious();
 
 	/**
 	 * 是否是第一页
 	 * 
 	 * @return 是否是第一页
 	 */
-	public boolean isFirst();
+	boolean isFirst();
 
 	/**
 	 * 是否是最后一页
 	 * 
 	 * @return 是否是最后一页
 	 */
-	public boolean isLast();
+	boolean isLast();
 
 	/**
 	 * 下一页的 {@link Slice}
 	 * 
 	 * @return 下一页的 {@link Slice}
 	 */
-	public Slice getNextPageable();
+	Slice getNextPageable();
 
 	/**
 	 * 上一页的 {@link Slice}
 	 * 
 	 * @return 上一页的 {@link Slice}
 	 */
-	public Slice getPreviousPageable();
+	Slice getPreviousPageable();
 	
 	/**
 	 * 将当前 Page<E> 转换成 Page<T>
@@ -128,5 +128,5 @@ public interface Page<E> {
 	 * @param clazz 类型
 	 * @return 一个新的 Page<T> 实例
 	 */
-	public <T> Page<T> convert(Class<T> clazz);
+	<T> Page<T> convert(Class<T> clazz);
 }

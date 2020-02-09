@@ -8,8 +8,8 @@ public class Student {
 	private String sname;
 
 	private Card card;
-	private Set<Teacher> teachers = new HashSet<Teacher>();
-	private Set<ClassRoom> classRooms = new HashSet<ClassRoom>();
+	private Set<Teacher> teachers = new HashSet<>();
+	private Set<ClassRoom> classRooms = new HashSet<>();
 
 	public Student() {
 	}
@@ -62,9 +62,7 @@ public class Student {
 
 	// 删除一条关联记录
 	public void removeTeacher(Teacher teacher) {
-		if (teachers.contains(teacher)) {
 			teachers.remove(teacher);
-		}
 	}
 
 	public Set<ClassRoom> getClassRooms() {
@@ -104,9 +102,7 @@ public class Student {
 		if (getClass() != obj.getClass())
 			return false;
 		Student other = (Student) obj;
-		if (id != other.id)
-			return false;
-		return true;
+		return id == other.id;
 	}
 
 	@Override

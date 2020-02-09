@@ -68,7 +68,7 @@ public interface ConnectionPoolProvider {
 			String serverName = map.get("serverName");
 			String user = map.get("user");
 			String url = map.get("url");
-			DataSource ds = null;
+			DataSource ds;
 			
 			try {
 				ds = clazz.newInstance();

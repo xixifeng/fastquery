@@ -53,18 +53,10 @@ public class RepVersion extends FastQueryTest  {
 
 	private static final String REG = "\\d+\\.\\d+\\.\\d+(\\.enforce)*";
 
-	@SuppressWarnings("unused")
-	private static void exec(String path, String target) throws IOException, InterruptedException {
-		String command = "/usr/bin/sed -i s/{\\[version\\]}/" + target + "/ " + path;
-		LOG.debug(command);
-		Process p = Runtime.getRuntime().exec(command);
-		p.waitFor();
-		p.destroy();
-	}
-
 	private static String showInputDialog(String initialSelectionValue) {
 		String s;
 		while ("".equals((s = JOptionPane.showInputDialog("请输入发布版本号: ", initialSelectionValue))) || s == null || !Pattern.matches(REG, s)) {
+			LOG.warn("输入的版本号是空，重新输入");
 		}
 		return s;
 	}
@@ -91,7 +83,7 @@ public class RepVersion extends FastQueryTest  {
 
 		try (BufferedReader br = new BufferedReader(
 				new InputStreamReader(new FileInputStream(new File(userDir, "/pom.xml"))))) {
-			String lineTxt = null;
+			String lineTxt;
 			while ((lineTxt = br.readLine()) != null) {
 				if (lineTxt.endsWith("<!-- fastquery.version -->")) {
 					initialSelectionValue = TypeUtil.matches(lineTxt, REG).get(0);
@@ -108,11 +100,10 @@ public class RepVersion extends FastQueryTest  {
 		String[] names = { "/pom.xml", "/README.md" };
 		for (String name : names) {
 			File tmp = File.createTempFile("temp", ".fquery");// 创建临时文件
-			String tpf = tmp.getAbsolutePath();
 			File f = new File(userDir, name);
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-					BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tmp)));) {
-				String lineTxt = null;
+					BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tmp)))) {
+				String lineTxt;
 				while ((lineTxt = br.readLine()) != null) {
 					if (lineTxt.endsWith("<!-- fastquery.version -->") || lineTxt.startsWith("compile 'org.fastquery:fastquery") ) {
 						bw.write(lineTxt.replaceAll(REG, version) + "\n");
@@ -121,12 +112,14 @@ public class RepVersion extends FastQueryTest  {
 					}
 				}
 				bw.flush();
+				br.close();
+				LOG.debug("f: {}",f.getAbsolutePath());
+				LOG.debug("tmp.toPath():{}",tmp.toPath());
 				assertThat(f.delete(), is(true));
-				Files.move(tmp.toPath(), f.toPath());
+				//Files.move(tmp.toPath(), f.toPath());
+				Files.copy(tmp.toPath(), f.toPath());
 			} catch (IOException e) {
 				throw e;
-			} finally {
-				new File(tpf).delete();
 			}
 		}
 

@@ -176,7 +176,7 @@ public class StudentDBServiceTest extends FastQueryTest  {
 	@Test
 	public void count() {
 		long l = studentDBService.count();
-		assertThat(l, greaterThan(1l));
+		assertThat(l, greaterThan(1L));
 	}
 
 	@Test
@@ -269,10 +269,8 @@ public class StudentDBServiceTest extends FastQueryTest  {
 		JSONArray jsonObject = studentDBService.findColumnKey("product", "xk");
 		LOG.debug(JSON.toJSONString(jsonObject, true));
 		assertThat(jsonObject.size(), is(2));
-		// 断言: 第一个主键的列名称是 "pid"
-		assertThat(jsonObject.getJSONObject(0).getString("COLUMN_NAME"), equalTo("pid"));
-		// 断言: 第二个主键的列名称是 "pid"
-		assertThat(jsonObject.getJSONObject(1).getString("COLUMN_NAME"), equalTo("lid"));
+		assertThat(jsonObject.getJSONObject(0).getString("COLUMN_NAME"), either(equalTo("pid")).or(equalTo("lid")));
+		assertThat(jsonObject.getJSONObject(1).getString("COLUMN_NAME"), either(equalTo("pid")).or(equalTo("lid")));
 	}
 
 	@Test
@@ -508,9 +506,7 @@ public class StudentDBServiceTest extends FastQueryTest  {
 	public void findNames() {
 		List<String> names = studentDBService.findNames();
 		assertThat(names.size(), greaterThanOrEqualTo(3));
-		names.forEach(name -> {
-			LOG.debug(name);
-		});
+		names.forEach(LOG::debug);
 	}
 
 	@Test

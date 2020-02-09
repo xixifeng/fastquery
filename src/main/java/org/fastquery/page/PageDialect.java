@@ -37,8 +37,9 @@ public interface PageDialect {
 	 * @param pageSize 从offset位置(从0开始计数)向后取pageSize条记录
 	 * @return 分页SQL语句
 	 */
-	public default String getCurrentPageSQL(String querySQL, int offset, int pageSize) {
-		StringBuilder sb = new StringBuilder("WITH query AS (SELECT inner_query.*, ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP) as __row_index___ FROM ( ");
+	default String getCurrentPageSQL(String querySQL, int offset, int pageSize) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("WITH query AS (SELECT inner_query.*, ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP) as __row_index___ FROM ( ");
 		sb.append(querySQL);
 		sb.append(" ) inner_query ) SELECT * FROM query WHERE __row_index___ > ");
 		sb.append(offset);
@@ -54,13 +55,14 @@ public interface PageDialect {
 	 * @param countField count字段
 	 * @return count语句
 	 */
-	public default String countSQLInference(String querySQL, String countField) {
+	default String countSQLInference(String querySQL, String countField) {
 				
 		String tmp = querySQL.toLowerCase();
 		// 计算求和语句
 		// 把select 与 from 之间的 内容变为 count(countField)
 		int fromIndex = tmp.lastIndexOf("from") - 1;
-		StringBuilder sb = new StringBuilder("select count(");
+		StringBuilder sb = new StringBuilder();
+		sb.append("select count(");
 		sb.append(countField);
 		sb.append(')');
 		sb.append(querySQL.substring(fromIndex));

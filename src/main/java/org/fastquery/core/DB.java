@@ -63,7 +63,7 @@ public class DB {
 
 		String sql = sqlValue.getSql();
 		List<Object> objs = sqlValue.getValues();
-		List<Map<String, Object>> keyvals = null;
+		List<Map<String, Object>> keyvals;
 		Connection conn = QueryContext.getConn();
 		PreparedStatement stat = null;
 		ResultSet rs = null;
@@ -96,7 +96,7 @@ public class DB {
 	 * @return 改操作响应数据
 	 */
 	static List<RespUpdate> modify(List<SQLValue> sqlValues, boolean hasPK) {
-		List<RespUpdate> rus = null;
+		List<RespUpdate> rus;
 		Connection conn = QueryContext.getConn(); // 由QueryContext自动关闭
 		try {
 			QueryContext.disableAutoCommit(); // 关闭自动提交
@@ -218,7 +218,7 @@ public class DB {
 		@SuppressWarnings("unchecked")
 		List<Object> args = (List<Object>) updateInfo[1];
 		int count = args.size();
-		int effect = 0;
+		int effect;
 		try {
 			conn = QueryContext.getConn();
 			QueryContext.disableAutoCommit();
@@ -248,7 +248,7 @@ public class DB {
 	// 查询一条数据然后转换成一个实体
 	static Object select(String sql, Object bean) {
 		Class<?> cls = (bean instanceof Class) ? (Class<?>) bean : bean.getClass();
-		Connection conn = null;
+		Connection conn;
 		Statement stat = null;
 		ResultSet rs = null;
 		try {
@@ -270,7 +270,7 @@ public class DB {
 	}
 
 	static boolean exists(String sql) {
-		Connection conn = null;
+		Connection conn;
 		Statement stat = null;
 		ResultSet rs = null;
 		try {
@@ -333,7 +333,7 @@ public class DB {
 						if(val == null) {
 							val = "";
 						} 
-						s = s.replaceAll("\\$\\["+i+"\\]", val);
+						s = s.replaceAll("\\$\\["+i+"]", val);
 					}
 				}
 				consumer.accept(st, s);	
@@ -414,8 +414,8 @@ public class DB {
 	/**
 	 * 输出执行日志
 	 * 
-	 * @param sql
-	 * @param objs
+	 * @param sql sql语句
+	 * @param objs 参数
 	 */
 	private static void info(String sql, List<Object> objs) {
 		if (LOG.isInfoEnabled()) { // 这个输出要做很多事情,在此判断一下很有必要,生产环境通常是warn级别

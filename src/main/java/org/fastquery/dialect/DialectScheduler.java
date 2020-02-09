@@ -41,7 +41,7 @@ public class DialectScheduler {
 
 	public static PageDialect getCurrentPageDialect() {
 		Connection conn = QueryContext.getConn();
-		String dbProductName = "";
+		String dbProductName;
 		try {
 			DatabaseMetaData metaData = conn.getMetaData();
 			dbProductName = metaData.getDatabaseProductName();

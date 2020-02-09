@@ -8,9 +8,9 @@ public class ClassRoom {
 	private int id;
 	private String cname;
 
-	private Set<Teacher> teachers = new HashSet<Teacher>();
-	private Set<Student> students = new HashSet<Student>();
-	private Set<Desk> desks = new HashSet<Desk>();
+	private Set<Teacher> teachers = new HashSet<>();
+	private Set<Student> students = new HashSet<>();
+	private Set<Desk> desks = new HashSet<>();
 
 	public ClassRoom() {
 	}
@@ -87,9 +87,7 @@ public class ClassRoom {
 		if (getClass() != obj.getClass())
 			return false;
 		ClassRoom other = (ClassRoom) obj;
-		if (id != other.id)
-			return false;
-		return true;
+		return id == other.id;
 	}
 
 	@Override

@@ -49,8 +49,7 @@ public class QueryParser {
 	/**
 	 * 改操作分析
 	 * 
-	 * @param queries
-	 * @return
+	 * @return SQLValue 集合
 	 */
 	static List<SQLValue> modifyParser() {
 		MethodInfo method = QueryContext.getMethodInfo();
@@ -62,14 +61,9 @@ public class QueryParser {
 		String table = modifying.table();
 
 		List<String> sqls = TypeUtil.getQuerySQL(method, queries, args);
-
 		int sqlCount = sqls.size();
-
 		List<SQLValue> msvs = new ArrayList<>(sqlCount);
-
-		for (int jk = 0; jk < sqlCount; jk++) {
-			// 获取sql
-			String sql = sqls.get(jk);
+		for (String sql : sqls) {
 			// 替换SQL中的占位变量符
 			sql = sql.replaceAll(Placeholder.TABLE_REG, Matcher.quoteReplacement(table));
 			sql = sql.replaceAll(Placeholder.ID_REG, Matcher.quoteReplacement(id));
@@ -82,7 +76,7 @@ public class QueryParser {
 	/**
 	 * 如果没有标识@Query或@QueryByNamed,则返回null
 	 * 
-	 * @return
+	 * @return SQLValue
 	 */
 	static SQLValue queryParser() {
 		MethodInfo method = QueryContext.getMethodInfo();
@@ -114,7 +108,7 @@ public class QueryParser {
 			String countField = query.countField();
 			String countQuery = query.countQuery();
 			String countPageSQL;
-			if (countQuery == null || "".equals(countQuery)) { // 表明在声明时没有指定求和语句
+			if ("".equals(countQuery)) { // 表明在声明时没有指定求和语句
 				// 那么通过主体查询语句算出count语句,querySQL的where问题已经处理好
 				countPageSQL = pageDialect.countSQLInference(querySQL, countField);
 			} else {

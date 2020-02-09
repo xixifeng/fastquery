@@ -51,7 +51,7 @@ public class PreventSQLInjection {
 				"table_schema", "union", "where", "select", "delete", "update", "order", "by", "count", "*", "chr", "mid", "master", "truncate",
 				"char", "declare", "or", ";", "-", "--", "+", ",", "like", "//", "/", "%", "#" };
 		for (String key : keys) {
-			if (s.trim().indexOf(key) != -1) {
+			if (s.trim().contains(key)) {
 				return true;
 			}
 		}

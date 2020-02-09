@@ -64,12 +64,10 @@ class ParameterFilter implements MethodFilter {
 
 		// 3). 检测SQL语句中的参数所指定的方法索引是否越界.
 		int[] ints = TypeUtil.getSQLParameter(sql);
-		int methodIndex; // 计算从1开始
-		for (int i = 0; i < ints.length; i++) {
+		for (int methodIndex : ints) {
 			// 如果该for sqlParameterCount,可能会导致ints数组越界 因为sqlParameterCount长度有可能大于ints的长度
 			// 例如 sql "...?1 ?2 ?1..." 只需要方法带两个参数即可满足
 
-			methodIndex = ints[i];
 			if (methodIndex == 0) {
 				this.abortWith(method, sql + " SQL中禁止出现\"?0\",你是想对应方法中的第一个参数吗?那么请用\"?1\"");
 			}

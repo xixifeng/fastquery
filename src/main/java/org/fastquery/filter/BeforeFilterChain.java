@@ -71,13 +71,7 @@ class BeforeFilterChain<R extends Repository> extends BeforeFilter<R> {
 	void unload() {
 		THREADLOCAL.remove();
 	}
-	
-	/**
-	 * 开始链条
-	 * 
-	 * @param method
-	 * @param args
-	 */
+
 	public Object start(R repository, Method method, Object[] args) {
 		// 设置初始值
 		THREADLOCAL.set(void.class);

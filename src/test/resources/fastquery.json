@@ -103,7 +103,7 @@
     
     ,
     {
-        "config": "mySQLDriver",           
+        "config": "mySQLDriver"
     }
     
     ,
@@ -136,8 +136,8 @@
  ],
  
   // 基准目录,注意: 后面记得加上 "/"
- "basedir" : "/Users/mei.sir/mywork/workspace-2018/fastquery/src/test/resources/testFiles/",
- 
+ "basedir" : "E:/projects/fastquery/src/test/resources/testFiles/",
+
   // 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目,默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式
   "debug" : false,
  

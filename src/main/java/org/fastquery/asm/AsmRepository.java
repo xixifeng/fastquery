@@ -190,8 +190,7 @@ public class AsmRepository {
 			CtField field = CtField.make("private org.fastquery.core.MethodInfo[] m = new org.fastquery.core.MethodInfo[" + len + "];", ctClass);
 			ctClass.addField(field);
 			int index = 0;
-			for (int i = 0; i < len; i++) {
-				Method method = methods[i];
+			for (Method method : methods) {
 				Class<?>[] ps = method.getParameterTypes();
 				StringBuilder bodyBuilder = new StringBuilder();
 				bodyBuilder.append('{');

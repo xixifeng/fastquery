@@ -46,7 +46,7 @@ public final class SharpExprParser {
 	
 	private static void find(String str, Set<String> sets) {
 		int startIndex = 0;
-		int endIndex = 0;
+		int endIndex;
 		boolean loop = true;
 		while (loop) {
 			startIndex = str.indexOf("#{#",startIndex);

@@ -51,7 +51,7 @@ public class FQueryTest extends FastQueryTest  {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testReset()
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, IntrospectionException {
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IntrospectionException {
 		Class<PManager> clazz = PManager.class;
 		PManager tempPmanager = FQuery.reset(clazz);
 		clazz = (Class<PManager>) tempPmanager.getClass();

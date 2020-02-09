@@ -66,10 +66,7 @@ public class QueryPoolTest extends FastQueryTest  {
 			@Override
 			public boolean exist(String name) {
 				URL url = QueryPoolTest.class.getClassLoader().getResource(name);
-				if (url == null) {
-					return false;
-				}
-				return true;
+				return url != null;
 			}
 		};
 	}
@@ -139,19 +136,19 @@ public class QueryPoolTest extends FastQueryTest  {
 				+ err
 				+ " #end";
 		Map<String, Object> map = new HashMap<>();
-		map.put("state", Byte.valueOf((byte)0));
+		map.put("state", (byte)0);
 		String str = render(template, "render", map);
 		assertThat(str, equalTo(ok));
 		
-		map.put("state", Byte.valueOf((byte)1));
+		map.put("state", (byte)1);
 		str = render(template, "render", map);
 		assertThat(str, equalTo(ok));
 		
-		map.put("state", Byte.valueOf((byte)1));
+		map.put("state", (byte)1);
 		str = render(template, "render", map);
 		assertThat(str, equalTo(ok));
 		
-		map.put("state", Byte.valueOf((byte)-1));
+		map.put("state", (byte)-1);
 		str = render(template, "render", map);
 		assertThat(str, equalTo(ok));
 		
@@ -167,7 +164,7 @@ public class QueryPoolTest extends FastQueryTest  {
 		Set<String> keys = map.keySet();
 		int len = keys.size();
 		assertThat(len, is(15));
-		assertThat(map.get("url"), equalTo("jdbc:mysql://db.fastquery.org:3306/xk"));
+		assertThat(map.get("url"), equalTo("jdbc:mysql://db.fastquery.org:3306/xk?serverTimezone=Asia/Shanghai"));
 		assertThat(map.get("username"), equalTo("xk"));
 		assertThat(map.get("password"), equalTo("abc123"));
 		assertThat(map.get("filters"), equalTo("stat"));
@@ -190,7 +187,7 @@ public class QueryPoolTest extends FastQueryTest  {
 		Set<String> keys = map.keySet();
 		int len = keys.size();
 		assertThat(len, is(3));
-		assertThat(map.get("url"), equalTo("jdbc:mysql://db.fastquery.org:3306/xk"));
+		assertThat(map.get("url"), equalTo("jdbc:mysql://db.fastquery.org:3306/xk?serverTimezone=Asia/Shanghai"));
 		assertThat(map.get("username"), equalTo("xk"));
 		assertThat(map.get("password"), equalTo("abc123"));
 	}

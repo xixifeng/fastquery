@@ -46,11 +46,10 @@ class PropertiesUtil {
 	
 	private PropertiesUtil() {
 	}
-	
+
 	/**
 	 * 配置转换
-	 * 
-	 * @param fqueryjson fquery.json 输入流
+	 *
 	 * @param fqueryResource fquery资源
 	 * @return fastquery.json set结构
 	 */
@@ -60,9 +59,9 @@ class PropertiesUtil {
 		FastQueryJSONObject.setJsonObject(json);
 		FastQueryJSONObject.check();
 		FastQueryJson[] fqProperties = JSON.toJavaObject(json.getJSONArray("scope"), FastQueryJson[].class);
-		String config = null;
-		String dataSourceName = null;
-		Set<String> basePackages = null;
+		String config;
+		String dataSourceName;
+		Set<String> basePackages;
 		List<String> dataSourceNames = new ArrayList<>(); // 用于存储所有的数据源名称,在fastquery.json文件里禁止dataSourceName重复出现
 		List<String> bpNames = new ArrayList<>(); // 用于存储所有的basePackage,在fastquery.json文件里禁止basePackage重复出现
 		
@@ -133,7 +132,7 @@ class PropertiesUtil {
 				throw new RepositoryException("没有找到fastquery.json .");
 			}
 			
-			int b = 0; // 定义尽量跟使用处保持短距离
+			int b; // 定义尽量跟使用处保持短距离
 			// 虽然这样读效率不高,但是针对小文件很合适.
 			while ((b = fqueryjson.read()) != -1) {
 				byteArrayOutputStream.write(b);

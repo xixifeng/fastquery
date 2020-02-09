@@ -48,7 +48,7 @@ import static org.hamcrest.Matchers.*;
  */
 public class TypeUtilTest {
 	@Test
-	public void testMatches() throws ClassNotFoundException {
+	public void testMatches() {
 		String sql = "select id,name,age from #{#limit} `userinfo` #{#where}";
 		List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE);
 		assertThat(strs.size(), equalTo(1));
@@ -321,7 +321,7 @@ public class TypeUtilTest {
 
 	@Test
 	public void mapValueTyep()
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+			throws IllegalArgumentException, NoSuchMethodException, SecurityException {
 		class A {
 			@SuppressWarnings("unused")
 			public Map<String, String> todo() {
@@ -336,7 +336,7 @@ public class TypeUtilTest {
 
 	@Test
 	public void listMapValueTyep()
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+			throws IllegalArgumentException, NoSuchMethodException, SecurityException {
 		class B {
 			@SuppressWarnings("unused")
 			public List<Map<String, String>> todo() {

@@ -35,7 +35,6 @@ import static org.junit.Assert.assertThat;
 /**
  * 
  * @author mei.sir@aliyun.cn
- * @date 2017年9月25日
  */
 public class SaveToIdTest extends FastQueryTest  {
 
@@ -63,7 +62,7 @@ public class SaveToIdTest extends FastQueryTest  {
 		v.setCreateDate(createDate);
 
 		BigInteger bigInteger = vdbs.saveToId(v);
-		assertThat(bigInteger.longValue(), greaterThanOrEqualTo(1l));
+		assertThat(bigInteger.longValue(), greaterThanOrEqualTo(1L));
 
 		int effect = vdbs.deleteByIden(iden);
 

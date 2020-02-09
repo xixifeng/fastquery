@@ -80,10 +80,10 @@ public class QueryPool {
 	}
 
 	/**
-	 * 获取求和模板 key: "类的完整名称.id值"
+	 * 获取求和模板
 	 * 
-	 * @param key
-	 * @return
+	 * @param key 类的完整名称.id值
+	 * @return 求和语句
 	 */
 	static String getCountQuery(String key) {
 		return countQueryMap.get(key);
@@ -108,9 +108,9 @@ public class QueryPool {
 	/**
 	 * 将*.querys.xml -> QueryMapper 并检测配置文件的正确性
 	 * 
-	 * @param className
-	 * @param resource
-	 * @return
+	 * @param className 类名称
+	 * @param resource 资源
+	 * @return QueryMapper 集合
 	 */
 	private static Set<QueryMapper> xml2QueryMapper(String className, Resource resource) {
 		// 用来存储全局parts
@@ -180,8 +180,9 @@ public class QueryPool {
 
 	/**
 	 * 融合模板 融合 <query>节点下的<XXX>和<parts> 然后返回字符串
-	 * 
-	 * @param gparts 全局parts
+	 *
+	 * @param postion
+	 * @param gparts
 	 * @param element
 	 * @param xxx
 	 * @param defaultText 如果没有找到<XXX>节点元素是否直接取<query>下的textContent, true表示是.
@@ -229,20 +230,13 @@ public class QueryPool {
 					// p.getTextContent() 里面很可能包含有$ 或 \
 					// 如果不用Matcher.quoteReplacement进行处理,那么$表示反向引用,就会报错的
 					// 这个name在初始化阶段就被限定只能是字母和数字,应此不存在包含有正则符号
-					template = template.replaceAll("\\#\\{\\#" + name + "\\}", Matcher.quoteReplacement(p.getTextContent()));
+					template = template.replaceAll("#\\{#" + name + "}", Matcher.quoteReplacement(p.getTextContent()));
 				}
 			}
 		}
 		return template;
 	}
 
-	/**
-	 * 从给定节点中查询名称为nodeName的子元素. 没有找到返回null
-	 * 
-	 * @param node
-	 * @param nodeName
-	 * @return
-	 */
 	private static Element getChildElement(Node node, String nodeName) {
 		NodeList nodeList = node.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
@@ -349,13 +343,6 @@ public class QueryPool {
 		return TypeUtil.parWhere(str);
 	}
 
-	/**
-	 * 往QueryPool里添加一个模板,参数值全部都不能为null,否则对外抛出IllegalArgumentException.
-	 * 
-	 * @param className
-	 * @param id
-	 * @param template
-	 */
 	private static synchronized void addTemplate(String className, QueryMapper queryMapper) {
 		Set<QueryMapper> queryMappers = getQueryMappers(className);
 		queryMappers.add(queryMapper);
@@ -364,9 +351,9 @@ public class QueryPool {
 	/**
 	 * 根据类名称(包含包地址)和id查询出模板 该方法永远不会返回null或"",因为在初始化时做了与处理,如果为null或"",初始化都通过不了.
 	 * 
-	 * @param className
-	 * @param id
-	 * @return
+	 * @param className calss 名称
+	 * @param id 唯一id
+	 * @return 模板
 	 */
 	private static String getTemplate(String className, String id) {
 		// 特别注意: 是否有模板,已经在初始化时做了严格校验,在此处就不用判断是否为null了

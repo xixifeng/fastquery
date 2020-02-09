@@ -53,7 +53,7 @@ public interface SQLInExample extends QueryRepository {
 	UserInfo[] findByIn(List<Integer> ids);
 
 	@Query("select * from student where sex = :sex and age > :age and name in(:names)")
-	List<Student> findByIn(@Param(value = "sex", defaultVal = "") String sex, @Param("age") Integer age,
+	List<Student> findByIn(@Param(value = "sex") String sex, @Param("age") Integer age,
 			@Param("names") Set<String> names);
 
 }

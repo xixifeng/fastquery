@@ -45,10 +45,10 @@ class QueryFilterHelper {
 
 	/**
 	 * 获取SQL语句,不考虑条件是否参与运算问题.
-	 * 
-	 * @param method
-	 * @param query
-	 * @return
+	 *
+	 * @param method 方法
+	 * @param queries query集
+	 * @return SQL 语句
 	 */
 	private static List<String> getQuerySQL(Method method, Query[] queries) {
 
@@ -60,9 +60,9 @@ class QueryFilterHelper {
 			StringBuilder sb = new StringBuilder();
 			// 追加条件
 			Condition[] conditions = method.getAnnotationsByType(Condition.class);
-			for (int i = 0; i < conditions.length; i++) {
+			for (Condition condition : conditions) {
 				sb.append(' ');
-				sb.append(conditions[i].value());
+				sb.append(condition.value());
 			}
 			// 追加条件 End
 

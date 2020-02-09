@@ -49,7 +49,7 @@ public interface ConditionDBService extends Repository {
 	@Condition(value = " $nameWhere", ignoreNull = false)
 	List<Student> findUserInfo2(String w1, @Param("nameWhere") String w2, @Param("tname") String tname);
 	
-	public static class LikeNameJudge extends Judge {
+	class LikeNameJudge extends Judge {
 		@Override
 		public boolean ignore() {
 			// 获取方法中名称为"age"的参数值

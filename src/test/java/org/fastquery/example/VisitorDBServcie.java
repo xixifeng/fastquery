@@ -26,11 +26,6 @@ import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 
-/**
- * 
- * @author mei.sir@aliyun.cn
- * @date 2017年9月25日
- */
 public interface VisitorDBServcie extends QueryRepository {
 
 	@Query("DELETE FROM `visitor` WHERE `iden` = ?1")

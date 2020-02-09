@@ -70,13 +70,13 @@ class GenerateRepositoryImpl {
 		List<Class<?>> clses = new ArrayList<>();
 
 		// 3). 批量生成 Repository 的实现类
-		fqPropertie.stream().forEach(fQueryPropertie -> {
+		fqPropertie.parallelStream().forEach(fQueryPropertie -> {
 			Set<String> basePackages = fQueryPropertie.getBasePackages();
-			basePackages.stream().forEach(basePackage -> {
+			basePackages.parallelStream().forEach(basePackage -> {
 				List<Class<?>> classes = ClassUtil.getClasses(basePackage);
 				clses.addAll(classes);
 				// classes.forEach(this::generate)
-				classes.stream().forEach(rcls -> {
+				classes.parallelStream().forEach(rcls -> {
 					generate(rcls); // 生成
 					QueryPool.put(rcls.getName(), resource);
 				});

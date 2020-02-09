@@ -58,9 +58,9 @@ public class XMLParse {
 	public static Map<String, String> toMap(Resource resource, String resourceName, String dataSourceName,String tagName) {
 		return toWho(resource, resourceName, dataSourceName,tagName,unitElement -> {
 
-			String key = null;
-			String val = null;
-			Node node = null;
+			String key;
+			String val;
+			Node node;
 			
 			Map<String, String> map = new HashMap<>();			
 			NodeList childNodes = unitElement.getChildNodes();
@@ -99,8 +99,8 @@ public class XMLParse {
 				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 				// 如下设置可禁用外部实体处理
 				factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-				DocumentBuilder builder = null;
-				Document document = null;
+				DocumentBuilder builder;
+				Document document;
 
 				builder = factory.newDocumentBuilder();
 				document = builder.parse(inputStream);
@@ -111,8 +111,8 @@ public class XMLParse {
 				if(nodes.getLength() == 0) {
 					nodes = document.getElementsByTagName(tagName);
 				}
-				Element unitElement = null;
-				String named = null;
+				Element unitElement;
+				String named;
 				for (int i = 0; i < nodes.getLength(); i++) {
 					unitElement = (Element) nodes.item(i);
 					named = unitElement.getAttribute("name");

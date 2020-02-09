@@ -54,7 +54,7 @@ public class ParamFilterTest extends FastQueryTest  {
 	public void paramFilter11() throws Exception {
 		Method method = getMethod1();
 		String name = "小王子";
-		Integer age = 6;
+		int age = 6;
 		Object[] args = { name, age };
 		String sql = "";
 		String str = paramFilter(method, args, sql);
@@ -85,7 +85,7 @@ public class ParamFilterTest extends FastQueryTest  {
 	public void paramFilter12() throws Exception {
 		Method method = getMethod1();
 		String name = "小王子";
-		Integer age = 6;
+		int age = 6;
 		Object[] args = { name, age };
 		String sql = "";
 		String str = paramFilter(method, args, sql);
@@ -116,7 +116,7 @@ public class ParamFilterTest extends FastQueryTest  {
 	public void paramFilter13() throws Exception {
 		Method method = getMethod1();
 		String name = "小王子";
-		Integer age = 6;
+		int age = 6;
 		Object[] args = { name, age };
 		String sql = ":name1";
 		String str = paramFilter(method, args, sql);
