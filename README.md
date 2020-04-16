@@ -128,7 +128,7 @@ JRE 8+
 ### fastquery.json
 配置数据源的作用范围
 
-```json
+```js
 // @author xixifeng (fastquery@126.com)
 // 配置必须遵循标准的json语法.
 {
@@ -170,7 +170,7 @@ JRE 8+
 
 数据源的初始化是从"fastquery.json"开始的,根据从里面读到"dataSourceName"的值,取相应的配置,继而完成数据源的创建.如,创建一个名为"rex-db"的数据源:
 
-```json   
+```js   
 {
     "config": "c3p0",           
     "dataSourceName": "rex-db"
