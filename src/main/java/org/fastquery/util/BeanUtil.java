@@ -34,6 +34,7 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.fastquery.struct.SQLValue;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.fastquery.core.ConditionList;
@@ -148,6 +149,80 @@ public final class BeanUtil {
 		sb.setCharAt(sb.length() - 1, ')');
 		return sb.toString();
 	}
+
+	// use select one
+	// [0] where 部分， [1] sql语言中"?"对应的实参
+	private static <B> Object[] toWhere(Field[] fields, B bean) {
+		StringBuilder sb = new StringBuilder();
+		List<Object> values = new ArrayList<>();
+		for (Field field : fields) {
+			if (allowField(field)) {
+				Object val;
+				try {
+					field.setAccessible(true);
+					val = field.get(bean);
+				} catch (IllegalAccessException | IllegalArgumentException e) {
+					throw new RepositoryException(e);
+				}
+				if (val != null && field.getAnnotation(Id.class) == null) {
+					sb.append(" and ");
+					sb.append(field.getName());
+					sb.append(" = ?");
+					values.add(val);
+				}
+			}
+		}
+		Object[] objs = new Object[2];
+		objs[0] = sb.toString();
+		objs[1] = values;
+		return objs;
+	}
+	public static SQLValue toSelectSQL(Object bean, String dbName) {
+		Class<?> cls = bean.getClass();
+		Field[] fields = getFields(cls);
+		Object[] objs = getKeyAndVal(bean, fields, null);
+		Object key = objs[1];
+		if (key == null) {
+			throw new RepositoryException("主键值，必须传递！");
+		} else {
+			String keyFeild = objs[0].toString();
+			// 表名称
+			String tableName = getTableName(dbName, cls);
+			Object[] objects = toWhere(fields,bean);
+			String sql = String.format("select %s from %s where %s = %s%s", selectFields(cls), tableName, keyFeild, key.toString(),objects[0]); // 待执行的sql
+			List<Object> values = (List<Object>) objects[1];// sql语言中"?"对应的实参
+			SQLValue sv = new SQLValue();
+			sv.setSql(sql);
+			sv.setValues(values);
+			return sv;
+		}
+	}
+	public static SQLValue toCount(Object bean, String dbName) {
+		Class<?> cls = bean.getClass();
+		Field[] fields = getFields(cls);
+		Object[] objs = getKeyAndVal(bean, fields, null);
+		Object key = objs[1];
+		String keyFeild = objs[0].toString();
+		// 表名称
+		String tableName = getTableName(dbName, cls);
+		Object[] objects = toWhere(fields,bean);
+		List<Object> values = (List<Object>) objects[1];// sql语言中"?"对应的实参
+		String sql; // 待执行的sql
+		if(key == null) {
+			String where = "";
+			if(values.size() != 0) {
+				where = " where" + objects[0].toString().substring(4);
+			}
+			sql = String.format("select count(id) from %s%s", tableName, where);
+		} else {
+			sql = String.format("select count(id) from %s where %s = %s%s", tableName, keyFeild, key.toString(),objects[0]);
+		}
+		SQLValue sv = new SQLValue();
+		sv.setSql(sql);
+		sv.setValues(values);
+		return sv;
+	}
+	// use select one end
 
 	/**
 	 *

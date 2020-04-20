@@ -28,11 +28,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.bean.Fish;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
+import org.fastquery.core.RepositoryException;
+import org.fastquery.struct.SQLValue;
 import org.fastquery.util.BeanUtil;
 import org.junit.Test;
 
@@ -183,6 +187,100 @@ public class BeanUtilTest {
 
 		String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk",false);
 		assertThat(sql, equalTo("select id from xk.UserInfo where id = 36"));
+	}
+
+	@Test
+	public void toSelectSQL3(){
+		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
+		SQLValue sqlValue = BeanUtil.toSelectSQL(userInfo, null);
+		String sql = sqlValue.getSql();
+		List<Object> list = sqlValue.getValues();
+		assertThat(list.size(), is(2));
+		assertThat(sql,equalTo("select id,name,age from UserInfo where id = 33 and name = ? and age = ?"));
+		assertThat(list.get(0),equalTo("函数式编程"));
+		assertThat(list.get(1),is(18));
+
+		userInfo = new UserInfo(33, null,18);
+		sqlValue = BeanUtil.toSelectSQL(userInfo, null);
+		sql = sqlValue.getSql();
+		list = sqlValue.getValues();
+		assertThat(list.size(), is(1));
+		assertThat(sql,equalTo("select id,name,age from UserInfo where id = 33 and age = ?"));
+		assertThat(list.get(0),is(18));
+
+		userInfo = new UserInfo(33, null,null);
+		sqlValue = BeanUtil.toSelectSQL(userInfo, null);
+		sql = sqlValue.getSql();
+		list = sqlValue.getValues();
+		assertThat(list.size(), is(0));
+		assertThat(sql,equalTo("select id,name,age from UserInfo where id = 33"));
+
+		userInfo = new UserInfo(null, null,null);
+		try {
+			sqlValue = BeanUtil.toSelectSQL(userInfo, null);
+		} catch (RepositoryException e){
+			String stackMsg = ExceptionUtils.getStackTrace(e);
+			assertThat(stackMsg, containsString("主键值，必须传递！"));
+		}
+	}
+
+	@Test
+	public void toCount(){
+		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
+		SQLValue sqlValue = BeanUtil.toCount(userInfo, null);
+		String sql = sqlValue.getSql();
+		List<Object> list = sqlValue.getValues();
+		assertThat(list.size(), is(2));
+		assertThat(sql,equalTo("select count(id) from UserInfo where id = 33 and name = ? and age = ?"));
+		assertThat(list.get(0),equalTo("函数式编程"));
+		assertThat(list.get(1),is(18));
+
+		userInfo = new UserInfo(33, null,18);
+		sqlValue = BeanUtil.toCount(userInfo, null);
+		sql = sqlValue.getSql();
+		list = sqlValue.getValues();
+		assertThat(list.size(), is(1));
+		assertThat(sql,equalTo("select count(id) from UserInfo where id = 33 and age = ?"));
+		assertThat(list.get(0),is(18));
+
+		userInfo = new UserInfo(33, null,null);
+		sqlValue = BeanUtil.toCount(userInfo, null);
+		sql = sqlValue.getSql();
+		list = sqlValue.getValues();
+		assertThat(list.size(), is(0));
+		assertThat(sql,equalTo("select count(id) from UserInfo where id = 33"));
+
+		userInfo = new UserInfo(null, null,null);
+		sqlValue = BeanUtil.toCount(userInfo, null);
+		sql = sqlValue.getSql();
+		list = sqlValue.getValues();
+		assertThat(list.size(), is(0));
+		assertThat(sql,equalTo("select count(id) from UserInfo"));
+
+		userInfo = new UserInfo(null, "小燕子",18);
+		sqlValue = BeanUtil.toCount(userInfo, null);
+		sql = sqlValue.getSql();
+		list = sqlValue.getValues();
+		assertThat(list.size(), is(2));
+		assertThat(sql,equalTo("select count(id) from UserInfo where name = ? and age = ?"));
+		assertThat(list.get(0),equalTo("小燕子"));
+		assertThat(list.get(1),is(18));
+
+		userInfo = new UserInfo(null, "小燕子",null);
+		sqlValue = BeanUtil.toCount(userInfo, null);
+		sql = sqlValue.getSql();
+		list = sqlValue.getValues();
+		assertThat(list.size(), is(1));
+		assertThat(sql,equalTo("select count(id) from UserInfo where name = ?"));
+		assertThat(list.get(0),equalTo("小燕子"));
+
+		userInfo = new UserInfo(null, null,13);
+		sqlValue = BeanUtil.toCount(userInfo, null);
+		sql = sqlValue.getSql();
+		list = sqlValue.getValues();
+		assertThat(list.size(), is(1));
+		assertThat(sql,equalTo("select count(id) from UserInfo where age = ?"));
+		assertThat(list.get(0),is(13));
 	}
 
 	@Test
