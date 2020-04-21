@@ -55,7 +55,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 
 	private final Class<QueryRepository> c = QueryRepository.class;
 
-	private static final MethodInfo[] m = new MethodInfo[35];
+	private static final MethodInfo[] m = new MethodInfo[36];
 
 	private void cache(int j, String name, Class<?>... parameterTypes) {
 		Method localMethod;
@@ -389,5 +389,13 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 		}
 		return (Page<Map<String, Object>>) Prepared.excute(m[j], new Object[] { builder, count, pageIndex, pageSize}, this);
 	}
-	
+
+	@Override
+	public long count(Object entity) {
+		int j = 35;
+		if(m[j] == null) {
+			cache(j,"count",Object.class);
+		}
+		return (Long) Prepared.excute(m[j], new Object[]{entity}, this);
+	}
 }

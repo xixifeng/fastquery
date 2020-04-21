@@ -84,6 +84,11 @@ class MethodId {
 	static final byte QUERY9 = 0X09;
 
 	/**
+	 * 0X10
+	 */
+	static final byte QUERY10 = 0X10;
+
+	/**
 	 * 默认私有构造方法
 	 */
 	private MethodId() {

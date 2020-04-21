@@ -123,10 +123,10 @@ public interface Page<E> {
 	Slice getPreviousPageable();
 	
 	/**
-	 * 将当前 Page<E> 转换成 Page<T>
+	 * 将当前 E 类型的 Page 转换成 T 类型的 -vPage
 	 * @param <T> 另一个类型
 	 * @param clazz 类型
-	 * @return 一个新的 Page<T> 实例
+	 * @return 一个新的 Page 包含 T 类型的实例
 	 */
 	<T> Page<T> convert(Class<T> clazz);
 }

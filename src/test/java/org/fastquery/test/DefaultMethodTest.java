@@ -110,4 +110,23 @@ public class DefaultMethodTest extends FastQueryTest {
 		str = db.sqlFun("select concat_ws('-','A1','B2','C3')");
 		assertThat(str, equalTo("A1-B2-C3"));
 	}
+
+	@Test
+	public void count(){
+		UserInfo u = new UserInfo(16,"986545457",32);
+		long count = db.count(u);
+		assertThat(count,is(0L));
+
+		u = new UserInfo(16,null,32);
+		count = db.count(u);
+		assertThat(count,is(0L));
+
+		u = new UserInfo(null,null,36);
+		count = db.count(u);
+		assertThat(count,is(1L));
+
+		u = new UserInfo(null,null,82);
+		count = db.count(u);
+		assertThat(count,is(1L));
+	}
 }

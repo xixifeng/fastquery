@@ -270,6 +270,8 @@ class QueryProcess {
 			return q8();
 		case MethodId.QUERY9:
 			return q9();
+		case MethodId.QUERY10:
+			return q10();
 		default:
 			break;
 		}
@@ -490,6 +492,14 @@ class QueryProcess {
 		} finally {
 			TxContext.end();
 		}
+	}
+
+	private Object q10() {
+		Object[] iargs = QueryContext.getArgs();
+		Object entity = iargs[0];
+		SQLValue sv = BeanUtil.toCount(entity,null);
+		List<Map<String,Object>> list = DB.find(sv);
+		return list.get(0).values().iterator().next();
 	}
 
 	@SuppressWarnings("rawtypes")

@@ -580,6 +580,15 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 */
 	@Id(MethodId.QUERY9)
 	int tx(IntSupplier fun);
+
+	/**
+	 * 根据指定的条件统计总记录数，实体属性若为 null 值，则，该属性不参与运算，反之，参与 and 运算
+	 * @param entity 实体对象
+	 * @param <E> 实体
+	 * @return 总记录
+	 */
+	@Id(MethodId.QUERY10)
+	<E> long count(E entity);
 	
 	/**
 	 * 查询分页
