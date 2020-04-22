@@ -450,7 +450,14 @@ public class MethodQueryTest extends FastQueryTest {
 		assertThat(sqlValues.size(), is(2));
 		assertThat(sqlValues.get(0), equalTo("select id,name,age from UserInfo order by id desc limit 0,3"));
 		assertThat(sqlValues.get(1), equalTo("select count(id) from UserInfo"));
-		
+
+		userInfoDBService.findPage(userInfo, null, false, 1, 3);
+		sqlValues = rule.getExecutedSQLs();
+		assertThat(sqlValues.size(), is(2));
+		assertThat(sqlValues.get(0), equalTo("select id,name,age from UserInfo  limit 0,3"));
+		assertThat(sqlValues.get(1), equalTo("select count(id) from UserInfo"));
+
+
 	}
 }
 

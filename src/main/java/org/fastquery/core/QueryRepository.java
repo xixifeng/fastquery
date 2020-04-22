@@ -25,8 +25,10 @@ package org.fastquery.core;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.IntSupplier;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
 import org.fastquery.page.PageIndex;
@@ -623,6 +625,10 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 */
 	@SuppressWarnings("unchecked")
 	default <E> Page<E> findPage(E entity, String sort, boolean notCount, int pageIndex, int pageSize,String...excludeColumns) {
+		Objects.requireNonNull(entity,"传递的实体不能为null");
+		if(sort == null) {
+			sort = StringUtils.EMPTY;
+		}
 		QueryBuilder builder = BeanUtil.toSelectSQL(entity, null, sort, excludeColumns);
 		Page<Map<String, Object>> page = this.findPage(builder, notCount, pageIndex, pageSize);
 		return (Page<E>) page.convert(entity.getClass());
