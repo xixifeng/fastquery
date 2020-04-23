@@ -138,9 +138,14 @@ public final class BeanUtil {
 					throw new RepositoryException(e);
 				}
 				if (val != null) {
-					sb.append('\'');
-					sb.append(escapeSql(val.toString()));
-					sb.append("',");
+					if(val instanceof Number || val instanceof Boolean) {
+						sb.append(val);
+					} else {
+						sb.append('\'');
+						sb.append(escapeSql(val.toString()));
+						sb.append('\'');
+					}
+					sb.append(',');
 				} else if (field.getAnnotation(Id.class) == null) {
 					sb.append("null,");
 				}

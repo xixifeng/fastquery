@@ -62,16 +62,16 @@ public class BeanUtilTest {
 	public void testToInsertSQL() {
 		UserInfo userInfo = new UserInfo(33, "想向公主", 18);
 		String sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into UserInfo(id,name,age) values('33','想向公主','18')"));
+		assertThat(sql, equalTo("insert into UserInfo(id,name,age) values(33,'想向公主',18)"));
 
 		// 主键设置为null
 		userInfo.setId(null);
 		sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into UserInfo(name,age) values('想向公主','18')"));
+		assertThat(sql, equalTo("insert into UserInfo(name,age) values('想向公主',18)"));
 
 		userInfo.setName(null);
 		sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into UserInfo(name,age) values(null,'18')"));
+		assertThat(sql, equalTo("insert into UserInfo(name,age) values(null,18)"));
 
 		userInfo.setAge(null);
 		sql = BeanUtil.toInsertSQL(userInfo);
@@ -86,16 +86,16 @@ public class BeanUtilTest {
 	public void testToInsertSQL2() {
 		UserInfo userInfo = new UserInfo(33, "想向公主", 18);
 		String sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into UserInfo(id,name,age) values('33','想向公主','18')"));
+		assertThat(sql, equalTo("insert into UserInfo(id,name,age) values(33,'想向公主',18)"));
 
 		// 主键设置为null
 		userInfo.setId(null);
 		sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into UserInfo(name,age) values('想向公主','18')"));
+		assertThat(sql, equalTo("insert into UserInfo(name,age) values('想向公主',18)"));
 
 		userInfo.setName(null);
 		sql = BeanUtil.toInsertSQL(userInfo);
-		assertThat(sql, equalTo("insert into UserInfo(name,age) values(null,'18')"));
+		assertThat(sql, equalTo("insert into UserInfo(name,age) values(null,18)"));
 
 		userInfo.setAge(null);
 		sql = BeanUtil.toInsertSQL(userInfo);
@@ -120,7 +120,7 @@ public class BeanUtilTest {
 		List<UserInfo> userInfos = new ArrayList<>();
 		userInfos.add(new UserInfo("牵牛花", 3));
 		String str = BeanUtil.toInsertSQL(userInfos, null, false);
-		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values('牵牛花','3')"));
+		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values('牵牛花',3)"));
 		userInfos.clear();
 
 		userInfos.add(new UserInfo("牵牛花", null));
@@ -130,7 +130,7 @@ public class BeanUtilTest {
 
 		userInfos.add(new UserInfo(null, 3));
 		str = BeanUtil.toInsertSQL(userInfos, null, false);
-		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values(null,'3')"));
+		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values(null,3)"));
 		userInfos.clear();
 
 		userInfos.add(new UserInfo(null, null));
@@ -154,7 +154,7 @@ public class BeanUtilTest {
 		userInfos.add(new UserInfo("牵牛花", 3));
 		userInfos.add(new UserInfo(10, "松'鼠", 5));
 		String str = BeanUtil.toInsertSQL(userInfos, null, false);
-		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values('牵牛花','3'),('10','松''鼠','5')"));
+		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values('牵牛花',3),(10,'松''鼠',5)"));
 	}
 	
 	private static String selectFields(Object bean,String...excludeColumns) throws Exception {
@@ -336,10 +336,10 @@ public class BeanUtilTest {
 
 		u = new UserInfo(1, "叶'兰", 2);
 		str = toValue(fields, u,false);
-		assertThat(str, equalTo("('1','叶''兰','2')"));
+		assertThat(str, equalTo("(1,'叶''兰',2)"));
 
 		str = toValue(fields, u,true);
-		assertThat(str, equalTo("values('1','叶''兰','2')"));
+		assertThat(str, equalTo("values(1,'叶''兰',2)"));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -402,7 +402,7 @@ public class BeanUtilTest {
 	@Test
 	public void toUpdate3() {
 		String sql = BeanUtil.toInsertSQL(new UserInfo(null, "zhansan", 30));
-		assertThat(sql, equalTo("insert into UserInfo(name,age) values('zhansan','30')"));
+		assertThat(sql, equalTo("insert into UserInfo(name,age) values('zhansan',30)"));
 	}
 
 	@Test
