@@ -791,10 +791,10 @@ public final class BeanUtil {
 	private static String selectFields(Object bean,String...excludeColumns) {
 		Objects.requireNonNull(bean);
 		List<Field> fields = mapFields(bean);
-		StringBuilder sb = new StringBuilder(6 * fields.size());
+		StringBuilder sb = new StringBuilder(6 * fields.size()); // 一个 field 大概包含 6 个字符
 		fields.forEach(f -> {
 			String fieldName = f.getName();
-			if(excludeColumns == null || excludeColumns.length == 0 || ArrayUtils.contains(excludeColumns, fieldName)) {
+			if(excludeColumns == null || excludeColumns.length == 0 || !ArrayUtils.contains(excludeColumns, fieldName)) {
 				sb.append(',');
 				sb.append(f.getName());
 			}
@@ -802,6 +802,8 @@ public final class BeanUtil {
 		int len = sb.length();
 		if (len > 0) {
 			sb.deleteCharAt(0);
+		} else {
+			sb.append(1);
 		}
 
 		return sb.toString();

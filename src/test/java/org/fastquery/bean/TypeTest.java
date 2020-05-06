@@ -34,14 +34,16 @@ public class TypeTest {
     private Long id;
     private Boolean deleted;
     private Boolean activated;
+    private Boolean auth;
     private String gender;
 
     public TypeTest(){
     }
 
-    public TypeTest(boolean deleted, boolean activated, String gender) {
+    public TypeTest(Boolean deleted, Boolean activated, Boolean auth, String gender) {
         this.deleted = deleted;
         this.activated = activated;
+        this.auth = auth;
         this.gender = gender;
     }
 
@@ -76,6 +78,15 @@ public class TypeTest {
     public void setGender(String gender) {
         this.gender = gender;
     }
+
+    public Boolean getAuth() {
+        return auth;
+    }
+
+    public void setAuth(Boolean auth) {
+        this.auth = auth;
+    }
+
 
     @Override
     public String toString() {

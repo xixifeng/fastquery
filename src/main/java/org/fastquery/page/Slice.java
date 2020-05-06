@@ -31,6 +31,9 @@ public class Slice {
 	private int number; // 当前页码
 	private int size; // 每页多少条数据
 
+	public Slice() {
+	}
+
 	/**
 	 * 构造 Slice(页片)
 	 * 

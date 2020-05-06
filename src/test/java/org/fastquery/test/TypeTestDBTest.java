@@ -50,20 +50,24 @@ public class TypeTestDBTest extends FastQueryTest {
     public void save() {
         boolean deleted = true;
         boolean activated = false;
+        boolean auth = true;
         String gender = "男";
-        TypeTest tt = new TypeTest(deleted,activated,gender);
+        TypeTest tt = new TypeTest(deleted,activated,auth,gender);
         TypeTest t = db.save(tt);
         assertThat(t.getDeleted().booleanValue(),is(deleted));
         assertThat(t.getActivated().booleanValue(),is(activated));
+        assertThat(t.getAuth().booleanValue(),is(auth));
         assertThat(t.getGender(),equalTo(gender));
 
         deleted = false;
         activated = true;
+        auth = false;
         gender = "女";
-        tt = new TypeTest(deleted,activated,gender);
+        tt = new TypeTest(deleted,activated,auth,gender);
         t = db.save(tt);
         assertThat(t.getDeleted().booleanValue(),is(deleted));
         assertThat(t.getActivated().booleanValue(),is(activated));
+        assertThat(t.getAuth().booleanValue(),is(auth));
         assertThat(t.getGender(),equalTo(gender));
     }
 
