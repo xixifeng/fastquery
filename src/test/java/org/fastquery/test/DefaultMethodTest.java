@@ -24,6 +24,8 @@ package org.fastquery.test;
 
 import static org.junit.Assert.assertThat;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.UUID;
 
@@ -129,4 +131,18 @@ public class DefaultMethodTest extends FastQueryTest {
 		count = db.count(u);
 		assertThat(count,is(1L));
 	}
+
+	@Test
+	public void update1(){
+		Collection<?> entities = new HashSet<>();
+		int effect = db.update(entities);
+		assertThat(effect,is(0));
+	}
+
+	@Test
+	public void update2(){
+		int effect = db.update(null);
+		assertThat(effect,is(0));
+	}
+
 }

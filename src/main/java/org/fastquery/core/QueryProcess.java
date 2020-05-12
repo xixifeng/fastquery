@@ -414,6 +414,10 @@ class QueryProcess {
 		Object[] iargs = QueryContext.getArgs();
 		@SuppressWarnings("unchecked")
 		Collection<Object> entities = (Collection<Object>) iargs[iargs.length - 1];
+		if(entities == null || entities.isEmpty()) {
+			return 0;
+		}
+
 		if (iargs.length == 3) {
 			dbName = (String) iargs[1];
 		}

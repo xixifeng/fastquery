@@ -276,7 +276,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * 批量更新实体
 	 * 
 	 * @param <E> 实体
-	 * @param entities 实体集合
+	 * @param entities 实体集合，如果传递 null 或者空集合，将直接返回 0
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY5)
@@ -287,7 +287,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * 
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
-	 * @param entities 实体集合
+	 * @param entities 实体集合，如果传递 null 或者空集合，将直接返回 0
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY5)
@@ -299,7 +299,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
-	 * @param entities 实体集合
+	 * @param entities 实体集合，如果传递 null 或者空集合，将直接返回 0
 	 * @return 影响行数
 	 */
 	@Id(MethodId.QUERY5)
