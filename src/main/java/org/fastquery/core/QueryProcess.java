@@ -452,9 +452,9 @@ class QueryProcess {
 		String dbName = null;
 		Object[] iargs = QueryContext.getArgs();
 		Class<?> clazz = (Class<?>) iargs[0]; // 类型
-		long i = (Long) iargs[1]; // 主键
-		if (iargs.length == 4) {
-			dbName = (String) iargs[3]; // 数据库名称
+		long i = (Long) iargs[2]; // 主键
+		if (iargs.length == 5) {
+			dbName = (String) iargs[4]; // 数据库名称
 		}
 
 		return DB.select(BeanUtil.toSelectSQL(clazz, i, dbName, true), clazz);

@@ -351,27 +351,68 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * 
 	 * @param <E> 实体
 	 * @param entityClass 实体的class
+	 * @param excludeColumns 查询时排除哪些字段
 	 * @param id 主键值
 	 * @return 返回实体
 	 */
 	@Id(MethodId.QUERY7)
-	<E> E find(Class<E> entityClass, long id);
+	<E> E find(Class<E> entityClass, String[] excludeColumns, long id);
 
 	/**
 	 * 根据主键查询实体
 	 * 
 	 * @param <E> 实体
 	 * @param entityClass 实体的class
+	 * @param excludeColumns 查询时排除哪些字段
 	 * @param id 主键值
 	 * @param dataSourceName 数据源名称
 	 * @return 返回实体
 	 */
 	@Id(MethodId.QUERY7)
-	<E> E find(Class<E> entityClass, long id, @Source String dataSourceName);
+	<E> E find(Class<E> entityClass, String[] excludeColumns, long id, @Source String dataSourceName);
 
 	/**
 	 * 根据主键查询实体
 	 * 
+	 * @param <E> 实体
+	 * @param entityClass 实体的class
+	 * @param excludeColumns 查询时排除哪些字段
+	 * @param id 主键值
+	 * @param dataSourceName 数据源名称
+	 * @param dbName 数据库名称
+	 * @return 返回实体
+	 */
+	@Id(MethodId.QUERY7)
+	<E> E find(Class<E> entityClass, String[] excludeColumns, long id, @Source String dataSourceName, String dbName);
+
+	/**
+	 * 根据主键查询实体
+	 *
+	 * @param <E> 实体
+	 * @param entityClass 实体的class
+	 * @param id 主键值
+	 * @return 返回实体
+	 */
+	default <E> E find(Class<E> entityClass, long id) {
+		return this.find(entityClass,null,id);
+	}
+
+	/**
+	 * 根据主键查询实体
+	 *
+	 * @param <E> 实体
+	 * @param entityClass 实体的class
+	 * @param id 主键值
+	 * @param dataSourceName 数据源名称
+	 * @return 返回实体
+	 */
+	default <E> E find(Class<E> entityClass, long id, @Source String dataSourceName) {
+		return this.find(entityClass,null,id,dataSourceName);
+	}
+
+	/**
+	 * 根据主键查询实体
+	 *
 	 * @param <E> 实体
 	 * @param entityClass 实体的class
 	 * @param id 主键值
@@ -379,9 +420,10 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @param dbName 数据库名称
 	 * @return 返回实体
 	 */
-	@Id(MethodId.QUERY7)
-	<E> E find(Class<E> entityClass, long id, @Source String dataSourceName, String dbName);
-	
+	default <E> E find(Class<E> entityClass, long id, @Source String dataSourceName, String dbName) {
+		return this.find(entityClass,null,id,dataSourceName,dbName);
+	}
+
 	/**
 	 * 根据主键删除实体
 	 * 

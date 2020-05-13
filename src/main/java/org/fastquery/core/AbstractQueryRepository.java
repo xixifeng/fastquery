@@ -269,32 +269,32 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> E find(Class<E> paramClass, long paramLong, String paramString1, String paramString2) {
+	public <E> E find(Class<E> paramClass, String[] excludeColumns, long paramLong, String paramString1, String paramString2) {
 		int j = 22;
 		if (m[j] == null) {
-			cache(j, "find", Class.class, long.class, String.class, String.class);
+			cache(j, "find", Class.class, String[].class, long.class, String.class, String.class);
 		}
-		return (E) Prepared.excute(m[j], new Object[] { paramClass, paramLong, paramString1, paramString2 }, this);
+		return (E) Prepared.excute(m[j], new Object[] { paramClass, excludeColumns, paramLong, paramString1, paramString2 }, this);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> E find(Class<E> paramClass, long paramLong) {
+	public <E> E find(Class<E> paramClass, String[] excludeColumns, long paramLong) {
 		int j = 23;
 		if (m[j] == null) {
-			cache(j, "find", Class.class, long.class);
+			cache(j, "find", Class.class, String[].class, long.class);
 		}
-		return (E) Prepared.excute(m[j], new Object[] { paramClass, paramLong}, this);
+		return (E) Prepared.excute(m[j], new Object[] { paramClass, excludeColumns, paramLong}, this);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> E find(Class<E> paramClass, long paramLong, String paramString) {
+	public <E> E find(Class<E> paramClass, String[] excludeColumns, long paramLong, String paramString) {
 		int j = 24;
 		if (m[j] == null) {
-			cache(j, "find", Class.class, long.class, String.class);
+			cache(j, "find", Class.class, String[].class, long.class, String.class);
 		}
-		return (E) Prepared.excute(m[j], new Object[] { paramClass, paramLong, paramString }, this);
+		return (E) Prepared.excute(m[j], new Object[] { paramClass, excludeColumns, paramLong, paramString }, this);
 	}
 
 	@Override
