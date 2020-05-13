@@ -452,12 +452,13 @@ class QueryProcess {
 		String dbName = null;
 		Object[] iargs = QueryContext.getArgs();
 		Class<?> clazz = (Class<?>) iargs[0]; // 类型
+		String[] excludeColumns = (String[]) iargs[1];
 		long i = (Long) iargs[2]; // 主键
 		if (iargs.length == 5) {
 			dbName = (String) iargs[4]; // 数据库名称
 		}
 
-		return DB.select(BeanUtil.toSelectSQL(clazz, i, dbName, true), clazz);
+		return DB.select(BeanUtil.toSelectSQL(clazz, i, dbName, true,excludeColumns), clazz);
 	}
 
 	private Object q8() {

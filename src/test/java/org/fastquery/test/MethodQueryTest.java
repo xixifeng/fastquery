@@ -342,8 +342,27 @@ public class MethodQueryTest extends FastQueryTest {
 		assertThat(userInfoDBService.find(UserInfo.class, 3).getId(), is(3));
 		assertThat(userInfoDBService.find(UserInfo.class, 3, null).getId(), is(3)); // 测试数据源传递null
 		assertThat(userInfoDBService.find(UserInfo.class, 3, null, null).getId(), is(3)); // 测试数据库名称为null
+	}
 
-		UserInfo u = userInfoDBService.find(UserInfo.class, 3);
+	@Test
+	public void find2() {
+		String[] excludeColumns = {"name"};
+		UserInfo u = userInfoDBService.find(UserInfo.class, excludeColumns, 3);
+		assertThat(u.getName(),equalTo(""));
+		assertThat(u.getId(),notNullValue());
+		assertThat(u.getAge(),notNullValue());
+
+		excludeColumns = new String[]{"name","age"};
+		u = userInfoDBService.find(UserInfo.class, excludeColumns, 3);
+		assertThat(u.getName(),equalTo(""));
+		assertThat(u.getId(),notNullValue());
+		assertThat(u.getAge(),nullValue());
+
+		excludeColumns = new String[]{"name","age","id"};
+		u = userInfoDBService.find(UserInfo.class, excludeColumns, 3);
+		assertThat(u.getName(),equalTo(""));
+		assertThat(u.getId(),nullValue());
+		assertThat(u.getAge(),nullValue());
 
 	}
 

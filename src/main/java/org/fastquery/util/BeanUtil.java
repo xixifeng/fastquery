@@ -355,9 +355,10 @@ public final class BeanUtil {
 	 * @param key 主键值, 如果传递null,那么自动获取,获取到的为null那么报错. 指定的值优先
 	 * @param dbName 数据库名称
 	 * @param selectEntity true 查实体, 反之,查主键值
+	 * @param excludeColumns 查询时，排除哪些字段
 	 * @return sql语句
 	 */
-	public static String toSelectSQL(Object bean, Object key, String dbName, boolean selectEntity) {
+	public static String toSelectSQL(Object bean, Object key, String dbName, boolean selectEntity,String...excludeColumns) {
 		Class<?> cls = (bean instanceof Class) ? (Class<?>) bean : bean.getClass();
 		Object[] objs = getKeyAndVal(bean, getFields(cls), key);
 		key = objs[1];
@@ -368,7 +369,7 @@ public final class BeanUtil {
 			// 表名称
 			String tableName = getTableName(dbName, cls);
 			if (selectEntity) {
-				return String.format("select %s from %s where %s = %s", selectFields(cls), tableName, keyFeild, key.toString());
+				return String.format("select %s from %s where %s = %s", selectFields(cls,excludeColumns), tableName, keyFeild, key.toString());
 			} else {
 				return String.format("select %s from %s where %s = %s", keyFeild, tableName, keyFeild, key.toString());
 			}
