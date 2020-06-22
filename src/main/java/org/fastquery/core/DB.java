@@ -38,6 +38,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
+import org.fastquery.util.TypeUtil;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.fastquery.struct.RespUpdate;
@@ -61,7 +62,7 @@ public class DB {
 
 	public static List<Map<String, Object>> find(SQLValue sqlValue) {
 
-		String sql = sqlValue.getSql();
+		String sql = TypeUtil.unStatementReference(sqlValue.getSql());
 		List<Object> objs = sqlValue.getValues();
 		List<Map<String, Object>> keyvals;
 		Connection conn = QueryContext.getConn();

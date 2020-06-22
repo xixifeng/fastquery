@@ -25,6 +25,7 @@ package org.fastquery.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.fastquery.bean.Department;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInformation;
 import org.fastquery.core.Source;
@@ -245,5 +246,17 @@ public interface UserInfoDBService extends QueryRepository {
 	UserInfo findByIdWithQueryBuilder(QueryBuilder queryBuilder);
 
 	@Query("select name,age from UserInfo u where u.name=:name or u.age=:age")
-	UserInfo[] findUserInfoWithQueryBuilder(@Param("name") String name, @Param("age") Integer age,QueryBuilder queryBuilder);	
+	UserInfo[] findUserInfoWithQueryBuilder(@Param("name") String name, @Param("age") Integer age,QueryBuilder queryBuilder);
+
+	@Query("select d.id as departmentId, d.name as departmentName, emps[e.id, e.name] from `department` d left join employee e on d.id = e.departmentId where d.id = :departmentId")
+	JSONObject findEmplByDid(@Param("departmentId") Long departmentId);
+
+	@Query("select d.id as departmentId, d.name as departmentName, emps[e.id, e.name] from `department` d left join employee e on d.id = e.departmentId where d.id = :departmentId")
+	Department findDepartment(@Param("departmentId") Long departmentId);
+
+	@Query("select d.id as departmentId, d.name as departmentName, emps[e.id, e.name] from `department` d left join employee e on d.id = e.departmentId")
+	List<Map<String,Object>> findEmpl();
+
+	@Query("select d.id as departmentId, d.name as departmentName, emps[e.id, e.name] from `department` d left join employee e on d.id = e.departmentId")
+	List<Department> findDepartments();
 }

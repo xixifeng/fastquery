@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.IntSupplier;
 
+import org.fastquery.struct.Reference;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.apache.commons.lang3.ArrayUtils;
@@ -153,20 +154,25 @@ class QueryProcess {
 		} else if (returnType == Map.class) {
 			return qh.mapType(keyvals, TypeUtil.mapValueTyep(method));
 		} else if (TypeUtil.isListMapSO(method.getGenericReturnType())) {
-			return qh.listType(keyvals, TypeUtil.listMapValueTyep(method));
+			Reference reference = TypeUtil.statementReference(sqlValue.getSql());
+			return qh.listType(keyvals, TypeUtil.listMapValueTyep(method),reference);
 		} else if (returnType == List.class) {
-			return qh.list(keyvals);
+			Reference reference = TypeUtil.statementReference(sqlValue.getSql());
+			return qh.list(keyvals,reference);
 		} else if (returnType == JSONObject.class) {
-			return qh.jsonObjeType(keyvals);
+			Reference reference = TypeUtil.statementReference(sqlValue.getSql());
+			return qh.jsonObjeType(keyvals,reference);
 		} else if (returnType == JSONArray.class) {
-			return qh.jsonArrayType(keyvals);
+			Reference reference = TypeUtil.statementReference(sqlValue.getSql());
+			return qh.jsonArrayType(keyvals,reference);
 		} else if (TypeUtil.isWarrp(returnType)) {
 			return qh.wrapperType(method, returnType, keyvals);
 		} else if (TypeUtil.isWarrp(returnType.getComponentType()) || TypeUtil.hasDefaultConstructor(returnType.getComponentType())) {
 			// 基本类型数组, bean数组
 			return qh.wrapperAarryType(returnType, keyvals);
 		} else {
-			return qh.beanType(keyvals);
+			Reference reference = TypeUtil.statementReference(sqlValue.getSql());
+			return qh.beanType(keyvals,reference);
 		}
 	}
 

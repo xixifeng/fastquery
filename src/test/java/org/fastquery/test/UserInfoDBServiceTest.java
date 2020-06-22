@@ -22,6 +22,11 @@
 
 package org.fastquery.test;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.fastquery.bean.Department;
+import org.fastquery.struct.Reference;
+import org.fastquery.util.TypeUtil;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -47,13 +52,13 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import static org.junit.Assert.assertThat;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.fail;
 
 /**
  * 
@@ -622,6 +627,50 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		UserInfo userInfo = db.findByIdWithQueryBuilder(queryBuilder);
 		assertThat(userInfo.getId(), is(3));
 	}
+
+	@Test
+	public void findEmplByDid(){
+		JSONObject json = db.findEmplByDid(1L);
+		LOG.info("json: {}",JSON.toJSONString(json,true));
+		assertThat(json.getString("departmentName"),equalTo("研发"));
+		assertThat(json.getIntValue("departmentId"),is(1));
+		assertThat(json.keySet().size(),is(3));
+		JSONArray emps = json.getJSONArray("emps");
+		assertThat(emps.size(),is(3));
+		assertThat(emps.getJSONObject(0).getString("name"),equalTo("小明"));
+		assertThat(emps.getJSONObject(0).getLongValue("id"),equalTo(1L));
+		assertThat(emps.getJSONObject(1).getString("name"),equalTo("张三"));
+		assertThat(emps.getJSONObject(1).getLongValue("id"),equalTo(2L));
+		assertThat(emps.getJSONObject(2).getString("name"),equalTo("李思"));
+		assertThat(emps.getJSONObject(2).getLongValue("id"),equalTo(3L));
+	}
+
+	@Test
+	public void findEmpl(){
+		List<Map<String, Object>> jsonArray = db.findEmpl();
+		LOG.info("{} ->", JSON.toJSONString(jsonArray,true));
+	}
+
+	@Test
+	public void findDepartments(){
+		List<Department> list = db.findDepartments();
+		assertThat(list.size(),is(3));
+		LOG.info("list:{}",list);
+	}
+
+	@Test
+	public void referenceForBean() {
+		Department department =  db.findDepartment(1L);
+		LOG.info("department:{}",department);
+	}
+
+	/*
+	@Test
+	public void referenceForJsonArray() {
+		fail("需要测试");
+	}
+	*/
+
 }
 
 

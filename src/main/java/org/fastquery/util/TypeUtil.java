@@ -39,6 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fastquery.struct.Reference;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.fastquery.asm.Script2Class;
@@ -891,4 +892,40 @@ public class TypeUtil {
         }
         return queryBuilder;
     }
+
+    // 暂时让其支持 一个 SQL  Reference 以后有时间了，再说
+    public static Reference statementReference(String sql) {
+        List<String> list = TypeUtil.matches(sql,Placeholder.ARRAY_REFERENCE);
+        List<Reference>  references = new ArrayList<>();
+        list.forEach(e -> {
+            String reference = StringUtils.substringBefore(e,"[");
+            List<String> fields = new ArrayList<>();
+            String sub = StringUtils.substringBetween(e,"[","]");
+            String[] strs = StringUtils.split(sub,',');
+            for (String s : strs) {
+                String ele = StringUtils.substringAfter(s,"as ");
+                if("".equals(ele)) {
+                    ele = StringUtils.substringAfter(s,".");
+                    if("".equals(ele)) {
+                        ele = s;
+                    }
+                }
+                fields.add(ele.trim().replace("`",""));
+            }
+            references.add(new Reference(reference,fields));
+        });
+        if(!references.isEmpty()) {
+            return references.get(0);
+        } else {
+            return null;
+        }
+    }
+    public static String unStatementReference(String sql) {
+        List<String> list = TypeUtil.matches(sql,Placeholder.ARRAY_REFERENCE);
+        for (String str : list) {
+           sql = StringUtils.replace(sql, str, StringUtils.substringBetween(str,"[","]"));
+        }
+        return sql;
+    }
+
 }

@@ -26,21 +26,19 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.fastquery.core.MethodInfo;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
+import org.fastquery.struct.Reference;
 import org.fastquery.util.TypeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -136,22 +134,31 @@ public class QueryHandler {
 	}
 
 	// convertType 表示map种的value需要转换的目标类型
-	public List<Map<String, Object>> listType(List<Map<String, Object>> keyvals, Class<?> convertType) {
-		if (convertType == String.class) {
-			List<Map<String, Object>> kvs = new ArrayList<>();
-			keyvals.forEach(map -> {
-				Map<String, Object> m = new HashMap<>();
-				map.forEach((k, v) -> {
-					m.put(k, v);
-					kvs.add(m);
+	public List<Map<String, Object>> listType(List<Map<String, Object>> keyvals, Class<?> convertType,Reference reference) {
+		if(reference == null) {
+			if (convertType == String.class) {
+				List<Map<String, Object>> kvs = new ArrayList<>();
+				keyvals.forEach(map -> {
+					Map<String, Object> m = new HashMap<>();
+					map.forEach((k, v) -> {
+						m.put(k, v);
+						kvs.add(m);
+					});
 				});
-			});
-			return kvs;
+				return kvs;
+			}
+			return keyvals;
+		} else {
+			return listMapGroupingBy(keyvals,reference);
 		}
-		return keyvals;
 	}
 
-	public Object list(List<Map<String, Object>> keyvals) { // list bean
+	public Object list(List<Map<String, Object>> keyvals,Reference reference) { // list bean
+
+		if(reference != null) {
+			keyvals = listMapGroupingBy(keyvals,reference);
+		}
+
 		List<Object> list = new ArrayList<>();
 		if (keyvals.isEmpty()) {
 			return list;
@@ -166,7 +173,7 @@ public class QueryHandler {
 			if (TypeUtil.isWarrp(ct)) {
 				keyvals.forEach(map -> {
 					if (map.values().size() > 1) {
-						throw new RepositoryException("不能把" + keyvals + "转换成" + returnTypeName);
+						throw new RepositoryException("不能把转换成" + returnTypeName);
 					}
 					Object obj = map.values().iterator().next();
 					Class<?> clazz = (Class<?>) ct;
@@ -190,16 +197,77 @@ public class QueryHandler {
 		return list;
 	}
 
-	public JSONObject jsonObjeType(List<Map<String, Object>> keyvals) {
-		if (keyvals.size() > 1) {
-			throw new RepositoryException(QueryContext.getMethodInfo() + "不能把多条记录赋值给JSONObject");
+	public JSONObject jsonObjeType(List<Map<String, Object>> keyvals,Reference reference) {
+		if(reference == null) {
+			if (keyvals.size() > 1) {
+				throw new RepositoryException(QueryContext.getMethodInfo() + "不能把多条记录赋值给JSONObject");
+			}
+			return new JSONObject(mapType(keyvals, Object.class));
+		} else {
+				List<Map<String, Object>> newList = listMapGroupingBy(keyvals,reference);
+				if(newList.size() > 1) {
+					throw new RepositoryException(QueryContext.getMethodInfo() + "不能把多条记录赋值给JSONObject");
+				}
+				return new JSONObject(newList.get(0));
 		}
-		return new JSONObject(mapType(keyvals, Object.class));
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public JSONArray jsonArrayType(List<Map<String, Object>> keyvals) {
-		return new JSONArray((List) keyvals);
+	public JSONArray jsonArrayType(List<Map<String, Object>> keyvals, Reference reference) {
+		if(reference == null) {
+			return new JSONArray((List) keyvals);
+		} else {
+			List<Map<String, Object>> newList = listMapGroupingBy(keyvals,reference);
+			return new JSONArray((List) newList);
+		}
+	}
+
+	private String fetchGroupKey(Map<String,Object> map, List<String> keys){
+		JSONObject jsonObject = new JSONObject(new LinkedHashMap());
+		for (String key : keys) {
+			jsonObject.put(key,map.get(key));
+		}
+		return jsonObject.toJSONString();
+	}
+	private List<Map<String, Object>> listMapGroupingBy(List<Map<String, Object>> keyvals,Reference reference) {
+		if(keyvals.isEmpty()) {
+			return keyvals;
+		}
+
+		List<String> feilds = reference.getFields();
+		String name = reference.getName();
+
+		// 确定分组属性
+		List<String> groupFeilds = new ArrayList<>();
+		Set<String> allKeys = keyvals.get(0).keySet();
+		for (String k : allKeys) {
+			if(!feilds.contains(k)) {
+				groupFeilds.add(k);
+			}
+		}
+
+		Map<String, List<Map<String, Object>>> map = keyvals.stream().collect(Collectors.groupingBy(m-> fetchGroupKey(m,groupFeilds) ));
+		Set<String> keys = map.keySet(); // 组名列表
+
+		List<Map<String,Object>> array = new ArrayList<>();
+		for (String key : keys) {
+			Map<String,Object> jsonObject = JSON.parseObject(key);
+			List<Map<String,Object>> ele = new ArrayList<>();
+			List<Map<String, Object>> list = map.get(key);
+			list.forEach( mp -> {
+				Map<String,Object> unit = new JSONObject();
+				Set<String> fs = mp.keySet();
+				for (String f : fs) {
+					if(feilds.contains(f)){
+						unit.put(f,mp.get(f));
+					}
+				}
+				ele.add(unit);
+			});
+			jsonObject.put(name,ele);
+			array.add(jsonObject);
+		}
+		return array;
 	}
 
 	// 基本包装类型
@@ -268,20 +336,30 @@ public class QueryHandler {
 		return array;
 	}
 
-	public Object beanType(List<Map<String, Object>> keyvals) {
-		Class<?> returnType = QueryContext.getReturnType();
+	public Object beanType(List<Map<String, Object>> keyvals,Reference reference) {
 		if (keyvals.isEmpty()) {
 			return null;
 		}
-		if (keyvals.size() != 1) {
-			// method + "不能把一个集合转换成" + returnType
-			throw new RepositoryException(String.format("%s 不能把一个集合转换成 %s %n根据输入的SQL所查询的结果是一个集合.", QueryContext.getMethodInfo(), returnType));
-		}
 
-		if (TypeUtil.hasDefaultConstructor(returnType)) {
-			return JSON.toJavaObject(new JSONObject(keyvals.get(0)), returnType);
+		Class<?> returnType = QueryContext.getReturnType();
+
+		if(reference == null) {
+			if (keyvals.size() != 1) {
+				// method + "不能把一个集合转换成" + returnType
+				throw new RepositoryException(String.format("%s 不能把一个集合转换成 %s %n根据输入的SQL所查询的结果是一个集合.", QueryContext.getMethodInfo(), returnType));
+			}
+
+			if (TypeUtil.hasDefaultConstructor(returnType)) {
+				return JSON.toJavaObject(new JSONObject(keyvals.get(0)), returnType);
+			} else {
+				return keyvals.get(0).entrySet().iterator().next().getValue();
+			}
 		} else {
-			return keyvals.get(0).entrySet().iterator().next().getValue();
+			List<Map<String, Object>> newList = listMapGroupingBy(keyvals,reference);
+			if(newList.size() > 1) {
+				throw new RepositoryException(QueryContext.getMethodInfo() + "不能把多条记录赋值给：" + returnType);
+			}
+			return JSON.toJavaObject(new JSONObject(newList.get(0)), returnType);
 		}
 	}
 }

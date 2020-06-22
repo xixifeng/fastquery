@@ -37,6 +37,7 @@ import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
+import org.fastquery.struct.Reference;
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
 
@@ -411,4 +412,22 @@ public class TypeUtilTest {
 		assertThat(objects.get(1), equalTo(2));
 		assertThat(objects.get(2), equalTo(3));
 	}
+
+	@Test
+	public void statementReference(){
+		String str = "jkge list_$[kwjlkeg as id, gweklge.name as name, `e.jgke` , d.xo, number] kwe";
+		Reference reference = TypeUtil.statementReference(str);
+		assertThat(reference,notNullValue());
+		assertThat(reference.getName(),equalTo("list_$"));
+		List<String> feilds = reference.getFields();
+		assertThat(feilds.get(0),equalTo("id"));
+		assertThat(feilds.get(1),equalTo("name"));
+		assertThat(feilds.get(2),equalTo("jgke"));
+		assertThat(feilds.get(3),equalTo("xo"));
+		assertThat(feilds.get(4),equalTo("number"));
+
+		String newStr = TypeUtil.unStatementReference(str);
+		assertThat(newStr,equalTo("jkge kwjlkeg as id, gweklge.name as name, `e.jgke` , d.xo, number kwe"));
+	}
+
 }
