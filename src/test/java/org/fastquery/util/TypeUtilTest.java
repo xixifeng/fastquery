@@ -415,7 +415,7 @@ public class TypeUtilTest {
 
 	@Test
 	public void statementReference(){
-		String str = "jkge list_$[kwjlkeg as id, gweklge.name as name, `e.jgke` , d.xo, number] kwe";
+		String str = "jkge,list_$[kwjlkeg as id, gweklge.name as name, `e.jgke` , d.xo, number] kwe";
 		Reference reference = TypeUtil.statementReference(str);
 		assertThat(reference,notNullValue());
 		assertThat(reference.getName(),equalTo("list_$"));
@@ -427,7 +427,7 @@ public class TypeUtilTest {
 		assertThat(feilds.get(4),equalTo("number"));
 
 		String newStr = TypeUtil.unStatementReference(str);
-		assertThat(newStr,equalTo("jkge kwjlkeg as id, gweklge.name as name, `e.jgke` , d.xo, number kwe"));
+		assertThat(newStr,equalTo("jkge,kwjlkeg as id, gweklge.name as name, `e.jgke` , d.xo, number kwe"));
 	}
 
 }

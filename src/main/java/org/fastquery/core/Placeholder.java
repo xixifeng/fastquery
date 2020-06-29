@@ -85,5 +85,5 @@ public final class Placeholder {
 
 	public static final String PERCENT = "%+";
 
-	public static final String ARRAY_REFERENCE = "[\\$A-Za-z0-9_,]+\\[[A-Za-z0-9`_\\.(),\\s]+]";
+	public static final String ARRAY_REFERENCE = "[\\$A-Za-z0-9_]+\\[[A-Za-z0-9`_\\.(),\\s]+]";
 }
