@@ -269,30 +269,30 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> E find(Class<E> clazz, long paramLong, String paramString1, String paramString2, Contain contain, String... fields) {
+	public <E> E find(Class<E> clazz, long paramLong, String paramString1, String paramString2, boolean contain, String... fields) {
 		int j = 22;
 		if (m[j] == null) {
-			cache(j, "find", Class.class, long.class, String.class, String.class, Contain.class, String[].class);
+			cache(j, "find", Class.class, long.class, String.class, String.class, boolean.class, String[].class);
 		}
 		return (E) Prepared.excute(m[j], new Object[] {clazz, paramLong, paramString1, paramString2, contain, fields }, this);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> E find(Class<E> clazz, long paramLong, Contain contain, String... fields) {
+	public <E> E find(Class<E> clazz, long paramLong, boolean contain, String... fields) {
 		int j = 23;
 		if (m[j] == null) {
-			cache(j, "find", Class.class, long.class, Contain.class, String[].class);
+			cache(j, "find", Class.class, long.class, boolean.class, String[].class);
 		}
 		return (E) Prepared.excute(m[j], new Object[] {clazz, paramLong, contain, fields}, this);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> E find(Class<E> clazz, long paramLong, String paramString, Contain contain, String... fields) {
+	public <E> E find(Class<E> clazz, long paramLong, String paramString, boolean contain, String... fields) {
 		int j = 24;
 		if (m[j] == null) {
-			cache(j, "find", Class.class, long.class, String.class, Contain.class, String[].class);
+			cache(j, "find", Class.class, long.class, String.class, boolean.class, String[].class);
 		}
 		return (E) Prepared.excute(m[j], new Object[] {clazz, paramLong, paramString, contain, fields }, this);
 	}
@@ -400,10 +400,10 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 	}
 
 	@Override
-	public <E> E findOne(E entity, Contain contain, String... fields) {
+	public <E> E findOne(E entity, boolean contain, String... fields) {
 		int j = 36;
 		if(m[j] == null) {
-			cache(j,"findOne", Object.class, Contain.class, String[].class);
+			cache(j,"findOne", Object.class, boolean.class, String[].class);
 		}
 		return (E) Prepared.excute(m[j], new Object[]{entity, contain, fields}, this);
 	}

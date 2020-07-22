@@ -185,7 +185,7 @@ public final class BeanUtil {
 		objs[1] = values;
 		return objs;
 	}
-	public static SQLValue toSelectSQL(Object bean, String dbName,Contain contain, String... fields) {
+	public static SQLValue toSelectSQL(Object bean, String dbName,boolean contain, String... fields) {
 		Class<?> cls = bean.getClass();
 		Field[] fs = getFields(cls);
 

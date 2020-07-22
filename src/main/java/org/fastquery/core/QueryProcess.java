@@ -460,7 +460,7 @@ class QueryProcess {
 		String dbName = null;
 		Object[] iargs = QueryContext.getArgs();
 		Class<?> clazz = (Class<?>) iargs[0];
-		Contain contain = (Contain) iargs[iargs.length - 2];
+		boolean contain = (boolean) iargs[iargs.length - 2];
 		String[] fields = (String[]) iargs[iargs.length - 1];
 		String selectFields = new SelectField<>(clazz,contain,fields).getFields();
 		long i = (Long) iargs[1]; // 主键
@@ -520,7 +520,7 @@ class QueryProcess {
 	private Object q11() {
 		Object[] iargs = QueryContext.getArgs();
 		Object entity = iargs[0];
-		Contain contain = (Contain) iargs[1];
+		boolean contain = (boolean) iargs[1];
 		String[] fields = (String[]) iargs[2];
 		SQLValue sv = BeanUtil.toSelectSQL(entity,null,contain, fields);
 		List<Map<String,Object>> list = DB.find(sv);

@@ -23,7 +23,6 @@
 package org.fastquery.core;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.fastquery.core.Contain;
 import org.fastquery.util.BeanUtil;
 
 import java.lang.reflect.Field;
@@ -37,10 +36,10 @@ import java.util.Objects;
 public class SelectField<T> {
 
     private Class<T> clazz;
-    private Contain contain;
+    private boolean contain;
     private String[] fields = {};
 
-    public SelectField(Class<T> clazz, Contain contain, String... fields) {
+    public SelectField(Class<T> clazz, boolean contain, String... fields) {
         Objects.requireNonNull(clazz,"clazz 不能为null");
         this.clazz = clazz;
         this.contain = contain;
@@ -54,16 +53,16 @@ public class SelectField<T> {
         StringBuilder sb = new StringBuilder(6 * fields.size()); // 一个 field 大概包含 6 个字符
         fields.forEach(f -> {
             String fieldName = f.getName();
-            if(contain == contain.EXCLUDE) {
-                if(this.fields.length == 0 || !ArrayUtils.contains(this.fields, fieldName)) {
-                    sb.append(',');
-                    sb.append(f.getName());
-                }
-            } else if(contain == contain.INCLUDE) {
+            if(contain) {
                  if(this.fields.length == 0 || ArrayUtils.contains(this.fields, fieldName)) {
                      sb.append(',');
                      sb.append(f.getName());
                  }
+            } else {
+                if(this.fields.length == 0 || !ArrayUtils.contains(this.fields, fieldName)) {
+                    sb.append(',');
+                    sb.append(f.getName());
+                }
             }
         });
         int len = sb.length();

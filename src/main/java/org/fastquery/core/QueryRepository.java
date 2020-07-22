@@ -22,12 +22,16 @@
 
 package org.fastquery.core;
 
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntSupplier;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.mchange.v2.beans.BeansUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
@@ -352,12 +356,12 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @param <E> 实体
 	 * @param clazz 查询的类
 	 * @param id 主键值
-	 * @param contain 指定是包含还是排除字段
+	 * @param contain true:包含 fields，反之，排除 fields
 	 * @param fields 待包含或待排除的字段列表
 	 * @return 返回实体
 	 */
 	@Id(MethodId.QUERY7)
-	<E> E find(Class<E> clazz, long id, Contain contain, String... fields);
+	<E> E find(Class<E> clazz, long id, boolean contain, String... fields);
 
 	/**
 	 * 根据主键查询实体
@@ -366,12 +370,12 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @param clazz 查询的类
 	 * @param id 主键值
 	 * @param dataSourceName 数据源名称
-	 * @param contain 指定是包含还是排除字段
+	 * @param contain true:包含 fields，反之，排除 fields
 	 * @param fields 待包含或待排除的字段列表
 	 * @return 返回实体
 	 */
 	@Id(MethodId.QUERY7)
-	<E> E find(Class<E> clazz, long id, @Source String dataSourceName, Contain contain, String... fields);
+	<E> E find(Class<E> clazz, long id, @Source String dataSourceName, boolean contain, String... fields);
 
 	/**
 	 * 根据主键查询实体
@@ -381,12 +385,12 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @param id 主键值
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
-	 * @param contain 指定是包含还是排除字段
+	 * @param contain true:包含 fields，反之，排除 fields
 	 * @param fields 待包含或待排除的字段列表
 	 * @return 返回实体
 	 */
 	@Id(MethodId.QUERY7)
-	<E> E find(Class<E> clazz, long id, @Source String dataSourceName, String dbName, Contain contain, String... fields);
+	<E> E find(Class<E> clazz, long id, @Source String dataSourceName, String dbName, boolean contain, String... fields);
 
 	/**
 	 * 根据主键查询实体
@@ -397,7 +401,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @return 返回实体
 	 */
 	default <E> E find(Class<E> entityClass, long id) {
-		return this.find(entityClass, id, Contain.EXCLUDE);
+		return this.find(entityClass, id, false);
 	}
 
 	/**
@@ -410,7 +414,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @return 返回实体
 	 */
 	default <E> E find(Class<E> entityClass, long id, @Source String dataSourceName) {
-		return this.find(entityClass, id, dataSourceName, Contain.EXCLUDE);
+		return this.find(entityClass, id, dataSourceName, false);
 	}
 
 	/**
@@ -424,7 +428,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @return 返回实体
 	 */
 	default <E> E find(Class<E> entityClass, long id, @Source String dataSourceName, String dbName) {
-		return this.find(entityClass, id,dataSourceName,dbName, Contain.EXCLUDE);
+		return this.find(entityClass, id,dataSourceName,dbName, false);
 	}
 
 	/**
@@ -640,13 +644,13 @@ public interface QueryRepository extends Repository { // NO_UCD
 	/**
 	 * 根据指定的条件查询一条记录，实体属性若为 null 值，则，该属性不参与运算，反之，参与 and 运算
 	 * @param entity 实体对象
-	 * @param contain 指定是包含还是排除字段
+	 * @param contain true:包含 fields，反之，排除 fields
 	 * @param fields 待包含或待排除的字段列表
 	 * @param <E> 实体
 	 * @return 实体
 	 */
 	@Id(MethodId.QUERY11)
-	<E> E findOne(E entity, Contain contain, String... fields);
+	<E> E findOne(E entity, boolean contain, String... fields);
 
 	/**
 	 * 查询分页
@@ -675,13 +679,13 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @param notCount true:表示分页时不执行 count 语句.反之,执行 count 语句.
 	 * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
 	 * @param pageSize 用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
-	 * @param contain 指定是包含还是排除字段
+	 * @param contain true:包含 fields，反之，排除 fields
 	 * @param fields 待包含或待排除的字段列表
 	 * @see #findPage(QueryBuilder, boolean, int, int)
 	 * @return 分页结构对象
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> Page<E> findPage(E entity, String sort, boolean notCount, int pageIndex, int pageSize, Contain contain, String... fields) {
+	default <E> Page<E> findPage(E entity, String sort, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields) {
 		Objects.requireNonNull(entity,"传递的实体不能为null");
 		if(sort == null) {
 			sort = StringUtils.EMPTY;

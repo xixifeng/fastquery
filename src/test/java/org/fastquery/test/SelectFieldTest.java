@@ -23,7 +23,6 @@
 package org.fastquery.test;
 
 import org.fastquery.bean.UserInfo;
-import org.fastquery.core.Contain;
 import org.fastquery.core.SelectField;
 import org.junit.Test;
 
@@ -38,29 +37,29 @@ public class SelectFieldTest {
 
     @Test
     public void getFields() {
-        SelectField<UserInfo> selectField = new SelectField<>(UserInfo.class, Contain.INCLUDE);
+        SelectField<UserInfo> selectField = new SelectField<>(UserInfo.class, true);
         assertThat(selectField.getFields(),equalTo("id,name,age"));
 
-        selectField = new SelectField<>(UserInfo.class,Contain.EXCLUDE);
+        selectField = new SelectField<>(UserInfo.class,false);
         assertThat(selectField.getFields(),equalTo("id,name,age"));
 
-        selectField = new SelectField<>(UserInfo.class,Contain.INCLUDE,"name");
+        selectField = new SelectField<>(UserInfo.class,true,"name");
         assertThat(selectField.getFields(),equalTo("name"));
-        selectField = new SelectField<>(UserInfo.class,Contain.INCLUDE,"name","age");
+        selectField = new SelectField<>(UserInfo.class,true,"name","age");
         assertThat(selectField.getFields(),equalTo("name,age"));
 
-        selectField = new SelectField<>(UserInfo.class,Contain.EXCLUDE,"name");
+        selectField = new SelectField<>(UserInfo.class,false,"name");
         assertThat(selectField.getFields(),equalTo("id,age"));
-        selectField = new SelectField<>(UserInfo.class,Contain.EXCLUDE,"name","id");
+        selectField = new SelectField<>(UserInfo.class,false,"name","id");
         assertThat(selectField.getFields(),equalTo("age"));
     }
 
     @Test
     public void getFields2() {
-        SelectField<UserInfo> selectField = new SelectField<>(UserInfo.class,Contain.EXCLUDE,"id","age","name");
+        SelectField<UserInfo> selectField = new SelectField<>(UserInfo.class,false,"id","age","name");
         assertThat(selectField.getFields(),equalTo("1"));
 
-        selectField = new SelectField<>(UserInfo.class,Contain.INCLUDE,"id","age","name");
+        selectField = new SelectField<>(UserInfo.class,true,"id","age","name");
         assertThat(selectField.getFields(),equalTo("id,name,age"));
     }
 }

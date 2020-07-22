@@ -34,7 +34,6 @@ import static org.junit.Assert.assertThat;
 import org.fastquery.bean.Fish;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
-import org.fastquery.core.Contain;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.core.SelectField;
 import org.junit.Test;
@@ -160,7 +159,7 @@ public class BeanUtilTest {
 	public void toSelectSQL1() {
 		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
 
-		String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk",true,new SelectField<UserInfo>(UserInfo.class, Contain.EXCLUDE).getFields());
+		String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk",true,new SelectField<UserInfo>(UserInfo.class, false).getFields());
 		assertThat(sql, equalTo("select id,name,age from xk.UserInfo where id = 36"));
 	}
 	
@@ -175,7 +174,7 @@ public class BeanUtilTest {
 	@Test
 	public void toSelectSQL3(){
 		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
-		SQLValue sqlValue = BeanUtil.toSelectSQL(userInfo, null,Contain.INCLUDE,"id","name");
+		SQLValue sqlValue = BeanUtil.toSelectSQL(userInfo, null,true,"id","name");
 		String sql = sqlValue.getSql();
 		List<Object> list = sqlValue.getValues();
 		assertThat(list.size(), is(3));
@@ -185,7 +184,7 @@ public class BeanUtilTest {
 		assertThat(list.get(2),is(18));
 
 		userInfo = new UserInfo(33, null,18);
-		sqlValue = BeanUtil.toSelectSQL(userInfo, null,Contain.INCLUDE);
+		sqlValue = BeanUtil.toSelectSQL(userInfo, null,true);
 		sql = sqlValue.getSql();
 		list = sqlValue.getValues();
 		assertThat(list.size(), is(2));
@@ -194,7 +193,7 @@ public class BeanUtilTest {
 		assertThat(list.get(1),is(18));
 
 		userInfo = new UserInfo(33, null,null);
-		sqlValue = BeanUtil.toSelectSQL(userInfo, null,Contain.EXCLUDE,"name");
+		sqlValue = BeanUtil.toSelectSQL(userInfo, null,false,"name");
 		sql = sqlValue.getSql();
 		list = sqlValue.getValues();
 		assertThat(list.size(), is(1));
@@ -202,7 +201,7 @@ public class BeanUtilTest {
 		assertThat(list.get(0),is(33));
 
 		userInfo = new UserInfo(null, null,null);
-		sqlValue = BeanUtil.toSelectSQL(userInfo, null,Contain.EXCLUDE,"name","id");
+		sqlValue = BeanUtil.toSelectSQL(userInfo, null,false,"name","id");
 		sql = sqlValue.getSql();
 		list = sqlValue.getValues();
 		assertThat(list.size(), is(0));

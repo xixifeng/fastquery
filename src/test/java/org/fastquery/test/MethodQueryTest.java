@@ -344,17 +344,17 @@ public class MethodQueryTest extends FastQueryTest {
 
 	@Test
 	public void find2() {
-		UserInfo u = userInfoDBService.find(UserInfo.class, 3, Contain.EXCLUDE,"name");
+		UserInfo u = userInfoDBService.find(UserInfo.class, 3, false,"name");
 		assertThat(u.getName(),equalTo(""));
 		assertThat(u.getId(),notNullValue());
 		assertThat(u.getAge(),notNullValue());
 
-		u = userInfoDBService.find(UserInfo.class, 3, Contain.EXCLUDE,"name","age");
+		u = userInfoDBService.find(UserInfo.class, 3, false,"name","age");
 		assertThat(u.getName(),equalTo(""));
 		assertThat(u.getId(),notNullValue());
 		assertThat(u.getAge(),nullValue());
 
-		u = userInfoDBService.find(UserInfo.class, 3, Contain.EXCLUDE,"name","age","id");
+		u = userInfoDBService.find(UserInfo.class, 3, false,"name","age","id");
 		assertThat(u.getName(),equalTo(""));
 		assertThat(u.getId(),nullValue());
 		assertThat(u.getAge(),nullValue());
@@ -433,7 +433,7 @@ public class MethodQueryTest extends FastQueryTest {
 		UserInfo userInfo = new UserInfo();
 		userInfo.setDescription("小说");
 		userInfo.setAge(18);
-		Page<UserInfo> page = userInfoDBService.findPage(userInfo, "order by id desc", true, 1, 3,Contain.EXCLUDE);
+		Page<UserInfo> page = userInfoDBService.findPage(userInfo, "order by id desc", true, 1, 3,false);
 		assertThat(page.getNumber(), is(1));
 		assertThat(page.getSize(), is(3));
 		assertThat(page.getTotalElements(), is(-1L));
@@ -444,7 +444,7 @@ public class MethodQueryTest extends FastQueryTest {
 		
 		userInfo.setAge(null);
 		userInfo.setName("张三");
-		page = userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3,Contain.EXCLUDE,"id");
+		page = userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3,false,"id");
 		assertThat(page.getTotalElements(), not(-1L));
 		assertThat(page.getTotalPages(), not(-1));
 		sqlValues = rule.getExecutedSQLs();
@@ -453,7 +453,7 @@ public class MethodQueryTest extends FastQueryTest {
 
 		userInfo.setAge(18);
 		userInfo.setName("张三gewgewkljgklwjgxx"); // 没有这条数据
-		page = userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3,Contain.EXCLUDE,"id","age");
+		page = userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3,false,"id","age");
 		assertThat(page.getTotalElements(), is(0L));
 		assertThat(page.getTotalPages(), is(0));
 		sqlValues = rule.getExecutedSQLs();
@@ -462,13 +462,13 @@ public class MethodQueryTest extends FastQueryTest {
 		
 		userInfo.setAge(null);
 		userInfo.setName(null); // 没有这条数据
-		userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3,Contain.INCLUDE,"age");
+		userInfoDBService.findPage(userInfo, "order by id desc", false, 1, 3,true,"age");
 		sqlValues = rule.getExecutedSQLs();
 		assertThat(sqlValues.size(), is(2));
 		assertThat(sqlValues.get(0), equalTo("select age from UserInfo order by id desc limit 0,3"));
 		assertThat(sqlValues.get(1), equalTo("select count(id) from UserInfo"));
 
-		userInfoDBService.findPage(userInfo, null, false, 1, 3,Contain.INCLUDE,"age","id");
+		userInfoDBService.findPage(userInfo, null, false, 1, 3,true,"age","id");
 		sqlValues = rule.getExecutedSQLs();
 		assertThat(sqlValues.size(), is(2));
 		assertThat(sqlValues.get(0), equalTo("select id,age from UserInfo  limit 0,3"));
