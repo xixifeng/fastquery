@@ -55,7 +55,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 
 	private final Class<QueryRepository> c = QueryRepository.class;
 
-	private static final MethodInfo[] m = new MethodInfo[36];
+	private static final MethodInfo[] m = new MethodInfo[37];
 
 	private void cache(int j, String name, Class<?>... parameterTypes) {
 		Method localMethod;
@@ -269,32 +269,32 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> E find(Class<E> paramClass, String[] excludeColumns, long paramLong, String paramString1, String paramString2) {
+	public <E> E find(Class<E> clazz, long paramLong, String paramString1, String paramString2, Contain contain, String... fields) {
 		int j = 22;
 		if (m[j] == null) {
-			cache(j, "find", Class.class, String[].class, long.class, String.class, String.class);
+			cache(j, "find", Class.class, long.class, String.class, String.class, Contain.class, String[].class);
 		}
-		return (E) Prepared.excute(m[j], new Object[] { paramClass, excludeColumns, paramLong, paramString1, paramString2 }, this);
+		return (E) Prepared.excute(m[j], new Object[] {clazz, paramLong, paramString1, paramString2, contain, fields }, this);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> E find(Class<E> paramClass, String[] excludeColumns, long paramLong) {
+	public <E> E find(Class<E> clazz, long paramLong, Contain contain, String... fields) {
 		int j = 23;
 		if (m[j] == null) {
-			cache(j, "find", Class.class, String[].class, long.class);
+			cache(j, "find", Class.class, long.class, Contain.class, String[].class);
 		}
-		return (E) Prepared.excute(m[j], new Object[] { paramClass, excludeColumns, paramLong}, this);
+		return (E) Prepared.excute(m[j], new Object[] {clazz, paramLong, contain, fields}, this);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> E find(Class<E> paramClass, String[] excludeColumns, long paramLong, String paramString) {
+	public <E> E find(Class<E> clazz, long paramLong, String paramString, Contain contain, String... fields) {
 		int j = 24;
 		if (m[j] == null) {
-			cache(j, "find", Class.class, String[].class, long.class, String.class);
+			cache(j, "find", Class.class, long.class, String.class, Contain.class, String[].class);
 		}
-		return (E) Prepared.excute(m[j], new Object[] { paramClass, excludeColumns, paramLong, paramString }, this);
+		return (E) Prepared.excute(m[j], new Object[] {clazz, paramLong, paramString, contain, fields }, this);
 	}
 
 	@Override
@@ -397,5 +397,14 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 			cache(j,"count",Object.class);
 		}
 		return (Long) Prepared.excute(m[j], new Object[]{entity}, this);
+	}
+
+	@Override
+	public <E> E findOne(E entity, Contain contain, String... fields) {
+		int j = 36;
+		if(m[j] == null) {
+			cache(j,"findOne", Object.class, Contain.class, String[].class);
+		}
+		return (E) Prepared.excute(m[j], new Object[]{entity, contain, fields}, this);
 	}
 }

@@ -278,6 +278,8 @@ class QueryProcess {
 			return q9();
 		case MethodId.QUERY10:
 			return q10();
+		case MethodId.QUERY11:
+		return q11();
 		default:
 			break;
 		}
@@ -358,7 +360,7 @@ class QueryProcess {
 			dbName = (String) iargs[1];
 			bean = iargs[2];
 		}
-		sql = BeanUtil.toSelectSQL(bean, null, dbName, false);
+		sql = BeanUtil.toSelectSQL(bean, null, dbName, false,null);
 		if (sql != null && DB.exists(sql)) {
 			// 更新
 			return DB.update(bean, dbName, null);
@@ -457,14 +459,16 @@ class QueryProcess {
 	private Object q7() {
 		String dbName = null;
 		Object[] iargs = QueryContext.getArgs();
-		Class<?> clazz = (Class<?>) iargs[0]; // 类型
-		String[] excludeColumns = (String[]) iargs[1];
-		long i = (Long) iargs[2]; // 主键
-		if (iargs.length == 5) {
-			dbName = (String) iargs[4]; // 数据库名称
+		Class<?> clazz = (Class<?>) iargs[0];
+		Contain contain = (Contain) iargs[iargs.length - 2];
+		String[] fields = (String[]) iargs[iargs.length - 1];
+		String selectFields = new SelectField<>(clazz,contain,fields).getFields();
+		long i = (Long) iargs[1]; // 主键
+		if (iargs.length == 6) {
+			dbName = (String) iargs[3]; // 数据库名称
 		}
 
-		return DB.select(BeanUtil.toSelectSQL(clazz, i, dbName, true,excludeColumns), clazz);
+		return DB.select(BeanUtil.toSelectSQL(clazz, i, dbName, true,selectFields), clazz);
 	}
 
 	private Object q8() {
@@ -511,6 +515,23 @@ class QueryProcess {
 		SQLValue sv = BeanUtil.toCount(entity,null);
 		List<Map<String,Object>> list = DB.find(sv);
 		return list.get(0).values().iterator().next();
+	}
+
+	private Object q11() {
+		Object[] iargs = QueryContext.getArgs();
+		Object entity = iargs[0];
+		Contain contain = (Contain) iargs[1];
+		String[] fields = (String[]) iargs[2];
+		SQLValue sv = BeanUtil.toSelectSQL(entity,null,contain, fields);
+		List<Map<String,Object>> list = DB.find(sv);
+		if(list.isEmpty()) {
+			LOG.warn("findOne 实际没有查到任何记录，返回 null");
+			return null;
+		} else if(list.size()>1) {
+			throw new RepositoryException("findOne 只能查询一条记录，可是实际返回多条记录。查多条记录请用 findPage 查询");
+		} else {
+			return JSON.toJavaObject(new JSONObject(list.get(0)), entity.getClass());
+		}
 	}
 
 	@SuppressWarnings("rawtypes")

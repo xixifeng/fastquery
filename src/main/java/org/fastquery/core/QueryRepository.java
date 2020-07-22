@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
@@ -37,13 +37,13 @@ import org.fastquery.util.BeanUtil;
 
 /**
  * 查询仓库
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
 public interface QueryRepository extends Repository { // NO_UCD
 	/**
 	 * 保存一个实体,然后将主键值返回(不适用于联合主键).注意:永不返回null,没有找到主键返回-1
-	 * 
+	 *
 	 * @param entity 实体bean
 	 * @return 主键
 	 */
@@ -52,7 +52,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存一个实体,然后将主键值返回(不适用于联合主键).注意:永不返回null,没有找到主键返回-1
-	 * 
+	 *
 	 * @param entity 实体bean
 	 * @param dataSourceName 数据源名称
 	 * @return 主键
@@ -62,7 +62,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存一个实体,然后将主键值返回(不适用于联合主键).注意:永不返回null,没有找到主键返回-1
-	 * 
+	 *
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
 	 * @param entity 实体bean
@@ -73,7 +73,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存实体集合
-	 * 
+	 *
 	 * @param <B> 实体
 	 * @param ignoreRepeat 是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录
 	 * @param entities 实体集合,若,传递null或空集合,则会返回0
@@ -84,7 +84,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存可变数组实体
-	 * 
+	 *
 	 * @param ignoreRepeat 是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录
 	 * @param entities 实体集合,若,传递null或空数组,则会返回0
 	 * @return 影响行数
@@ -94,7 +94,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存实体集合
-	 * 
+	 *
 	 * @param <B> 实体
 	 * @param ignoreRepeat 是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录
 	 * @param dataSourceName 数据源名称
@@ -106,7 +106,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存可变数组实体
-	 * 
+	 *
 	 * @param ignoreRepeat 是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录
 	 * @param dataSourceName 数据源名称
 	 * @param entities 实体集合,若,传递null或空数组,则会返回0
@@ -117,7 +117,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存实体集合
-	 * 
+	 *
 	 * @param <B> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
@@ -130,7 +130,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存可变数组实体
-	 * 
+	 *
 	 * @param ignoreRepeat 是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
@@ -142,7 +142,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 插入一个实体 <br>
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param entity 实体
 	 * @return 影响行数
@@ -152,7 +152,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 往指定的数据源里插入一个实体<br>
-	 * 
+	 *
 	 * @param <E> 存储的实例
 	 * @param entity 实体
 	 * @param dataSourceName 数据源名称
@@ -163,7 +163,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 往指定的数据源里插入一个实体,并且指定数据库名称<br>
-	 * 
+	 *
 	 * @param <E> 存储的实例
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
@@ -175,7 +175,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 更新实体,根据实体的主键值更新 <br>
-	 * 
+	 *
 	 * @param <E> 存储的实例
 	 * @param entity 实体
 	 * @return 影响行数
@@ -185,7 +185,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 更新实体,根据实体的主键值更新 <br>
-	 * 
+	 *
 	 * @param <E> 更新的实例
 	 * @param dataSourceName 数据源名称
 	 * @param entity 实体
@@ -196,7 +196,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 更新实体,根据实体的主键值更新 <br>
-	 * 
+	 *
 	 * @param <E> 更新的实例
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
@@ -208,7 +208,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 更新实体
-	 * 
+	 *
 	 * @param entity 实体
 	 * @param attachCondition 附加条件,若传递null或"",默认将主健作为条件进行修改
 	 * @return 影响行数
@@ -218,7 +218,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 更新实体
-	 * 
+	 *
 	 * @param dataSourceName 数据源名称
 	 * @param entity 实体
 	 * @param attachCondition 附加条件
@@ -229,7 +229,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 更新实体
-	 * 
+	 *
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
 	 * @param entity 实体
@@ -241,7 +241,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存或者更新实体,实体需要包含主键值否则报错 (如果不存在就存储,存在就更新)
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param entity 实体
 	 * @return 影响行数
@@ -251,7 +251,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存或者更新实体,实体需要包含主键值否则报错 (如果不存在就存储,存在就更新)
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param entity 实体
@@ -262,7 +262,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存或者更新实体,实体需要包含主键值否则报错 (如果不存在就存储,存在就更新)
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
@@ -274,7 +274,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 批量更新实体
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param entities 实体集合，如果传递 null 或者空集合，将直接返回 0
 	 * @return 影响行数
@@ -284,7 +284,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 批量更新实体
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param entities 实体集合，如果传递 null 或者空集合，将直接返回 0
@@ -295,7 +295,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 批量更新实体
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
@@ -307,7 +307,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 执行SQL文件,注意: 只支持单行注释 "#...","-- ..."
-	 * 
+	 *
 	 * @param sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置.当然,sqlName为绝对路径也可以.若传递null,什么也不做
 	 * @return 数组中的每个数对应一条SQL语句执行后所影响的行数,有些数据库驱动没有实现该功能，成功提交成功后不能返回影响行数,而是返回-2。在JDBC的规范中Statement.SUCCESS_NO_INFO(-2)代表:执行成功,受影响行数不确定.
 	 */
@@ -316,7 +316,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 执行SQL文件,注意: 只支持单行注释 "#...","-- ..."
-	 * 
+	 *
 	 * @param sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置.当然,sqlName为绝对路径也可以.若传递null,什么也不做
 	 * @param quotes 在SQL文件里可以通过<code>$[N]</code>引用数组的元素,N从0开始计数
 	 * @return 数组中的每个数对应一条SQL语句执行后所影响的行数,有些数据库驱动没有实现该功能，成功提交成功后不能返回影响行数,而是返回-2。在JDBC的规范中Statement.SUCCESS_NO_INFO(-2)代表:执行成功,受影响行数不确定.
@@ -327,7 +327,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 执行SQL文件,注意: 只支持单行注释 "#...","-- ..."
-	 * 
+	 *
 	 * @param sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置.当然,sqlName为绝对路径也可以.若传递null,什么也不做
 	 * @param dataSourceName 数据源的名称
 	 * @return 数组中的每个数对应一条SQL语句执行后所影响的行数,有些数据库驱动没有实现该功能，成功提交成功后不能返回影响行数,而是返回-2。在JDBC的规范中Statement.SUCCESS_NO_INFO(-2)代表:执行成功,受影响行数不确定.
@@ -337,7 +337,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 执行SQL文件,注意: 只支持单行注释 "#...","-- ..."
-	 * 
+	 *
 	 * @param sqlName 基准目录下的SQL文件名称 注意: 基准目录在fastquery.json里配置.当然,sqlName为绝对路径也可以.若传递null,什么也不做
 	 * @param dataSourceName 数据源的名称
 	 * @param quotes 在SQL文件里可以通过<code>$[N]</code>引用数组的元素,N从0开始计数
@@ -348,42 +348,45 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 根据主键查询实体
-	 * 
+	 *
 	 * @param <E> 实体
-	 * @param entityClass 实体的class
-	 * @param excludeColumns 查询时排除哪些字段
+	 * @param clazz 查询的类
 	 * @param id 主键值
+	 * @param contain 指定是包含还是排除字段
+	 * @param fields 待包含或待排除的字段列表
 	 * @return 返回实体
 	 */
 	@Id(MethodId.QUERY7)
-	<E> E find(Class<E> entityClass, String[] excludeColumns, long id);
+	<E> E find(Class<E> clazz, long id, Contain contain, String... fields);
 
 	/**
 	 * 根据主键查询实体
-	 * 
+	 *
 	 * @param <E> 实体
-	 * @param entityClass 实体的class
-	 * @param excludeColumns 查询时排除哪些字段
+	 * @param clazz 查询的类
 	 * @param id 主键值
 	 * @param dataSourceName 数据源名称
+	 * @param contain 指定是包含还是排除字段
+	 * @param fields 待包含或待排除的字段列表
 	 * @return 返回实体
 	 */
 	@Id(MethodId.QUERY7)
-	<E> E find(Class<E> entityClass, String[] excludeColumns, long id, @Source String dataSourceName);
+	<E> E find(Class<E> clazz, long id, @Source String dataSourceName, Contain contain, String... fields);
 
 	/**
 	 * 根据主键查询实体
-	 * 
+	 *
 	 * @param <E> 实体
-	 * @param entityClass 实体的class
-	 * @param excludeColumns 查询时排除哪些字段
+	 * @param clazz 查询的类
 	 * @param id 主键值
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
+	 * @param contain 指定是包含还是排除字段
+	 * @param fields 待包含或待排除的字段列表
 	 * @return 返回实体
 	 */
 	@Id(MethodId.QUERY7)
-	<E> E find(Class<E> entityClass, String[] excludeColumns, long id, @Source String dataSourceName, String dbName);
+	<E> E find(Class<E> clazz, long id, @Source String dataSourceName, String dbName, Contain contain, String... fields);
 
 	/**
 	 * 根据主键查询实体
@@ -394,7 +397,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @return 返回实体
 	 */
 	default <E> E find(Class<E> entityClass, long id) {
-		return this.find(entityClass,null,id);
+		return this.find(entityClass, id, Contain.EXCLUDE);
 	}
 
 	/**
@@ -407,7 +410,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @return 返回实体
 	 */
 	default <E> E find(Class<E> entityClass, long id, @Source String dataSourceName) {
-		return this.find(entityClass,null,id,dataSourceName);
+		return this.find(entityClass, id, dataSourceName, Contain.EXCLUDE);
 	}
 
 	/**
@@ -421,12 +424,12 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @return 返回实体
 	 */
 	default <E> E find(Class<E> entityClass, long id, @Source String dataSourceName, String dbName) {
-		return this.find(entityClass,null,id,dataSourceName,dbName);
+		return this.find(entityClass, id,dataSourceName,dbName, Contain.EXCLUDE);
 	}
 
 	/**
 	 * 根据主键删除实体
-	 * 
+	 *
 	 * @param tableName 表名称,若传递null或空字符串,则,立马返回0
 	 * @param primaryKeyName 主键名称,若传递null或空字符串,则,立马返回0
 	 * @param id 主键值
@@ -437,7 +440,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 根据主键删除实体
-	 * 
+	 *
 	 * @param tableName 表名称,若传递null或空字符串,则,立马返回0
 	 * @param primaryKeyName 主键名称,若传递null或空字符串,则,立马返回0
 	 * @param id 主键值
@@ -449,7 +452,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 根据主键删除实体
-	 * 
+	 *
 	 * @param tableName 表名称,若传递null或空字符串,则,立马返回0
 	 * @param primaryKeyName 主键名称,若传递null或空字符串,则,立马返回0
 	 * @param id 主键值
@@ -462,7 +465,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存一个实体,返回实体
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param entity 实体
 	 * @return 返回实体
@@ -475,7 +478,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存一个实体,返回实体
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param entity 实体
 	 * @param dataSourceName 数据源名称
@@ -489,7 +492,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 保存一个实体,返回实体
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
@@ -504,7 +507,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 更新一个实体,返回实体
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param entity 实体
 	 * @return 返回实体
@@ -521,7 +524,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 更新一个实体,返回实体
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param entity 实体
@@ -539,7 +542,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 更新一个实体,返回实体
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
@@ -560,7 +563,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * 保存或更新一个实体,返回实体 <br>
 	 * 前提条件:这个实体必须包含主键字段,主键值若是null,直接存 <br>
 	 * 另见: {@link #executeSaveOrUpdate(Object)} 返回影响行数(int类型)
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param entity 实体
 	 * @return 返回实体
@@ -579,7 +582,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * 保存或更新一个实体,返回实体<br>
 	 * 前提条件:这个实体必须包含主键字段,主键值若是null,直接存 <br>
 	 * 另见: {@link #executeSaveOrUpdate(String, Object)} 返回影响行数(int类型)
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param entity 实体
@@ -599,7 +602,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * 保存或更新一个实体,返回实体<br>
 	 * 前提条件:这个实体必须包含主键字段,主键值若是null,直接存 <br>
 	 * 另见: {@link #executeSaveOrUpdate(String, String, Object)} 返回影响行数(int类型)
-	 * 
+	 *
 	 * @param <E> 实体
 	 * @param dataSourceName 数据源名称
 	 * @param dbName 数据库名称
@@ -618,7 +621,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 
 	/**
 	 * 事务函数
-	 * 
+	 *
 	 * @param fun 函数式子
 	 * @return fun函数体中有任何没被捕获的异常或fun函数体返回null或返回-1,就会导致fun里面的全部操作回滚,被回滚后的tx最后会返回-1,除此之外,tx的返回值等于fun的返回值.
 	 */
@@ -633,11 +636,22 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 */
 	@Id(MethodId.QUERY10)
 	<E> long count(E entity);
-	
+
+	/**
+	 * 根据指定的条件查询一条记录，实体属性若为 null 值，则，该属性不参与运算，反之，参与 and 运算
+	 * @param entity 实体对象
+	 * @param contain 指定是包含还是排除字段
+	 * @param fields 待包含或待排除的字段列表
+	 * @param <E> 实体
+	 * @return 实体
+	 */
+	@Id(MethodId.QUERY11)
+	<E> E findOne(E entity, Contain contain, String... fields);
+
 	/**
 	 * 查询分页
 	 * @param builder 查询构造器
-	 * @param notCount ture:表示分页时不执行 count 语句.反之,执行 count 语句.
+	 * @param notCount true:表示分页时不执行 count 语句.反之,执行 count 语句.
 	 * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
 	 * @param pageSize 用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
 	 * @return 分页结构对象
@@ -658,20 +672,22 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * 注意: 实体的属性若为 null 该属性将不参与任何运算.
 	 * </pre>
 	 * @param sort 排序语句，如,设置"order by id desc". 传递null,则采取默认排序
-	 * @param notCount ture:表示分页时不执行 count 语句.反之,执行 count 语句.
+	 * @param notCount true:表示分页时不执行 count 语句.反之,执行 count 语句.
 	 * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
 	 * @param pageSize 用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
-	 * @param excludeColumns 查询排除哪些字段
+	 * @param contain 指定是包含还是排除字段
+	 * @param fields 待包含或待排除的字段列表
 	 * @see #findPage(QueryBuilder, boolean, int, int)
 	 * @return 分页结构对象
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> Page<E> findPage(E entity, String sort, boolean notCount, int pageIndex, int pageSize,String...excludeColumns) {
+	default <E> Page<E> findPage(E entity, String sort, boolean notCount, int pageIndex, int pageSize, Contain contain, String... fields) {
 		Objects.requireNonNull(entity,"传递的实体不能为null");
 		if(sort == null) {
 			sort = StringUtils.EMPTY;
 		}
-		QueryBuilder builder = BeanUtil.toSelectSQL(entity, null, sort, excludeColumns);
+		SelectField<E> selectField = new SelectField<>((Class<E>) entity.getClass(),contain,fields);
+		QueryBuilder builder = BeanUtil.toSelectSQL(entity, null, sort, selectField.getFields());
 		Page<Map<String, Object>> page = this.findPage(builder, notCount, pageIndex, pageSize);
 		return (Page<E>) page.convert(entity.getClass());
 	}

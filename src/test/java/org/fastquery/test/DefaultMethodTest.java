@@ -32,6 +32,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.*;
 
 import org.fastquery.bean.UserInfo;
+import org.fastquery.core.Contain;
 import org.fastquery.dao2.DefaultDBService;
 import org.fastquery.service.FQuery;
 import org.junit.Test;
@@ -130,6 +131,22 @@ public class DefaultMethodTest extends FastQueryTest {
 		u = new UserInfo(null,null,82);
 		count = db.count(u);
 		assertThat(count,is(1L));
+	}
+
+	@Test
+	public void findOne() {
+		UserInfo userInfo = new UserInfo();
+		UserInfo u = db.findOne(userInfo, Contain.INCLUDE, "id","name");
+		assertThat(u,nullValue());
+
+		String name = "王五";
+		userInfo.setName(name);
+		u = db.findOne(userInfo, Contain.INCLUDE,"id","name");
+		LOG.info("u:{}",u);
+		assertThat(u.getId(),notNullValue());
+		assertThat(u.getName(),equalTo(name));
+		assertThat(u.getAge(),nullValue());
+
 	}
 
 	@Test

@@ -31,13 +31,12 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.bean.Fish;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
-import org.fastquery.core.RepositoryException;
+import org.fastquery.core.Contain;
 import org.fastquery.struct.SQLValue;
-import org.fastquery.util.BeanUtil;
+import org.fastquery.core.SelectField;
 import org.junit.Test;
 
 /**
@@ -156,28 +155,12 @@ public class BeanUtilTest {
 		String str = BeanUtil.toInsertSQL(userInfos, null, false);
 		assertThat(str, equalToIgnoringCase("insert into UserInfo(name,age) values('牵牛花',3),(10,'松''鼠',5)"));
 	}
-	
-	private static String selectFields(Object bean,String...excludeColumns) throws Exception {
-		Method method = BeanUtil.class.getDeclaredMethod("selectFields", Object.class, String[].class);
-		method.setAccessible(true);
-		return (String) method.invoke(null, bean, excludeColumns);
-	}
-	
-	@Test
-	public void selectFields() throws Exception {
-		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
-		String selectFields =  selectFields(userInfo);
-		assertThat(selectFields, equalTo("id,name,age"));
-		
-		selectFields =  selectFields(UserInfo.class);
-		assertThat(selectFields, equalTo("id,name,age"));
-	}
 
 	@Test
 	public void toSelectSQL1() {
 		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
 
-		String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk",true);
+		String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk",true,new SelectField<UserInfo>(UserInfo.class, Contain.EXCLUDE).getFields());
 		assertThat(sql, equalTo("select id,name,age from xk.UserInfo where id = 36"));
 	}
 	
@@ -185,43 +168,45 @@ public class BeanUtilTest {
 	public void toSelectSQL2() {
 		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
 
-		String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk",false);
+		String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk",false,null);
 		assertThat(sql, equalTo("select id from xk.UserInfo where id = 36"));
 	}
 
 	@Test
 	public void toSelectSQL3(){
 		UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
-		SQLValue sqlValue = BeanUtil.toSelectSQL(userInfo, null);
+		SQLValue sqlValue = BeanUtil.toSelectSQL(userInfo, null,Contain.INCLUDE,"id","name");
 		String sql = sqlValue.getSql();
 		List<Object> list = sqlValue.getValues();
-		assertThat(list.size(), is(2));
-		assertThat(sql,equalTo("select id,name,age from UserInfo where id = 33 and name = ? and age = ?"));
-		assertThat(list.get(0),equalTo("函数式编程"));
-		assertThat(list.get(1),is(18));
+		assertThat(list.size(), is(3));
+		assertThat(sql,equalTo("select id,name from UserInfo where id = ? and name = ? and age = ?"));
+		assertThat(list.get(0),equalTo(33));
+		assertThat(list.get(1),is("函数式编程"));
+		assertThat(list.get(2),is(18));
 
 		userInfo = new UserInfo(33, null,18);
-		sqlValue = BeanUtil.toSelectSQL(userInfo, null);
+		sqlValue = BeanUtil.toSelectSQL(userInfo, null,Contain.INCLUDE);
+		sql = sqlValue.getSql();
+		list = sqlValue.getValues();
+		assertThat(list.size(), is(2));
+		assertThat(sql,equalTo("select id,name,age from UserInfo where id = ? and age = ?"));
+		assertThat(list.get(0),is(33));
+		assertThat(list.get(1),is(18));
+
+		userInfo = new UserInfo(33, null,null);
+		sqlValue = BeanUtil.toSelectSQL(userInfo, null,Contain.EXCLUDE,"name");
 		sql = sqlValue.getSql();
 		list = sqlValue.getValues();
 		assertThat(list.size(), is(1));
-		assertThat(sql,equalTo("select id,name,age from UserInfo where id = 33 and age = ?"));
-		assertThat(list.get(0),is(18));
+		assertThat(sql,equalTo("select id,age from UserInfo where id = ?"));
+		assertThat(list.get(0),is(33));
 
-		userInfo = new UserInfo(33, null,null);
-		sqlValue = BeanUtil.toSelectSQL(userInfo, null);
+		userInfo = new UserInfo(null, null,null);
+		sqlValue = BeanUtil.toSelectSQL(userInfo, null,Contain.EXCLUDE,"name","id");
 		sql = sqlValue.getSql();
 		list = sqlValue.getValues();
 		assertThat(list.size(), is(0));
-		assertThat(sql,equalTo("select id,name,age from UserInfo where id = 33"));
-
-		userInfo = new UserInfo(null, null,null);
-		try {
-			sqlValue = BeanUtil.toSelectSQL(userInfo, null);
-		} catch (RepositoryException e){
-			String stackMsg = ExceptionUtils.getStackTrace(e);
-			assertThat(stackMsg, containsString("主键值，必须传递！"));
-		}
+		assertThat(sql,equalTo("select age from UserInfo"));
 	}
 
 	@Test

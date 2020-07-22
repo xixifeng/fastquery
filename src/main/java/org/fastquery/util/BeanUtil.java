@@ -30,20 +30,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.fastquery.core.*;
 import org.fastquery.struct.SQLValue;
+import org.fastquery.core.SelectField;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.fastquery.core.ConditionList;
-import org.fastquery.core.Id;
-import org.fastquery.core.Placeholder;
-import org.fastquery.core.QueryBuilder;
-import org.fastquery.core.RepositoryException;
-import org.fastquery.core.Table;
-import org.fastquery.core.Transient;
 
 import com.alibaba.fastjson.JSON;
 
@@ -157,7 +151,7 @@ public final class BeanUtil {
 
 	// use select one
 	// [0] where 部分， [1] sql语言中"?"对应的实参
-	private static <B> Object[] toWhere(Field[] fields, B bean) {
+	private static <B> Object[] toWhere(Field[] fields, B bean, boolean ignoreId) {
 		StringBuilder sb = new StringBuilder();
 		List<Object> values = new ArrayList<>();
 		for (Field field : fields) {
@@ -169,11 +163,20 @@ public final class BeanUtil {
 				} catch (IllegalAccessException | IllegalArgumentException e) {
 					throw new RepositoryException(e);
 				}
-				if (val != null && field.getAnnotation(Id.class) == null) {
-					sb.append(" and ");
-					sb.append(field.getName());
-					sb.append(" = ?");
-					values.add(val);
+				if(ignoreId) {
+					if (val != null && field.getAnnotation(Id.class) == null) {
+						sb.append(" and ");
+						sb.append(field.getName());
+						sb.append(" = ?");
+						values.add(val);
+					}
+				} else {
+					if (val != null) {
+						sb.append(" and ");
+						sb.append(field.getName());
+						sb.append(" = ?");
+						values.add(val);
+					}
 				}
 			}
 		}
@@ -182,25 +185,24 @@ public final class BeanUtil {
 		objs[1] = values;
 		return objs;
 	}
-	public static SQLValue toSelectSQL(Object bean, String dbName) {
+	public static SQLValue toSelectSQL(Object bean, String dbName,Contain contain, String... fields) {
 		Class<?> cls = bean.getClass();
-		Field[] fields = getFields(cls);
-		Object[] objs = getKeyAndVal(bean, fields, null);
-		Object key = objs[1];
-		if (key == null) {
-			throw new RepositoryException("主键值，必须传递！");
-		} else {
-			String keyFeild = objs[0].toString();
-			// 表名称
-			String tableName = getTableName(dbName, cls);
-			Object[] objects = toWhere(fields,bean);
-			String sql = String.format("select %s from %s where %s = %s%s", selectFields(cls), tableName, keyFeild, key.toString(),objects[0]); // 待执行的sql
-			List<Object> values = (List<Object>) objects[1];// sql语言中"?"对应的实参
-			SQLValue sv = new SQLValue();
-			sv.setSql(sql);
-			sv.setValues(values);
-			return sv;
+		Field[] fs = getFields(cls);
+
+		// 表名称
+		String tableName = getTableName(dbName, cls);
+		Object[] objects = toWhere(fs,bean,false);
+		List<Object> values = (List<Object>) objects[1];// sql语言中"?"对应的实参
+		SelectField<?> selectField = new SelectField<>(cls, contain, fields);
+		String where = "";
+		if(values.size() != 0) {
+			where = " where" + objects[0].toString().substring(4);
 		}
+		String sql = String.format("select %s from %s%s", selectField.getFields(), tableName, where); // 待执行的sql
+		SQLValue sv = new SQLValue();
+		sv.setSql(sql);
+		sv.setValues(values);
+		return sv;
 	}
 	public static SQLValue toCount(Object bean, String dbName) {
 		Class<?> cls = bean.getClass();
@@ -210,7 +212,7 @@ public final class BeanUtil {
 		String keyFeild = objs[0].toString();
 		// 表名称
 		String tableName = getTableName(dbName, cls);
-		Object[] objects = toWhere(fields,bean);
+		Object[] objects = toWhere(fields,bean,true);
 		List<Object> values = (List<Object>) objects[1];// sql语言中"?"对应的实参
 		String sql; // 待执行的sql
 		if(key == null) {
@@ -355,10 +357,10 @@ public final class BeanUtil {
 	 * @param key 主键值, 如果传递null,那么自动获取,获取到的为null那么报错. 指定的值优先
 	 * @param dbName 数据库名称
 	 * @param selectEntity true 查实体, 反之,查主键值
-	 * @param excludeColumns 查询时，排除哪些字段
+	 * @param selectFields 查询哪些字段
 	 * @return sql语句
 	 */
-	public static String toSelectSQL(Object bean, Object key, String dbName, boolean selectEntity,String...excludeColumns) {
+	public static String toSelectSQL(Object bean, Object key, String dbName, boolean selectEntity,String selectFields) {
 		Class<?> cls = (bean instanceof Class) ? (Class<?>) bean : bean.getClass();
 		Object[] objs = getKeyAndVal(bean, getFields(cls), key);
 		key = objs[1];
@@ -369,14 +371,14 @@ public final class BeanUtil {
 			// 表名称
 			String tableName = getTableName(dbName, cls);
 			if (selectEntity) {
-				return String.format("select %s from %s where %s = %s", selectFields(cls,excludeColumns), tableName, keyFeild, key.toString());
+				return String.format("select %s from %s where %s = %s", selectFields, tableName, keyFeild, key.toString());
 			} else {
 				return String.format("select %s from %s where %s = %s", keyFeild, tableName, keyFeild, key.toString());
 			}
 		}
 	}
 	
-	public static QueryBuilder toSelectSQL(Object bean, String dbName, String sort, String... excludeColumns) {
+	public static QueryBuilder toSelectSQL(Object bean, String dbName, String sort, String selectFields) {
 		Class<?> cls = bean.getClass();
 		ConditionList conditions = new ConditionList();
 		Map<String, Object> parameters = new HashMap<>();
@@ -406,10 +408,10 @@ public final class BeanUtil {
 			String lastCondition = conditions.get(lastIndex);
 			lastCondition = lastCondition.substring(0, lastCondition.length() - 3);
 			conditions.set(lastIndex,lastCondition);
-			query = String.format("select %s from %s #{#where} %s", selectFields(cls,excludeColumns), tableName, sort);
+			query = String.format("select %s from %s #{#where} %s", selectFields, tableName, sort);
 			countQuery = String.format("select count(id) from %s #{#where}", tableName);
 		} else {
-			query = String.format("select %s from %s %s", selectFields(cls,excludeColumns), tableName, sort);
+			query = String.format("select %s from %s %s", selectFields, tableName, sort);
 			countQuery = String.format("select count(id) from %s", tableName);
 		}
 		
@@ -777,7 +779,7 @@ public final class BeanUtil {
 		return t != null ? t.value() : clazz.getSimpleName();
 	}
 
-	private static List<Field> mapFields(Object bean) {
+	public static List<Field> mapFields(Object bean) {
 		List<Field> list = new ArrayList<>();
 		Class<?> cls = (bean instanceof Class) ? (Class<?>) bean : bean.getClass();
 		Field[] fields = getFields(cls);
@@ -787,26 +789,5 @@ public final class BeanUtil {
 			}
 		}
 		return list;
-	}
-
-	private static String selectFields(Object bean,String...excludeColumns) {
-		Objects.requireNonNull(bean);
-		List<Field> fields = mapFields(bean);
-		StringBuilder sb = new StringBuilder(6 * fields.size()); // 一个 field 大概包含 6 个字符
-		fields.forEach(f -> {
-			String fieldName = f.getName();
-			if(excludeColumns == null || excludeColumns.length == 0 || !ArrayUtils.contains(excludeColumns, fieldName)) {
-				sb.append(',');
-				sb.append(f.getName());
-			}
-		});
-		int len = sb.length();
-		if (len > 0) {
-			sb.deleteCharAt(0);
-		} else {
-			sb.append(1);
-		}
-
-		return sb.toString();
 	}
 }
