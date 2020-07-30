@@ -227,6 +227,18 @@ public class DefaultMethodTest extends FastQueryTest {
 	}
 
 	@Test
+	public void exists2() {
+		boolean b = db.exists(UserInfo.class,"cc","bb");
+		assertThat(b,is(false));
+
+		b = db.exists(UserInfo.class,"name","张三");
+		assertThat(b,is(false));
+
+		b = db.exists(UserInfo.class,"name","王五");
+		assertThat(b,is(true));
+	}
+
+	@Test
 	public void update1(){
 		Collection<?> entities = new HashSet<>();
 		int effect = db.update(entities);
