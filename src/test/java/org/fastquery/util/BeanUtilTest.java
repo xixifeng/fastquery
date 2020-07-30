@@ -31,18 +31,23 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
+import com.alibaba.fastjson.JSON;
 import org.fastquery.bean.Fish;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.core.SelectField;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
 public class BeanUtilTest {
+
+	private static final Logger LOG = LoggerFactory.getLogger(BeanUtilTest.class);
 
 	final static class T {
 		private Integer key;
@@ -473,6 +478,17 @@ public class BeanUtilTest {
 		assertThat(getField("id"), notNullValue());
 		assertThat(getField("name"), notNullValue());
 		assertThat(getField("num"), notNullValue());		
+	}
+
+	@Test
+	public void toEachOne() {
+		String sql = "select xx,yy,zz from table where aa = bb and cc=dd and ee =ff";
+		String[] sqls = BeanUtil.toEachOne(sql);
+		LOG.debug("sqls:{}",JSON.toJSONString(sqls));
+		assertThat(sqls.length,is(3));
+		assertThat(sqls[0],equalTo("select xx,yy,zz from table where aa = bb"));
+		assertThat(sqls[1],equalTo("select xx,yy,zz from table where cc=dd"));
+		assertThat(sqls[2],equalTo("select xx,yy,zz from table where ee =ff"));
 	}
 	
 	

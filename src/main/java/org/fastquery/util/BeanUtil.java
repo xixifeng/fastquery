@@ -790,4 +790,23 @@ public final class BeanUtil {
 		}
 		return list;
 	}
+
+	/**
+	 * 以 and 作为分隔符，拆分成多条单条件查询
+	 * @param sql 一个包含多条件的sql
+	 * @return 多条sql
+	 */
+	public static String[] toEachOne(String sql) {
+		String[] strs = StringUtils.splitByWholeSeparator(sql," and ");
+		int len = strs.length;
+		String[] sqls = new String[len];
+		sqls[0] = strs[0];
+		if(len > 1) {
+			String base = StringUtils.substringBefore(strs[0]," where ") + " where ";
+			for (int i = 1; i < strs.length; i++) {
+				sqls[i] = base + strs[i];
+			}
+		}
+		return sqls;
+	}
 }

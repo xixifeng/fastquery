@@ -279,7 +279,11 @@ class QueryProcess {
 		case MethodId.QUERY10:
 			return q10();
 		case MethodId.QUERY11:
-		return q11();
+			return q11();
+		case MethodId.QUERY12:
+			return q12();
+		case MethodId.QUERY13:
+			return q13();
 		default:
 			break;
 		}
@@ -532,6 +536,41 @@ class QueryProcess {
 		} else {
 			return JSON.toJavaObject(new JSONObject(list.get(0)), entity.getClass());
 		}
+	}
+
+	private Object q12() {
+		Object[] iargs = QueryContext.getArgs();
+		Object entity = iargs[0];
+		boolean or = (boolean) iargs[1];
+		SQLValue sv = BeanUtil.toSelectSQL(entity,null,true, "1");
+		if(or) {
+			String sql = sv.getSql();
+			sql = sql.replace(" and "," or ");
+			sv.setSql(sql);
+		}
+		return DB.exists(sv);
+	}
+
+	private Object q13() {
+		Object[] iargs = QueryContext.getArgs();
+		Object entity = iargs[0];
+		SQLValue sv = BeanUtil.toSelectSQL(entity,null,true, "1");
+		String sql = sv.getSql();
+		String[] eachs = BeanUtil.toEachOne(sql);
+		if(eachs.length != 1) {
+			List<Object> vals = sv.getValues();
+			for (int i = 0; i < eachs.length; i++) {
+				List<Object> list = new ArrayList<>();
+				list.add(vals.get(i));
+				sv.setSql(eachs[i]);
+				sv.setValues(list);
+				if(DB.exists(sv)) {
+					return StringUtils.substringsBetween(eachs[i]," where "," = ")[0];
+				}
+			}
+		}
+
+		return null;
 	}
 
 	@SuppressWarnings("rawtypes")

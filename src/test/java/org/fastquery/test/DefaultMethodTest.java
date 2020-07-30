@@ -149,6 +149,84 @@ public class DefaultMethodTest extends FastQueryTest {
 	}
 
 	@Test
+	public void exists() { // xk3
+		UserInfo userInfo = new UserInfo();
+		userInfo.setName(null);
+		boolean b = db.exists(userInfo,true);
+		assertThat(b,is(true));
+
+		userInfo.setName("婤姶");
+		b = db.exists(userInfo,true);
+		assertThat(b,is(true));
+
+		userInfo.setName("凤雏");
+		b = db.exists(userInfo,true);
+		assertThat(b,is(false));
+
+		userInfo.setName("王五");
+		userInfo.setAge(36);
+		b = db.exists(userInfo,true);
+		assertThat(b,is(true));
+
+		userInfo.setId(2);
+		b = db.exists(userInfo,true);
+		assertThat(b,is(true));
+	}
+
+	@Test
+	public void exists1() { // xk3
+		UserInfo userInfo = new UserInfo();
+		userInfo.setName(null);
+		boolean b = db.exists(userInfo,false);
+		assertThat(b,is(true));
+
+		userInfo.setName("婤姶");
+		b = db.exists(userInfo,false);
+		assertThat(b,is(true));
+
+		userInfo.setName("凤雏");
+		b = db.exists(userInfo,false);
+		assertThat(b,is(false));
+
+		userInfo.setName("王五");
+		userInfo.setAge(36);
+		b = db.exists(userInfo,false);
+		assertThat(b,is(true));
+
+		userInfo.setId(2);
+		b = db.exists(userInfo,false);
+		assertThat(b,is(true));
+
+		userInfo.setName("瘌蛤蟆");
+		b = db.exists(userInfo,false);
+		assertThat(b,is(false));
+	}
+
+	@Test
+	public void existsEachOn() {
+		UserInfo userInfo = new UserInfo();
+		userInfo.setId(56);
+		userInfo.setName("李四");
+		userInfo.setAge(79);
+		String str = db.existsEachOn(userInfo);
+		assertThat(str,equalTo("name"));
+
+		userInfo.setId(56);
+		userInfo.setName("李逵");
+		userInfo.setAge(79);
+		str = db.existsEachOn(userInfo);
+		assertThat(str,nullValue());
+	}
+
+	@Test
+	public void existsEachOn1() {
+		UserInfo userInfo = new UserInfo();
+		userInfo.setName(null);
+		String str = db.existsEachOn(userInfo);
+		assertThat(str,nullValue());
+	}
+
+	@Test
 	public void update1(){
 		Collection<?> entities = new HashSet<>();
 		int effect = db.update(entities);

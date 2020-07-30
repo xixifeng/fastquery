@@ -55,7 +55,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 
 	private final Class<QueryRepository> c = QueryRepository.class;
 
-	private static final MethodInfo[] m = new MethodInfo[37];
+	private static final MethodInfo[] m = new MethodInfo[39];
 
 	private void cache(int j, String name, Class<?>... parameterTypes) {
 		Method localMethod;
@@ -406,5 +406,23 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 			cache(j,"findOne", Object.class, boolean.class, String[].class);
 		}
 		return (E) Prepared.excute(m[j], new Object[]{entity, contain, fields}, this);
+	}
+
+	@Override
+	public boolean exists(Object entity, boolean or) {
+		int j = 37;
+		if(m[j] == null) {
+			cache(j,"exists", Object.class, boolean.class);
+		}
+		return (boolean) Prepared.excute(m[j], new Object[]{entity, or}, this);
+	}
+
+	@Override
+	public String existsEachOn(Object entity) {
+		int j = 38;
+		if(m[j] == null) {
+			cache(j,"existsEachOn", Object.class);
+		}
+		return (String) Prepared.excute(m[j], new Object[]{entity}, this);
 	}
 }

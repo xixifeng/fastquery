@@ -653,6 +653,23 @@ public interface QueryRepository extends Repository { // NO_UCD
 	<E> E findOne(E entity, boolean contain, String... fields);
 
 	/**
+	 * 根据条件判断是否存在
+	 * @param entity 根据指定的条件判断是否存在，实体属性若为 null 值，则，该属性不参与运算
+	 * @param or true 表示条件与条件之间参与 or 运算，反之，参与 and 运算
+	 * @return 存在返回 true，反之，返回 false
+	 */
+	@Id(MethodId.QUERY12)
+	boolean exists(Object entity, boolean or);
+
+	/**
+	 * 逐一遍历指定对象的成员属性并查询该属性值是否在，若存在，立马返回当前属性的名称，反之，继续搜寻下一个属性。实体的  null 属性值不参与运算
+	 * @param entity 条件
+	 * @return 返回属性名称，如果返回 null 表示传递的属性集，其值均在该表中不存在记录
+	 */
+	@Id(MethodId.QUERY13)
+	String existsEachOn(Object entity);
+
+	/**
 	 * 查询分页
 	 * @param builder 查询构造器
 	 * @param notCount true:表示分页时不执行 count 语句.反之,执行 count 语句.

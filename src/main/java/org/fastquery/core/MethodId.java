@@ -93,6 +93,11 @@ class MethodId {
 	 */
 	static final byte QUERY11 = 0X11;
 
+
+	static final byte QUERY12 = 0X12;
+
+	static final byte QUERY13 = 0X13;
+
 	/**
 	 * 默认私有构造方法
 	 */

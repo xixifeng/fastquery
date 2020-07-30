@@ -287,6 +287,31 @@ public class DB {
 		}
 	}
 
+	public static boolean exists(SQLValue sqlValue) {
+		String sql = sqlValue.getSql();
+		List<Object> objs = sqlValue.getValues();
+		Connection conn = QueryContext.getConn();
+		PreparedStatement stat = null;
+		ResultSet rs = null;
+		try {
+			QueryContext.addSqls(sql);
+			info(sql, objs);
+			stat = conn.prepareStatement(sql);
+			// 设置sql参数值
+			int lenTmp = objs.size(); // objs 源头上已经控制禁止为null
+			for (int i = 0; i < lenTmp; i++) {
+				stat.setObject(i + 1, objs.get(i));
+			}
+			// 设置sql参数值 End
+			rs = stat.executeQuery();
+			return rs.next();
+		} catch (Exception e) {
+			throw new RepositoryException(e.getMessage(), e);
+		} finally {
+			close(rs, stat);
+		}
+	}
+
 	private static Stream<String> parserSQLFile(String name) {
 		Builder<String> builder = Stream.builder();
 
