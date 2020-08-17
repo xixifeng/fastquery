@@ -170,7 +170,7 @@ public class QueryHandler {
 		java.lang.reflect.Type[] types = pt.getActualTypeArguments();
 		if (types.length == 1) {
 			java.lang.reflect.Type ct = types[0];
-			if (TypeUtil.isWarrp(ct)) {
+			if (ct instanceof Class && TypeUtil.isWarrp( (Class) ct)) {
 				keyvals.forEach(map -> {
 					if (map.values().size() > 1) {
 						throw new RepositoryException("不能把转换成" + returnTypeName);

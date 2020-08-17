@@ -82,7 +82,7 @@ public class FQueryPropertiesTest extends FastQueryTest  {
 	public void testGetDataSourceIndexs() {
 		Map<String, String> maps = getDataSourceIndexs();
 		maps.forEach((k, v) -> LOG.debug(k + ":" + v));
-		assertThat(maps.size(), is(19));
+		assertThat(maps.size(), is(20));
 	}
 
 	@Test

@@ -40,6 +40,6 @@ import org.junit.runners.Suite.SuiteClasses;
 		FQueryResourceImplTest.class, SunnyDBServiceTest.class, SaveToIdTest.class, PlaceholderTest.class, DBTest.class, ProductDBServiceTest.class,
 		FQueryPropertiesTest.class, QueryPoolTest.class, ParamFilterTest.class, ConditionTest.class, MySQLPageDialectTest.class, DefaultMethodTest.class,
 		RepVersion.class,SetDBServiceTest.class, SetDBServiceTest2.class, SharpExprParserTest.class,
-		TransactionalTest.class,QueryByNamedDBExtendTest.class,JudgeTest.class,Script2ClassTest.class,TxTest.class,WorldDBTest.class,TypeTestDBTest.class,SelectFieldTest.class})
+		TransactionalTest.class,QueryByNamedDBExtendTest.class,JudgeTest.class,Script2ClassTest.class,TxTest.class,WorldDBTest.class,TypeTestDBTest.class,SelectFieldTest.class,TypeFeatureDBServiceTest.class})
 public class AllRuleTest {
 }

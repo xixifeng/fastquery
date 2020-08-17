@@ -821,12 +821,12 @@ public class TypeUtil {
      * @param ct 类型
      * @return 是:true,否:false
      */
-    public static boolean isWarrp(java.lang.reflect.Type ct) {
+    public static boolean isWarrp(Class<?> ct) {
         if (ct == null) {
             return false;
         } else {
             return ct == String.class || ct == Byte.class || ct == Short.class || ct == Integer.class || ct == Long.class || ct == Float.class
-                    || ct == Double.class || ct == Character.class || ct == Boolean.class;
+                    || ct == Double.class || ct == Character.class || ct == Boolean.class || Enum.class.isAssignableFrom(ct);
         }
     }
 

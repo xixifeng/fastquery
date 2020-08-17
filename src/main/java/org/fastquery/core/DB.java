@@ -60,6 +60,16 @@ public class DB {
 	private DB() {
 	}
 
+	private static void statSetObject(PreparedStatement stat, int parameterIndex, Object object) throws SQLException {
+		if(object instanceof Enum) {
+			Enum e = (Enum) object;
+			int index = e.ordinal() + 1; // 数据库中枚举元素对应的数字索引
+			stat.setObject(parameterIndex,index);
+		} else {
+			stat.setObject(parameterIndex, object);
+		}
+	}
+
 	public static List<Map<String, Object>> find(SQLValue sqlValue) {
 
 		String sql = TypeUtil.unStatementReference(sqlValue.getSql());
@@ -75,7 +85,7 @@ public class DB {
 			// 设置sql参数值
 			int lenTmp = objs.size(); // objs 源头上已经控制禁止为null
 			for (int i = 0; i < lenTmp; i++) {
-				stat.setObject(i + 1, objs.get(i));
+				statSetObject(stat,i + 1, objs.get(i));
 			}
 			// 设置sql参数值 End
 			rs = stat.executeQuery();
@@ -134,7 +144,7 @@ public class DB {
 				int len = values.size();
 				for (int i = 0; i < len; i++) {
 					// 设置sql参数值
-					stat.setObject(i + 1, values.get(i));
+					statSetObject(stat,i + 1, values.get(i));
 				}
 
 				ru.setEffect(stat.executeUpdate());
@@ -227,7 +237,7 @@ public class DB {
 			info(sql, args);
 			stat = conn.prepareStatement(sql);
 			for (int i = 1; i <= count; i++) {
-				stat.setObject(i, args.get(i - 1));
+				statSetObject(stat, i, args.get(i - 1));
 			}
 			effect = stat.executeUpdate();
 			QueryContext.commit();
@@ -300,7 +310,7 @@ public class DB {
 			// 设置sql参数值
 			int lenTmp = objs.size(); // objs 源头上已经控制禁止为null
 			for (int i = 0; i < lenTmp; i++) {
-				stat.setObject(i + 1, objs.get(i));
+				statSetObject(stat, i + 1, objs.get(i));
 			}
 			// 设置sql参数值 End
 			rs = stat.executeQuery();
