@@ -37,7 +37,7 @@ import java.util.List;
  */
 public interface TypeFeatureDBService extends QueryRepository {
 
-    @Query("select id, name, gender from type_feature where gender = ?1")
+    @Query("select id, name, gender, ruits from type_feature where gender = ?1")
     List<TypeFeature> findByGender(Gender gender);
 
     @Query("select id, name, gender from type_feature where id = ?1")
