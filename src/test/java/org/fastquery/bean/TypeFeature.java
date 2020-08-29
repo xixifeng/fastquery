@@ -25,6 +25,8 @@ package org.fastquery.bean;
 import org.fastquery.core.Id;
 import org.fastquery.core.Table;
 
+import java.util.EnumSet;
+
 /**
  *
  * @author xixifeng (fastquery@126.com)
@@ -36,7 +38,14 @@ public class TypeFeature {
     private Long id;
     private String name;
     private Gender gender;
+    private EnumSet<Ruits> ruits;
 
+    public EnumSet<Ruits> getRuits() {
+        return ruits;
+    }
+    public void setRuits(EnumSet<Ruits> ruits) {
+        this.ruits = ruits;
+    }
     public Long getId() {
         return id;
     }
