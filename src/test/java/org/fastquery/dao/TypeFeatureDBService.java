@@ -23,12 +23,14 @@
 package org.fastquery.dao;
 
 import org.fastquery.bean.Gender;
+import org.fastquery.bean.Ruits;
 import org.fastquery.bean.TypeFeature;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -40,8 +42,20 @@ public interface TypeFeatureDBService extends QueryRepository {
     @Query("select id, name, gender, ruits from type_feature where gender = ?1")
     List<TypeFeature> findByGender(Gender gender);
 
-    @Query("select id, name, gender from type_feature where id = ?1")
+    @Query("select gender from type_feature limit 3")
+    List<Gender> findGenders();
+
+    @Query("select ruits from type_feature limit 3")
+    List<EnumSet<Ruits>> findRuits();
+
+    @Query("select id, name, gender , ruits from type_feature where id = ?1")
     TypeFeature findOneById(Long id);
+
+    @Query("select gender from type_feature where id = ?1")
+    Gender findGenderById(Long id);
+
+    @Query("select ruits from type_feature where id = ?1")
+    EnumSet<Ruits> findEnumSetById(Long id);
 
     @Modifying
     @Query("update type_feature set gender = :gender where id = ?1")

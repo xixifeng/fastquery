@@ -4,7 +4,7 @@
 
 	<groupId>org.fastquery</groupId>
 	<artifactId>fastquery</artifactId>
-	<version>1.0.93</version> <!-- fastquery.version -->
+	<version>1.0.94</version> <!-- fastquery.version -->
 	<packaging>jar</packaging>
 
 	<name>fastquery</name>
@@ -26,19 +26,19 @@
 		<dependency>
 		    <groupId>org.javassist</groupId>
 		    <artifactId>javassist</artifactId>
-		    <version>3.26.0-GA</version>
+		    <version>3.27.0-GA</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
-			<version>1.2.62</version>
+			<version>1.2.73</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity-engine-core</artifactId>
-			<version>2.1</version>
+			<version>2.2</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-api</artifactId>
@@ -50,7 +50,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.29</version>
+			<version>1.7.30</version>
 		</dependency>
 		
 		<!-- provided -->

@@ -687,7 +687,8 @@ class QueryProcess {
 			page.numberOfElements = this.numberOfElements;
 			
 			List bs = new ArrayList<>();
-			this.content.forEach(map -> bs.add(JSON.toJavaObject(new JSONObject((Map<String, Object>) map), clazz)));
+			// JSON.toJavaObject(new JSONObject((Map<String, Object>) map), clazz)
+			this.content.forEach(map -> bs.add( TypeUtil.map2Obj(clazz, (Map<String, Object>) map)));
 			page.content = bs;
 
 			page.totalElements = this.totalElements;

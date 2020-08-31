@@ -23,6 +23,7 @@
 package org.fastquery.test;
 
 import org.fastquery.bean.Gender;
+import org.fastquery.bean.Ruits;
 import org.fastquery.bean.TypeFeature;
 import org.fastquery.dao.TypeFeatureDBService;
 import org.fastquery.page.Page;
@@ -33,6 +34,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -61,10 +63,55 @@ public class TypeFeatureDBServiceTest extends FastQueryTest {
         Gender gender = Gender.男;
         List<TypeFeature> tfs = db.findByGender(gender);
         assertThat(tfs,notNullValue());
-        assertThat(tfs.size(),is(15));
+        assertThat(tfs.size(),is(12));
         tfs.forEach(t -> {
           assertThat(t.getGender(),equalTo(Gender.男));
+          assertThat(t.getRuits(),notNullValue());
+            assertThat(t.getRuits().isEmpty(),is(false));
         });
+    }
+
+    @Test
+    public void findGenders(){
+        List<Gender> genders = db.findGenders();
+        assertThat(genders.isEmpty(),is(false));
+        genders.forEach(gender -> {
+            assertThat(gender,either(is(Gender.男)).or(is(Gender.女)));
+        });
+    }
+
+    @Test
+    public void findRuits(){
+        EnumSet<Ruits> opts = EnumSet.of(Ruits.苹果,Ruits.香蕉,Ruits.西瓜,Ruits.芒果,Ruits.橘子,Ruits.梨,Ruits.葡萄,Ruits.樱桃);
+        List<EnumSet<Ruits>> ruits = db.findRuits();
+        assertThat(ruits.isEmpty(),is(false));
+        ruits.forEach(e -> {
+            assertThat(opts.containsAll(e),is(true));
+        });
+    }
+
+    @Test
+    public void findGenderById(){
+        Gender gender = db.findGenderById(1L);
+        assertThat(gender,notNullValue());
+        assertThat(gender,equalTo(Gender.男));
+    }
+
+    @Test
+    public void findEnumSetById() {
+        EnumSet<Ruits> ruits = db.findEnumSetById(1L);
+        assertThat(ruits,equalTo(EnumSet.of(Ruits.香蕉,Ruits.西瓜,Ruits.芒果,Ruits.橘子,Ruits.梨)));
+    }
+
+    @Test
+    public void findOneById() {
+        TypeFeature typeFeature = db.findOneById(1L);
+        assertThat(typeFeature.getName(),equalTo("张三"));
+        assertThat(typeFeature.getGender(),equalTo(Gender.男));
+        EnumSet<Ruits> ruits = typeFeature.getRuits();
+        assertThat(ruits,notNullValue());
+        // 香蕉,西瓜,芒果,橘子,梨
+        assertThat(ruits,equalTo(EnumSet.of(Ruits.香蕉,Ruits.西瓜,Ruits.芒果,Ruits.橘子,Ruits.梨)));
     }
 
     @Test
@@ -83,7 +130,7 @@ public class TypeFeatureDBServiceTest extends FastQueryTest {
         assertThat(typeFeature.getGender(),equalTo(gender));
         sqlValue = rule.getSQLValue();
         sql = sqlValue.getSql();
-        assertThat(sql,equalTo("select id, name, gender from type_feature where id = ?"));
+        assertThat(sql,equalTo("select id, name, gender , ruits from type_feature where id = ?"));
 
         typeFeature = db.find(TypeFeature.class,id);
         assertThat(typeFeature.getId(),equalTo(id));
@@ -91,7 +138,7 @@ public class TypeFeatureDBServiceTest extends FastQueryTest {
         assertThat(typeFeature.getGender(),equalTo(gender));
         sqlValue = rule.getSQLValue();
         sql = sqlValue.getSql();
-        assertThat(sql,equalTo("select id, name, gender from type_feature where id = ?"));
+        assertThat(sql,equalTo("select id, name, gender , ruits from type_feature where id = ?"));
     }
 
     @Test

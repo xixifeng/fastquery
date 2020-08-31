@@ -23,21 +23,12 @@
 package org.fastquery.util;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.lang.reflect.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.struct.Reference;
 import org.slf4j.LoggerFactory;
@@ -815,18 +806,12 @@ public class TypeUtil {
         }
     }
 
-    /**
-     * 判断传入的ct是否是String,Byte,Short,Integer,Long,Float,Double,Character,Boolean其中的一个.如果是,返回true
-     *
-     * @param ct 类型
-     * @return 是:true,否:false
-     */
     public static boolean isWarrp(Class<?> ct) {
         if (ct == null) {
             return false;
         } else {
             return ct == String.class || ct == Byte.class || ct == Short.class || ct == Integer.class || ct == Long.class || ct == Float.class
-                    || ct == Double.class || ct == Character.class || ct == Boolean.class || Enum.class.isAssignableFrom(ct);
+                    || ct == Double.class || ct == Character.class || ct == Boolean.class || Enum.class.isAssignableFrom(ct) || EnumSet.class == ct;
         }
     }
 
@@ -927,5 +912,66 @@ public class TypeUtil {
         }
         return sql;
     }
+
+    public static EnumSet toEnumSet(String value, Class<Enum> clazz) {
+        List<Enum> enums = new ArrayList<>();
+        String[] names = StringUtils.split(value, ',');
+        for (String name : names) {
+            Enum e = EnumUtils.getEnum(clazz, name);
+            Objects.requireNonNull(e, name + " 转换成 " + clazz + " 失败！");
+            enums.add(e);
+        }
+        return EnumSet.copyOf(enums);
+    }
+
+    public static Object map2Obj(Class<?> beanType, Map<String, Object> map) {
+        // xxx
+        // 1. 从 beanType 中找出 EnumSet<Ruits> 属性,及对应的枚举类型
+        Map<String, Type> enumSetFeilds = new HashMap<>();
+        Field[] fields = beanType.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getType() == EnumSet.class) {
+                if (field.getGenericType() instanceof ParameterizedType) {
+                    ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+                    if (parameterizedType.getActualTypeArguments()[0].getClass() == Class.class) {
+                        enumSetFeilds.put(field.getName(), parameterizedType.getActualTypeArguments()[0]);
+                    } else {
+                        throw new RepositoryException("禁止出现EnumSet<?通配符>");
+                    }
+                }
+            }
+        }
+
+        // 2. 从 map 取出 EnumSet 本来要对应的字符串
+        Map<String, String> enumSetValues = new HashMap<>();
+        enumSetFeilds.keySet().forEach(f -> {
+            String val = (String) map.get(f);
+            enumSetValues.put(f, val);
+            map.put(f, null);
+        });
+
+        // 3. 实现反序列化
+        Object obj = JSON.toJavaObject(new JSONObject(map), beanType);
+        enumSetValues.forEach((k, v) -> {
+            try {
+                List<Enum> enums = new ArrayList<>();
+                String[] names = StringUtils.split(v, ',');
+                for (String name : names) {
+                    Enum e = EnumUtils.getEnum((Class<Enum>) enumSetFeilds.get(k), name);
+                    Objects.requireNonNull(e, "不能为 null");
+                    enums.add(e);
+                }
+                Field field = beanType.getDeclaredField(k);
+                field.setAccessible(true);
+                EnumSet enumSet = EnumSet.copyOf(enums);
+                field.set(obj, enumSet);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
+        // xxx end
+        return obj;
+    }
+
 
 }

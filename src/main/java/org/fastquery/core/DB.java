@@ -272,7 +272,8 @@ public class DB {
 			if (maps.isEmpty()) {
 				return null;
 			}
-			return JSON.toJavaObject(new JSONObject(maps.get(0)), cls);
+			//return JSON.toJavaObject(new JSONObject(maps.get(0)), cls)
+			return TypeUtil.map2Obj(cls,maps.get(0));
 		} catch (Exception e) {
 			throw new RepositoryException(e);
 		} finally {

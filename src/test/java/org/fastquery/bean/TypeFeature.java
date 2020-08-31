@@ -64,4 +64,14 @@ public class TypeFeature {
     public void setGender(Gender gender) {
         this.gender = gender;
     }
+
+    @Override
+    public String toString() {
+        return "TypeFeature{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", gender=" + gender +
+                ", ruits=" + ruits +
+                '}';
+    }
 }
