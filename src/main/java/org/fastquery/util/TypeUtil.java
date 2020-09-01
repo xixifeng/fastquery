@@ -946,8 +946,10 @@ public class TypeUtil {
         Map<String, String> enumSetValues = new HashMap<>();
         enumSetFeilds.keySet().forEach(f -> {
             String val = (String) map.get(f);
-            enumSetValues.put(f, val);
-            map.put(f, null);
+            if(val != null) {
+                enumSetValues.put(f, val);
+                map.put(f, null);
+            }
         });
 
         // 3. 实现反序列化
