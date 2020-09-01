@@ -24,12 +24,7 @@ package org.fastquery.util;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -128,6 +123,9 @@ public final class BeanUtil {
 				try {
 					field.setAccessible(true);
 					val = field.get(bean);
+					if(val != null && field.getType() == EnumSet.class) {
+						val = TypeUtil.enumSet2Val((EnumSet) val);
+					}
 				} catch (IllegalAccessException | IllegalArgumentException e) {
 					throw new RepositoryException(e);
 				}

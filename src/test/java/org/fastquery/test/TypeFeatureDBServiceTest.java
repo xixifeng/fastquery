@@ -63,11 +63,21 @@ public class TypeFeatureDBServiceTest extends FastQueryTest {
         Gender gender = Gender.男;
         List<TypeFeature> tfs = db.findByGender(gender);
         assertThat(tfs,notNullValue());
-        assertThat(tfs.size(),is(12));
+        assertThat(tfs.size(),is(13));
         tfs.forEach(t -> {
           assertThat(t.getGender(),equalTo(Gender.男));
           assertThat(t.getRuits(),notNullValue());
             assertThat(t.getRuits().isEmpty(),is(false));
+        });
+    }
+
+    @Test
+    public void findByRuits() {
+        List<TypeFeature> tfs = db.findByRuits(Ruits.苹果,Ruits.橘子);
+        LOG.error("tfs:{},len:{}",tfs,tfs.size());
+        assertThat(tfs,not(empty()));
+        tfs.forEach(t -> {
+            assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.苹果,Ruits.橘子)),is(true));
         });
     }
 
@@ -154,6 +164,21 @@ public class TypeFeatureDBServiceTest extends FastQueryTest {
         });
         assertThat(tf.getNumberOfElements(),is(7));
         LOG.info("Gender.女, toString:{}",Gender.女);
+    }
+
+    @Test
+    public void saveTypeFeature() {
+        Gender gender = Gender.男;
+        String name = "乐迪";
+        EnumSet<Ruits> ruits = EnumSet.of(Ruits.橘子,Ruits.苹果);
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.setGender(gender);
+        typeFeature.setName(name);
+        typeFeature.setRuits(ruits);
+        TypeFeature newTypeFeature = db.save(typeFeature);
+        assertThat(newTypeFeature.getGender(),equalTo(gender));
+        assertThat(newTypeFeature.getName(),equalTo(name));
+        assertThat(newTypeFeature.getRuits(),equalTo(ruits));
     }
 
 }

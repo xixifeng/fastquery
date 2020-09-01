@@ -973,5 +973,22 @@ public class TypeUtil {
         return obj;
     }
 
+    public static String enumSet2Val(EnumSet enumSet) {
+       if(enumSet==null) {
+           return null;
+       } else {
+           Iterator<Enum> iterator = enumSet.iterator();
+           StringBuilder sb = new StringBuilder();
+           while (iterator.hasNext()) {
+               sb.append(iterator.next().name());
+               sb.append(',');
+           }
+           int len = sb.length();
+           if(len > 1) {
+               sb.deleteCharAt(len-1);
+           }
+           return sb.toString();
+       }
+    }
 
 }

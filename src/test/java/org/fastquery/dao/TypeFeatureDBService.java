@@ -42,6 +42,10 @@ public interface TypeFeatureDBService extends QueryRepository {
     @Query("select id, name, gender, ruits from type_feature where gender = ?1")
     List<TypeFeature> findByGender(Gender gender);
 
+    // 查询爱吃苹果和香蕉的
+    @Query("select id, name, gender, ruits from type_feature where find_in_set('${one}',ruits) and find_in_set('${two}',ruits)")
+    List<TypeFeature> findByRuits(@Param("one") Ruits one,@Param("two") Ruits two);
+
     @Query("select gender from type_feature limit 3")
     List<Gender> findGenders();
 
