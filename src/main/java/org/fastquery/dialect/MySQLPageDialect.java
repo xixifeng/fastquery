@@ -22,12 +22,12 @@
 
 package org.fastquery.dialect;
 
-import java.util.List;
-import java.util.regex.Matcher;
-
 import org.fastquery.core.Placeholder;
 import org.fastquery.page.PageDialect;
 import org.fastquery.util.TypeUtil;
+
+import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * 
@@ -51,11 +51,7 @@ class MySQLPageDialect implements PageDialect {
 	public String getCurrentPageSQL(String querySQL,int offset, int pageSize) {
 		
 		// limit语句
-		StringBuilder sb = new StringBuilder(" limit ");
-		sb.append(offset);
-		sb.append(',');
-		sb.append(pageSize);
-		String limit = sb.toString();
+		String limit = " limit " + offset + ',' + pageSize;
 
 		List<String> strs = TypeUtil.matches(querySQL, Placeholder.LIMIT_RGE);
 		if (strs.isEmpty()) { // 如果没有#{#limit}, 默认在末尾增加.
