@@ -708,6 +708,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * 占位符?问号的值通过 PreparedStatement 设置
 	 * 注意: 实体的属性若为 null 该属性将不参与任何运算.
 	 * </pre>
+	 * @param likes 实体对象实例 用于指定 like 运算集
 	 * @param sort 排序语句，如,设置"order by id desc". 传递null,则采取默认排序
 	 * @param notCount true:表示分页时不执行 count 语句.反之,执行 count 语句.
 	 * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
@@ -718,14 +719,24 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @return 分页结构对象
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> Page<E> findPage(E entity, String sort, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields) {
-		Objects.requireNonNull(entity,"传递的实体不能为null");
+	default <E> Page<E> findPage(E entity, E likes, String sort, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields) {
+
+		Class<E> type;
+		if(entity != null) {
+			type = (Class<E>) entity.getClass();
+		} else if(likes != null) {
+			type = (Class<E>) likes.getClass();
+		} else {
+			throw new IllegalArgumentException("entity，likes 其中一个实体必须不为 null");
+		}
+
 		if(sort == null) {
 			sort = StringUtils.EMPTY;
 		}
-		SelectField<E> selectField = new SelectField<>((Class<E>) entity.getClass(),contain,fields);
-		QueryBuilder builder = BeanUtil.toSelectSQL(entity, null, sort, selectField.getFields());
+
+		SelectField<E> selectField = new SelectField<>(type, contain, fields);
+		QueryBuilder builder = BeanUtil.toSelectSQL(type, entity, likes,null, sort, selectField.getFields());
 		Page<Map<String, Object>> page = this.findPage(builder, notCount, pageIndex, pageSize);
-		return (Page<E>) page.convert(entity.getClass());
+		return page.convert(type);
 	}
 }

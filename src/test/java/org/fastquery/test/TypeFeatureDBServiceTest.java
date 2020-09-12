@@ -155,7 +155,7 @@ public class TypeFeatureDBServiceTest extends FastQueryTest {
     public void findOne() {
         TypeFeature typeFeature = new TypeFeature();
         typeFeature.setGender(Gender.女);
-        Page<TypeFeature> tf = db.findPage(typeFeature,null,false,1,7,true);
+        Page<TypeFeature> tf = db.findPage(typeFeature, null, null,false,1,7,true);
         List<TypeFeature> tfs = tf.getContent();
         tfs.forEach(t -> {
             Gender gender = t.getGender();

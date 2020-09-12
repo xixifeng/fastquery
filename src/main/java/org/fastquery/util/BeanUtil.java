@@ -376,8 +376,7 @@ public final class BeanUtil {
 		}
 	}
 	
-	public static QueryBuilder toSelectSQL(Object bean, String dbName, String sort, String selectFields) {
-		Class<?> cls = bean.getClass();
+	public static QueryBuilder toSelectSQL(Class<?> cls, Object bean, Object likes, String dbName, String sort, String selectFields) {
 		ConditionList conditions = new ConditionList();
 		Map<String, Object> parameters = new HashMap<>();
 		// 表名称
@@ -386,15 +385,32 @@ public final class BeanUtil {
 		for (Field field : fields) {
 			if (allowField(field)) {
 				field.setAccessible(true);
-				Object fv;
-				try {
-					fv = field.get(bean);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new RepositoryException(e);
+
+				if(bean != null) {
+					Object fv;
+					try {
+						fv = field.get(bean);
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						throw new RepositoryException(e);
+					}
+					if (fv != null) {
+						conditions.add(field.getName() + " = :" + field.getName() + " and");
+						parameters.put(field.getName(), fv);// 同时把这个?号的值记下来
+					}
 				}
-				if (fv != null) {
-					conditions.add(field.getName() + " = :" + field.getName() + " and");
-					parameters.put(field.getName(), fv);// 同时把这个?号的值记下来
+
+				if(likes != null) {
+					Object lv;
+					try
+					{
+						lv = field.get(likes);
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						throw new RepositoryException(e);
+					}
+					if(lv != null) {
+						conditions.add(field.getName() + " like :" + field.getName() + " and");
+						parameters.put(field.getName(), lv);// 同时把这个?号的值记下来
+					}
 				}
 			}
 		}
