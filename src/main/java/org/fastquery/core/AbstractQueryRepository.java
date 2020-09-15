@@ -400,12 +400,12 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 	}
 
 	@Override
-	public <E> E findOne(E entity, boolean contain, String... fields) {
+	public <E> E findOne(E equals, boolean contain, String... fields) {
 		int j = 36;
 		if(m[j] == null) {
 			cache(j,"findOne", Object.class, boolean.class, String[].class);
 		}
-		return (E) Prepared.excute(m[j], new Object[]{entity, contain, fields}, this);
+		return (E) Prepared.excute(m[j], new Object[]{equals, contain, fields}, this);
 	}
 
 	@Override

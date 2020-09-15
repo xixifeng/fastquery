@@ -639,20 +639,20 @@ public interface QueryRepository extends Repository { // NO_UCD
 	<E> long count(E entity);
 
 	/**
-	 * 根据指定的条件查询一条记录，实体属性若为 null 值，则，该属性不参与运算，反之，参与 and 运算
-	 * @param entity 实体对象
+	 * 根据指定的条件查询一条记录，实体属性若为 null 值，则，该属性不参与运算，反之，参与 equal 运算，条件与条件之间的关系是 and
+	 * @param equals 实体对象
 	 * @param contain true:包含 fields，反之，排除 fields
 	 * @param fields 待包含或待排除的字段列表
 	 * @param <E> 实体
 	 * @return 实体
 	 */
 	@Id(MethodId.QUERY11)
-	<E> E findOne(E entity, boolean contain, String... fields);
+	<E> E findOne(E equals, boolean contain, String... fields);
 
 	/**
 	 * 根据条件判断是否存在
 	 * @param entity 根据指定的条件判断是否存在，实体属性若为 null 值，则，该属性不参与运算
-	 * @param or true 表示条件与条件之间参与 or 运算，反之，参与 and 运算
+	 * @param or true 表示条件与条件之间参与 or 运算，反之，参与 and 运算。实体的属性参与 equal 运算
 	 * @return 存在返回 true，反之，返回 false
 	 */
 	@Id(MethodId.QUERY12)
@@ -698,7 +698,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 	/**
 	 * 查找存储的实体集并进行分页
 	 * @param <E> 实体类型
-	 * @param entity 实体实例,用于作为查询条件,条件之间是 and 关系.举例说明,若传递的实体为:<br>
+	 * @param equals 实体实例,用于作为查询条件,条件之间是 and 关系.举例说明,若传递的实体为:<br>
 	 * <pre>
 	 * Student student = new Student();
 	 * student.setDept("计算机");
@@ -719,11 +719,11 @@ public interface QueryRepository extends Repository { // NO_UCD
 	 * @return 分页结构对象
 	 */
 	@SuppressWarnings("unchecked")
-	default <E> Page<E> findPage(E entity, E likes, String sort, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields) {
+	default <E> Page<E> findPage(E equals, E likes, String sort, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields) {
 
 		Class<E> type;
-		if(entity != null) {
-			type = (Class<E>) entity.getClass();
+		if(equals != null) {
+			type = (Class<E>) equals.getClass();
 		} else if(likes != null) {
 			type = (Class<E>) likes.getClass();
 		} else {
@@ -735,7 +735,7 @@ public interface QueryRepository extends Repository { // NO_UCD
 		}
 
 		SelectField<E> selectField = new SelectField<>(type, contain, fields);
-		QueryBuilder builder = BeanUtil.toSelectSQL(type, entity, likes,null, sort, selectField.getFields());
+		QueryBuilder builder = BeanUtil.toSelectSQL(type, equals, likes,null, sort, selectField.getFields());
 		Page<Map<String, Object>> page = this.findPage(builder, notCount, pageIndex, pageSize);
 		return page.convert(type);
 	}
