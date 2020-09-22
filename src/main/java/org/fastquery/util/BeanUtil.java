@@ -823,4 +823,34 @@ public final class BeanUtil {
 		}
 		return sqls;
 	}
+
+	public static SQLValue getSqlValue(Class<?> clazz, String fieldName, List<Object> fieldValues, int rows, boolean contain, String[] fields)
+	{
+		String selectFields = new SelectField<>(clazz,contain,fields).getFields();
+		LOG.debug("selectFields: {}",selectFields);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("select ");
+		sb.append(selectFields);
+		sb.append(" from ");
+		sb.append(getTableName(null,clazz));
+		sb.append(" where ");
+		sb.append(fieldName);
+		if(fieldValues==null || fieldValues.isEmpty())
+		{
+			sb.append(" in (null) limit ");
+		}
+		else
+		{
+			sb.append(" in (");
+			sb.append(TypeUtil.repeatChar(fieldValues.size(),'?'));
+			sb.append(") limit ");
+		}
+		sb.append(rows);
+
+		SQLValue sqlValue = new SQLValue();
+		sqlValue.setSql(sb.toString());
+		sqlValue.setValues(fieldValues);
+		return sqlValue;
+	}
 }

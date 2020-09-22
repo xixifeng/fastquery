@@ -24,10 +24,9 @@ package org.fastquery.core;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.IntSupplier;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.page.NotCount;
@@ -739,4 +738,37 @@ public interface QueryRepository extends Repository { // NO_UCD
 		Page<Map<String, Object>> page = this.findPage(builder, notCount, pageIndex, pageSize);
 		return page.convert(type);
 	}
+
+	/**
+	 * 指定某个字段进行 in 查询
+	 * @param entity 实体 class
+	 * @param fieldName 字段
+	 * @param fieldValues 字段值列表，参与 in 运算
+	 * @param rows 行数
+	 * @param contain true:包含 fields，反之，排除 fields
+	 * @param fields 待包含或待排除的字段列表
+	 * @param <E> 实体类型
+	 * @param <F> 参与 in 运算字段的类型
+	 * @return 实体 list
+	 */
+	@Id(MethodId.QUERY14)
+	<E,F> List<E> findByIn(Class<E> entity, String fieldName, List<F> fieldValues, int rows, boolean contain, String... fields);
+
+	/**
+	 * 指定 id 集进行 in 查询
+	 * @param entity 实体 class
+	 * @param ids id 集
+	 * @param rows 行数
+	 * @param contain true:包含 fields，反之，排除 fields
+	 * @param fields 待包含或待排除的字段列表
+	 * @param <E> 实体类型
+	 * @return 实体 list
+	 */
+	default <E> List<E> findByIn(Class<E> entity, long[] ids, int rows, boolean contain, String... fields)
+	{
+		Objects.requireNonNull(ids, "ids must not be null");
+		List<Object> list = Arrays.stream(ids).boxed().collect(Collectors.toList());
+		return this.findByIn(entity,"id", list, rows, contain, fields);
+	}
+
 }

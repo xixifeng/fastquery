@@ -993,4 +993,19 @@ public class TypeUtil {
        }
     }
 
+    public static String repeatChar(int size,char x)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i++)
+        {
+            sb.append(x);
+            sb.append(',');
+        }
+        if(size > 0)
+        {
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        return sb.toString();
+    }
+
 }

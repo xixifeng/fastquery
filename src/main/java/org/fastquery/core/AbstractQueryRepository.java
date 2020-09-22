@@ -25,6 +25,7 @@ package org.fastquery.core;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.IntSupplier;
 import org.fastquery.page.Page;
@@ -55,7 +56,7 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 
 	private final Class<QueryRepository> c = QueryRepository.class;
 
-	private static final MethodInfo[] m = new MethodInfo[39];
+	private static final MethodInfo[] m = new MethodInfo[40];
 
 	private void cache(int j, String name, Class<?>... parameterTypes) {
 		Method localMethod;
@@ -424,5 +425,16 @@ public abstract class AbstractQueryRepository implements QueryRepository {
 			cache(j,"existsEachOn", Object.class);
 		}
 		return (String) Prepared.excute(m[j], new Object[]{entity}, this);
+	}
+
+	@Override
+	public <E,F> List<E> findByIn(Class<E> clazz, String fieldName, List<F> fieldValues, int rows, boolean contain, String... fields)
+	{
+		int j = 39;
+		if(m[39] == null)
+		{
+			cache(j,"findByIn",Class.class,String.class,List.class,int.class,boolean.class,String[].class);
+		}
+		return (List<E>) Prepared.excute(m[j], new Object[]{clazz, fieldName, fieldValues, rows, contain, fields}, this);
 	}
 }

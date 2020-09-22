@@ -31,10 +31,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.math.BigInteger;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.IntSupplier;
 
 import org.fastquery.struct.Reference;
@@ -284,6 +281,8 @@ class QueryProcess {
 			return q12();
 		case MethodId.QUERY13:
 			return q13();
+		case MethodId.QUERY14:
+			return q14();
 		default:
 			break;
 		}
@@ -534,7 +533,7 @@ class QueryProcess {
 		} else if(list.size()>1) {
 			throw new RepositoryException("findOne 只能查询一条记录，可是实际返回多条记录。查多条记录请用 findPage 查询");
 		} else {
-			return JSON.toJavaObject(new JSONObject(list.get(0)), entity.getClass());
+			return TypeUtil.map2Obj(entity.getClass(),list.get(0));
 		}
 	}
 
@@ -571,6 +570,31 @@ class QueryProcess {
 		}
 
 		return null;
+	}
+
+	private Object q14() {
+		Object[] iargs = QueryContext.getArgs();
+		Class<?> clazz = (Class<?>) iargs[0];
+		Objects.requireNonNull(clazz);
+		String fieldName = (String) iargs[1];
+		if(fieldName==null || "".equals(fieldName))
+		{
+			fieldName = "1";
+		}
+		List<Object> fieldValues = (List<Object>) iargs[2];
+		int rows = (int) iargs[3];
+		boolean contain = (boolean) iargs[4];
+		String[] fields = (String[]) iargs[5];
+		LOG.debug("clazz:{}, fieldName:{}, fieldValues:{}, rows:{}, contain:{}, fields:{}",
+				clazz,fieldName,fieldValues,rows,contain,fields);
+		SQLValue sqlValue = BeanUtil.getSqlValue(clazz, fieldName, fieldValues, rows, contain, fields);
+		List<Map<String, Object>> keymaps = DB.find(sqlValue);
+		List<Object> list = new ArrayList<>();
+		for (Map<String, Object> map : keymaps) {
+			Object obj = TypeUtil.map2Obj(clazz, map);
+			list.add(obj);
+		}
+		return list;
 	}
 
 	@SuppressWarnings("rawtypes")

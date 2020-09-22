@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -179,6 +180,29 @@ public class TypeFeatureDBServiceTest extends FastQueryTest {
         assertThat(newTypeFeature.getGender(),equalTo(gender));
         assertThat(newTypeFeature.getName(),equalTo(name));
         assertThat(newTypeFeature.getRuits(),equalTo(ruits));
+    }
+
+    @Test
+    public void findOne1() {
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.setId(1L);
+        TypeFeature tf = db.findOne(typeFeature, true);
+        assertThat(tf, notNullValue());
+        assertThat(tf.getRuits().toString(),equalTo("[香蕉, 西瓜, 芒果, 橘子, 梨]"));
+    }
+
+    @Test
+    public void findByIn1 () {
+        List<String> fieldValues = Arrays.asList("aa","bb","cc");
+        List<TypeFeature> list = db.findByIn(TypeFeature.class,"name", fieldValues,3,true,"id","name");
+        assertThat(list,is(empty()));
+    }
+
+    @Test
+    public void findByIn2 () {
+        List<Long> fieldValues = Arrays.asList(1L,2L,3L);
+        List<TypeFeature> list = db.findByIn(TypeFeature.class,"id", fieldValues,3,true, "name");
+        assertThat(list.size(),is(3));
     }
 
 }
