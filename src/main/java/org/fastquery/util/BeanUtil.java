@@ -215,7 +215,7 @@ public final class BeanUtil {
 		String sql; // 待执行的sql
 		if(key == null) {
 			String where = "";
-			if(values.size() != 0) {
+			if(!values.isEmpty()) {
 				where = " where" + objects[0].toString().substring(4);
 			}
 			sql = String.format("select count(id) from %s%s", tableName, where);
