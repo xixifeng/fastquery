@@ -141,13 +141,14 @@ public class TypeUtil {
      * @return sql处理信号集
      */
     public static ParamMap getParamMap(int[] indexMap) {
+        Object[] args = QueryContext.getArgs();
         Map<Integer, Integer> rps = new HashMap<>();
         List<Object> objs = new ArrayList<>();
         int increment = 0;
         for (int i = 0; i < indexMap.length; i++) {
             int paramIndex = indexMap[i] - 1;
             // 取出sql参数所对应的方法参数
-            Object mp = QueryContext.getArgs()[paramIndex]; // 这个值有可能是null
+            Object mp = args[paramIndex]; // 这个值有可能是null
             if (mp == null) {
                 objs.add(getParamDefVal(paramIndex, null));
             } else {
@@ -519,9 +520,10 @@ public class TypeUtil {
 		</pre>
 		*/
         Set<String> pars = TypeUtil.matchesNotrepeat(value, Placeholder.SP1_REG);
+        Object[] args = QueryContext.getArgs();
         for (String par : pars) {
             int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
-            Object arg = QueryContext.getArgs()[index - 1];
+            Object arg = args[index - 1];
             if (getFactor1(condition, arg) || getFactor2(condition, arg) || getFactor5(condition, arg) || getFactor6(condition, arg)) {
                 return null;
             } else if (arg == null) { // 当前?num 处是null也要保留条件,那么就要考略null跟一些运算符不能运算的问题(纠正它)
@@ -549,9 +551,10 @@ public class TypeUtil {
     private static String elseVal(String elseValue) {
         elseValue = paramFilter(QueryContext.getMethodInfo(), QueryContext.getArgs(), elseValue);
         Set<String> pars = TypeUtil.matchesNotrepeat(elseValue, Placeholder.SP1_REG);
+        Object[] args = QueryContext.getArgs();
         for (String par : pars) {
             int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
-            if (QueryContext.getArgs()[index - 1] == null) { // ?num 对应的实参是null,要附加处理下
+            if (args[index - 1] == null) { // ?num 对应的实参是null,要附加处理下
                 elseValue = extReplaceAll(elseValue, index);
             }
         }

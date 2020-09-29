@@ -666,25 +666,6 @@ public interface QueryRepository extends Repository { // NO_UCD
 	String existsEachOn(Object entity);
 
 	/**
-	 * 判断某一列是否存在
-	 * @param classEntity 实体类
-	 * @param columnName 列名
-	 * @param columnValue 值
-	 * @return 存在返回 true，反之，false
-	 */
-	default boolean exists(Class<?> classEntity, String columnName,String columnValue) {
-		try {
-			Object obj = classEntity.newInstance();
-			Field field = classEntity.getDeclaredField(columnName);
-			field.setAccessible(true);
-			field.set(obj,columnValue);
-			return count(obj) > 0;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	/**
 	 * 查询分页
 	 * @param builder 查询构造器
 	 * @param notCount true:表示分页时不执行 count 语句.反之,执行 count 语句.

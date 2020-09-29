@@ -97,9 +97,10 @@ final class SetParser {
 		// 像||,&& 这种运算, 多长都不嫌丑
 		
 		java.util.Set<String> pars = TypeUtil.matchesNotrepeat(value, "\\?\\d+");
+		Object[] args = QueryContext.getArgs();
 		for (String par : pars) {
 			int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
-			Object arg = QueryContext.getArgs()[index - 1];
+			Object arg = args[index - 1];
 			if (getFactor1(set, arg) || getFactor2(set, arg)) {
 				return true;
 			}

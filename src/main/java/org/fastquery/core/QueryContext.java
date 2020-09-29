@@ -142,6 +142,7 @@ public final class QueryContext {
 	}
 
 	public static Object[] getArgs() {
+		LOG.debug("检测 SQL 注入");
 		Parameter[] parameters = getQueryContext().methodInfo.getParameters();
 		int len = getQueryContext().args.length;
 		for (int i = 0; i < len; i++)

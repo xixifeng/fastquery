@@ -230,19 +230,23 @@ public class DefaultMethodTest extends FastQueryTest {
 
 	@Test
 	public void exists2() {
-		boolean b = db.exists(UserInfo.class,"cc","bb");
-		assertThat(b,is(false));
+		try
+		{
+			db.exists("cc","bb");
+		} catch (RepositoryException e) {
+			assertThat(e.getMessage(),containsString("Unknown column 'cc' in 'where clause'"));
+		}
 	}
 
 	@Test
 	public void exists3() {
-		boolean b = db.exists(UserInfo.class,"name","张三");
+		boolean b = db.exists("name","张三");
 		assertThat(b,is(false));
 	}
 
 	@Test
 	public void exists4() {
-		boolean b = db.exists(UserInfo.class,"name","王五");
+		boolean b = db.exists("name","王五");
 		assertThat(b,is(true));
 	}
 
@@ -254,6 +258,12 @@ public class DefaultMethodTest extends FastQueryTest {
 		} catch (RepositoryException e) {
 			assertThat(e.getMessage(),containsString("有注入风险"));
 		}
+	}
+
+	@Test
+	public void exists6() {
+		boolean b = db.exists("id","200");
+		assertThat(b,is(false));
 	}
 
 	@Test
