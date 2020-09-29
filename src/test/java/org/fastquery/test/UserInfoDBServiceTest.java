@@ -647,8 +647,24 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void findEmpl(){
-		List<Map<String, Object>> jsonArray = db.findEmpl();
-		LOG.info("{} ->", JSON.toJSONString(jsonArray,true));
+		List<Map<String, Object>> maps = db.findEmpl();
+		assertThat(maps.size(),is(3));
+		maps.forEach( map -> {
+			Integer departmentId = (Integer) map.get("departmentId");
+			List<Map<String,Object>> emps = (List<Map<String, Object>>) map.get("emps");
+			assertThat(emps.size(),is(3));
+			emps.forEach(m->{
+				assertThat(Integer.parseInt(m.get("dId").toString()),equalTo(departmentId));
+			});
+			if(departmentId == 1) {
+				assertThat(map.get("departmentName").toString(),equalTo("研发"));
+			} else if(departmentId == 2) {
+				assertThat(map.get("departmentName").toString(),equalTo("人事"));
+			} else {
+				assertThat(map.get("departmentName").toString(),equalTo("财务"));
+			}
+		});
+		LOG.info("{} ->", JSON.toJSONString(maps,true));
 	}
 
 	@Test
