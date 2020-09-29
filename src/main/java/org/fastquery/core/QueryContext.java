@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.fastquery.util.PreventSQLInjection;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONObject;
@@ -141,6 +142,17 @@ public final class QueryContext {
 	}
 
 	public static Object[] getArgs() {
+		Parameter[] parameters = getQueryContext().methodInfo.getParameters();
+		int len = getQueryContext().args.length;
+		for (int i = 0; i < len; i++)
+		{
+			Parameter parameter = parameters[i];
+			if(parameter.getAnnotation(Safe.class) != null
+					&& PreventSQLInjection.isInjectStr(getQueryContext().args[i].toString())) {
+				throw new RepositoryException(getQueryContext().args[i] + " 有注入风险！");
+			}
+		}
+
 		return getQueryContext().args;
 	}
 	

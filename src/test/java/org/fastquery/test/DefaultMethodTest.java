@@ -31,7 +31,9 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.bean.UserInfo;
+import org.fastquery.core.RepositoryException;
 import org.fastquery.dao2.DefaultDBService;
 import org.fastquery.service.FQuery;
 import org.junit.Test;
@@ -230,12 +232,28 @@ public class DefaultMethodTest extends FastQueryTest {
 	public void exists2() {
 		boolean b = db.exists(UserInfo.class,"cc","bb");
 		assertThat(b,is(false));
+	}
 
-		b = db.exists(UserInfo.class,"name","张三");
+	@Test
+	public void exists3() {
+		boolean b = db.exists(UserInfo.class,"name","张三");
 		assertThat(b,is(false));
+	}
 
-		b = db.exists(UserInfo.class,"name","王五");
+	@Test
+	public void exists4() {
+		boolean b = db.exists(UserInfo.class,"name","王五");
 		assertThat(b,is(true));
+	}
+
+	@Test
+	public void exists5() {
+		try
+		{
+		  db.exists("id and or","200");
+		} catch (RepositoryException e) {
+			assertThat(e.getMessage(),containsString("有注入风险"));
+		}
 	}
 
 	@Test

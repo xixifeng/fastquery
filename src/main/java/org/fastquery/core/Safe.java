@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, fastquery.org and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2088, fastquery.org and/or its affiliates. All rights reserved.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -20,22 +20,20 @@
  * 
  */
 
-package org.fastquery.dao2;
+package org.fastquery.core;
 
-import org.fastquery.core.Param;
-import org.fastquery.core.Query;
-import org.fastquery.core.QueryRepository;
-import org.fastquery.core.Safe;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ * 标记参数将做 SQL 注入检测
  * 
- * @author mei.sir@aliyun.cn
+ * @author xixifeng (fastquery@126.com)
  */
-public interface DefaultDBService extends QueryRepository {
-	
-	@Query("$s")
-	String sqlFun(@Param("s") String sql);
-
-	@Query("select id from userinfo where ${columnName} = ?2")
-	boolean exists(@Safe @Param("columnName") String columnName, Object columnValue);
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Safe
+{
 }
