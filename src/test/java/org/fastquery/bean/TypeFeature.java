@@ -39,6 +39,17 @@ public class TypeFeature {
     private String name;
     private Gender gender;
     private EnumSet<Ruits> ruits;
+    private Integer sort;
+
+    public Integer getSort()
+    {
+        return sort;
+    }
+
+    public void setSort(Integer sort)
+    {
+        this.sort = sort;
+    }
 
     public EnumSet<Ruits> getRuits() {
         return ruits;

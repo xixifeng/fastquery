@@ -259,4 +259,7 @@ public interface UserInfoDBService extends QueryRepository {
 
 	@Query("select d.id as departmentId, d.name as departmentName, emps[e.id, e.name] from `department` d left join employee e on d.id = e.departmentId")
 	List<Department> findDepartments();
+
+	@Query(value = "select d.id as departmentId, d.name as departmentName, emps[e.id, e.name] from `department` d left join employee e on d.id = e.departmentId",countField = "d.id")
+	Page<Department> findDepPage(Pageable pageable);
 }

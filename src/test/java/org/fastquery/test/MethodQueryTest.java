@@ -485,10 +485,10 @@ public class MethodQueryTest extends FastQueryTest {
 		typeFeature.setGender(Gender.女);
 		TypeFeature likes = new TypeFeature();
 		likes.setName("Ru%");
-		Page<TypeFeature> page = userInfoDBService.findPage(typeFeature,likes,null,false,1,1,true);
+		Page<TypeFeature> page = userInfoDBService.findPage(typeFeature,likes,"order by sort DESC",false,1,1,true);
 		List<String> sqlValues = rule.getExecutedSQLs();
 		assertThat(sqlValues.size(), is(2));
-		assertThat(sqlValues.get(0),equalTo("select id,name,gender,ruits from type_feature where name like ? and gender = ?   limit 0,1"));
+		assertThat(sqlValues.get(0),equalTo("select id,name,gender,ruits,sort from type_feature where name like ? and gender = ?  order by sort DESC limit 0,1"));
 		assertThat(sqlValues.get(1),equalTo("select count(id) from type_feature where name like ? and gender = ? "));
 	}
 }

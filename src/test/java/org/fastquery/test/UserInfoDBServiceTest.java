@@ -655,13 +655,19 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	public void findDepartments(){
 		List<Department> list = db.findDepartments();
 		assertThat(list.size(),is(3));
-		LOG.info("list:{}",list);
+		LOG.info("list:{}",JSON.toJSONString(list, true));
 	}
 
 	@Test
 	public void referenceForBean() {
 		Department department =  db.findDepartment(1L);
 		LOG.info("department:{}",department);
+	}
+
+	@Test
+	public void findDepPage() {
+		Page<Department> page = db.findDepPage(new PageableImpl(1,100));
+		LOG.info("page: {}",JSON.toJSONString(page, true));
 	}
 
 	/*
