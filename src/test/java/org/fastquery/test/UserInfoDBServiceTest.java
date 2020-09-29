@@ -683,7 +683,18 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void findDepPage() {
 		Page<Department> page = db.findDepPage(new PageableImpl(1,100));
-		LOG.info("page: {}",JSON.toJSONString(page, true));
+		assertThat(page.getNumberOfElements(),is(3));
+		List<Department> departments = page.getContent();
+		assertThat(departments.size(),is(3));
+		departments.forEach(d -> {
+			Long departmentId = d.getDepartmentId();
+			if(departmentId == 1L) {
+				assertThat(d.getEmps().toString(),equalTo("[Employee{id=1, departmentId=null, name='小明'}, Employee{id=2, departmentId=null, name='张三'}, Employee{id=3, departmentId=null, name='李思'}]"));
+			}
+			else if(departmentId == 2L) {
+				assertThat(d.getEmps().toString(),equalTo("[Employee{id=4, departmentId=null, name='小红'}, Employee{id=5, departmentId=null, name='小黑'}, Employee{id=6, departmentId=null, name='小贝'}]"));
+			}
+		});
 	}
 
 	/*

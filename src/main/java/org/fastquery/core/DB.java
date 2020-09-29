@@ -30,14 +30,13 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
+import org.fastquery.struct.Reference;
 import org.fastquery.util.TypeUtil;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -71,7 +70,7 @@ public class DB {
 	}
 
 	public static List<Map<String, Object>> find(SQLValue sqlValue) {
-
+		Reference reference = TypeUtil.statementReference(sqlValue.getSql());
 		String sql = TypeUtil.unStatementReference(sqlValue.getSql());
 		List<Object> objs = sqlValue.getValues();
 		List<Map<String, Object>> keyvals;
@@ -90,6 +89,9 @@ public class DB {
 			// 设置sql参数值 End
 			rs = stat.executeQuery();
 			keyvals = rs2Map(rs);
+			if(reference != null) {
+				keyvals = listMapGroupingBy(keyvals,reference);
+			}
 			stat.close();
 		} catch (Exception e) {
 			throw new RepositoryException(e.getMessage(), e);
@@ -98,6 +100,57 @@ public class DB {
 		}
 
 		return keyvals;
+	}
+
+
+	private static String fetchGroupKey(Map<String, Object> map, List<String> keys) {
+		JSONObject jsonObject = new JSONObject(new LinkedHashMap());
+		for (String key : keys) {
+			jsonObject.put(key, map.get(key));
+		}
+		return jsonObject.toJSONString();
+	}
+
+
+	private static List<Map<String, Object>> listMapGroupingBy(List<Map<String, Object>> keyvals, Reference reference) {
+		if (keyvals.isEmpty()) {
+			return keyvals;
+		}
+
+		List<String> feilds = reference.getFields();
+		String name = reference.getName();
+
+		// 确定分组属性
+		List<String> groupFeilds = new ArrayList<>();
+		Set<String> allKeys = keyvals.get(0).keySet();
+		for (String k : allKeys) {
+			if (!feilds.contains(k)) {
+				groupFeilds.add(k);
+			}
+		}
+
+		Map<String, List<Map<String, Object>>> map = keyvals.stream().collect(Collectors.groupingBy(m -> fetchGroupKey(m, groupFeilds)));
+		Set<String> keys = map.keySet(); // 组名列表
+
+		List<Map<String, Object>> array = new ArrayList<>();
+		for (String key : keys) {
+			Map<String, Object> jsonObject = JSON.parseObject(key);
+			List<Map<String, Object>> ele = new ArrayList<>();
+			List<Map<String, Object>> list = map.get(key);
+			list.forEach(mp -> {
+				Map<String, Object> unit = new JSONObject();
+				Set<String> fs = mp.keySet();
+				for (String f : fs) {
+					if (feilds.contains(f)) {
+						unit.put(f, mp.get(f));
+					}
+				}
+				ele.add(unit);
+			});
+			jsonObject.put(name, ele);
+			array.add(jsonObject);
+		}
+		return array;
 	}
 
 	/**
