@@ -196,7 +196,7 @@ public final class BeanUtil {
 		if(values.size() != 0) {
 			where = " where" + objects[0].toString().substring(4);
 		}
-		String sql = String.format("select %s from %s%s", selectField.getFields(), tableName, where); // 待执行的sql
+		String sql = String.format("select %s from %s%s limit 1", selectField.getFields(), tableName, where); // 待执行的sql
 		SQLValue sv = new SQLValue();
 		sv.setSql(sql);
 		sv.setValues(values);
