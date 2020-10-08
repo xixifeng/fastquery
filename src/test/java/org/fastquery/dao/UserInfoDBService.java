@@ -24,6 +24,7 @@ package org.fastquery.dao;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import org.fastquery.bean.Department;
 import org.fastquery.bean.UserInfo;
@@ -261,5 +262,8 @@ public interface UserInfoDBService extends QueryRepository {
 	List<Department> findDepartments();
 
 	@Query(value = "select d.id as departmentId, d.name as departmentName, emps[e.id, e.name] from `department` d left join employee e on d.id = e.departmentId",countField = "d.id")
-	Page<Department> findDepPage(Pageable pageable);
+	Page<Department> findDepPage(Pageable pageable, Predicate<Map<String,Object>> predicate, String[][] exchangeNames);
+
+	@Query(value = "select d.id as departmentId, d.name as departmentName, emps[e.id, e.departmentId as deptId, e.name] from `department` d left join employee e on d.id = e.departmentId",countField = "d.id")
+	Page<Department> findDepPage2(Pageable pageable, Predicate<Map<String,Object>> predicate, String[][] exchangeNames);
 }

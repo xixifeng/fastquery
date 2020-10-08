@@ -648,20 +648,26 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void findEmpl(){
 		List<Map<String, Object>> maps = db.findEmpl();
-		assertThat(maps.size(),is(3));
+		assertThat(maps.size(),is(4));
 		maps.forEach( map -> {
 			Integer departmentId = (Integer) map.get("departmentId");
 			List<Map<String,Object>> emps = (List<Map<String, Object>>) map.get("emps");
-			assertThat(emps.size(),is(3));
 			emps.forEach(m->{
-				assertThat(Integer.parseInt(m.get("dId").toString()),equalTo(departmentId));
+				if(departmentId != 4)
+				{
+					assertThat(Integer.parseInt(m.get("dId").toString()),equalTo(departmentId));
+				}
 			});
+
 			if(departmentId == 1) {
 				assertThat(map.get("departmentName").toString(),equalTo("研发"));
+				assertThat(emps.size(),is(3));
 			} else if(departmentId == 2) {
 				assertThat(map.get("departmentName").toString(),equalTo("人事"));
-			} else {
+				assertThat(emps.size(),is(3));
+			} else if(departmentId == 3) {
 				assertThat(map.get("departmentName").toString(),equalTo("财务"));
+				assertThat(emps.size(),is(3));
 			}
 		});
 		LOG.info("{} ->", JSON.toJSONString(maps,true));
@@ -670,7 +676,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 	@Test
 	public void findDepartments(){
 		List<Department> list = db.findDepartments();
-		assertThat(list.size(),is(3));
+		assertThat(list.size(),is(4));
 		LOG.info("list:{}",JSON.toJSONString(list, true));
 	}
 
@@ -682,10 +688,10 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void findDepPage() {
-		Page<Department> page = db.findDepPage(new PageableImpl(1,100));
-		assertThat(page.getNumberOfElements(),is(3));
+		Page<Department> page = db.findDepPage(new PageableImpl(1,100),null,null);
+		assertThat(page.getNumberOfElements(),is(4));
 		List<Department> departments = page.getContent();
-		assertThat(departments.size(),is(3));
+		assertThat(departments.size(),is(4));
 		departments.forEach(d -> {
 			Long departmentId = d.getDepartmentId();
 			if(departmentId == 1L) {
@@ -695,6 +701,14 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 				assertThat(d.getEmps().toString(),equalTo("[Employee{id=4, departmentId=null, name='小红'}, Employee{id=5, departmentId=null, name='小黑'}, Employee{id=6, departmentId=null, name='小贝'}]"));
 			}
 		});
+	}
+
+	@Test
+	public void findDepPage2() {
+		Page<Department> page = db.findDepPage2(new PageableImpl(1,100),(map) -> map.get("id") != null, new String[][]{
+				{"deptId","departmentId"}
+		});
+		LOG.info("page: {}", JSON.toJSONString(page,true));
 	}
 
 	/*

@@ -75,17 +75,20 @@ public class AsmRepository {
 		return sb.toString();
 	}
 
-	private static String getParameterDef(Class<?>[] parameterTypes) {
+	public static String getParameterDef(Class<?>[] parameterTypes) {
 		int len = parameterTypes.length;
 		if (len > 0) {
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < len; i++) {
-				Class<?> clazz = parameterTypes[i];
-				if (clazz.getComponentType() != null) {
-					sb.append(clazz.getComponentType().getName());
+				if (parameterTypes[i].getComponentType() != null) {
+					Class<?> clazz = parameterTypes[i].getComponentType();
+					sb.append(clazz.getName().replace("[L","").replace("[","").replace(";",""));
 					sb.append("[]");
+					while ( (clazz = clazz.getComponentType()) != null) {
+						sb.append("[]");
+					}
 				} else {
-					sb.append(clazz.getName());
+					sb.append(parameterTypes[i].getName());
 				}
 				sb.append(' ');
 				sb.append("p");
