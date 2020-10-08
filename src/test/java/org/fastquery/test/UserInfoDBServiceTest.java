@@ -708,7 +708,11 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 		Page<Department> page = db.findDepPage2(new PageableImpl(1,100),(map) -> map.get("id") != null, new String[][]{
 				{"deptId","departmentId"}
 		});
-		LOG.info("page: {}", JSON.toJSONString(page,true));
+		page.getContent().forEach(d -> {
+			if(d.getDepartmentId() == 4L) {
+				assertThat(d.getEmps(),is(empty()));
+			}
+		});
 	}
 
 	/*
