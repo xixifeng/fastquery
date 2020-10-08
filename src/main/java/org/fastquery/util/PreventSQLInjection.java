@@ -15,46 +15,53 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.util;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class PreventSQLInjection {
+public class PreventSQLInjection
+{
 
-	private PreventSQLInjection() {
-	}
+    // 敏感sql关键字
+    private static final String[] KEYS =
+            {
+                    "drop", "select", "declare", "information_schema.columns", "use",
+                    "insert", "update", "mid", "delete", "like'", "truncate", "and",
+                    "by", "sitename", "create", "from", "where", "xp_cmdshell", "table",
+                    "order", "--", "//", "or", "#", "%", "like", "'", "count", "column_name",
+                    "*", "+", "union", "chr", "net user", ",", "execute", "-", "master", "/",
+                    "group_concat", "char", "table_schema", ";", "grant", "exec"
+            };
 
-	/**
-	 * 判断是否是注入SQL
-	 * 
-	 * @param str 待检测的字符串
-	 * @return 如果是敏感字符串就返回true,反之false
-	 */
-	public static boolean isInjectStr(String str) {
-		if (str == null || "".equals(str.trim())) {
-			return false;
-		}
+    private PreventSQLInjection()
+    {
+    }
 
-		String s = str.toLowerCase();
-
-		// 敏感sql关键字
-		String[] keys = { "'", "and", "exec", "execute", "insert", "select", "delete", "update", "count", "drop", "*", "%", "chr", "mid",
-				"master", "truncate", "char", "declare", "sitename", "net user", "xp_cmdshell", ";", "or", "-", "+", ",", "like'", "and", "exec",
-				"execute", "insert", "create", "drop", "table", "from", "grant", "use", "group_concat", "column_name", "information_schema.columns",
-				"table_schema", "union", "where", "select", "delete", "update", "order", "by", "count", "*", "chr", "mid", "master", "truncate",
-				"char", "declare", "or", ";", "-", "--", "+", ",", "like", "//", "/", "%", "#" };
-		for (String key : keys) {
-			if (s.trim().contains(key)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * 判断是否是注入SQL
+     *
+     * @param str 待检测的字符串
+     * @return 如果是敏感字符串就返回true, 反之false
+     */
+    public static boolean isInjectStr(String str)
+    {
+        if (str != null && !"".equals(str.trim()))
+        {
+            String s = str.toLowerCase();
+            for (String key : KEYS)
+            {
+                if (s.trim().contains(key))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
