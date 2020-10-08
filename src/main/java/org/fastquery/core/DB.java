@@ -32,6 +32,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
@@ -145,12 +147,64 @@ public class DB {
 						unit.put(f, mp.get(f));
 					}
 				}
-				ele.add(unit);
+				// 决定当前 unit 是否添加
+				Predicate<Map<String,Object>> predicate = getPredicate();
+				if(predicate==null || predicate.test(unit))
+				{
+					// change names
+					String[][] changeNames = getTwoDimensional();
+					changeNames(unit, changeNames);
+					// change names end
+					ele.add(unit);
+				}
 			});
 			jsonObject.put(name, ele);
 			array.add(jsonObject);
 		}
 		return array;
+	}
+
+	// 获取二维参数
+	private static String[][] getTwoDimensional()
+	{
+		Object[] args = QueryContext.getArgs();
+		for (Object obj : args) {
+			if(obj instanceof String[][])
+			{
+				return (String[][]) obj;
+			}
+		}
+		return null;
+	}
+	private static Predicate<Map<String,Object>> getPredicate()
+	{
+		Object[] args = QueryContext.getArgs();
+		for (Object obj : args) {
+			if(obj instanceof Predicate)
+			{
+				return (Predicate<Map<String,Object>>) obj;
+			}
+		}
+		return null;
+	}
+
+	private static void changeNames(Map<String,Object> map, String[][] names)
+	{
+		if(map != null && names != null )
+		{
+			for (String[] keys : names)
+			{
+				if (keys != null && keys.length == 2)
+				{
+					String oldKey = keys[0];
+					if (map.containsKey(oldKey))
+					{
+						String newKey = keys[1];
+						map.put(newKey, map.remove(oldKey));
+					}
+				}
+			}
+		}
 	}
 
 	/**
