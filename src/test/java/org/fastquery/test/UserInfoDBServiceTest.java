@@ -705,9 +705,7 @@ public class UserInfoDBServiceTest extends FastQueryTest  {
 
 	@Test
 	public void findDepPage2() {
-		Page<Department> page = db.findDepPage2(new PageableImpl(1,100),(map) -> map.get("id") != null, new String[][]{
-				{"deptId","departmentId"}
-		});
+		Page<Department> page = db.findDepPage2(new PageableImpl(1,100), map -> map.get("id") != null, new String[][]{ {"deptId","departmentId"} });
 		page.getContent().forEach(d -> {
 			if(d.getDepartmentId() == 4L) {
 				assertThat(d.getEmps(),is(empty()));
