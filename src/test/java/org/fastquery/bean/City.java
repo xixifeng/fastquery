@@ -22,12 +22,18 @@
 
 package org.fastquery.bean;
 
+import lombok.*;
 import org.fastquery.core.Id;
 
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class City {
 
 	@Id
@@ -35,41 +41,4 @@ public class City {
 	private Integer code;
 	private String cityAbb;
 	private String cityName;
-		
-	public City() {
-	}
-	public City(Integer id, Integer code, String cityAbb, String cityName) {
-		this.id = id;
-		this.code = code;
-		this.cityAbb = cityAbb;
-		this.cityName = cityName;
-	}
-	public Integer getId() {
-		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
-	public Integer getCode() {
-		return code;
-	}
-	public void setCode(Integer code) {
-		this.code = code;
-	}
-	public String getCityAbb() {
-		return cityAbb;
-	}
-	public void setCityAbb(String cityAbb) {
-		this.cityAbb = cityAbb;
-	}
-	public String getCityName() {
-		return cityName;
-	}
-	public void setCityName(String cityName) {
-		this.cityName = cityName;
-	}
-	@Override
-	public String toString() {
-		return "City [id=" + id + ", code=" + code + ", cityAbb=" + cityAbb + ", cityName=" + cityName + "]";
-	}
 }

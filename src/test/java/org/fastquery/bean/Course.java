@@ -22,10 +22,17 @@
 
 package org.fastquery.bean;
 
+import lombok.*;
+
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Course {
 
 	private String name;
@@ -33,36 +40,4 @@ public class Course {
 	private Integer semester;
 	private Integer period;
 	private String no;
-	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public Integer getCredit() {
-		return credit;
-	}
-	public void setCredit(Integer credit) {
-		this.credit = credit;
-	}
-	public Integer getSemester() {
-		return semester;
-	}
-	public void setSemester(Integer semester) {
-		this.semester = semester;
-	}
-	public Integer getPeriod() {
-		return period;
-	}
-	public void setPeriod(Integer period) {
-		this.period = period;
-	}
-	public String getNo() {
-		return no;
-	}
-	public void setNo(String no) {
-		this.no = no;
-	}
-
 }

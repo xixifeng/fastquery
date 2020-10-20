@@ -22,21 +22,24 @@
 
 package org.fastquery.bean;
 
+import lombok.*;
 import org.fastquery.core.Id;
 
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Fish extends Named{
 
 	 @Id
 	 private Integer id;
 	 private Integer num;
-	
-	 public Fish() {
-	 }
-	
+
 	public Fish(Integer id, String name, Integer num) {
 		super(name);
 		this.id = id;
@@ -46,22 +49,4 @@ public class Fish extends Named{
 	public Fish(String name, Integer num) {
 		this.num = num;
 	}
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public Integer getNum() {
-		return num;
-	}
-
-	public void setNum(Integer num) {
-		this.num = num;
-	} 
-	
-	
 }

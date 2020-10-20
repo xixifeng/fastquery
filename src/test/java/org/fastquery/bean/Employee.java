@@ -22,47 +22,22 @@
 
 package org.fastquery.bean;
 
+import lombok.*;
 import org.fastquery.core.Id;
 
 /**
  *
  * @author xixifeng (fastquery@126.com)
  */
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Employee {
 
     @Id
     private Long id;
     private Long departmentId;
     private String name;
-
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
-    }
-
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "Employee{" +
-                "id=" + id +
-                ", departmentId=" + departmentId +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }

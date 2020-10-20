@@ -22,6 +22,7 @@
 
 package org.fastquery.bean;
 
+import lombok.*;
 import org.fastquery.core.Id;
 
 import java.util.List;
@@ -30,43 +31,15 @@ import java.util.List;
  *
  * @author xixifeng (fastquery@126.com)
  */
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Department {
 
     @Id
     private Long departmentId;
     private String departmentName;
     private List<Employee> emps;
-
-    public Long getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
-    }
-
-    public String getDepartmentName() {
-        return departmentName;
-    }
-
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
-    }
-
-    public List<Employee> getEmps() {
-        return emps;
-    }
-
-    public void setEmps(List<Employee> emps) {
-        this.emps = emps;
-    }
-
-    @Override
-    public String toString() {
-        return "Department{" +
-                "departmentId=" + departmentId +
-                ", departmentName='" + departmentName + '\'' +
-                ", emps=" + emps +
-                '}';
-    }
 }

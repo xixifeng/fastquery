@@ -22,12 +22,18 @@
 
 package org.fastquery.bean;
 
+import lombok.*;
 import org.fastquery.core.Id;
 
 /**
  *
  * @author xixifeng (fastquery@126.com)
  */
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class TypeTest {
 
     @Id
@@ -37,64 +43,11 @@ public class TypeTest {
     private Boolean auth;
     private String gender;
 
-    public TypeTest(){
-    }
-
-    public TypeTest(Boolean deleted, Boolean activated, Boolean auth, String gender) {
+    public TypeTest(Boolean deleted, Boolean activated, Boolean auth, String gender)
+    {
         this.deleted = deleted;
         this.activated = activated;
         this.auth = auth;
         this.gender = gender;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    public Boolean getActivated() {
-        return activated;
-    }
-
-    public void setActivated(Boolean activated) {
-        this.activated = activated;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public Boolean getAuth() {
-        return auth;
-    }
-
-    public void setAuth(Boolean auth) {
-        this.auth = auth;
-    }
-
-
-    @Override
-    public String toString() {
-        return "TypeTest{" +
-                "id=" + id +
-                ", deleted=" + deleted +
-                ", activated=" + activated +
-                ", gender='" + gender + '\'' +
-                '}';
     }
 }

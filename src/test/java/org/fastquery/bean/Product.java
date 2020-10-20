@@ -22,50 +22,27 @@
 
 package org.fastquery.bean;
 
+import lombok.*;
+
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Product {
 	
  	private Integer pid;
 	private Integer lid;
 	private String pname;
 	private String description;
-	
-	public Product() {
-	}
-	
+
 	public Product(Integer pid, Integer lid, String pname) {
-		super();
 		this.pid = pid;
 		this.lid = lid;
 		this.pname = pname;
 	}
-	
-	public Integer getPid() {
-		return pid;
-	}
-	public Integer getLid() {
-		return lid;
-	}
-	public String getPname() {
-		return pname;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setPid(Integer pid) {
-		this.pid = pid;
-	}
-	public void setLid(Integer lid) {
-		this.lid = lid;
-	}
-	public void setPname(String pname) {
-		this.pname = pname;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	
 }

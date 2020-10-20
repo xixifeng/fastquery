@@ -22,56 +22,26 @@
 
 package org.fastquery.bean;
 
+import lombok.*;
 import org.fastquery.core.Transient;
 
 /**
  *
  * @author xixifeng (fastquery@126.com)
  */
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class UserInformation {
 
 	private Integer uid;
 	private String myname;
 	private Integer myage;
 
-	public Integer getUid() {
-		return uid;
-	}
-
-	public String getMyname() {
-		return myname;
-	}
-
-	public Integer getMyage() {
-		return myage;
-	}
-
-	public void setUid(Integer uid) {
-		this.uid = uid;
-	}
-
-	public void setMyname(String myname) {
-		this.myname = myname;
-	}
-
-	public void setMyage(Integer myage) {
-		this.myage = myage;
-	}
-
-	@Override
-	public String toString() {
-		return "UserInformation [uid=" + uid + ", myname=" + myname + ", myage=" + myage + "]";
-	}
-
 	@Transient
 	private String description;
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
 
 }

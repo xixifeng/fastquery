@@ -22,28 +22,17 @@
 
 package org.fastquery.bean;
 
+import lombok.*;
+
 /**
  * 
  * @author mei.sir@aliyun.cn
  */
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Named {
-
 	private String name;
-	
-	public String getName() {
-		return name;
-	}
-
-	public Named() {
-	}
-	
-	public Named(String name) {
-		this.name = name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	
 }

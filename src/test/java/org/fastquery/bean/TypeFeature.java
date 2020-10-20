@@ -22,6 +22,7 @@
 
 package org.fastquery.bean;
 
+import lombok.*;
 import org.fastquery.core.Id;
 import org.fastquery.core.Table;
 
@@ -32,6 +33,11 @@ import java.util.EnumSet;
  * @author xixifeng (fastquery@126.com)
  */
 @Table("type_feature")
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class TypeFeature {
 
     @Id
@@ -40,49 +46,4 @@ public class TypeFeature {
     private Gender gender;
     private EnumSet<Ruits> ruits;
     private Integer sort;
-
-    public Integer getSort()
-    {
-        return sort;
-    }
-
-    public void setSort(Integer sort)
-    {
-        this.sort = sort;
-    }
-
-    public EnumSet<Ruits> getRuits() {
-        return ruits;
-    }
-    public void setRuits(EnumSet<Ruits> ruits) {
-        this.ruits = ruits;
-    }
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public Gender getGender() {
-        return gender;
-    }
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    @Override
-    public String toString() {
-        return "TypeFeature{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", gender=" + gender +
-                ", ruits=" + ruits +
-                '}';
-    }
 }

@@ -22,12 +22,18 @@
 
 package org.fastquery.bean;
 
+import lombok.*;
 import org.fastquery.core.Transient;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Student {
 
 	private String no;
@@ -35,71 +41,14 @@ public class Student {
 	private String sex;
 	private Integer age;
 	private String dept;
-
-	public Student() {
-	}
-
-	public Student(String no, String name, String sex, Integer age, String dept) {
-		this.no = no;
-		this.name = name;
-		this.sex = sex;
-		this.age = age;
-		this.dept = dept;
-	}
-
-	public String getNo() {
-		return no;
-	}
-
-	public void setNo(String no) {
-		this.no = no;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getSex() {
-		return sex;
-	}
-
-	public void setSex(String sex) {
-		this.sex = sex;
-	}
-
-	public Integer getAge() {
-		return age;
-	}
-
-	public void setAge(Integer age) {
-		this.age = age;
-	}
-
-	public String getDept() {
-		return dept;
-	}
-
-	public void setDept(String dept) {
-		this.dept = dept;
-	}
-
-	@Override
-	public String toString() {
-		return "Student [no=" + no + ", name=" + name + ", sex=" + sex + ", age=" + age + ", dept=" + dept + "]";
-	}
-
 	@Transient
 	private String description;
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
+	public Student(String no, String name, String sex, Integer age, String dept)
+	{
+		this.no = no;
+		this.name = name;
+		this.sex = sex;
+		this.age = age;
+		this.dept = dept;
 	}
 }
