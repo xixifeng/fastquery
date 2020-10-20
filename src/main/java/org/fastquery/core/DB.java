@@ -32,7 +32,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -106,7 +105,7 @@ public class DB {
 
 
 	private static String fetchGroupKey(Map<String, Object> map, List<String> keys) {
-		JSONObject jsonObject = new JSONObject(new LinkedHashMap());
+		JSONObject jsonObject = new JSONObject(true);
 		for (String key : keys) {
 			jsonObject.put(key, map.get(key));
 		}
@@ -131,7 +130,7 @@ public class DB {
 			}
 		}
 
-		Map<String, List<Map<String, Object>>> map = keyvals.stream().collect(Collectors.groupingBy(m -> fetchGroupKey(m, groupFeilds)));
+		Map<String, List<Map<String, Object>>> map = keyvals.stream().collect(Collectors.groupingBy(m -> fetchGroupKey(m, groupFeilds), LinkedHashMap::new, Collectors.toList()));
 		Set<String> keys = map.keySet(); // 组名列表
 
 		List<Map<String, Object>> array = new ArrayList<>();

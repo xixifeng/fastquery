@@ -22,11 +22,7 @@
 
 package org.fastquery.test;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.fastquery.bean.Department;
-import org.fastquery.struct.Reference;
-import org.fastquery.util.TypeUtil;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -54,11 +50,8 @@ import static org.junit.Assert.assertThat;
 
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.fail;
 
 /**
  * 
