@@ -660,9 +660,14 @@ public final class BeanUtil {
 					sets.append(keyVal);
 					sets.append(" then ");
 					if (fieldVal != null) {
-						sets.append('\'');
-						sets.append(fieldVal);
-						sets.append("' ");
+						if(fieldVal instanceof Boolean){
+							sets.append(fieldVal);
+							sets.append(' ');
+						} else {
+							sets.append('\'');
+							sets.append(fieldVal);
+							sets.append("' ");
+						}
 					} else {
 						sets.append(fieldName);
 						sets.append(' ');

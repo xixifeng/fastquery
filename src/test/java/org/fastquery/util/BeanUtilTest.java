@@ -26,6 +26,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
@@ -34,6 +36,7 @@ import static org.junit.Assert.assertThat;
 import com.alibaba.fastjson.JSON;
 import org.fastquery.bean.Fish;
 import org.fastquery.bean.Student;
+import org.fastquery.bean.TypeTest;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.core.SelectField;
@@ -442,6 +445,18 @@ public class BeanUtilTest {
 		String sql = BeanUtil.toUpdateSQL(userInfos, null);
 		assertThat(sql, equalTo(
 				"update UserInfo set name = case id when 77 then name when 88 then name when 99 then name else name end,age = case id when 77 then age when 88 then age when 99 then '16' else age end where id in(77,88,99)"));
+	}
+
+	@Test
+	public void toUpdateSQL5() {
+		TypeTest tt1 = new TypeTest(1L,true,false,true,"男");
+		TypeTest tt2 = new TypeTest(3L,false,true,false,"女");
+		TypeTest tt3 = new TypeTest(5L,true,false,true,"男");
+		List<TypeTest> list = Stream.of(tt1,tt2,tt3).collect(Collectors.toList());
+
+		String sql = BeanUtil.toUpdateSQL(list, null);
+		assertThat(sql, equalTo(
+				"update TypeTest set deleted = case id when 1 then true when 3 then false when 5 then true else deleted end,activated = case id when 1 then false when 3 then true when 5 then false else activated end,auth = case id when 1 then true when 3 then false when 5 then true else auth end,gender = case id when 1 then '男' when 3 then '女' when 5 then '男' else gender end where id in(1,3,5)"));
 	}
 
 	@Test
