@@ -235,8 +235,6 @@ public class AsmRepository {
 	 */
 	public static void after(List<Class<?>> classes) {
 		QueryValidator.check(classes);
-		classes.clear();
-
 		LOG.debug("\n\n\n\n初始化阶段结束\n");
 	}
 

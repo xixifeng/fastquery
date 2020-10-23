@@ -36,7 +36,7 @@ import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
@@ -54,15 +54,19 @@ public class RepVersion extends FastQueryTest  {
 	private static final String REG = "\\d+\\.\\d+\\.\\d+(\\.enforce)*";
 
 	private static String showInputDialog(String initialSelectionValue) {
+		JFrame jf = new JFrame();
+		jf.setAlwaysOnTop(true);
 		String s;
-		while ("".equals((s = JOptionPane.showInputDialog("请输入发布版本号: ", initialSelectionValue))) || s == null || !Pattern.matches(REG, s)) {
+		while ("".equals((s = JOptionPane.showInputDialog(jf,"请输入发布版本号: ", initialSelectionValue))) || s == null || !Pattern.matches(REG, s)) {
 			LOG.warn("输入的版本号是空，重新输入");
 		}
 		return s;
 	}
 
 	private static String confirm(String v, String initialSelectionValue) {
-		int n = JOptionPane.showConfirmDialog(null, "发布的版本号为: " + v + " 吗?", "版本确认", JOptionPane.YES_NO_OPTION);
+		JFrame jf = new JFrame();
+		jf.setAlwaysOnTop(true);
+		int n = JOptionPane.showConfirmDialog(jf, "发布的版本号为: " + v + " 吗?", "版本确认", JOptionPane.YES_NO_OPTION);
 		if (n == JOptionPane.YES_OPTION) {
 			return v;
 		} else {

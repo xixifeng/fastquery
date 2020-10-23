@@ -479,8 +479,6 @@ public class MethodQueryTest extends FastQueryTest {
 
 	@Test
 	public void findPage2() {
-		System.out.println(Gender.女);
-		System.out.println(Gender.女.toString());
 		TypeFeature typeFeature = new TypeFeature();
 		typeFeature.setGender(Gender.女);
 		TypeFeature likes = new TypeFeature();

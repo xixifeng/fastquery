@@ -45,7 +45,7 @@ class GenerateRepositoryImpl {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GenerateRepositoryImpl.class);
 
-	private final FqClassLoader classLoader = new FqClassLoader(GenerateRepositoryImpl.class.getClassLoader());
+	private final FqClassLoader classLoader = FqClassLoader.getInstance();
 
 	private static class LazyHolder {
 		private static final GenerateRepositoryImpl INSTANCE = new GenerateRepositoryImpl();
@@ -58,6 +58,9 @@ class GenerateRepositoryImpl {
 		return LazyHolder.INSTANCE;
 	}
 
+
+	private List<Class<?>> clses = new ArrayList<>();
+
 	private GenerateRepositoryImpl() {
 
 		LOG.debug("GenerateRepositoryImpl 已实例化.");
@@ -67,16 +70,14 @@ class GenerateRepositoryImpl {
 		// 1). 装载配置文件
 		Set<FastQueryJson> fqPropertie = LoadPrperties.load(resource);
 
-		List<Class<?>> clses = new ArrayList<>();
-
 		// 3). 批量生成 Repository 的实现类
-		fqPropertie.parallelStream().forEach(fQueryPropertie -> {
+		fqPropertie.forEach(fQueryPropertie -> {
 			Set<String> basePackages = fQueryPropertie.getBasePackages();
-			basePackages.parallelStream().forEach(basePackage -> {
+			basePackages.forEach(basePackage -> {
 				List<Class<?>> classes = ClassUtil.getClasses(basePackage);
 				clses.addAll(classes);
 				// classes.forEach(this::generate)
-				classes.parallelStream().forEach(rcls -> {
+				classes.forEach(rcls -> {
 					generate(rcls); // 生成
 					QueryPool.put(rcls.getName(), resource);
 				});
@@ -112,4 +113,14 @@ class GenerateRepositoryImpl {
 	public FqClassLoader getClassLoader() {
 		return classLoader;
 	}
+
+	List<Class<?>> getClasses() {
+		return clses;
+	}
+
+	void cleanClasses(){
+		clses.clear();
+		clses = null;
+	}
 }
+

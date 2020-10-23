@@ -20,29 +20,39 @@
  * 
  */
 
-package org.fastquery.service;
+package org.fastquery.test;
+
+import org.fastquery.dao.TypeFeatureDBService;
+import org.fastquery.dao.UserInfoDBService;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.annotation.Resource;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * 
  * @author xixifeng (fastquery@126.com)
  */
-class FqClassLoader extends ClassLoader {
+@ContextConfiguration(locations = {"classpath:beans.xml"})
+@RunWith(value = SpringJUnit4ClassRunner.class)
+public class SpringSupportTest extends FastQueryTest {
 
-	private static class LazyHolder {
-		private LazyHolder() {
-		}
-		private static final FqClassLoader INSTANCE = new FqClassLoader();
-	}
+    @Resource
+    private UserInfoDBService userInfoDBService;
 
-	private FqClassLoader() {
-		super(FqClassLoader.class.getClassLoader());
-	}
+    @Autowired
+    private TypeFeatureDBService typeFeatureDBService;
 
-	static FqClassLoader getInstance() {
-		return LazyHolder.INSTANCE;
-	}
+    @Test
+    public void notNullVal(){
+        assertThat(userInfoDBService,notNullValue());
+        assertThat(typeFeatureDBService,notNullValue());
+    }
 
-	final Class<?> defineClassByName(String name, byte[] b, int len) {
-		return defineClass(name, b, 0, len);
-	}
 }
