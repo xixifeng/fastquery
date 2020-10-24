@@ -25,9 +25,7 @@ package org.fastquery.core;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.List;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.filter.FilterChainHandler;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.Page;
@@ -38,11 +36,9 @@ import org.fastquery.util.TypeUtil;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class Prepared
 { // NO_UCD
-
-    private static final Logger LOG = LoggerFactory.getLogger(Prepared.class);
-
     private Prepared()
     {
     }
@@ -80,7 +76,7 @@ public class Prepared
                 return object;
             }
 
-            LOG.info("准备执行方法:{}", method);
+            log.info("准备执行方法:{}", method);
             object = businessProcess();
 
             // 注入AfterFilter
@@ -120,7 +116,7 @@ public class Prepared
             }
             catch (SQLException e)
             {
-                LOG.error("数据库连接无法释放", e);
+                log.error("数据库连接无法释放", e);
             }
 
             long slowQueryTime = FastQueryJSONObject.getSlowQueryTime();
@@ -130,7 +126,7 @@ public class Prepared
                 long x = end - start;
                 if (x >= slowQueryTime)
                 {
-                    LOG.warn("slowQueryTime: 执行{} 耗时: {} 毫秒", method, x);
+                    log.warn("slowQueryTime: 执行{} 耗时: {} 毫秒", method, x);
                 }
             }
         }

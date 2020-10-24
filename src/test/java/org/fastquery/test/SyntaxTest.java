@@ -21,21 +21,16 @@
  */
 
 package org.fastquery.test;
-
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.core.Param;
 import org.junit.Test;
-
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,28 +38,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class SyntaxTest extends FastQueryTest
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SyntaxTest.class);
-
-    public static class Ca {
-        public  void show(){
-            System.out.println("吃饭了");
-        }
-    }
-
-    @Test
-    public void testNew() throws IllegalAccessException, InstantiationException
-    {
-        Ca.class.newInstance().show();
-    }
-
     @Test
     public void listEmpty()
     {
         List<Map<String, Object>> maps = new ArrayList<>();
-        assertThrows(IndexOutOfBoundsException.class,() -> maps.get(0));
+        assertThrows(IndexOutOfBoundsException.class, () -> maps.get(0));
     }
 
     @Test
@@ -95,11 +76,11 @@ public class SyntaxTest extends FastQueryTest
     @Test
     public void testReg()
     {
-        LOG.debug(String.valueOf(Pattern.matches("", "")));
+        log.debug(String.valueOf(Pattern.matches("", "")));
         // s.replaceAll(""+param.value()+"\\b", "?"+(i+1));
         assertThat("abckdwgew:name&".replaceAll(":name\\b", "?"), equalTo("abckdwgew?&"));
         assertThat("abckdwgew:name &".replaceAll("name\\b", "?"), equalTo("abckdwgew:? &"));
-        LOG.debug("-->: " + ("abckdwgew:name222 &".replaceAll("name\\b", "?")));
+        log.debug("-->: " + ("abckdwgew:name222 &".replaceAll("name\\b", "?")));
         assertThat(":name22".replaceAll("name\\b", "?"), equalTo(":name22"));
         assertThat(":name22 ".replaceAll("name\\b", "?"), equalTo(":name22 "));
         assertThat(":name,".replaceAll("name\\b", "?"), equalTo(":?,"));

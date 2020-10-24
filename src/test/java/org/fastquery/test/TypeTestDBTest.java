@@ -28,13 +28,9 @@ import org.fastquery.example.TypeTestDB;
 import org.fastquery.service.FQuery;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 

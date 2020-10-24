@@ -22,6 +22,7 @@
 
 package org.fastquery.test;
 
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Gender;
 import org.fastquery.bean.Ruits;
 import org.fastquery.bean.TypeFeature;
@@ -31,24 +32,18 @@ import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
-
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class TypeFeatureDBServiceTest extends FastQueryTest
 {
-
-    private Logger LOG = LoggerFactory.getLogger(TypeFeatureDBServiceTest.class);
-
     private TypeFeatureDBService db = FQuery.getRepository(TypeFeatureDBService.class);
 
     @Rule
@@ -78,7 +73,7 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
     public void findByRuits()
     {
         List<TypeFeature> tfs = db.findByRuits(Ruits.苹果, Ruits.橘子);
-        LOG.error("tfs:{},len:{}", tfs, tfs.size());
+        log.error("tfs:{},len:{}", tfs, tfs.size());
         assertThat(tfs, not(empty()));
         tfs.forEach(t -> {
             assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.苹果, Ruits.橘子)), is(true));
@@ -174,7 +169,7 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
             assertThat(gender.getEnName(), is("Woman"));
         });
         assertThat(tf.getNumberOfElements(), is(7));
-        LOG.info("Gender.女, toString:{}", Gender.女);
+        log.info("Gender.女, toString:{}", Gender.女);
     }
 
     @Test

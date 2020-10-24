@@ -21,18 +21,15 @@
  */
 
 package org.fastquery.util;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.struct.Reference;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.fastquery.asm.Script2Class;
 import org.fastquery.core.Id;
 import org.fastquery.core.MethodInfo;
@@ -48,18 +45,15 @@ import org.fastquery.page.PageIndex;
 import org.fastquery.page.PageSize;
 import org.fastquery.struct.ParamMap;
 import org.fastquery.where.Condition;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class TypeUtil
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(TypeUtil.class);
-
     private TypeUtil()
     {
     }
@@ -526,7 +520,7 @@ public class TypeUtil
         {
             // 这个异常其实永远也发生不了,该异常已经通过静态分析,提升到初始化阶段了
 
-            LOG.error("{} 必须有一个不带参数且用public修饰的构造方法.反之,作废", condition.ignore());
+            log.error("{} 必须有一个不带参数且用public修饰的构造方法.反之,作废", condition.ignore());
             return false;
         }
     }

@@ -25,24 +25,20 @@ package org.fastquery.util;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.*;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.*;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.core.SelectField;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
 import com.alibaba.fastjson.JSON;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public final class BeanUtil
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(BeanUtil.class);
     private static final String UPDATE = "update ";
     private static final String NOT_ID = " 必须有@Id标识,并且主键不能为null";
 
@@ -604,7 +600,7 @@ public final class BeanUtil
 
             if (sb.length() == len)
             {
-                LOG.warn("传递的实体,没有什么可以修改,{}", bean);
+                log.warn("传递的实体,没有什么可以修改,{}", bean);
                 return ArrayUtils.EMPTY_OBJECT_ARRAY;
             }
             else
@@ -673,7 +669,7 @@ public final class BeanUtil
             }
             if (sb.length() == len)
             {
-                LOG.warn("传递的实体,没有什么可修改,{}", bean);
+                log.warn("传递的实体,没有什么可修改,{}", bean);
                 return ArrayUtils.EMPTY_OBJECT_ARRAY;
             }
             else
@@ -1012,7 +1008,7 @@ public final class BeanUtil
     public static SQLValue getSqlValue(Class<?> clazz, String fieldName, List<Object> fieldValues, int rows, boolean contain, String[] fields)
     {
         String selectFields = new SelectField<>(clazz, contain, fields).getFields();
-        LOG.debug("selectFields: {}", selectFields);
+        log.debug("selectFields: {}", selectFields);
 
         StringBuilder sb = new StringBuilder();
         sb.append("select ");

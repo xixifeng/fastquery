@@ -28,29 +28,25 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.UUID;
-
 import static org.hamcrest.Matchers.*;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao2.DefaultDBService;
 import org.fastquery.service.FQuery;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 测试QueryRepository中的默认方法
  *
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 public class DefaultMethodTest extends FastQueryTest
 {
 
     private final DefaultDBService db = FQuery.getRepository(DefaultDBService.class);
-
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultMethodTest.class);
 
     @Test
     public void dbNoneNull()
@@ -63,7 +59,7 @@ public class DefaultMethodTest extends FastQueryTest
     {
         UserInfo u1 = new UserInfo("婤姶", 2558);
         UserInfo u2 = db.save(u1);
-        LOG.debug("{}", u2);
+        log.debug("{}", u2);
         long id = u2.getId();
         int effect = db.delete("UserInfo", "id", id);
         assertThat(effect, is(1));
@@ -152,7 +148,7 @@ public class DefaultMethodTest extends FastQueryTest
         String name = "王五";
         userInfo.setName(name);
         u = db.findOne(userInfo, true, "id", "name");
-        LOG.info("u:{}", u);
+        log.info("u:{}", u);
         assertThat(u.getId(), notNullValue());
         assertThat(u.getName(), equalTo(name));
         assertThat(u.getAge(), nullValue());

@@ -34,8 +34,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.function.IntSupplier;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.handler.ModifyingHandler;
@@ -49,17 +48,15 @@ import org.fastquery.util.BeanUtil;
 import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 class QueryProcess
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(QueryProcess.class);
 
     private static class LazyHolder
     {
@@ -363,7 +360,7 @@ class QueryProcess
         {
             bean = iargs[2];
             sql = BeanUtil.toInsertSQL((String) iargs[1], bean);
-            LOG.info(sql);
+            log.info(sql);
             Object keyObj = DB.update(sql, false);
             if (keyObj == null)
             {
@@ -378,7 +375,7 @@ class QueryProcess
         {
             bean = iargs[0];
             sql = BeanUtil.toInsertSQL(bean);
-            LOG.info(sql);
+            log.info(sql);
             Object keyObj = DB.update(sql, false);
             if (keyObj == null)
             {
@@ -406,7 +403,7 @@ class QueryProcess
             bean = iargs[0];
             sql = BeanUtil.toInsertSQL(bean);
         }
-        LOG.info(sql);
+        log.info(sql);
         return DB.update(sql, true);
     }
 
@@ -519,7 +516,7 @@ class QueryProcess
             }
             sql = BeanUtil.toInsertSQL(coll, dbName, ignoreRepeat);
         }
-        LOG.info(sql);
+        log.info(sql);
         return DB.update(sql, true);
     }
 
@@ -540,7 +537,7 @@ class QueryProcess
             dbName = (String) iargs[1];
         }
         sql = BeanUtil.toUpdateSQL(entities, dbName);
-        LOG.info(sql);
+        log.info(sql);
         return DB.update(sql, true);
     }
 
@@ -621,7 +618,7 @@ class QueryProcess
             int asInt = ((IntSupplier) (QueryContext.getArgs()[0])).getAsInt();
             if (asInt == -1)
             {
-                LOG.info("tx中的函数式返回了null或-1,导致tx中的所有操作回滚");
+                log.info("tx中的函数式返回了null或-1,导致tx中的所有操作回滚");
                 TxContext.getTxContext().rollback();
                 return -1;
             }
@@ -634,7 +631,7 @@ class QueryProcess
         catch (Exception e)
         {
             TxContext.getTxContext().rollback();
-            LOG.warn("tx方法被迫回滚", e);
+            log.warn("tx方法被迫回滚", e);
             return -1;
         }
         finally
@@ -662,7 +659,7 @@ class QueryProcess
         List<Map<String, Object>> list = DB.find(sv);
         if (list.isEmpty())
         {
-            LOG.warn("findOne 实际没有查到任何记录，返回 null");
+            log.warn("findOne 实际没有查到任何记录，返回 null");
             return null;
         }
         else if (list.size() > 1)
@@ -730,7 +727,7 @@ class QueryProcess
         int rows = (int) iargs[3];
         boolean contain = (boolean) iargs[4];
         String[] fields = (String[]) iargs[5];
-        LOG.debug("clazz:{}, fieldName:{}, fieldValues:{}, rows:{}, contain:{}, fields:{}",
+        log.debug("clazz:{}, fieldName:{}, fieldValues:{}, rows:{}, contain:{}, fields:{}",
                 clazz, fieldName, fieldValues, rows, contain, fields);
         SQLValue sqlValue = BeanUtil.getSqlValue(clazz, fieldName, fieldValues, rows, contain, fields);
         List<Map<String, Object>> keymaps = DB.find(sqlValue);

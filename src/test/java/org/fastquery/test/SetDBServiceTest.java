@@ -28,6 +28,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Course;
 import org.fastquery.dao.SetDBService;
 import org.fastquery.service.FQuery;
@@ -40,18 +41,14 @@ import org.junit.experimental.theories.FromDataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 @RunWith(Theories.class)
 public class SetDBServiceTest extends FastQueryTest
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SetDBServiceTest.class);
-
     private static SetDBService db = FQuery.getRepository(SetDBService.class);
 
     @Rule
@@ -77,7 +74,7 @@ public class SetDBServiceTest extends FastQueryTest
     @Theory
     public void testUpdateCourse1$1(@FromDataPoints("names") String name, @FromDataPoints("credits") Integer credit, @FromDataPoints("semesters") Integer semester, @FromDataPoints("periods") Integer period, @FromDataPoints("no") String no)
     {
-        LOG.info("当前参数 name={}, credit={}, semester={}, period={}, no={} ", name, credit, semester, period, no);
+        log.info("当前参数 name={}, credit={}, semester={}, period={}, no={} ", name, credit, semester, period, no);
         if ((name == null || "".equals(name)) && credit == null && semester == null && period == null)
         {
             // 这种情形 已在SetDBServiceTest2中测试

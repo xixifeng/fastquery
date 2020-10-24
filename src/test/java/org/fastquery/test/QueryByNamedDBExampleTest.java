@@ -21,9 +21,7 @@
  */
 
 package org.fastquery.test;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.RepositoryException;
@@ -35,12 +33,9 @@ import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
 import org.junit.Test;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -51,11 +46,9 @@ import static org.hamcrest.Matchers.*;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class QueryByNamedDBExampleTest extends FastQueryTest
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(QueryByNamedDBExampleTest.class);
-
     @Rule
     public FastQueryTestRule rule = new FastQueryTestRule();
 
@@ -174,7 +167,7 @@ public class QueryByNamedDBExampleTest extends FastQueryTest
             assertThat(pageObj.getTotalElements(), not(0L)); // 总记录数不为0l
             // 注意TotalElements是long类型,比较是最好保持类型一致!
         }
-        LOG.debug(JSON.toJSONString(JSON.toJSON(pageObj), true));
+        log.debug(JSON.toJSONString(JSON.toJSON(pageObj), true));
 
         List<SQLValue> sqlValues = rule.getListSQLValue();
         assertThat(sqlValues.size(), is(2));
@@ -229,7 +222,7 @@ public class QueryByNamedDBExampleTest extends FastQueryTest
     public void updateUserInfoById()
     {
         int id = Math.abs(new Random().nextInt() % 3) + 1; // [1,3] 范围的随机数
-        LOG.debug("正在修改主键为" + id + "的UserInfo.");
+        log.debug("正在修改主键为" + id + "的UserInfo.");
         String name = "清风习习" + new Random().nextInt(8);
         int age = new Random().nextInt(99);
         int effect = db.updateUserInfoById(id, name, age);

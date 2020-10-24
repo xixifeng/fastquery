@@ -21,20 +21,16 @@
  */
 
 package org.fastquery.test;
-
+import lombok.extern.slf4j.Slf4j;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
@@ -48,10 +44,9 @@ import org.fastquery.util.BeanUtil;
  *
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 public class FastQueryTestRule implements TestRule
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(FastQueryTestRule.class);
     private SQLValue sqlValue;
     private List<SQLValue> sqlValues;
     private List<String> executedSQLs;
@@ -59,7 +54,7 @@ public class FastQueryTestRule implements TestRule
     private void proxy(Statement base, Description description) throws IllegalAccessException
     {
         Object testTarget = getTestTarget(base);
-        LOG.debug("SkipFilter:{}", description.getAnnotation(SkipFilter.class));
+        log.debug("SkipFilter:{}", description.getAnnotation(SkipFilter.class));
         Class<?> clazz = description.getTestClass();
         List<Field> fList = new ArrayList<>();
         Field[] fields = BeanUtil.getFields(clazz);
@@ -139,7 +134,7 @@ public class FastQueryTestRule implements TestRule
                 try
                 {
                     proxy(base, description);
-                    LOG.debug("{} --------------------------------------------开始执行,当前线程: {}", description.getMethodName(), Thread.currentThread());
+                    log.debug("{} --------------------------------------------开始执行,当前线程: {}", description.getMethodName(), Thread.currentThread());
                     base.evaluate();
                 }
                 catch (Throwable e)
@@ -195,7 +190,7 @@ public class FastQueryTestRule implements TestRule
 
     private void after(Description description) throws SQLException
     {
-        LOG.debug("{} --------------------------------------------已经结束,当前线程:{}", description.getMethodName(), Thread.currentThread());
+        log.debug("{} --------------------------------------------已经结束,当前线程:{}", description.getMethodName(), Thread.currentThread());
         QueryContext context = QueryContextHelper.getQueryContext();
         if (context != null && QueryContext.getConn() != null)
         {
@@ -203,12 +198,12 @@ public class FastQueryTestRule implements TestRule
             if (rollback == null || rollback.value())
             {
                 QueryContext.getConn().rollback();
-                LOG.info("事务已经回滚");
+                log.info("事务已经回滚");
             }
             else
             {
                 QueryContext.getConn().commit();
-                LOG.info("事务已经提交");
+                log.info("事务已经提交");
             }
             QueryContext.forceClear();
         }

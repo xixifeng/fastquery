@@ -28,12 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Fish;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.TypeTest;
@@ -41,17 +40,13 @@ import org.fastquery.bean.UserInfo;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.core.SelectField;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class BeanUtilTest
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(BeanUtilTest.class);
-
     final static class T
     {
         private Integer key;
@@ -532,7 +527,7 @@ public class BeanUtilTest
     {
         String sql = "select xx,yy,zz from table where aa = bb and cc=dd and ee =ff";
         String[] sqls = BeanUtil.toEachOne(sql);
-        LOG.debug("sqls:{}", JSON.toJSONString(sqls));
+        log.debug("sqls:{}", JSON.toJSONString(sqls));
         assertThat(sqls.length, is(3));
         assertThat(sqls[0], equalTo("select xx,yy,zz from table where aa = bb"));
         assertThat(sqls[1], equalTo("select xx,yy,zz from table where cc=dd"));

@@ -21,13 +21,10 @@
  */
 
 package org.fastquery.struct;
-
 import java.util.List;
 import java.util.regex.Pattern;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
@@ -39,11 +36,9 @@ import org.fastquery.util.TypeUtil;
  *
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 public class SQLValue
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SQLValue.class);
-
     private String sql; // 待执行的sql
     private List<Object> values;// sql语言中"?"对应的实参
 
@@ -54,7 +49,7 @@ public class SQLValue
     public SQLValue(String sql, List<Object> values)
     {
 
-        LOG.info("SQL扩展之前:{}", sql);
+        log.info("SQL扩展之前:{}", sql);
         Object[] args = QueryContext.getArgs();
         // 1. 处理"% ? % "问题, 对应的正则 "[_\\s*%]+\\?[_\\s*%]+"
         List<String> ssms = percent(sql, values, args);
@@ -83,7 +78,7 @@ public class SQLValue
             if (PreventSQLInjection.isInjectStr(in) && TypeUtil.matches(in, Placeholder.SMILE).isEmpty())
             {
                 String tip = in.replace("`-", "").replace("-`", "") + "中包含有危险关键字,正在尝试SQL注入";
-                LOG.error(tip);
+                log.error(tip);
                 throw new RepositoryException(tip);
             }
         }

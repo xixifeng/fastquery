@@ -23,13 +23,9 @@
 package org.fastquery.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-
 import java.math.BigInteger;
-
 import static org.hamcrest.Matchers.*;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.sunny.Card;
 import org.fastquery.bean.sunny.Tenant;
 import org.fastquery.dao.SunnyDBService;
@@ -40,11 +36,9 @@ import org.junit.Test;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class SunnyDBServiceTest extends FastQueryTest
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SunnyDBServiceTest.class);
-
     private final SunnyDBService sunnyDBService = FQuery.getRepository(SunnyDBService.class);
 
     @Rule
@@ -86,7 +80,7 @@ public class SunnyDBServiceTest extends FastQueryTest
     @Test
     public void saveTenant()
     {
-        LOG.debug(String.valueOf(Integer.MAX_VALUE));
+        log.debug(String.valueOf(Integer.MAX_VALUE));
         long id = (long) Integer.MAX_VALUE + 10;
         while (sunnyDBService.existsTenant(id))
         {

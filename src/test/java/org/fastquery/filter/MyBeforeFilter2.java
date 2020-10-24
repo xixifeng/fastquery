@@ -24,25 +24,21 @@ package org.fastquery.filter;
 
 import java.lang.reflect.Method;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.example.StudentDBService;
-import org.fastquery.filter.BeforeFilter;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class MyBeforeFilter2 extends BeforeFilter<StudentDBService>
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MyBeforeFilter2.class);
-
     @Override
     public void doFilter(StudentDBService repository, Method method, Object[] args)
     {
         // repository : 当前拦截到实例对象
         // method : 当前拦截到的方法
         // args : 当前传递进来的参数列表
-        LOG.debug("MyBeforeFilter2....");
+        log.debug("MyBeforeFilter2....");
     }
 }

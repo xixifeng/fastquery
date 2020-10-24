@@ -22,8 +22,7 @@
 
 package org.fastquery.test;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.core.DB;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
@@ -31,10 +30,8 @@ import org.fastquery.struct.RespUpdate;
 import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
 import org.junit.Test;
-
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,11 +42,9 @@ import java.util.stream.Stream;
 /**
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 public class DBTest extends FastQueryTest
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DBTest.class);
-
     private final StudentDBService db = FQuery.getRepository(StudentDBService.class);
 
     // 调用: DB.modify
@@ -95,7 +90,7 @@ public class DBTest extends FastQueryTest
         rus.forEach(ru -> {
             assertThat(ru.getEffect(), greaterThanOrEqualTo(1));
             assertThat(ru.getPk(), greaterThanOrEqualTo(1L));
-            LOG.debug("正在删除:" + ru.getPk());
+            log.debug("正在删除:" + ru.getPk());
             List<RespUpdate> rusx;
             try
             {

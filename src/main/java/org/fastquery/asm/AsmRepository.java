@@ -25,10 +25,6 @@ package org.fastquery.asm;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javassist.CannotCompileException;
 import javassist.ClassClassPath;
 import javassist.ClassPool;
@@ -36,7 +32,7 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
-
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.analysis.GenerateExtends;
 import org.fastquery.core.AbstractQueryRepository;
 import org.fastquery.core.Placeholder;
@@ -46,11 +42,9 @@ import org.fastquery.mapper.QueryValidator;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class AsmRepository
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AsmRepository.class);
-
     private AsmRepository()
     {
     }
@@ -281,7 +275,7 @@ public class AsmRepository
     public static void after(List<Class<?>> classes)
     {
         QueryValidator.check(classes);
-        LOG.debug("\n\n\n\n初始化阶段结束\n");
+        log.debug("\n\n\n\n初始化阶段结束\n");
     }
 
 }

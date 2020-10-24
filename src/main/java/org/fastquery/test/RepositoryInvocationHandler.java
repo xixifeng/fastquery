@@ -28,9 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
@@ -48,11 +46,9 @@ import org.junit.runner.Description;
 /**
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 public class RepositoryInvocationHandler implements InvocationHandler
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RepositoryInvocationHandler.class);
-
     private final Repository repository;
     private final FastQueryTestRule rule;
     private final Description description;
@@ -85,14 +81,14 @@ public class RepositoryInvocationHandler implements InvocationHandler
             return;
         }
         Class<QueryParser> clazz = QueryParser.class;
-        LOG.debug("RepositoryInvocationHandler:当前线程:{}", Thread.currentThread());
+        log.debug("RepositoryInvocationHandler:当前线程:{}", Thread.currentThread());
         MethodInfo currentMethod = QueryContext.getMethodInfo();
         Method modifyParserMethod = clazz.getDeclaredMethod("modifyParser");
         Method queryParserMethod = clazz.getDeclaredMethod("queryParser");
         modifyParserMethod.setAccessible(true);
         queryParserMethod.setAccessible(true);
-        LOG.debug("modifyParserMethod:{}", modifyParserMethod);
-        LOG.info("currentMethod:{}", currentMethod);
+        log.debug("modifyParserMethod:{}", modifyParserMethod);
+        log.info("currentMethod:{}", currentMethod);
         Modifying modifying = currentMethod.getModifying();
         Class<?> returnType = QueryContext.getReturnType();
         QueryByNamed queryById = currentMethod.getQueryByNamed();
@@ -118,7 +114,7 @@ public class RepositoryInvocationHandler implements InvocationHandler
         }
         else
         {
-            LOG.error("暂时没考虑");
+            log.error("暂时没考虑");
         }
 
         Field executedSQLsField = qcclazz.getDeclaredField("executedSQLs");

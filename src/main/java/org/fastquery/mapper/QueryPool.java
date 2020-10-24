@@ -33,13 +33,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.fastquery.core.MethodInfo;
@@ -58,11 +55,9 @@ import org.w3c.dom.NodeList;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class QueryPool
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(QueryPool.class);
-
     private static Resource resource;
 
     private static final Map<String, Set<QueryMapper>> mapQueryMapper = new HashMap<>();
@@ -175,7 +170,7 @@ public class QueryPool
                     String countQuery = fuseValTpl(postion, gparts, element, "countQuery", false);
                     // countQuery 单独存储起来 (className + "." + id)可以确保唯一值,
                     putCountQuery(className + "." + id, countQuery); // 该方法接受到null值后,会视而不见
-                    LOG.debug("id={} , template={}", id, template);
+                    log.debug("id={} , template={}", id, template);
                     QueryMapper queryMapper = new QueryMapper(id, template);
                     // 边解析,边做合法校验
                     legalCheck(queryMappers, queryMapper, postion);
@@ -348,7 +343,7 @@ public class QueryPool
         {
             id = method.getName();
         }
-        LOG.info("已获得模板:{}", id);
+        log.info("已获得模板:{}", id);
         String tpl;
         if (isQuery)
         {

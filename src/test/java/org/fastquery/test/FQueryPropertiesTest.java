@@ -23,35 +23,23 @@
 package org.fastquery.test;
 
 import java.lang.reflect.Field;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
-
 import javax.sql.DataSource;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.fastquery.dao.UserInfoDBService;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.dsm.FQueryProperties;
-import org.fastquery.service.FQuery;
 import org.junit.Test;
-
 import com.mysql.cj.jdbc.MysqlDataSource;
-
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 public class FQueryPropertiesTest extends FastQueryTest
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(FQueryPropertiesTest.class);
-
-    public UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
-
     @SuppressWarnings("unchecked")
     public Map<String, String> getDataSourceIndexs()
     {
@@ -90,7 +78,7 @@ public class FQueryPropertiesTest extends FastQueryTest
     public void testGetDataSourceIndexs()
     {
         Map<String, String> maps = getDataSourceIndexs();
-        maps.forEach((k, v) -> LOG.debug(k + ":" + v));
+        maps.forEach((k, v) -> log.debug(k + ":" + v));
         assertThat(maps.size(), is(20));
     }
 
@@ -99,7 +87,7 @@ public class FQueryPropertiesTest extends FastQueryTest
     {
 
         Map<String, DataSource> maps = getDataSources();
-        maps.forEach((k, v) -> LOG.debug(k + ":" + v));
+        maps.forEach((k, v) -> log.debug(k + ":" + v));
         assertThat(maps.size(), either(is(6)).or(is(10)).or(is(11)));
         Set<String> keys = maps.keySet();
         assertThat(keys, hasItems("sunnydb", "xkdb2", "xk3", "s1", "s2"));

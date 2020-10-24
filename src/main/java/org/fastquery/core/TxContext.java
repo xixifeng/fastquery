@@ -21,28 +21,22 @@
  */
 
 package org.fastquery.core;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.sql.DataSource;
-
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.struct.DC;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * tx 上下文
  *
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 class TxContext
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(TxContext.class);
-
     private static final ThreadLocal<TxContext> threadLocal = new ThreadLocal<>();
 
     private final List<DC> dclist = new ArrayList<>();
@@ -100,7 +94,7 @@ class TxContext
             }
             catch (SQLException e)
             {
-                LOG.error("conn rollback败", e);
+                log.error("conn rollback败", e);
             }
         }
     }
@@ -117,7 +111,7 @@ class TxContext
             }
             catch (SQLException e)
             {
-                LOG.error("conn 关闭失败", e);
+                log.error("conn 关闭失败", e);
             }
         }
 

@@ -25,12 +25,9 @@ package org.fastquery.test;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
-
 import java.util.List;
 import java.util.regex.Pattern;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.core.Placeholder;
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
@@ -40,11 +37,9 @@ import org.junit.Test;
  *
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 public class PlaceholderTest extends FastQueryTest
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(PlaceholderTest.class);
-
     @Test
     public void Q_MATCH()
     {
@@ -54,7 +49,7 @@ public class PlaceholderTest extends FastQueryTest
 
         for (String string : ssms)
         {
-            LOG.debug(string);
+            log.debug(string);
         }
 
         assertThat(ssms.size(), is(4));
@@ -67,7 +62,7 @@ public class PlaceholderTest extends FastQueryTest
 
         assertThat(ssms.get(3), equalTo("`-  ?                     -`"));
 
-        ssms.forEach(LOG::debug);
+        ssms.forEach(log::debug);
     }
 
     @Test

@@ -7,15 +7,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import javax.sql.DataSource;
-
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.util.PreventSQLInjection;
-import org.slf4j.LoggerFactory;
-
 import com.alibaba.fastjson.JSONObject;
-
-import org.slf4j.Logger;
 import org.fastquery.dsm.FQueryProperties;
 import org.fastquery.page.Pageable;
 import org.fastquery.page.PageableImpl;
@@ -24,11 +19,9 @@ import org.fastquery.util.TypeUtil;
 /**
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 public final class QueryContext
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(QueryContext.class);
-
     private static final ThreadLocal<QueryContext> threadLocal = new ThreadLocal<>();
 
     private MethodInfo methodInfo; // 当前method
@@ -168,7 +161,7 @@ public final class QueryContext
 
     public static Object[] getArgs()
     {
-        LOG.debug("检测 SQL 注入");
+        log.debug("检测 SQL 注入");
         Parameter[] parameters = getQueryContext().methodInfo.getParameters();
         int len = getQueryContext().args.length;
         for (int i = 0; i < len; i++)
@@ -221,7 +214,7 @@ public final class QueryContext
             finally
             {
                 threadLocal.remove();
-                LOG.info("当前 QueryContext 生命周期结束");
+                log.info("当前 QueryContext 生命周期结束");
             }
         }
     }

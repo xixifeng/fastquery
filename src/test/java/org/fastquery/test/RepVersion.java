@@ -35,22 +35,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.util.regex.Pattern;
-
 import javax.swing.*;
-
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 public class RepVersion extends FastQueryTest
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RepVersion.class);
-
     private static final String REG = "\\d+\\.\\d+\\.\\d+(\\.enforce)*";
 
     private static String showInputDialog(String initialSelectionValue)
@@ -60,7 +55,7 @@ public class RepVersion extends FastQueryTest
         String s;
         while ("".equals((s = JOptionPane.showInputDialog(jf, "请输入发布版本号: ", initialSelectionValue))) || s == null || !Pattern.matches(REG, s))
         {
-            LOG.warn("输入的版本号是空，重新输入");
+            log.warn("输入的版本号是空，重新输入");
         }
         return s;
     }
@@ -112,7 +107,7 @@ public class RepVersion extends FastQueryTest
         }
 
         String version = confirm(initialSelectionValue);
-        LOG.debug("最终确认的版本号是: " + version);
+        log.debug("最终确认的版本号是: " + version);
 
         String[] names = {"/pom.xml", "/README.md"};
         for (String name : names)
@@ -136,8 +131,8 @@ public class RepVersion extends FastQueryTest
                 }
                 bw.flush();
                 br.close();
-                LOG.debug("f: {}", f.getAbsolutePath());
-                LOG.debug("tmp.toPath():{}", tmp.toPath());
+                log.debug("f: {}", f.getAbsolutePath());
+                log.debug("tmp.toPath():{}", tmp.toPath());
                 assertThat(f.delete(), is(true));
                 //Files.move(tmp.toPath(), f.toPath());
                 Files.copy(tmp.toPath(), f.toPath());

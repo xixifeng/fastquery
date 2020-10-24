@@ -22,9 +22,8 @@
 
 package org.fastquery.test;
 
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Department;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInformation;
@@ -56,11 +55,9 @@ import static org.hamcrest.Matchers.*;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class UserInfoDBServiceTest extends FastQueryTest
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(UserInfoDBServiceTest.class);
-
     private final UserInfoDBService db = FQuery.getRepository(UserInfoDBService.class);
 
     @Rule
@@ -72,7 +69,7 @@ public class UserInfoDBServiceTest extends FastQueryTest
         try
         {
             Object id = db.findId(1);
-            LOG.info("id:{}", id);
+            log.info("id:{}", id);
         }
         catch (Exception e)
         {
@@ -174,7 +171,7 @@ public class UserInfoDBServiceTest extends FastQueryTest
     {
         UserInformation userInformation = db.findUserInfoById(1);
         assertThat(userInformation, notNullValue());
-        LOG.debug(userInformation.toString());
+        log.debug(userInformation.toString());
     }
 
     @Test
@@ -279,7 +276,7 @@ public class UserInfoDBServiceTest extends FastQueryTest
 
         // 打印出来看看
         String str = JSON.toJSONString(page, true);
-        LOG.debug(str);
+        log.debug(str);
 
     }
 
@@ -291,13 +288,13 @@ public class UserInfoDBServiceTest extends FastQueryTest
         List<UserInfo> userInfos = page.getContent();
         if (page.isHasContent())
         {
-            userInfos.forEach(u -> LOG.debug(u.toString()));
+            userInfos.forEach(u -> log.debug(u.toString()));
         }
         assertThat(page.isFirst(), is(true));
 
         String str = JSON.toJSONString(page, true);
 
-        LOG.debug(str);
+        log.debug(str);
     }
 
     @Test
@@ -352,7 +349,7 @@ public class UserInfoDBServiceTest extends FastQueryTest
             {
                 pageIndex += 1;
             }
-            LOG.debug("totalElements:" + totalElements + " pageIndex:" + pageIndex + "  pageSize:" + pageSize + "  totalPages:" + totalPages);
+            log.debug("totalElements:" + totalElements + " pageIndex:" + pageIndex + "  pageSize:" + pageSize + "  totalPages:" + totalPages);
 
             Page<Map<String, Object>> page = db.findSome2(age, id, pageIndex, pageSize);
             assertThat(page, notNullValue());
@@ -361,7 +358,7 @@ public class UserInfoDBServiceTest extends FastQueryTest
             assertThat(page.getTotalElements(), equalTo(-1L));
             assertThat(page.getTotalPages(), equalTo(-1));
             assertThat(page.getNumberOfElements(), lessThanOrEqualTo(pageSize));
-            // LOG.debug(JSON.toJSONString(page, true));
+            // log.debug(JSON.toJSONString(page, true));
 
             boolean hasContent = pageIndex <= totalPages; // 是否有结果集
             boolean isFirst = pageIndex == 1; // 是否是第一页
@@ -494,7 +491,7 @@ public class UserInfoDBServiceTest extends FastQueryTest
         for (String name : names)
         {
             assertThat(Pattern.matches("\\{\".+\":\".+\"}", name), is(false));
-            LOG.debug(name);
+            log.debug(name);
         }
     }
 
@@ -690,7 +687,7 @@ public class UserInfoDBServiceTest extends FastQueryTest
     public void findEmplByDid()
     {
         JSONObject json = db.findEmplByDid(1L);
-        LOG.info("json: {}", JSON.toJSONString(json, true));
+        log.info("json: {}", JSON.toJSONString(json, true));
         assertThat(json.getString("departmentName"), equalTo("研发"));
         assertThat(json.getIntValue("departmentId"), is(1));
         assertThat(json.keySet().size(), is(3));
@@ -735,7 +732,7 @@ public class UserInfoDBServiceTest extends FastQueryTest
                 assertThat(emps.size(), is(3));
             }
         });
-        LOG.info("{} ->", JSON.toJSONString(maps, true));
+        log.info("{} ->", JSON.toJSONString(maps, true));
     }
 
     @Test
@@ -743,7 +740,7 @@ public class UserInfoDBServiceTest extends FastQueryTest
     {
         List<Department> list = db.findDepartments();
         assertThat(list.size(), is(4));
-        LOG.info("list:{}", JSON.toJSONString(list, true));
+        log.info("list:{}", JSON.toJSONString(list, true));
     }
 
     @Test

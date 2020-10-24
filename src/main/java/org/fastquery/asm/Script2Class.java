@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryContext;
@@ -40,9 +40,6 @@ import org.fastquery.util.TypeUtil;
 import org.fastquery.where.Condition;
 import org.fastquery.where.Judge;
 import org.fastquery.where.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -52,11 +49,9 @@ import javassist.NotFoundException;
 /**
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 public class Script2Class
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(Script2Class.class);
-
     private static final Map<String, Judge> judges = new HashMap<>();
 
     private Script2Class()
@@ -174,7 +169,7 @@ public class Script2Class
         body.append(code);
         body.append(";");
 
-        LOG.info("生成源代码: {}", body);
+        log.info("生成源代码: {}", body);
         ctMethod.setBody(body.toString());
         ctClass.addMethod(ctMethod);
 

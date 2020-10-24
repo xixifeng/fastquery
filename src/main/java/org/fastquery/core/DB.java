@@ -36,15 +36,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
-
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.struct.Reference;
 import org.fastquery.util.TypeUtil;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.fastquery.struct.RespUpdate;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.util.BeanUtil;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
@@ -53,11 +50,9 @@ import com.alibaba.fastjson.JSONObject;
  *
  * @author mei.sir@aliyun.cn
  */
+@Slf4j
 public class DB
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DB.class);
-
     private DB()
     {
     }
@@ -397,7 +392,7 @@ public class DB
             return 0;
         }
         String sql = updateInfo[0].toString();
-        LOG.info(sql);
+        log.info(sql);
         @SuppressWarnings("unchecked")
         List<Object> args = (List<Object>) updateInfo[1];
         int count = args.size();
@@ -449,7 +444,7 @@ public class DB
         {
             conn = QueryContext.getConn();
             stat = conn.createStatement();
-            LOG.info(sql);
+            log.info(sql);
             QueryContext.addSqls(sql);
             rs = stat.executeQuery(sql);
             List<Map<String, Object>> maps = rs2Map(rs);
@@ -643,7 +638,7 @@ public class DB
             }
             catch (SQLException e)
             {
-                LOG.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
     }
@@ -692,7 +687,7 @@ public class DB
      */
     private static void info(String sql, List<Object> objs)
     {
-        if (LOG.isInfoEnabled())
+        if (log.isInfoEnabled())
         { // 这个输出要做很多事情,在此判断一下很有必要,生产环境通常是warn级别
             StringBuilder sb = new StringBuilder("\n正在准备执行SQL:");
             sb.append(sql);
@@ -705,7 +700,7 @@ public class DB
                     sb.append(String.format("第%d个\"?\"对应的参数值是:%s;%n", i + 1, objs.get(i)));
                 }
             }
-            LOG.info(sb.toString());
+            log.info(sb.toString());
         }
     }
 }

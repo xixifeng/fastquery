@@ -704,15 +704,13 @@ public interface QueryRepository extends Repository
      *
      * @param <E>       实体类型
      * @param equals    实体实例,用于作为查询条件,条件之间是 and 关系.举例说明,若传递的实体为:<br>
-     *                  <pre>
-     *                                   Student student = new Student();
-     *                                   student.setDept("计算机");
-     *                                   student.setName("海猫");
-     *                                   那么会推导出 SQL 语句的查询条件为:
-     *                                   where dept = ? and name = ?
-     *                                   占位符?问号的值通过 PreparedStatement 设置
-     *                                   注意: 实体的属性若为 null 该属性将不参与任何运算.
-     *                                   </pre>
+     *                  Student student = new Student(); <br>
+     *                  student.setDept("计算机");<br>
+     *                  student.setName("海猫");<br>
+     *                  那么会推导出 SQL 语句的查询条件为:<br>
+     *                  where dept = ? and name = ?<br>
+     *                  占位符?问号的值通过 PreparedStatement 设置<br>
+     *                  注意: 实体的属性若为 null 该属性将不参与任何运算.
      * @param likes     实体对象实例 用于指定 like 运算集
      * @param sort      排序语句，如,设置"order by id desc". 传递null,则采取默认排序
      * @param notCount  true:表示分页时不执行 count 语句.反之,执行 count 语句.

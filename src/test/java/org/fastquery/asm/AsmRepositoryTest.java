@@ -22,20 +22,17 @@
 
 package org.fastquery.asm;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class AsmRepositoryTest
 {
-    private static final Logger log = LoggerFactory.getLogger(AsmRepositoryTest.class);
-
     @Test
     public void getParameterDef() throws Exception
     {

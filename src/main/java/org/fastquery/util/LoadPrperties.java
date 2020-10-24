@@ -24,11 +24,8 @@ package org.fastquery.util;
 
 import java.util.Map;
 import java.util.Set;
-
 import javax.sql.DataSource;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.core.ConnectionPoolProvider;
 import org.fastquery.core.Resource;
 import org.fastquery.dsm.FastQueryJson;
@@ -37,11 +34,9 @@ import org.fastquery.dsm.FQueryProperties;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class LoadPrperties
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(LoadPrperties.class);
-
     private LoadPrperties()
     {
     }
@@ -90,7 +85,7 @@ public class LoadPrperties
                 }
                 DataSource dataSource = poolProvider.getDataSource(fqueryResource, namedConfig);
                 FQueryProperties.putDataSource(namedConfig, dataSource);
-                LOG.debug("创建数据源:{},名称为:{}", dataSource, namedConfig);
+                log.debug("创建数据源:{},名称为:{}", dataSource, namedConfig);
             }
 
             basePackages = fQueryPropertie.getBasePackages();

@@ -26,9 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Student;
 import org.fastquery.core.Primarykey;
 import org.fastquery.core.QueryRepository;
@@ -36,12 +34,9 @@ import org.fastquery.example.StudentDBService;
 import org.fastquery.filter.SkipFilter;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
-
 import static org.hamcrest.Matchers.*;
-
 import org.junit.Rule;
 import org.junit.Test;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -49,11 +44,9 @@ import com.alibaba.fastjson.JSONObject;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class StudentDBServiceTest extends FastQueryTest
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(StudentDBServiceTest.class);
-
     @Rule
     public FastQueryTestRule rule = new FastQueryTestRule();
 
@@ -197,7 +190,7 @@ public class StudentDBServiceTest extends FastQueryTest
     public void count2()
     {
         int i = studentDBService.count2();
-        LOG.debug("i=" + i);
+        log.debug("i=" + i);
         assertThat(i, greaterThan(1));
     }
 
@@ -205,7 +198,7 @@ public class StudentDBServiceTest extends FastQueryTest
     public void testRows()
     {
         JSONObject jsonObject = studentDBService.rows();
-        LOG.debug(jsonObject.toJSONString());
+        log.debug(jsonObject.toJSONString());
         assertThat(jsonObject.keySet().size(), is(1));
     }
 
@@ -245,7 +238,7 @@ public class StudentDBServiceTest extends FastQueryTest
             // 输出前面三条看看
             for (int i = 0; i < 3; i++)
             {
-                LOG.debug(students[i].toString());
+                log.debug(students[i].toString());
             }
         }
         List<String> sqls = rule.getExecutedSQLs();
@@ -264,13 +257,13 @@ public class StudentDBServiceTest extends FastQueryTest
         JSONArray students = studentDBService.findBySex("男", 18);
         if (students.size() >= 3)
         {
-            LOG.debug(JSON.toJSONString(students.subList(0, 3), true));
+            log.debug(JSON.toJSONString(students.subList(0, 3), true));
         }
         else
         {
-            LOG.debug(JSON.toJSONString(students.subList(0, students.size()), true));
+            log.debug(JSON.toJSONString(students.subList(0, students.size()), true));
         }
-        LOG.debug(studentDBService.toString());
+        log.debug(studentDBService.toString());
 
         String sql = rule.getSQLValue().getSql();
         assertThat(sql, equalTo("select * from student s where s.sex=? and s.age > ?"));
@@ -294,7 +287,7 @@ public class StudentDBServiceTest extends FastQueryTest
     public void findColumnKey()
     {
         JSONArray jsonObject = studentDBService.findColumnKey("product", "xk");
-        LOG.debug(JSON.toJSONString(jsonObject, true));
+        log.debug(JSON.toJSONString(jsonObject, true));
         assertThat(jsonObject.size(), is(2));
         assertThat(jsonObject.getJSONObject(0).getString("COLUMN_NAME"), either(equalTo("pid")).or(equalTo("lid")));
         assertThat(jsonObject.getJSONObject(1).getString("COLUMN_NAME"), either(equalTo("pid")).or(equalTo("lid")));
@@ -332,7 +325,7 @@ public class StudentDBServiceTest extends FastQueryTest
     public void saveUserInfo2()
     {
         JSONObject jsonObject = studentDBService.saveUserInfo2("网五", 31);
-        LOG.debug(JSON.toJSONString(jsonObject, true));
+        log.debug(JSON.toJSONString(jsonObject, true));
         assertThat(jsonObject.getString("name"), equalTo("网五"));
         assertThat(jsonObject.getInteger("age"), equalTo(31));
         assertThat(jsonObject.containsKey("id"), is(false));
@@ -352,7 +345,7 @@ public class StudentDBServiceTest extends FastQueryTest
         Integer age = 16;
         JSONObject jsonObject = studentDBService.updateUserinfoById(16, 1);
         assertThat(jsonObject, notNullValue());
-        LOG.debug(JSON.toJSONString(jsonObject, true));
+        log.debug(JSON.toJSONString(jsonObject, true));
         assertThat(jsonObject.getInteger("id"), is(id));
         assertThat(jsonObject.getInteger("age"), is(age));
     }
@@ -551,7 +544,7 @@ public class StudentDBServiceTest extends FastQueryTest
     {
         List<String> names = studentDBService.findNames();
         assertThat(names.size(), greaterThanOrEqualTo(3));
-        names.forEach(LOG::debug);
+        names.forEach(log::debug);
     }
 
     @Test
@@ -572,7 +565,7 @@ public class StudentDBServiceTest extends FastQueryTest
             }
         });
         JSONObject json = (JSONObject) JSONObject.toJSON(map);
-        LOG.debug(json.toJSONString());
+        log.debug(json.toJSONString());
     }
 
     @Test

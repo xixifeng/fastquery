@@ -21,15 +21,11 @@
  */
 
 package org.fastquery.jersey;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import javax.ws.rs.Path;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.asm.AsmRepository;
 import org.fastquery.asm.AsmRest;
 import org.fastquery.core.FQueryResourceImpl;
@@ -43,17 +39,15 @@ import org.fastquery.util.LoadPrperties;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 class GenerateRepositoryImpl
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(GenerateRepositoryImpl.class);
-
     private final FqClassLoader classLoader;
 
     GenerateRepositoryImpl(FqClassLoader classLoader)
     {
         this.classLoader = classLoader;
-        LOG.debug("GenerateRepositoryImpl 已实例化.");
+        log.debug("GenerateRepositoryImpl 已实例化.");
     }
 
     @SuppressWarnings("unchecked")
