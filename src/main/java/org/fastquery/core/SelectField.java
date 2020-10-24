@@ -52,9 +52,9 @@ public class SelectField<T>
 
     public String getFields()
     {
-        List<Field> fields = BeanUtil.mapFields(this.clazz);
-        StringBuilder sb = new StringBuilder(6 * fields.size()); // 一个 field 大概包含 6 个字符
-        fields.forEach(f -> {
+        List<Field> fieldList = BeanUtil.mapFields(this.clazz);
+        StringBuilder sb = new StringBuilder(6 * fieldList.size()); // 一个 field 大概包含 6 个字符
+        fieldList.forEach(f -> {
             String fieldName = f.getName();
             if (contain)
             {

@@ -30,6 +30,8 @@ import org.fastquery.where.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * @author mei.sir@aliyun.cn
  */
@@ -145,9 +147,9 @@ final class SetParser
     {
         try
         {
-            return set.ignore().newInstance().ignore();
+            return set.ignore().getDeclaredConstructor().newInstance().ignore();
         }
-        catch (InstantiationException | IllegalAccessException e1)
+        catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1)
         {
             // 这个异常其实永远也发生不了,该异常已经通过静态分析,提升到初始化阶段了
 

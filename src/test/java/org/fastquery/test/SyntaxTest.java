@@ -23,6 +23,7 @@
 package org.fastquery.test;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -36,7 +37,8 @@ import org.fastquery.core.Param;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThrows;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author xixifeng (fastquery@126.com)
@@ -46,11 +48,23 @@ public class SyntaxTest extends FastQueryTest
 
     private static final Logger LOG = LoggerFactory.getLogger(SyntaxTest.class);
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    public static class Ca {
+        public  void show(){
+            System.out.println("吃饭了");
+        }
+    }
+
+    @Test
+    public void testNew() throws IllegalAccessException, InstantiationException
+    {
+        Ca.class.newInstance().show();
+    }
+
+    @Test
     public void listEmpty()
     {
         List<Map<String, Object>> maps = new ArrayList<>();
-        maps.get(0); // 这样引用是错误的
+        assertThrows(IndexOutOfBoundsException.class,() -> maps.get(0));
     }
 
     @Test
@@ -84,10 +98,10 @@ public class SyntaxTest extends FastQueryTest
         LOG.debug(String.valueOf(Pattern.matches("", "")));
         // s.replaceAll(""+param.value()+"\\b", "?"+(i+1));
         assertThat("abckdwgew:name&".replaceAll(":name\\b", "?"), equalTo("abckdwgew?&"));
-        assertThat("abckdwgew:name &".replaceAll("name\\b", "?"), equalTo("abckdwgew? &"));
+        assertThat("abckdwgew:name &".replaceAll("name\\b", "?"), equalTo("abckdwgew:? &"));
         LOG.debug("-->: " + ("abckdwgew:name222 &".replaceAll("name\\b", "?")));
         assertThat(":name22".replaceAll("name\\b", "?"), equalTo(":name22"));
         assertThat(":name22 ".replaceAll("name\\b", "?"), equalTo(":name22 "));
-        assertThat(":name,".replaceAll("name\\b", "?"), equalTo("?,"));
+        assertThat(":name,".replaceAll("name\\b", "?"), equalTo(":?,"));
     }
 }

@@ -29,7 +29,7 @@ public final class QueryContext
 
     private static final Logger LOG = LoggerFactory.getLogger(QueryContext.class);
 
-    private final static ThreadLocal<QueryContext> threadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<QueryContext> threadLocal = new ThreadLocal<>();
 
     private MethodInfo methodInfo; // 当前method
     private boolean supporTx; // 是否需要事务支持

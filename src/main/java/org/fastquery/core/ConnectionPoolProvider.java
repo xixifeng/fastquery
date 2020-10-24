@@ -80,7 +80,7 @@ public interface ConnectionPoolProvider
 
             try
             {
-                ds = clazz.newInstance();
+                ds = clazz.getDeclaredConstructor().newInstance();
                 Method setDatabaseNameMethod = clazz.getMethod("setDatabaseName", String.class);
                 Method setPasswordMethod = clazz.getMethod("setPassword", String.class);
                 Method setPortNumberMethod = clazz.getMethod("setPortNumber", int.class);

@@ -72,7 +72,7 @@ public class FilterChainHandler
             {
                 try
                 {
-                    beforeFilterChain.addFilter(clazz.newInstance());
+                    beforeFilterChain.addFilter(clazz.getDeclaredConstructor().newInstance());
                 }
                 catch (Exception e)
                 {
@@ -108,7 +108,7 @@ public class FilterChainHandler
             {
                 try
                 {
-                    afterFilterChain.addFilter(clazz.newInstance());
+                    afterFilterChain.addFilter(clazz.getDeclaredConstructor().newInstance());
                 }
                 catch (Exception e)
                 {

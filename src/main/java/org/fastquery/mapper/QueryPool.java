@@ -65,9 +65,9 @@ public class QueryPool
 
     private static Resource resource;
 
-    private final static Map<String, Set<QueryMapper>> mapQueryMapper = new HashMap<>();
+    private static final Map<String, Set<QueryMapper>> mapQueryMapper = new HashMap<>();
 
-    private final static Map<String, String> countQueryMap = new HashMap<>();
+    private static final Map<String, String> countQueryMap = new HashMap<>();
 
     private QueryPool()
     {

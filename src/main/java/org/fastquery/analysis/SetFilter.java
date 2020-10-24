@@ -22,6 +22,7 @@
 
 package org.fastquery.analysis;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.fastquery.where.Judge;
@@ -47,9 +48,9 @@ class SetFilter implements MethodFilter
             Class<? extends Judge> judge = set.ignore();
             try
             {
-                judge.newInstance();
+                judge.getDeclaredConstructor().newInstance();
             }
-            catch (InstantiationException | IllegalAccessException e)
+            catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e)
             {
                 this.abortWith(method, set.ignore() + " 必须有一个不带参数并且用public修饰的构造方法");
             }

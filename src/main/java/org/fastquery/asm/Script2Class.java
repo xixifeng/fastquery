@@ -23,6 +23,7 @@
 package org.fastquery.asm;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Base64;
@@ -56,7 +57,7 @@ public class Script2Class
 
     private static final Logger LOG = LoggerFactory.getLogger(Script2Class.class);
 
-    private final static Map<String, Judge> judges = new HashMap<>();
+    private static final Map<String, Judge> judges = new HashMap<>();
 
     private Script2Class()
     {
@@ -144,13 +145,13 @@ public class Script2Class
         {
             generate(script, method, i);
         }
-        catch (InstantiationException | IllegalAccessException | CannotCompileException | NotFoundException e)
+        catch (InstantiationException | IllegalAccessException | CannotCompileException | NotFoundException | NoSuchMethodException | InvocationTargetException e)
         {
             throw new RepositoryException(method + "中的脚本  \"" + script + "  \" 编译错误", e);
         }
     }
 
-    private static void generate(String script, Method method, int annotationIndex) throws CannotCompileException, NotFoundException, InstantiationException, IllegalAccessException
+    private static void generate(String script, Method method, int annotationIndex) throws CannotCompileException, NotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException
     {
 
         ClassPool pool = ClassPool.getDefault();
@@ -177,7 +178,7 @@ public class Script2Class
         ctMethod.setBody(body.toString());
         ctClass.addMethod(ctMethod);
 
-        judges.put(ctClass.getName(), (Judge) ctClass.toClass().newInstance());
+        judges.put(ctClass.getName(), (Judge) ctClass.toClass().getDeclaredConstructor().newInstance());
 
     }
 }

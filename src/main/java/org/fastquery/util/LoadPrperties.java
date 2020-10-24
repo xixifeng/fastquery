@@ -82,7 +82,7 @@ public class LoadPrperties
                 try
                 {
                     Class<?> providerClazz = Class.forName(provider);
-                    poolProvider = (ConnectionPoolProvider) providerClazz.newInstance();
+                    poolProvider = (ConnectionPoolProvider) providerClazz.getDeclaredConstructor().newInstance();
                 }
                 catch (Exception e)
                 {

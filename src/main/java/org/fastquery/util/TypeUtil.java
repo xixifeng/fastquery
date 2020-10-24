@@ -520,9 +520,9 @@ public class TypeUtil
     {
         try
         {
-            return condition.ignore().newInstance().ignore();
+            return condition.ignore().getDeclaredConstructor().newInstance().ignore();
         }
-        catch (InstantiationException | IllegalAccessException e1)
+        catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1)
         {
             // 这个异常其实永远也发生不了,该异常已经通过静态分析,提升到初始化阶段了
 
@@ -587,24 +587,6 @@ public class TypeUtil
     {
 
         // 忽略因子列表,任何一个都可以导致忽略
-        // 这些因子不拿出来定义是有意义的, 多个 || 第一个true,后面的方法就不执行了
-
-        // 针对该按例不用写成这样
-		/*
-		 * <pre>
-		boolean factor1 = getFactor1(condition, arg);
-		boolean factor2 = getFactor2(condition, arg);
-		boolean factor3 = getFactor3(condition, index);
-		boolean factor4 = getFactor4(condition);
-		boolean factor5 = getFactor5(condition, arg);
-		boolean factor6 = getFactor6(condition, arg);
-		
-		return factor1 || factor2 || factor3 || factor4 || factor5 || factor6;
-		
-		缺点: factor1 是 true 后面的factor2,factor3.. 等于是白白浪费计算时间
-		
-		</pre>
-		*/
         Set<String> pars = TypeUtil.matchesNotrepeat(value, Placeholder.SP1_REG);
         Object[] args = QueryContext.getArgs();
         for (String par : pars)

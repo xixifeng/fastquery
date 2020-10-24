@@ -34,7 +34,6 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.function.IntSupplier;
 
-import org.fastquery.struct.Reference;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.apache.commons.lang3.ArrayUtils;

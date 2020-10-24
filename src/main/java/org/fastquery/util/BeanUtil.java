@@ -899,7 +899,7 @@ public final class BeanUtil
         {
             if (bean == null)
             {
-                bean = clazz.newInstance();
+                bean = clazz.getDeclaredConstructor().newInstance();
             }
             for (Field field : fields)
             {

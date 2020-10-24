@@ -27,16 +27,10 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.MethodInfo;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
-import org.fastquery.struct.Reference;
 import org.fastquery.util.TypeUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -47,8 +41,6 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class QueryHandler
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(QueryHandler.class);
 
     private static class LazyHolder
     {
@@ -280,7 +272,6 @@ public class QueryHandler
                 else if (returnType != val.getClass())
                 {
                     String methodLongName = method.getClass().getName() + "." + method.getName();
-                    String key = map.keySet().iterator().next();
                     String typeName = val.getClass().getName();
                     try
                     {
