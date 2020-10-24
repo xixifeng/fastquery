@@ -39,11 +39,11 @@ import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
 /**
- *
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
-public class TypeTestDBTest extends FastQueryTest {
+public class TypeTestDBTest extends FastQueryTest
+{
 
     private TypeTestDB db = FQuery.getRepository(TypeTestDB.class);
 
@@ -51,55 +51,58 @@ public class TypeTestDBTest extends FastQueryTest {
     public FastQueryTestRule rule = new FastQueryTestRule();
 
     @Test
-    public void batchUpdate(){
+    public void batchUpdate()
+    {
         Long id1 = 1L;
         Long id3 = 3L;
         Long id5 = 5L;
-        TypeTest tt1 = new TypeTest(id1,true,false,true,"男");
-        TypeTest tt2 = new TypeTest(id3,false,true,false,"女");
-        TypeTest tt3 = new TypeTest(id5,true,false,true,"男");
-        List<TypeTest> list = Stream.of(tt1,tt2,tt3).collect(Collectors.toList());
+        TypeTest tt1 = new TypeTest(id1, true, false, true, "男");
+        TypeTest tt2 = new TypeTest(id3, false, true, false, "女");
+        TypeTest tt3 = new TypeTest(id5, true, false, true, "男");
+        List<TypeTest> list = Stream.of(tt1, tt2, tt3).collect(Collectors.toList());
         int effect = db.update(list);
         assertThat(rule.getExecutedSQLs().get(0), equalTo("update TypeTest set deleted = case id when 1 then true when 3 then false when 5 then true else deleted end,activated = case id when 1 then false when 3 then true when 5 then false else activated end,auth = case id when 1 then true when 3 then false when 5 then true else auth end,gender = case id when 1 then '男' when 3 then '女' when 5 then '男' else gender end where id in(1,3,5)"));
-        assertThat(effect,is(3));
-        TypeTest t1 = db.find(TypeTest.class,id1);
-        TypeTest t2 = db.find(TypeTest.class,id3);
-        TypeTest t3 = db.find(TypeTest.class,id5);
-        compare(t1,tt1);
-        compare(t2,tt2);
-        compare(t3,tt3);
+        assertThat(effect, is(3));
+        TypeTest t1 = db.find(TypeTest.class, id1);
+        TypeTest t2 = db.find(TypeTest.class, id3);
+        TypeTest t3 = db.find(TypeTest.class, id5);
+        compare(t1, tt1);
+        compare(t2, tt2);
+        compare(t3, tt3);
     }
 
-    public void compare(TypeTest t1, TypeTest t2){
-        assertThat(t1.getDeleted(),equalTo(t2.getDeleted()));
-        assertThat(t1.getActivated(),equalTo(t2.getActivated()));
-        assertThat(t1.getAuth(),equalTo(t2.getAuth()));
-        assertThat(t1.getGender(),equalTo(t2.getGender()));
+    public void compare(TypeTest t1, TypeTest t2)
+    {
+        assertThat(t1.getDeleted(), equalTo(t2.getDeleted()));
+        assertThat(t1.getActivated(), equalTo(t2.getActivated()));
+        assertThat(t1.getAuth(), equalTo(t2.getAuth()));
+        assertThat(t1.getGender(), equalTo(t2.getGender()));
     }
 
     @Test
-    public void save() {
+    public void save()
+    {
         boolean deleted = true;
         boolean activated = false;
         boolean auth = true;
         String gender = "男";
-        TypeTest tt = new TypeTest(deleted,activated,auth,gender);
+        TypeTest tt = new TypeTest(deleted, activated, auth, gender);
         TypeTest t = db.save(tt);
-        assertThat(t.getDeleted().booleanValue(),is(deleted));
-        assertThat(t.getActivated().booleanValue(),is(activated));
-        assertThat(t.getAuth().booleanValue(),is(auth));
-        assertThat(t.getGender(),equalTo(gender));
+        assertThat(t.getDeleted().booleanValue(), is(deleted));
+        assertThat(t.getActivated().booleanValue(), is(activated));
+        assertThat(t.getAuth().booleanValue(), is(auth));
+        assertThat(t.getGender(), equalTo(gender));
 
         deleted = false;
         activated = true;
         auth = false;
         gender = "女";
-        tt = new TypeTest(deleted,activated,auth,gender);
+        tt = new TypeTest(deleted, activated, auth, gender);
         t = db.save(tt);
-        assertThat(t.getDeleted().booleanValue(),is(deleted));
-        assertThat(t.getActivated().booleanValue(),is(activated));
-        assertThat(t.getAuth().booleanValue(),is(auth));
-        assertThat(t.getGender(),equalTo(gender));
+        assertThat(t.getDeleted().booleanValue(), is(deleted));
+        assertThat(t.getActivated().booleanValue(), is(activated));
+        assertThat(t.getAuth().booleanValue(), is(auth));
+        assertThat(t.getGender(), equalTo(gender));
     }
 
 }

@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.mapper.filter;
@@ -26,28 +26,29 @@ import org.fastquery.core.RepositoryException;
 import org.w3c.dom.Element;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
 @FunctionalInterface
-public interface Filter {
+public interface Filter
+{
 
-	/**
-	 * 过滤
-	 * 
-	 * @param xmlName xml名称
-	 * @param element element 待检测的Element
-	 * @return 元素
-	 */
-	Element doFilter(String xmlName, Element element);
+    /**
+     * 过滤
+     *
+     * @param xmlName xml名称
+     * @param element element 待检测的Element
+     * @return 元素
+     */
+    Element doFilter(String xmlName, Element element);
 
-	/**
-	 * 终止(扯断链条)
-	 * 
-	 * @param errmsg 终止理由
-	 */
-	default void abortWith(String errmsg) {
-		throw new RepositoryException(errmsg);
-	}
+    /**
+     * 终止(扯断链条)
+     *
+     * @param errmsg 终止理由
+     */
+    default void abortWith(String errmsg)
+    {
+        throw new RepositoryException(errmsg);
+    }
 
 }

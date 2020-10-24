@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.struct;
@@ -26,25 +26,28 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class ParamMap {
+public class ParamMap
+{
 
-	private final Map<Integer, Integer> rps;
-	private final List<Object> objs;
+    private final Map<Integer, Integer> rps;
+    private final List<Object> objs;
 
-	public ParamMap(Map<Integer, Integer> rps, List<Object> objs) {
-		this.rps = rps;
-		this.objs = objs;
-	}
+    public ParamMap(Map<Integer, Integer> rps, List<Object> objs)
+    {
+        this.rps = rps;
+        this.objs = objs;
+    }
 
-	public Map<Integer, Integer> getRps() {
-		return rps;
-	}
+    public Map<Integer, Integer> getRps()
+    {
+        return rps;
+    }
 
-	public List<Object> getObjs() {
-		return objs;
-	}
+    public List<Object> getObjs()
+    {
+        return objs;
+    }
 
 }

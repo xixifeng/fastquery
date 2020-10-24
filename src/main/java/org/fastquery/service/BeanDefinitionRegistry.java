@@ -23,7 +23,6 @@
 package org.fastquery.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
@@ -40,7 +39,7 @@ import java.util.List;
 public class BeanDefinitionRegistry implements BeanDefinitionRegistryPostProcessor
 {
     @Override
-    public void postProcessBeanDefinitionRegistry(org.springframework.beans.factory.support.BeanDefinitionRegistry registry) throws BeansException
+    public void postProcessBeanDefinitionRegistry(org.springframework.beans.factory.support.BeanDefinitionRegistry registry)
     {
         log.info("FQ BeanDefinitionRegistry");
 
@@ -57,8 +56,9 @@ public class BeanDefinitionRegistry implements BeanDefinitionRegistryPostProcess
     }
 
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
     {
+        // Do nothing because of X and Y.
     }
 
 }

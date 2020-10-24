@@ -28,7 +28,6 @@ import org.fastquery.core.Id;
 import java.util.List;
 
 /**
- *
  * @author xixifeng (fastquery@126.com)
  */
 @Setter
@@ -36,7 +35,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Department {
+public class Department
+{
 
     @Id
     private Long departmentId;

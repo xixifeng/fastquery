@@ -15,14 +15,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThrows;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import java.lang.reflect.Method;
@@ -33,43 +34,47 @@ import org.fastquery.where.Judge;
 import org.junit.Test;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class JudgeTest {
+public class JudgeTest
+{
 
-	public void todo1(String aa,@Param("bb")Integer bb,int cc) {
-		
-	}
-	
-	public void todo2(@Param("aa")String aa,Integer bb,int cc) {
-		
-	}
-	
-	public void todo3(String aa,Integer bb,@Param("cc")int cc) {
-		
-	}
-	
-	@Test
-	public void testGetParamType1() throws NoSuchMethodException, SecurityException {
-		Method method = JudgeTest.class.getMethod("todo1", String.class,Integer.class,int.class);
-		Class<?> clazz = Judge.getParamType("bb", method);
-		assertThat(clazz==Integer.class,is(true));
-		
-		method = JudgeTest.class.getMethod("todo2", String.class,Integer.class,int.class);
-		clazz = Judge.getParamType("aa", method);
-		assertThat(clazz==String.class,is(true));
-		
-		method = JudgeTest.class.getMethod("todo3", String.class,Integer.class,int.class);
-		clazz = Judge.getParamType("cc", method);
-		assertThat(clazz==int.class,is(true));
-	}
+    public void todo1(String aa, @Param("bb") Integer bb, int cc)
+    {
 
-	@Test(expected=RepositoryException.class)
-	public void testGetParamType2() throws NoSuchMethodException, SecurityException {
-		Method method = JudgeTest.class.getMethod("todo1", String.class,Integer.class,int.class);
-		Class<?> clazz = Judge.getParamType("aa", method);
-		assertThat(clazz==Integer.class,is(true));
-	}
+    }
+
+    public void todo2(@Param("aa") String aa, Integer bb, int cc)
+    {
+
+    }
+
+    public void todo3(String aa, Integer bb, @Param("cc") int cc)
+    {
+
+    }
+
+    @Test
+    public void testGetParamType1() throws NoSuchMethodException, SecurityException
+    {
+        Method method = JudgeTest.class.getMethod("todo1", String.class, Integer.class, int.class);
+        Class<?> clazz = Judge.getParamType("bb", method);
+        assertThat(clazz == Integer.class, is(true));
+
+        method = JudgeTest.class.getMethod("todo2", String.class, Integer.class, int.class);
+        clazz = Judge.getParamType("aa", method);
+        assertThat(clazz == String.class, is(true));
+
+        method = JudgeTest.class.getMethod("todo3", String.class, Integer.class, int.class);
+        clazz = Judge.getParamType("cc", method);
+        assertThat(clazz == int.class, is(true));
+    }
+
+    @Test
+    public void testGetParamType2() throws NoSuchMethodException, SecurityException
+    {
+        Method method = JudgeTest.class.getMethod("todo1", String.class, Integer.class, int.class);
+        assertThrows(RepositoryException.class, () -> Judge.getParamType("aa", method));
+    }
 
 }

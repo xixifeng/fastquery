@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.filter;
@@ -30,18 +30,19 @@ import org.fastquery.example.StudentDBService;
 import org.fastquery.filter.BeforeFilter;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class MyBeforeFilter2 extends BeforeFilter<StudentDBService> {
+public class MyBeforeFilter2 extends BeforeFilter<StudentDBService>
+{
 
-	private static final Logger LOG = LoggerFactory.getLogger(MyBeforeFilter2.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MyBeforeFilter2.class);
 
-	@Override
-	public void doFilter(StudentDBService repository, Method method, Object[] args) {
-		// repository : 当前拦截到实例对象
-		// method : 当前拦截到的方法
-		// args : 当前传递进来的参数列表
-		LOG.debug("MyBeforeFilter2....");
-	}
+    @Override
+    public void doFilter(StudentDBService repository, Method method, Object[] args)
+    {
+        // repository : 当前拦截到实例对象
+        // method : 当前拦截到的方法
+        // args : 当前传递进来的参数列表
+        LOG.debug("MyBeforeFilter2....");
+    }
 }

@@ -15,14 +15,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -42,241 +42,265 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 测试QueryRepository中的默认方法
- * 
+ *
  * @author mei.sir@aliyun.cn
  */
-public class DefaultMethodTest extends FastQueryTest {
+public class DefaultMethodTest extends FastQueryTest
+{
 
-	private final DefaultDBService db = FQuery.getRepository(DefaultDBService.class);
+    private final DefaultDBService db = FQuery.getRepository(DefaultDBService.class);
 
-	private static final Logger LOG = LoggerFactory.getLogger(DefaultMethodTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultMethodTest.class);
 
-	@Test
-	public void dbNoneNull() {
-		assertThat(db, notNullValue());
-	}
+    @Test
+    public void dbNoneNull()
+    {
+        assertThat(db, notNullValue());
+    }
 
-	@Test
-	public void saveReturnEntity() {
-		UserInfo u1 = new UserInfo("婤姶", 2558);
-		UserInfo u2 = db.save(u1);
-		LOG.debug("{}", u2);
-		long id = u2.getId();
-		int effect = db.delete("UserInfo", "id", id);
-		assertThat(effect, is(1));
-	}
+    @Test
+    public void saveReturnEntity()
+    {
+        UserInfo u1 = new UserInfo("婤姶", 2558);
+        UserInfo u2 = db.save(u1);
+        LOG.debug("{}", u2);
+        long id = u2.getId();
+        int effect = db.delete("UserInfo", "id", id);
+        assertThat(effect, is(1));
+    }
 
-	@Test
-	public void updateReturnEntity() {
-		String name = "海猫" + UUID.randomUUID().toString().substring(0, 3);
-		Integer age = Math.abs(new Random().nextInt(30));
-		UserInfo u1 = new UserInfo(1, name, age);
-		UserInfo u2 = db.update(u1);
-		assertThat(u2.getId(), is(u1.getId()));
-		assertThat(u2.getName(), is(name));
-		assertThat(u2.getAge(), is(age));
-	}
+    @Test
+    public void updateReturnEntity()
+    {
+        String name = "海猫" + UUID.randomUUID().toString().substring(0, 3);
+        Integer age = Math.abs(new Random().nextInt(30));
+        UserInfo u1 = new UserInfo(1, name, age);
+        UserInfo u2 = db.update(u1);
+        assertThat(u2.getId(), is(u1.getId()));
+        assertThat(u2.getName(), is(name));
+        assertThat(u2.getAge(), is(age));
+    }
 
-	@Test
-	public void saveOrUpdateReturnEntity1() {
-		String name = "海猫" + UUID.randomUUID().toString().substring(0, 3);
-		Integer age = Math.abs(new Random().nextInt(30));
-		UserInfo u1 = new UserInfo(1, name, age);
-		UserInfo u2 = db.saveOrUpdate(u1);
-		assertThat(u2.getId(), is(u1.getId()));
-		assertThat(u2.getName(), is(name));
-		assertThat(u2.getAge(), is(age));
-	}
+    @Test
+    public void saveOrUpdateReturnEntity1()
+    {
+        String name = "海猫" + UUID.randomUUID().toString().substring(0, 3);
+        Integer age = Math.abs(new Random().nextInt(30));
+        UserInfo u1 = new UserInfo(1, name, age);
+        UserInfo u2 = db.saveOrUpdate(u1);
+        assertThat(u2.getId(), is(u1.getId()));
+        assertThat(u2.getName(), is(name));
+        assertThat(u2.getAge(), is(age));
+    }
 
-	@Test
-	public void saveOrUpdateReturnEntity2() {
-		Integer id = Math.abs(new Random().nextInt(30)) + 1000;
-		String name = "海猫" + UUID.randomUUID().toString().substring(0, 3);
-		Integer age = Math.abs(new Random().nextInt(30));
-		UserInfo u1 = new UserInfo(id, name, age);
-		UserInfo u2 = db.saveOrUpdate(u1);
-		assertThat(u2.getId(), is(id));
-		assertThat(u2.getName(), is(name));
-		assertThat(u2.getAge(), is(age));
+    @Test
+    public void saveOrUpdateReturnEntity2()
+    {
+        Integer id = Math.abs(new Random().nextInt(30)) + 1000;
+        String name = "海猫" + UUID.randomUUID().toString().substring(0, 3);
+        Integer age = Math.abs(new Random().nextInt(30));
+        UserInfo u1 = new UserInfo(id, name, age);
+        UserInfo u2 = db.saveOrUpdate(u1);
+        assertThat(u2.getId(), is(id));
+        assertThat(u2.getName(), is(name));
+        assertThat(u2.getAge(), is(age));
 
-		int effect = db.delete("UserInfo", "id", id);
-		assertThat(effect, is(1));
-	}
-	
-	@Test
-	public void sqlFun() {
-		String str = db.sqlFun("select hex(255)");
-		assertThat(str, equalTo("FF"));
-		
-		str = db.sqlFun("select concat('A1','B2','C3')");
-		assertThat(str, equalTo("A1B2C3"));
-		
-		str = db.sqlFun("select concat_ws('-','A1','B2','C3')");
-		assertThat(str, equalTo("A1-B2-C3"));
-	}
+        int effect = db.delete("UserInfo", "id", id);
+        assertThat(effect, is(1));
+    }
 
-	@Test
-	public void count(){
-		UserInfo u = new UserInfo(16,"986545457",32);
-		long count = db.count(u);
-		assertThat(count,is(0L));
+    @Test
+    public void sqlFun()
+    {
+        String str = db.sqlFun("select hex(255)");
+        assertThat(str, equalTo("FF"));
 
-		u = new UserInfo(16,null,32);
-		count = db.count(u);
-		assertThat(count,is(0L));
+        str = db.sqlFun("select concat('A1','B2','C3')");
+        assertThat(str, equalTo("A1B2C3"));
 
-		u = new UserInfo(null,null,36);
-		count = db.count(u);
-		assertThat(count,is(1L));
+        str = db.sqlFun("select concat_ws('-','A1','B2','C3')");
+        assertThat(str, equalTo("A1-B2-C3"));
+    }
 
-		u = new UserInfo(null,null,82);
-		count = db.count(u);
-		assertThat(count,is(1L));
-	}
+    @Test
+    public void count()
+    {
+        UserInfo u = new UserInfo(16, "986545457", 32);
+        long count = db.count(u);
+        assertThat(count, is(0L));
 
-	@Test
-	public void findOne() {
-		UserInfo userInfo = new UserInfo();
-		UserInfo u = db.findOne(userInfo, true, "id","name");
-		assertThat(u,nullValue());
+        u = new UserInfo(16, null, 32);
+        count = db.count(u);
+        assertThat(count, is(0L));
 
-		String name = "王五";
-		userInfo.setName(name);
-		u = db.findOne(userInfo, true,"id","name");
-		LOG.info("u:{}",u);
-		assertThat(u.getId(),notNullValue());
-		assertThat(u.getName(),equalTo(name));
-		assertThat(u.getAge(),nullValue());
+        u = new UserInfo(null, null, 36);
+        count = db.count(u);
+        assertThat(count, is(1L));
 
-	}
+        u = new UserInfo(null, null, 82);
+        count = db.count(u);
+        assertThat(count, is(1L));
+    }
 
-	@Test
-	public void exists() { // xk3
-		UserInfo userInfo = new UserInfo();
-		userInfo.setName(null);
-		boolean b = db.exists(userInfo,true);
-		assertThat(b,is(true));
+    @Test
+    public void findOne()
+    {
+        UserInfo userInfo = new UserInfo();
+        UserInfo u = db.findOne(userInfo, true, "id", "name");
+        assertThat(u, nullValue());
 
-		userInfo.setName("婤姶");
-		b = db.exists(userInfo,true);
-		assertThat(b,is(true));
+        String name = "王五";
+        userInfo.setName(name);
+        u = db.findOne(userInfo, true, "id", "name");
+        LOG.info("u:{}", u);
+        assertThat(u.getId(), notNullValue());
+        assertThat(u.getName(), equalTo(name));
+        assertThat(u.getAge(), nullValue());
 
-		userInfo.setName("凤雏");
-		b = db.exists(userInfo,true);
-		assertThat(b,is(false));
+    }
 
-		userInfo.setName("王五");
-		userInfo.setAge(36);
-		b = db.exists(userInfo,true);
-		assertThat(b,is(true));
+    @Test
+    public void exists()
+    { // xk3
+        UserInfo userInfo = new UserInfo();
+        userInfo.setName(null);
+        boolean b = db.exists(userInfo, true);
+        assertThat(b, is(true));
 
-		userInfo.setId(2);
-		b = db.exists(userInfo,true);
-		assertThat(b,is(true));
-	}
+        userInfo.setName("婤姶");
+        b = db.exists(userInfo, true);
+        assertThat(b, is(true));
 
-	@Test
-	public void exists1() { // xk3
-		UserInfo userInfo = new UserInfo();
-		userInfo.setName(null);
-		boolean b = db.exists(userInfo,false);
-		assertThat(b,is(true));
+        userInfo.setName("凤雏");
+        b = db.exists(userInfo, true);
+        assertThat(b, is(false));
 
-		userInfo.setName("婤姶");
-		b = db.exists(userInfo,false);
-		assertThat(b,is(true));
+        userInfo.setName("王五");
+        userInfo.setAge(36);
+        b = db.exists(userInfo, true);
+        assertThat(b, is(true));
 
-		userInfo.setName("凤雏");
-		b = db.exists(userInfo,false);
-		assertThat(b,is(false));
+        userInfo.setId(2);
+        b = db.exists(userInfo, true);
+        assertThat(b, is(true));
+    }
 
-		userInfo.setName("王五");
-		userInfo.setAge(36);
-		b = db.exists(userInfo,false);
-		assertThat(b,is(true));
+    @Test
+    public void exists1()
+    { // xk3
+        UserInfo userInfo = new UserInfo();
+        userInfo.setName(null);
+        boolean b = db.exists(userInfo, false);
+        assertThat(b, is(true));
 
-		userInfo.setId(2);
-		b = db.exists(userInfo,false);
-		assertThat(b,is(true));
+        userInfo.setName("婤姶");
+        b = db.exists(userInfo, false);
+        assertThat(b, is(true));
 
-		userInfo.setName("瘌蛤蟆");
-		b = db.exists(userInfo,false);
-		assertThat(b,is(false));
-	}
+        userInfo.setName("凤雏");
+        b = db.exists(userInfo, false);
+        assertThat(b, is(false));
 
-	@Test
-	public void existsEachOn() {
-		UserInfo userInfo = new UserInfo();
-		userInfo.setId(56);
-		userInfo.setName("李四");
-		userInfo.setAge(79);
-		String str = db.existsEachOn(userInfo);
-		assertThat(str,equalTo("name"));
+        userInfo.setName("王五");
+        userInfo.setAge(36);
+        b = db.exists(userInfo, false);
+        assertThat(b, is(true));
 
-		userInfo.setId(56);
-		userInfo.setName("李逵");
-		userInfo.setAge(79);
-		str = db.existsEachOn(userInfo);
-		assertThat(str,nullValue());
-	}
+        userInfo.setId(2);
+        b = db.exists(userInfo, false);
+        assertThat(b, is(true));
 
-	@Test
-	public void existsEachOn1() {
-		UserInfo userInfo = new UserInfo();
-		userInfo.setName(null);
-		String str = db.existsEachOn(userInfo);
-		assertThat(str,nullValue());
-	}
+        userInfo.setName("瘌蛤蟆");
+        b = db.exists(userInfo, false);
+        assertThat(b, is(false));
+    }
 
-	@Test
-	public void exists2() {
-		try
-		{
-			db.exists("cc","bb");
-		} catch (RepositoryException e) {
-			assertThat(e.getMessage(),containsString("Unknown column 'cc' in 'where clause'"));
-		}
-	}
+    @Test
+    public void existsEachOn()
+    {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setId(56);
+        userInfo.setName("李四");
+        userInfo.setAge(79);
+        String str = db.existsEachOn(userInfo);
+        assertThat(str, equalTo("name"));
 
-	@Test
-	public void exists3() {
-		boolean b = db.exists("name","张三");
-		assertThat(b,is(false));
-	}
+        userInfo.setId(56);
+        userInfo.setName("李逵");
+        userInfo.setAge(79);
+        str = db.existsEachOn(userInfo);
+        assertThat(str, nullValue());
+    }
 
-	@Test
-	public void exists4() {
-		boolean b = db.exists("name","王五");
-		assertThat(b,is(true));
-	}
+    @Test
+    public void existsEachOn1()
+    {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setName(null);
+        String str = db.existsEachOn(userInfo);
+        assertThat(str, nullValue());
+    }
 
-	@Test
-	public void exists5() {
-		try
-		{
-		  db.exists("id and or","200");
-		} catch (RepositoryException e) {
-			assertThat(e.getMessage(),containsString("有注入风险"));
-		}
-	}
+    @Test
+    public void exists2()
+    {
+        try
+        {
+            db.exists("cc", "bb");
+        }
+        catch (RepositoryException e)
+        {
+            assertThat(e.getMessage(), containsString("Unknown column 'cc' in 'where clause'"));
+        }
+    }
 
-	@Test
-	public void exists6() {
-		boolean b = db.exists("id","200");
-		assertThat(b,is(false));
-	}
+    @Test
+    public void exists3()
+    {
+        boolean b = db.exists("name", "张三");
+        assertThat(b, is(false));
+    }
 
-	@Test
-	public void update1(){
-		Collection<?> entities = new HashSet<>();
-		int effect = db.update(entities);
-		assertThat(effect,is(0));
-	}
+    @Test
+    public void exists4()
+    {
+        boolean b = db.exists("name", "王五");
+        assertThat(b, is(true));
+    }
 
-	@Test
-	public void update2(){
-		int effect = db.update(null);
-		assertThat(effect,is(0));
-	}
+    @Test
+    public void exists5()
+    {
+        try
+        {
+            db.exists("id and or", "200");
+        }
+        catch (RepositoryException e)
+        {
+            assertThat(e.getMessage(), containsString("有注入风险"));
+        }
+    }
+
+    @Test
+    public void exists6()
+    {
+        boolean b = db.exists("id", "200");
+        assertThat(b, is(false));
+    }
+
+    @Test
+    public void update1()
+    {
+        Collection<?> entities = new HashSet<>();
+        int effect = db.update(entities);
+        assertThat(effect, is(0));
+    }
+
+    @Test
+    public void update2()
+    {
+        int effect = db.update(null);
+        assertThat(effect, is(0));
+    }
 
 }

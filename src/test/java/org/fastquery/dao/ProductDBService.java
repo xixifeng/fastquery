@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.dao;
@@ -29,26 +29,26 @@ import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public interface ProductDBService extends QueryRepository {
+public interface ProductDBService extends QueryRepository
+{
 
-	@Query("SELECT * FROM `product` limit 1;")
-	Map<String, Object> findOne();
+    @Query("SELECT * FROM `product` limit 1;")
+    Map<String, Object> findOne();
 
-	@Modifying
-	@Query("DELETE FROM `product` WHERE `pid` = 1")
-	@Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 3, '中国', NULL)")
-	@Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 2, '伟大', NULL)")
-	@Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 1, '复兴', NULL)")
-	int inserts();
-	
-	// 测试不同表事务
-	@Modifying
-	@Query("DELETE FROM `product` WHERE `pid` = 882")
-	@Query("update UserInfo set `name` = '苹果' where id = 1")
-	@Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 1, NULL, NULL)")
-	int updates();
+    @Modifying
+    @Query("DELETE FROM `product` WHERE `pid` = 1")
+    @Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 3, '中国', NULL)")
+    @Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 2, '伟大', NULL)")
+    @Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 1, '复兴', NULL)")
+    int inserts();
+
+    // 测试不同表事务
+    @Modifying
+    @Query("DELETE FROM `product` WHERE `pid` = 882")
+    @Query("update UserInfo set `name` = '苹果' where id = 1")
+    @Query("INSERT INTO `product` (`pid`, `lid`, `pname`, `description`) VALUES (1, 1, NULL, NULL)")
+    int updates();
 
 }

@@ -15,34 +15,40 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.service;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-class FqClassLoader extends ClassLoader {
+class FqClassLoader extends ClassLoader
+{
 
-	private static class LazyHolder {
-		private LazyHolder() {
-		}
-		private static final FqClassLoader INSTANCE = new FqClassLoader();
-	}
+    private static class LazyHolder
+    {
+        private LazyHolder()
+        {
+        }
 
-	private FqClassLoader() {
-		super(FqClassLoader.class.getClassLoader());
-	}
+        private static final FqClassLoader INSTANCE = new FqClassLoader();
+    }
 
-	static FqClassLoader getInstance() {
-		return LazyHolder.INSTANCE;
-	}
+    private FqClassLoader()
+    {
+        super(FqClassLoader.class.getClassLoader());
+    }
 
-	final Class<?> defineClassByName(String name, byte[] b, int len) {
-		return defineClass(name, b, 0, len);
-	}
+    static FqClassLoader getInstance()
+    {
+        return LazyHolder.INSTANCE;
+    }
+
+    final Class<?> defineClassByName(String name, byte[] b, int len)
+    {
+        return defineClass(name, b, 0, len);
+    }
 }

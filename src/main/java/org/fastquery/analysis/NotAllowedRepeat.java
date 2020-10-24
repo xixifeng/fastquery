@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.analysis;
@@ -28,17 +28,20 @@ import org.fastquery.core.Query;
 
 /**
  * 在生成代码之前不允许Query注解重复.
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
-class NotAllowedRepeat implements MethodFilter {
+class NotAllowedRepeat implements MethodFilter
+{
 
-	@Override
-	public void doFilter(Method method) {
-		Query[] queries = method.getAnnotationsByType(Query.class);
-		if (queries.length > 1) {
-			this.abortWith(method, "@Query注解在这个方法上不能重复! 改操作的情形下@Query可以重复.");
-		}
-	}
+    @Override
+    public void doFilter(Method method)
+    {
+        Query[] queries = method.getAnnotationsByType(Query.class);
+        if (queries.length > 1)
+        {
+            this.abortWith(method, "@Query注解在这个方法上不能重复! 改操作的情形下@Query可以重复.");
+        }
+    }
 
 }

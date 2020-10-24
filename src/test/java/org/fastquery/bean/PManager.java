@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.bean;
@@ -29,7 +29,6 @@ import lombok.*;
 import org.fastquery.core.Id;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
 @Setter
@@ -37,27 +36,28 @@ import org.fastquery.core.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class PManager {
+public class PManager
+{
 
-	@Id
-	private Long pmuid;
-	private Long punitId;
-	private String mobile;
-	private String password;
-	private Byte isActive = 0;
-	private Byte isdm = 0;
-	private Byte isReg = 0;
-	private Byte pmRole = 0;
+    @Id
+    private Long pmuid;
+    private Long punitId;
+    private String mobile;
+    private String password;
+    private Byte isActive = 0;
+    private Byte isdm = 0;
+    private Byte isReg = 0;
+    private Byte pmRole = 0;
 
-	private String realName;
-	private Byte gender = 0;
-	private String head;
-	private Byte isOnline = 0;
-	private String hxuser;
-	private String hxpass;
-	private String hxRoomId;
-	private Long createUid = 0L;
-	private Long lastUpdateUid;
-	private int[] ins = {};
-	private List<String> lists = new ArrayList<>();
+    private String realName;
+    private Byte gender = 0;
+    private String head;
+    private Byte isOnline = 0;
+    private String hxuser;
+    private String hxpass;
+    private String hxRoomId;
+    private Long createUid = 0L;
+    private Long lastUpdateUid;
+    private int[] ins = {};
+    private List<String> lists = new ArrayList<>();
 }

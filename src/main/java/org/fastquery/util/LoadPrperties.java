@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.util;
@@ -35,61 +35,72 @@ import org.fastquery.dsm.FastQueryJson;
 import org.fastquery.dsm.FQueryProperties;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class LoadPrperties {
+public class LoadPrperties
+{
 
-	private static final Logger LOG = LoggerFactory.getLogger(LoadPrperties.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LoadPrperties.class);
 
-	private LoadPrperties() {
-	}
+    private LoadPrperties()
+    {
+    }
 
-	/**
-	 * 装载配置并且初始化数据源,该方法消耗大,只能被调用一次
-	 * 
-	 * @param fqueryResource fquery.json 资源文件
-	 * @return set格式 fquery.json
-	 */
-	public static Set<FastQueryJson> load(Resource fqueryResource) {
-		Set<FastQueryJson> fqProperties = PropertiesUtil.getFQueryProperties(fqueryResource);
-		String namedConfig;
-		Set<String> basePackages;
-		String config;
-		
-		Map<String, String> poolMap = XMLParse.toMap(fqueryResource, "pools.xml", "providers", "pools");
-		if(fqueryResource.exist("pool-extend.xml")) {
-			poolMap.putAll(XMLParse.toMap(fqueryResource, "pool-extend.xml", "providers", "pools"));
-		}
-		
-		for (FastQueryJson fQueryPropertie : fqProperties) {
-			config = fQueryPropertie.getConfig(); // 获取fastquery.json 中的config属性
-			namedConfig = fQueryPropertie.getDataSourceName();
-			
-			String provider = poolMap.get(config);
-			
-			if(provider==null) {
-				throw new ExceptionInInitializerError("根据" + config + "没有找到数据源提供者");
-			} else if(FQueryProperties.findDataSource(namedConfig) == null && namedConfig != null) {
-				ConnectionPoolProvider poolProvider;
-				try {
-					Class<?> providerClazz = Class.forName(provider);
-					poolProvider = (ConnectionPoolProvider) providerClazz.newInstance();
-				} catch (Exception e) {
-					throw new ExceptionInInitializerError(provider + "初始化失败");
-				}
-				DataSource dataSource = poolProvider.getDataSource(fqueryResource, namedConfig);
-				FQueryProperties.putDataSource(namedConfig, dataSource);
-				LOG.debug("创建数据源:{},名称为:{}", dataSource, namedConfig);
-			}
-			
-			basePackages = fQueryPropertie.getBasePackages();
-			for (String basePackage : basePackages) {
-				FQueryProperties.putDataSourceIndex(basePackage, namedConfig);
-			}
-		}
-		
-		return fqProperties;
-	}
-	
+    /**
+     * 装载配置并且初始化数据源,该方法消耗大,只能被调用一次
+     *
+     * @param fqueryResource fquery.json 资源文件
+     * @return set格式 fquery.json
+     */
+    public static Set<FastQueryJson> load(Resource fqueryResource)
+    {
+        Set<FastQueryJson> fqProperties = PropertiesUtil.getFQueryProperties(fqueryResource);
+        String namedConfig;
+        Set<String> basePackages;
+        String config;
+
+        Map<String, String> poolMap = XMLParse.toMap(fqueryResource, "pools.xml", "providers", "pools");
+        if (fqueryResource.exist("pool-extend.xml"))
+        {
+            poolMap.putAll(XMLParse.toMap(fqueryResource, "pool-extend.xml", "providers", "pools"));
+        }
+
+        for (FastQueryJson fQueryPropertie : fqProperties)
+        {
+            config = fQueryPropertie.getConfig(); // 获取fastquery.json 中的config属性
+            namedConfig = fQueryPropertie.getDataSourceName();
+
+            String provider = poolMap.get(config);
+
+            if (provider == null)
+            {
+                throw new ExceptionInInitializerError("根据" + config + "没有找到数据源提供者");
+            }
+            else if (FQueryProperties.findDataSource(namedConfig) == null && namedConfig != null)
+            {
+                ConnectionPoolProvider poolProvider;
+                try
+                {
+                    Class<?> providerClazz = Class.forName(provider);
+                    poolProvider = (ConnectionPoolProvider) providerClazz.newInstance();
+                }
+                catch (Exception e)
+                {
+                    throw new ExceptionInInitializerError(provider + "初始化失败");
+                }
+                DataSource dataSource = poolProvider.getDataSource(fqueryResource, namedConfig);
+                FQueryProperties.putDataSource(namedConfig, dataSource);
+                LOG.debug("创建数据源:{},名称为:{}", dataSource, namedConfig);
+            }
+
+            basePackages = fQueryPropertie.getBasePackages();
+            for (String basePackage : basePackages)
+            {
+                FQueryProperties.putDataSourceIndex(basePackage, namedConfig);
+            }
+        }
+
+        return fqProperties;
+    }
+
 }

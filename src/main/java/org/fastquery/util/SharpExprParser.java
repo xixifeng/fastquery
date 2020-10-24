@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.util;
@@ -28,40 +28,53 @@ import java.util.Set;
 
 /**
  * #{#表达式} 解析
+ *
  * @author mei.sir@aliyun.cn
  */
-public final class SharpExprParser {
+public final class SharpExprParser
+{
 
-	private SharpExprParser() {}
-	
-	public static Set<String> matchesNotrepeat(String str) {
-		Objects.requireNonNull(str);
-		
-		Set<String> sets = new HashSet<>();
-		
-		find(str, sets);
-		
-		return sets;
-	}
-	
-	private static void find(String str, Set<String> sets) {
-		int startIndex = 0;
-		int endIndex;
-		boolean loop = true;
-		while (loop) {
-			startIndex = str.indexOf("#{#",startIndex);
-			if(startIndex != -1) {
-				endIndex = str.indexOf('}', startIndex + 1);
-				if(endIndex!=-1) {
-					sets.add(str.substring(startIndex, endIndex + 1));
-					startIndex = endIndex + 1;
-				} else {
-					loop = false;
-				}
-			} else {
-				break;
-			}
-		}
-	}
-	
+    private SharpExprParser()
+    {
+    }
+
+    public static Set<String> matchesNotrepeat(String str)
+    {
+        Objects.requireNonNull(str);
+
+        Set<String> sets = new HashSet<>();
+
+        find(str, sets);
+
+        return sets;
+    }
+
+    private static void find(String str, Set<String> sets)
+    {
+        int startIndex = 0;
+        int endIndex;
+        boolean loop = true;
+        while (loop)
+        {
+            startIndex = str.indexOf("#{#", startIndex);
+            if (startIndex != -1)
+            {
+                endIndex = str.indexOf('}', startIndex + 1);
+                if (endIndex != -1)
+                {
+                    sets.add(str.substring(startIndex, endIndex + 1));
+                    startIndex = endIndex + 1;
+                }
+                else
+                {
+                    loop = false;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
 }

@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.analysis;
@@ -34,21 +34,24 @@ import org.fastquery.util.TypeUtil;
 /**
  * 在QueryRepository中 {@link Modifying} 依赖检测 <br>
  * Modifying 要么跟 Query 组合, 要么跟QueryByNamed组合 不能独存
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
-class ModifyingDependencyFilter implements MethodFilter {
+class ModifyingDependencyFilter implements MethodFilter
+{
 
-	@Override
-	public void doFilter(Method method) {
-		Modifying m = method.getAnnotation(Modifying.class);
-		int queryLen = method.getAnnotationsByType(Query.class).length;
-		QueryByNamed queryByNamed = method.getAnnotation(QueryByNamed.class);
-		Parameter[] parameters = method.getParameters();
-		boolean hasQueryBuilder = TypeUtil.hasType(QueryBuilder.class, parameters);
-		if (m != null && queryLen == 0 && queryByNamed == null && !hasQueryBuilder) {
-			this.abortWith(method, "@Modifying 要么跟 @Query 组合, 要么跟@QueryByNamed组合, 要么跟QueryBuilder参数组合!");
-		}
-	}
+    @Override
+    public void doFilter(Method method)
+    {
+        Modifying m = method.getAnnotation(Modifying.class);
+        int queryLen = method.getAnnotationsByType(Query.class).length;
+        QueryByNamed queryByNamed = method.getAnnotation(QueryByNamed.class);
+        Parameter[] parameters = method.getParameters();
+        boolean hasQueryBuilder = TypeUtil.hasType(QueryBuilder.class, parameters);
+        if (m != null && queryLen == 0 && queryByNamed == null && !hasQueryBuilder)
+        {
+            this.abortWith(method, "@Modifying 要么跟 @Query 组合, 要么跟@QueryByNamed组合, 要么跟QueryBuilder参数组合!");
+        }
+    }
 
 }

@@ -15,32 +15,36 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
 
 /**
  * Repository Exception
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
-public class RepositoryException extends RuntimeException {
+public class RepositoryException extends RuntimeException
+{
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public RepositoryException(Throwable cause) {
-		super(cause);
-	}
+    public RepositoryException(Throwable cause)
+    {
+        super(cause);
+    }
 
-	public RepositoryException(String message) {
-		super(message);
-	}
+    public RepositoryException(String message)
+    {
+        super(message);
+    }
 
-	public RepositoryException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public RepositoryException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 
 }

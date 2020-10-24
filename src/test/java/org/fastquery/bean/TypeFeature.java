@@ -29,7 +29,6 @@ import org.fastquery.core.Table;
 import java.util.EnumSet;
 
 /**
- *
  * @author xixifeng (fastquery@126.com)
  */
 @Table("type_feature")
@@ -38,7 +37,8 @@ import java.util.EnumSet;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class TypeFeature {
+public class TypeFeature
+{
 
     @Id
     private Long id;

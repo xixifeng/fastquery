@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
@@ -30,23 +30,24 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class TransactionalTest extends FastQueryTest  {
-	
-	private final ProductDBService pdbs = FQuery.getRepository(ProductDBService.class);
-	
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
-	
-	@Test
-	public void testUpdates() {
-		 // 断言: 在执行pdbs.updates()之后,将会抛出 RepositoryException 异常!
-		exception.expect(RepositoryException.class);
-		// 断言: 在执行pdbs.updates()之后,抛出的异常信息是 "Column 'pname' cannot be null"
-		exception.expectMessage("Column 'pname' cannot be null");
-		pdbs.updates();		
-	}
-	
+public class TransactionalTest extends FastQueryTest
+{
+
+    private final ProductDBService pdbs = FQuery.getRepository(ProductDBService.class);
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    @Test
+    public void testUpdates()
+    {
+        // 断言: 在执行pdbs.updates()之后,将会抛出 RepositoryException 异常!
+        exception.expect(RepositoryException.class);
+        // 断言: 在执行pdbs.updates()之后,抛出的异常信息是 "Column 'pname' cannot be null"
+        exception.expectMessage("Column 'pname' cannot be null");
+        pdbs.updates();
+    }
+
 }

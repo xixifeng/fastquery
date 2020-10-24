@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.analysis;
@@ -28,24 +28,28 @@ import java.util.List;
 
 /**
  * 责任链
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
-class MethodFilterChain implements MethodFilter {
+class MethodFilterChain implements MethodFilter
+{
 
-	private final List<MethodFilter> methodFilters = new ArrayList<>();
+    private final List<MethodFilter> methodFilters = new ArrayList<>();
 
-	MethodFilterChain addFilter(MethodFilter methodFilter) {
-		methodFilters.add(methodFilter);
-		return this;
-	}
+    MethodFilterChain addFilter(MethodFilter methodFilter)
+    {
+        methodFilters.add(methodFilter);
+        return this;
+    }
 
-	@Override
-	public void doFilter(Method method) {
-		for (MethodFilter methodFilter : methodFilters) {
-			methodFilter.doFilter(method);
-		}
-		methodFilters.clear();
-	}
+    @Override
+    public void doFilter(Method method)
+    {
+        for (MethodFilter methodFilter : methodFilters)
+        {
+            methodFilter.doFilter(method);
+        }
+        methodFilters.clear();
+    }
 
 }

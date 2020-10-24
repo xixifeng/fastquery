@@ -55,39 +55,47 @@ import com.alibaba.fastjson.JSONObject;
 /**
  * @author xixifeng (fastquery@126.com)
  */
-public class TypeUtil {
+public class TypeUtil
+{
 
     private static final Logger LOG = LoggerFactory.getLogger(TypeUtil.class);
 
-    private TypeUtil() {
+    private TypeUtil()
+    {
     }
 
     // 给定一个"正则匹配"匹配在另一个字符串,把匹配上的字符串存入一个数组里. 这样一来即可以用,又可以统计出现次数!
-    public static List<String> matches(String str, String regex) {
+    public static List<String> matches(String str, String regex)
+    {
         List<String> empty = new ArrayList<>();
-        if (str == null) {
+        if (str == null)
+        {
             return empty;
         }
         return matcheAll(regex, str, empty);
     }
 
     // 集合中没有重复
-    public static Set<String> matchesNotrepeat(String str, String regex) {
+    public static Set<String> matchesNotrepeat(String str, String regex)
+    {
         Set<String> empty = new HashSet<>();
-        if (str == null) {
+        if (str == null)
+        {
             return empty;
         }
         return matcheAll(regex, str, empty);
     }
 
-    private static <E extends Collection<String>> E matcheAll(String regex, String str, E collection) {
+    private static <E extends Collection<String>> E matcheAll(String regex, String str, E collection)
+    {
         // 将给定的正则表达式编译到模式中。
         Pattern p = Pattern.compile(regex);
         // 创建匹配给定输入与此模式的匹配器。
         Matcher m = p.matcher(str);
         String val;
         // 尝试查找与该模式匹配的输入序列的下一个子序列。
-        while (m.find()) {
+        while (m.find())
+        {
             // 返回由以前匹配操作所匹配的输入子序列。
             val = m.group();
             collection.add(val);
@@ -108,11 +116,13 @@ public class TypeUtil {
      * @param sql sql语句
      * @return sql
      */
-    public static int[] getSQLParameter(String sql) {
+    public static int[] getSQLParameter(String sql)
+    {
         List<String> subs = matches(sql, Placeholder.SP1_REG);
         int len = subs.size();
         int[] ints = new int[len];
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++)
+        {
             ints[i] = Integer.parseInt(subs.get(i).replace("?", ""));
         }
         return ints;
@@ -140,37 +150,48 @@ public class TypeUtil {
      *                 请特别注意: sql参数与方法参数的对应,并不代表就是值的对应. <br>
      * @return sql处理信号集
      */
-    public static ParamMap getParamMap(int[] indexMap) {
+    public static ParamMap getParamMap(int[] indexMap)
+    {
         Object[] args = QueryContext.getArgs();
         Map<Integer, Integer> rps = new HashMap<>();
         List<Object> objs = new ArrayList<>();
         int increment = 0;
-        for (int i = 0; i < indexMap.length; i++) {
+        for (int i = 0; i < indexMap.length; i++)
+        {
             int paramIndex = indexMap[i] - 1;
             // 取出sql参数所对应的方法参数
             Object mp = args[paramIndex]; // 这个值有可能是null
-            if (mp == null) {
+            if (mp == null)
+            {
                 objs.add(getParamDefVal(paramIndex, null));
-            } else {
+            }
+            else
+            {
                 Class<?> mpClazz = mp.getClass();
                 int count;
-                if (mp instanceof Iterable) {
+                if (mp instanceof Iterable)
+                {
                     @SuppressWarnings("unchecked")
                     Iterable<Object> iterable = (Iterable<Object>) mp;
                     Iterator<Object> iterator = iterable.iterator();
                     count = 0;
-                    while (iterator.hasNext()) {
+                    while (iterator.hasNext())
+                    {
                         ++count;
                         objs.add(iterator.next());
                     }
                     increment = exted(rps, objs, increment, i, count);
-                } else if (mpClazz.isArray()) {
+                }
+                else if (mpClazz.isArray())
+                {
                     // asList 是一个可变变量
                     List<Object> arrs = toList(mp);
                     objs.addAll(arrs);
                     count = arrs.size();
                     increment = exted(rps, objs, increment, i, count);
-                } else {
+                }
+                else
+                {
                     objs.add(mp);
                 }
             }
@@ -183,31 +204,42 @@ public class TypeUtil {
     // 做两件事
     // 1. 如果SQL中的第i个参数是个集合并且这个集合为空,那么就给这个SQL参数的真实值设置为null
     // 2. 用于记录,第i个"?"需要替换成count个"?"
-    private static int exted(Map<Integer, Integer> rps, List<Object> objs, int increment, int i, int count) {
-        if (count == 0) {
+    private static int exted(Map<Integer, Integer> rps, List<Object> objs, int increment, int i, int count)
+    {
+        if (count == 0)
+        {
             objs.add(null);
-        } else {
+        }
+        else
+        {
             rps.put(i + increment, count); // 这个put用于记录,第i个"?"需要替换成count个"?"
             increment += count - 1; // 增量个数(除开本身一个)
         }
         return increment;
     }
 
-    private static Object getParamDefVal(int paramIndex, Object mp) {
+    private static Object getParamDefVal(int paramIndex, Object mp)
+    {
         Param param = QueryContext.getMethodInfo().getParameters()[paramIndex].getAnnotation(Param.class);
-        if (param != null && !param.defaultVal().trim().equals("")) {
+        if (param != null && !param.defaultVal().trim().equals(""))
+        {
             return param.defaultVal();
-        } else {
+        }
+        else
+        {
             return mp;
         }
     }
 
-    private static String overChar(int overlap) {
-        if (overlap < 1) {
+    private static String overChar(int overlap)
+    {
+        if (overlap < 1)
+        {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < overlap; i++) {
+        for (int i = 0; i < overlap; i++)
+        {
             sb.append("?,");
         }
         sb.deleteCharAt(sb.length() - 1);
@@ -222,15 +254,18 @@ public class TypeUtil {
      * @param overlap 个数
      * @return 处理后的字符串
      */
-    public static String replace(String str, int index, int overlap) {
+    public static String replace(String str, int index, int overlap)
+    {
         if (str == null || index < 0 || overlap < 1)
             return "";
         StringBuilder sb = new StringBuilder(str);
         int arisen = 0; // 记录"?"是第几次出现
         int len = sb.length();
-        for (int i = 0; i < len; i++) { // 在这里用len 而不是
+        for (int i = 0; i < len; i++)
+        { // 在这里用len 而不是
             // sb.length(),那是因为sb一但被改变了,这个for循环就会结束,因此用len是没问题的
-            if (sb.charAt(i) == '?' && index == arisen++) {
+            if (sb.charAt(i) == '?' && index == arisen++)
+            {
                 sb.replace(i, i + 1, overChar(overlap));
                 break;
             }
@@ -245,7 +280,8 @@ public class TypeUtil {
      * @param word 待差找的单词
      * @return 存在:true,反之,false
      */
-    public static boolean containsIgnoreCase(String str, String word) {
+    public static boolean containsIgnoreCase(String str, String word)
+    {
 
         // 将给定的正则表达式编译到模式中。
         // 在不区分大小写的前提下,匹配是否包含有单词 word
@@ -256,9 +292,11 @@ public class TypeUtil {
         Matcher m = p.matcher(str);
 
         // 尝试查找与该模式匹配的输入序列的下一个子序列。
-        while (m.find()) {
+        while (m.find())
+        {
             // m.group() 表示返回由以前匹配操作所匹配的输入子序列。
-            if (m.group().equalsIgnoreCase(word)) {
+            if (m.group().equalsIgnoreCase(word))
+            {
                 return true;
             }
         }
@@ -273,13 +311,18 @@ public class TypeUtil {
      * @return 有:true, 无:false
      * @throws SecurityException 安全异常
      */
-    public static boolean hasDefaultConstructor(Class<?> clazz) {
-        if (clazz == null) {
+    public static boolean hasDefaultConstructor(Class<?> clazz)
+    {
+        if (clazz == null)
+        {
             return false;
         }
-        try {
+        try
+        {
             clazz.getConstructor();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return false;
         }
         return true;
@@ -292,9 +335,12 @@ public class TypeUtil {
      * @param parameters 被查的参数列表
      * @return 第几个
      */
-    public static int findAnnotationIndex(Class<? extends Annotation> clazz, Parameter[] parameters) {
-        for (int i = 0; i < parameters.length; i++) {
-            if (parameters[i].getAnnotation(clazz) != null) {
+    public static int findAnnotationIndex(Class<? extends Annotation> clazz, Parameter[] parameters)
+    {
+        for (int i = 0; i < parameters.length; i++)
+        {
+            if (parameters[i].getAnnotation(clazz) != null)
+            {
                 return i;
             }
         }
@@ -308,9 +354,12 @@ public class TypeUtil {
      * @param parameters 参数类型集
      * @return 参数类型
      */
-    public static Parameter findParameter(Class<? extends Annotation> clazz, Parameter[] parameters) {
-        for (Parameter parameter : parameters) {
-            if (parameter.getAnnotation(clazz) != null) {
+    public static Parameter findParameter(Class<? extends Annotation> clazz, Parameter[] parameters)
+    {
+        for (Parameter parameter : parameters)
+        {
+            if (parameter.getAnnotation(clazz) != null)
+            {
                 return parameter;
             }
         }
@@ -324,9 +373,12 @@ public class TypeUtil {
      * @param parameters 参数类型
      * @return 有返回true, 无:false
      */
-    public static boolean hasType(Class<?> clazz, Parameter[] parameters) {
-        for (Parameter parameter : parameters) {
-            if (parameter.getType() == clazz) {
+    public static boolean hasType(Class<?> clazz, Parameter[] parameters)
+    {
+        for (Parameter parameter : parameters)
+        {
+            if (parameter.getType() == clazz)
+            {
                 return true;
             }
         }
@@ -340,10 +392,13 @@ public class TypeUtil {
      * @param parameters 参数类型
      * @return 出现次数
      */
-    public static int countRepeated(Class<? extends Annotation> clazz, Parameter[] parameters) {
+    public static int countRepeated(Class<? extends Annotation> clazz, Parameter[] parameters)
+    {
         int count = 0;
-        for (Parameter parameter : parameters) {
-            if (parameter.getAnnotation(clazz) != null) {
+        for (Parameter parameter : parameters)
+        {
+            if (parameter.getAnnotation(clazz) != null)
+            {
                 count += 1;
             }
         }
@@ -356,16 +411,19 @@ public class TypeUtil {
      * @param parameters 参数类型
      * @return 若返回 -1 表示没有找到
      */
-    public static int findId(Parameter[] parameters) {
+    public static int findId(Parameter[] parameters)
+    {
         return findAnnotationIndex(Id.class, parameters);
     }
 
-    private static String getReplacement(Object obj, String defVal) {
+    private static String getReplacement(Object obj, String defVal)
+    {
         return Matcher.quoteReplacement(obj != null ? obj.toString() : defVal);
     }
 
     // 将 str中的 ${tagName} 和 $tagName 统统替换成 replacement
-    private static String replaceAllEL(String str, String tagName, String replacement) {
+    private static String replaceAllEL(String str, String tagName, String replacement)
+    {
         return str.replaceAll("\\$\\{" + tagName + "}", replacement).replaceAll("\\$" + tagName + "\\b", replacement);
     }
 
@@ -377,22 +435,27 @@ public class TypeUtil {
      * @param sql    sql语句
      * @return sql
      */
-    static String paramFilter(MethodInfo method, Object[] args, String sql) {
+    static String paramFilter(MethodInfo method, Object[] args, String sql)
+    {
         String s = sql.replace("::", ":");
         // 替换@Param
         Annotation[][] annotations = method.getParameterAnnotations();
         QueryByNamed queryByNamed = method.getQueryByNamed();
         int len = annotations.length;
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++)
+        {
             Annotation[] anns = annotations[i];
-            for (Annotation ann : anns) {
-                if (ann.annotationType() == Param.class) {
+            for (Annotation ann : anns)
+            {
+                if (ann.annotationType() == Param.class)
+                {
                     Param param = (Param) ann;
                     Object objx = args[i];
                     objx = BeanUtil.parseList(objx);
                     // 这里的replaceAll的先后顺序很重要
                     // '{' 是正则语法的关键字,必须转义
-                    if (queryByNamed == null) {
+                    if (queryByNamed == null)
+                    {
                         String replacement = getReplacement(objx, param.defaultVal());
                         s = replaceAllEL(s, param.value(), replacement);
                     }
@@ -415,15 +478,19 @@ public class TypeUtil {
      * @param sql    sql语句
      * @return sql
      */
-    public static String paramNameFilter(MethodInfo method, String sql) {
+    public static String paramNameFilter(MethodInfo method, String sql)
+    {
         String s = sql;
         // 替换@Param
         Annotation[][] annotations = method.getParameterAnnotations();
         int len = annotations.length;
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++)
+        {
             Annotation[] anns = annotations[i];
-            for (Annotation ann : anns) {
-                if (ann.annotationType() == Param.class) {
+            for (Annotation ann : anns)
+            {
+                if (ann.annotationType() == Param.class)
+                {
                     Param param = (Param) ann;
                     // Pattern.quote(":"+param.value())
                     s = s.replaceAll(":" + param.value() + "\\b", "?" + (i + 1));
@@ -434,22 +501,29 @@ public class TypeUtil {
         return s;
     }
 
-    private static boolean getFactor1(Condition condition, Object arg) {
+    private static boolean getFactor1(Condition condition, Object arg)
+    {
         return (arg == null) && condition.ignoreNull();
     }
 
-    private static boolean getFactor2(Condition condition, Object arg) {
+    private static boolean getFactor2(Condition condition, Object arg)
+    {
         return arg != null && "".equals(arg.toString()) && condition.ignoreEmpty();
     }
 
-    private static boolean getFactor3(Condition condition, int index) {
+    private static boolean getFactor3(Condition condition, int index)
+    {
         return (!condition.ignoreScript().equals("false")) && Script2Class.getJudge(index).ignore();
     }
 
-    private static boolean getFactor4(Condition condition) {
-        try {
+    private static boolean getFactor4(Condition condition)
+    {
+        try
+        {
             return condition.ignore().newInstance().ignore();
-        } catch (InstantiationException | IllegalAccessException e1) {
+        }
+        catch (InstantiationException | IllegalAccessException e1)
+        {
             // 这个异常其实永远也发生不了,该异常已经通过静态分析,提升到初始化阶段了
 
             LOG.error("{} 必须有一个不带参数且用public修饰的构造方法.反之,作废", condition.ignore());
@@ -457,17 +531,24 @@ public class TypeUtil {
         }
     }
 
-    private static boolean getFactor5(Condition condition, Object arg) {
+    private static boolean getFactor5(Condition condition, Object arg)
+    {
 
         String[] allows = condition.allowRule();
 
-        if (allows.length != 0) { // 表明,允许的范围并不是全部,而是有所限定
-            if (arg == null) { // 范围有明确指定,还传递null,那么必然忽略
+        if (allows.length != 0)
+        { // 表明,允许的范围并不是全部,而是有所限定
+            if (arg == null)
+            { // 范围有明确指定,还传递null,那么必然忽略
                 return true;
-            } else {
-                for (String allow : allows) {
+            }
+            else
+            {
+                for (String allow : allows)
+                {
                     // 因为注解的特性 allows的集合中的成员永远不可能出现null
-                    if (!Pattern.matches(allow, arg.toString())) { // 不在允许范围立即忽略
+                    if (!Pattern.matches(allow, arg.toString()))
+                    { // 不在允许范围立即忽略
                         return true;
                     }
                 }
@@ -477,11 +558,15 @@ public class TypeUtil {
         return false;
     }
 
-    private static boolean getFactor6(Condition condition, Object arg) {
-        if (arg != null) {
+    private static boolean getFactor6(Condition condition, Object arg)
+    {
+        if (arg != null)
+        {
             String[] ignores = condition.ignoreRule();
-            for (String ignore : ignores) {
-                if (Pattern.matches(ignore, arg.toString())) {
+            for (String ignore : ignores)
+            {
+                if (Pattern.matches(ignore, arg.toString()))
+                {
                     return true;
                 }
             }
@@ -498,7 +583,8 @@ public class TypeUtil {
      * @param conditionPosition 条件在方法上的位置索引
      * @return null表示忽略这个条件, 反之返回这个条件的值
      */
-    private static String ignoreCondition(Condition condition, String value, int conditionPosition) {
+    private static String ignoreCondition(Condition condition, String value, int conditionPosition)
+    {
 
         // 忽略因子列表,任何一个都可以导致忽略
         // 这些因子不拿出来定义是有意义的, 多个 || 第一个true,后面的方法就不执行了
@@ -521,40 +607,54 @@ public class TypeUtil {
 		*/
         Set<String> pars = TypeUtil.matchesNotrepeat(value, Placeholder.SP1_REG);
         Object[] args = QueryContext.getArgs();
-        for (String par : pars) {
+        for (String par : pars)
+        {
             int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
             Object arg = args[index - 1];
-            if (getFactor1(condition, arg) || getFactor2(condition, arg) || getFactor5(condition, arg) || getFactor6(condition, arg)) {
+            if (getFactor1(condition, arg) || getFactor2(condition, arg) || getFactor5(condition, arg) || getFactor6(condition, arg))
+            {
                 return null;
-            } else if (arg == null) { // 当前?num 处是null也要保留条件,那么就要考略null跟一些运算符不能运算的问题(纠正它)
+            }
+            else if (arg == null)
+            { // 当前?num 处是null也要保留条件,那么就要考略null跟一些运算符不能运算的问题(纠正它)
                 value = extReplaceAll(value, index);
             }
         }
 
-        if (getFactor3(condition, conditionPosition) || getFactor4(condition)) {
+        if (getFactor3(condition, conditionPosition) || getFactor4(condition))
+        {
             return null;
         }
 
         // if$ , else$ 解析
-        if (!"true".equals(condition.if$()) && !Script2Class.getJudge(conditionPosition).ignore()) { // 如果if结果为假
+        if (!"true".equals(condition.if$()) && !Script2Class.getJudge(conditionPosition).ignore())
+        { // 如果if结果为假
             String elseValue = condition.else$();
-            if ("".equals(elseValue)) {
+            if ("".equals(elseValue))
+            {
                 return null;
-            } else {
+            }
+            else
+            {
                 return elseVal(elseValue);
             }
-        } else {
+        }
+        else
+        {
             return value;
         }
     }
 
-    private static String elseVal(String elseValue) {
+    private static String elseVal(String elseValue)
+    {
         elseValue = paramFilter(QueryContext.getMethodInfo(), QueryContext.getArgs(), elseValue);
         Set<String> pars = TypeUtil.matchesNotrepeat(elseValue, Placeholder.SP1_REG);
         Object[] args = QueryContext.getArgs();
-        for (String par : pars) {
+        for (String par : pars)
+        {
             int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
-            if (args[index - 1] == null) { // ?num 对应的实参是null,要附加处理下
+            if (args[index - 1] == null)
+            { // ?num 对应的实参是null,要附加处理下
                 elseValue = extReplaceAll(elseValue, index);
             }
         }
@@ -568,26 +668,33 @@ public class TypeUtil {
      * @param args   参数集
      * @return where部分sql
      */
-    public static String getWhereSQL(MethodInfo method, Object[] args) {
+    public static String getWhereSQL(MethodInfo method, Object[] args)
+    {
         StringBuilder sb = new StringBuilder();
 
         // 追加条件
         Condition[] conditions = method.getConditions();
-        for (int i = 0; i < conditions.length; i++) {
+        for (int i = 0; i < conditions.length; i++)
+        {
             String value = conditions[i].value();
             value = paramFilter(method, args, value);
             value = ignoreCondition(conditions[i], value, i);
-            if (value != null) {
+            if (value != null)
+            {
                 int sblen = sb.length();
                 // sb的长度是0 或者 最后一个字符就是不是空格
-                if (sblen == 0 || sb.charAt(sblen - 1) != ' ') {
+                if (sblen == 0 || sb.charAt(sblen - 1) != ' ')
+                {
                     sb.append(' ');
                     sblen += 1;
                 }
-                if (sblen == 1 && i != 0) { // 条件成立,表示这个SQL条件的前面还不存在条件,// 那么第一个条件的链接符,必须去掉.
+                if (sblen == 1 && i != 0)
+                { // 条件成立,表示这个SQL条件的前面还不存在条件,// 那么第一个条件的链接符,必须去掉.
                     // (where后面不能直接跟运算符号)
                     sb.append(removePart(value));
-                } else {
+                }
+                else
+                {
                     sb.append(value);
                 }
 
@@ -595,14 +702,16 @@ public class TypeUtil {
         }
         // 追加条件 End
 
-        if (!"".equals(sb.toString())) {
+        if (!"".equals(sb.toString()))
+        {
             sb.insert(0, "where");
         }
 
         return sb.toString();
     }
 
-    private static String extReplaceAll(String value, int index) {
+    private static String extReplaceAll(String value, int index)
+    {
         // 如果传递null 还要求参与运算.
         // sql中null无法跟比较运算符(如 =, <, 或者 <>),一起运算,必须使用 is null 和 is not null 操作符.
         value = value.replaceAll("\\s+", " "); // 把多个空白换成一个空格
@@ -621,22 +730,26 @@ public class TypeUtil {
      * @param args    参数集
      * @return sql集
      */
-    public static List<String> getQuerySQL(MethodInfo method, Query[] queries, Object[] args) {
+    public static List<String> getQuerySQL(MethodInfo method, Query[] queries, Object[] args)
+    {
         List<String> sqls = new ArrayList<>();
 
         // 如果是QueryByNamed
-        if (method.getQueryByNamed() != null) {
+        if (method.getQueryByNamed() != null)
+        {
             String s = QueryPool.render(true);
             s = paramFilter(method, args, s);
             sqls.add(s);
             return sqls;
         }
 
-        for (Query query : queries) {
+        for (Query query : queries)
+        {
             String sql = query.value();
             sql = paramFilter(method, args, sql);
             String sets = SetParser.process();
-            if (sets != null) {
+            if (sets != null)
+            {
                 sql = sql.replaceFirst(Placeholder.SETS_REG, Matcher.quoteReplacement(sets));
             }
             sql = sql.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(getWhereSQL(method, args)));
@@ -651,7 +764,8 @@ public class TypeUtil {
      * @param str 等待过滤的字符串
      * @return 处理之后的字符串
      */
-    static String filterComments(String str) {
+    static String filterComments(String str)
+    {
         // 过滤 //
         String s = str.replaceAll("//(.)+\\n", "");
         s = s.replaceAll("//(.)?\\n", "");
@@ -666,7 +780,8 @@ public class TypeUtil {
      * @param type 类型
      * @return y:true/n:false
      */
-    public static boolean isMapSO(java.lang.reflect.Type type) {
+    public static boolean isMapSO(java.lang.reflect.Type type)
+    {
         return "java.util.Map<java.lang.String, java.lang.Object>".equals(type.toString())
                 || "java.util.Map<java.lang.String, java.lang.String>".equals(type.toString());
     }
@@ -677,12 +792,14 @@ public class TypeUtil {
      * @param type 类型
      * @return y:true/n:false
      */
-    public static boolean isListMapSO(java.lang.reflect.Type type) {
+    public static boolean isListMapSO(java.lang.reflect.Type type)
+    {
         return "java.util.List<java.util.Map<java.lang.String, java.lang.Object>>".equals(type.toString())
                 || "java.util.List<java.util.Map<java.lang.String, java.lang.String>>".equals(type.toString());
     }
 
-    public static <B> List<B> listMap2ListBean(List<Map<String, Object>> maps, Class<B> b) {
+    public static <B> List<B> listMap2ListBean(List<Map<String, Object>> maps, Class<B> b)
+    {
         List<B> bs = new ArrayList<>();
         maps.forEach(map -> bs.add(JSON.toJavaObject(new JSONObject(map), b)));
         return bs;
@@ -696,9 +813,12 @@ public class TypeUtil {
      * @param args       该方的具体参数
      * @return 值
      */
-    public static Object findAnnotationParameterVal(Class<? extends Annotation> clazz, Parameter[] parameters, Object... args) {
-        for (int i = 0; i < parameters.length; i++) {
-            if (parameters[i].getAnnotation(clazz) != null) {
+    public static Object findAnnotationParameterVal(Class<? extends Annotation> clazz, Parameter[] parameters, Object... args)
+    {
+        for (int i = 0; i < parameters.length; i++)
+        {
+            if (parameters[i].getAnnotation(clazz) != null)
+            {
                 return args[i];
             }
         }
@@ -712,7 +832,8 @@ public class TypeUtil {
      * @param args       实参
      * @return 位置索引
      */
-    public static int findPageIndex(Parameter[] parameters, Object... args) {
+    public static int findPageIndex(Parameter[] parameters, Object... args)
+    {
         Object obj = findAnnotationParameterVal(PageIndex.class, parameters, args);
         return obj != null ? (int) obj : -1;
     }
@@ -724,7 +845,8 @@ public class TypeUtil {
      * @param args       参数值
      * @return 位置索引
      */
-    public static int findPageSize(Parameter[] parameters, Object... args) {
+    public static int findPageSize(Parameter[] parameters, Object... args)
+    {
         Object obj = findAnnotationParameterVal(PageSize.class, parameters, args);
         return obj != null ? (int) obj : -1;
     }
@@ -738,14 +860,19 @@ public class TypeUtil {
      * @param str 待处理字符串
      * @return 处理之后的字符串
      */
-    private static String removePart(String str) {
-        if (str == null) {
+    private static String removePart(String str)
+    {
+        if (str == null)
+        {
             return null;
-        } else {
+        }
+        else
+        {
             // 为了方便处理先把首尾空白去掉,把省下的空白换成空格
             StringBuilder sb = new StringBuilder(str.trim().replaceAll("\\s+", " "));
             int i = sb.indexOf(" "); // 查找第一个空格
-            if (i != -1) { // 如果还存在空格, 就把第1个空格前面的部分删除掉
+            if (i != -1)
+            { // 如果还存在空格, 就把第1个空格前面的部分删除掉
                 sb.delete(0, i + 1);
             }
 
@@ -759,14 +886,17 @@ public class TypeUtil {
      * @param str 待处理的字符串
      * @return 处理之后的字符串
      */
-    public static String parWhere(String str) { // 不可能传递null进来
+    public static String parWhere(String str)
+    { // 不可能传递null进来
 
         // <where> 不存在大小写问题,因为在初始化阶段已经严格要求<where>,</where> 只能是小写
         final String openWhere = "<where>";
         final String closeWhere = "</where>";
         String[] wheres = StringUtils.substringsBetween(str, openWhere, closeWhere);
-        if (wheres != null) {
-            for (String where : wheres) {
+        if (wheres != null)
+        {
+            for (String where : wheres)
+            {
 
                 // sorce 不会受 where 的变化的变化
                 String sorce = where; // 把值copy一份
@@ -778,9 +908,12 @@ public class TypeUtil {
                 where = where.trim();
 
                 // 注意: 这里用quote是因为 sorce 很可能会包含有正则符号
-                if ("".equals(where)) {
+                if ("".equals(where))
+                {
                     str = str.replaceFirst(Pattern.quote(openWhere + sorce + closeWhere), "");
-                } else {
+                }
+                else
+                {
                     str = str.replaceFirst(Pattern.quote(openWhere + sorce + closeWhere), Matcher.quoteReplacement("where " + where));
                 }
             }
@@ -795,24 +928,35 @@ public class TypeUtil {
      * @param str 待处理的字符串
      * @return 处理之后的字符串
      */
-    public static String getFirstWord(String str) {
-        if (str == null) {
+    public static String getFirstWord(String str)
+    {
+        if (str == null)
+        {
             return null;
-        } else {
+        }
+        else
+        {
             String word = str.trim().replaceAll("\\s+", " ");
             int index = word.indexOf(' ');
-            if (index == -1) {
+            if (index == -1)
+            {
                 return str;
-            } else {
+            }
+            else
+            {
                 return word.substring(0, index);
             }
         }
     }
 
-    public static boolean isWarrp(Class<?> ct) {
-        if (ct == null) {
+    public static boolean isWarrp(Class<?> ct)
+    {
+        if (ct == null)
+        {
             return false;
-        } else {
+        }
+        else
+        {
             return ct == String.class || ct == Byte.class || ct == Short.class || ct == Integer.class || ct == Long.class || ct == Float.class
                     || ct == Double.class || ct == Character.class || ct == Boolean.class || Enum.class.isAssignableFrom(ct) || EnumSet.class == ct;
         }
@@ -824,7 +968,8 @@ public class TypeUtil {
      * @param method 方法
      * @return clazz
      */
-    public static Class<?> mapValueTyep(MethodInfo method) {
+    public static Class<?> mapValueTyep(MethodInfo method)
+    {
         ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
         return (Class<?>) type.getActualTypeArguments()[1];
     }
@@ -835,7 +980,8 @@ public class TypeUtil {
      * @param method 方法
      * @return clazz
      */
-    public static Class<?> listMapValueTyep(MethodInfo method) {
+    public static Class<?> listMapValueTyep(MethodInfo method)
+    {
         ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
         type = (ParameterizedType) type.getActualTypeArguments()[0];
         return (Class<?>) type.getActualTypeArguments()[1];
@@ -847,79 +993,101 @@ public class TypeUtil {
      * @param array 数组
      * @return 数组
      */
-    public static List<Object> toList(Object array) {
+    public static List<Object> toList(Object array)
+    {
         Objects.requireNonNull(array);
-        if (array.getClass().isArray()) {
+        if (array.getClass().isArray())
+        {
             int len = Array.getLength(array);
             List<Object> objs = new ArrayList<>();
-            for (int i = 0; i < len; i++) {
+            for (int i = 0; i < len; i++)
+            {
                 objs.add(Array.get(array, i));
             }
             return objs;
-        } else {
+        }
+        else
+        {
             throw new ClassCastException("你传递的不是一个数组");
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T findCurrentMethodParameter() {
+    private static <T> T findCurrentMethodParameter()
+    {
         Object[] args = QueryContext.getArgs();
-        for (Object arg : args) {
-            if (arg != null && arg.getClass() == QueryBuilder.class) {
+        for (Object arg : args)
+        {
+            if (arg != null && arg.getClass() == QueryBuilder.class)
+            {
                 return (T) arg;
             }
         }
         return null;
     }
 
-    public static QueryBuilder getQueryBuilder() {
+    public static QueryBuilder getQueryBuilder()
+    {
         MethodInfo methodInfo = QueryContext.getMethodInfo();
         QueryBuilder queryBuilder = findCurrentMethodParameter();
-        if (methodInfo.isContainQueryBuilderParam() && queryBuilder == null) {
+        if (methodInfo.isContainQueryBuilderParam() && queryBuilder == null)
+        {
             throw new RepositoryException("传递的QueryBuilder不能为null");
         }
         return queryBuilder;
     }
 
     // 暂时让其支持 一个 SQL  Reference 以后有时间了，再说
-    public static Reference statementReference(String sql) {
-        List<String> list = TypeUtil.matches(sql,Placeholder.ARRAY_REFERENCE);
-        List<Reference>  references = new ArrayList<>();
+    public static Reference statementReference(String sql)
+    {
+        List<String> list = TypeUtil.matches(sql, Placeholder.ARRAY_REFERENCE);
+        List<Reference> references = new ArrayList<>();
         list.forEach(e -> {
-            String reference = StringUtils.substringBefore(e,"[");
+            String reference = StringUtils.substringBefore(e, "[");
             List<String> fields = new ArrayList<>();
-            String sub = StringUtils.substringBetween(e,"[","]");
-            String[] strs = StringUtils.split(sub,',');
-            for (String s : strs) {
-                String ele = StringUtils.substringAfter(s,"as ");
-                if("".equals(ele)) {
-                    ele = StringUtils.substringAfter(s,".");
-                    if("".equals(ele)) {
+            String sub = StringUtils.substringBetween(e, "[", "]");
+            String[] strs = StringUtils.split(sub, ',');
+            for (String s : strs)
+            {
+                String ele = StringUtils.substringAfter(s, "as ");
+                if ("".equals(ele))
+                {
+                    ele = StringUtils.substringAfter(s, ".");
+                    if ("".equals(ele))
+                    {
                         ele = s;
                     }
                 }
-                fields.add(ele.trim().replace("`",""));
+                fields.add(ele.trim().replace("`", ""));
             }
-            references.add(new Reference(reference,fields));
+            references.add(new Reference(reference, fields));
         });
-        if(!references.isEmpty()) {
+        if (!references.isEmpty())
+        {
             return references.get(0);
-        } else {
+        }
+        else
+        {
             return null;
         }
     }
-    public static String unStatementReference(String sql) {
-        List<String> list = TypeUtil.matches(sql,Placeholder.ARRAY_REFERENCE);
-        for (String str : list) {
-           sql = StringUtils.replace(sql, str, StringUtils.substringBetween(str,"[","]"));
+
+    public static String unStatementReference(String sql)
+    {
+        List<String> list = TypeUtil.matches(sql, Placeholder.ARRAY_REFERENCE);
+        for (String str : list)
+        {
+            sql = StringUtils.replace(sql, str, StringUtils.substringBetween(str, "[", "]"));
         }
         return sql;
     }
 
-    public static EnumSet toEnumSet(String value, Class<Enum> clazz) {
+    public static EnumSet toEnumSet(String value, Class<Enum> clazz)
+    {
         List<Enum> enums = new ArrayList<>();
         String[] names = StringUtils.split(value, ',');
-        for (String name : names) {
+        for (String name : names)
+        {
             Enum e = EnumUtils.getEnum(clazz, name);
             Objects.requireNonNull(e, name + " 转换成 " + clazz + " 失败！");
             enums.add(e);
@@ -927,18 +1095,25 @@ public class TypeUtil {
         return EnumSet.copyOf(enums);
     }
 
-    public static Object map2Obj(Class<?> beanType, Map<String, Object> map) {
+    public static Object map2Obj(Class<?> beanType, Map<String, Object> map)
+    {
         // xxx
         // 1. 从 beanType 中找出 EnumSet<Ruits> 属性,及对应的枚举类型
         Map<String, Type> enumSetFeilds = new HashMap<>();
         Field[] fields = beanType.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getType() == EnumSet.class) {
-                if (field.getGenericType() instanceof ParameterizedType) {
+        for (Field field : fields)
+        {
+            if (field.getType() == EnumSet.class)
+            {
+                if (field.getGenericType() instanceof ParameterizedType)
+                {
                     ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-                    if (parameterizedType.getActualTypeArguments()[0].getClass() == Class.class) {
+                    if (parameterizedType.getActualTypeArguments()[0].getClass() == Class.class)
+                    {
                         enumSetFeilds.put(field.getName(), parameterizedType.getActualTypeArguments()[0]);
-                    } else {
+                    }
+                    else
+                    {
                         throw new RepositoryException("禁止出现EnumSet<?通配符>");
                     }
                 }
@@ -949,7 +1124,8 @@ public class TypeUtil {
         Map<String, String> enumSetValues = new HashMap<>();
         enumSetFeilds.keySet().forEach(f -> {
             String val = (String) map.get(f);
-            if(val != null) {
+            if (val != null)
+            {
                 enumSetValues.put(f, val);
                 map.put(f, null);
             }
@@ -958,10 +1134,12 @@ public class TypeUtil {
         // 3. 实现反序列化
         Object obj = JSON.toJavaObject(new JSONObject(map), beanType);
         enumSetValues.forEach((k, v) -> {
-            try {
+            try
+            {
                 List<Enum> enums = new ArrayList<>();
                 String[] names = StringUtils.split(v, ',');
-                for (String name : names) {
+                for (String name : names)
+                {
                     Enum e = EnumUtils.getEnum((Class<Enum>) enumSetFeilds.get(k), name);
                     Objects.requireNonNull(e, "不能为 null");
                     enums.add(e);
@@ -970,7 +1148,9 @@ public class TypeUtil {
                 field.setAccessible(true);
                 EnumSet enumSet = EnumSet.copyOf(enums);
                 field.set(obj, enumSet);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
+            }
+            catch (NoSuchFieldException | IllegalAccessException e)
+            {
                 e.printStackTrace();
             }
         });
@@ -978,25 +1158,31 @@ public class TypeUtil {
         return obj;
     }
 
-    public static String enumSet2Val(EnumSet enumSet) {
-       if(enumSet==null) {
-           return null;
-       } else {
-           Iterator<Enum> iterator = enumSet.iterator();
-           StringBuilder sb = new StringBuilder();
-           while (iterator.hasNext()) {
-               sb.append(iterator.next().name());
-               sb.append(',');
-           }
-           int len = sb.length();
-           if(len > 1) {
-               sb.deleteCharAt(len-1);
-           }
-           return sb.toString();
-       }
+    public static String enumSet2Val(Set<Enum<?>> enumSet)
+    {
+        if (enumSet == null)
+        {
+            return null;
+        }
+        else
+        {
+            Iterator<Enum<?>> iterator = enumSet.iterator();
+            StringBuilder sb = new StringBuilder();
+            while (iterator.hasNext())
+            {
+                sb.append(iterator.next().name());
+                sb.append(',');
+            }
+            int len = sb.length();
+            if (len > 1)
+            {
+                sb.deleteCharAt(len - 1);
+            }
+            return sb.toString();
+        }
     }
 
-    public static String repeatChar(int size,char x)
+    public static String repeatChar(int size, char x)
     {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < size; i++)
@@ -1004,7 +1190,7 @@ public class TypeUtil {
             sb.append(x);
             sb.append(',');
         }
-        if(size > 0)
+        if (size > 0)
         {
             sb.deleteCharAt(sb.length() - 1);
         }

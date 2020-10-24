@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.dialect;
@@ -31,30 +31,40 @@ import org.fastquery.core.RepositoryException;
 import org.fastquery.page.PageDialect;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class DialectScheduler {
-	
-	private DialectScheduler() {
-	}
+public class DialectScheduler
+{
 
-	public static PageDialect getCurrentPageDialect() {
-		Connection conn = QueryContext.getConn();
-		String dbProductName;
-		try {
-			DatabaseMetaData metaData = conn.getMetaData();
-			dbProductName = metaData.getDatabaseProductName();
-			if ("MySQL".equals(dbProductName)) {
-				return MySQLPageDialect.getInstance();
-			} else if ("PostgreSQL".equals(dbProductName)) {
-				return PostgreSQLPageDialect.getInstance();
-			} else {
-				return DefaultPageDialect.getInstance();
-			}
-		} catch (SQLException e) {
-			throw new RepositoryException(e);
-		}
-	}
-	
+    private DialectScheduler()
+    {
+    }
+
+    public static PageDialect getCurrentPageDialect()
+    {
+        Connection conn = QueryContext.getConn();
+        String dbProductName;
+        try
+        {
+            DatabaseMetaData metaData = conn.getMetaData();
+            dbProductName = metaData.getDatabaseProductName();
+            if ("MySQL".equals(dbProductName))
+            {
+                return MySQLPageDialect.getInstance();
+            }
+            else if ("PostgreSQL".equals(dbProductName))
+            {
+                return PostgreSQLPageDialect.getInstance();
+            }
+            else
+            {
+                return DefaultPageDialect.getInstance();
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new RepositoryException(e);
+        }
+    }
+
 }

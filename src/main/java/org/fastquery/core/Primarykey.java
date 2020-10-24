@@ -15,50 +15,54 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
 
 /**
  * 主键对象
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
-public class Primarykey {
+public class Primarykey
+{
 
-	private final Long autoIncKey;
-	private final String pkey;
+    private final Long autoIncKey;
+    private final String pkey;
 
-	/**
-	 * 主键有2中可能 数字类型(int Integer long Long)可视为long, 另一种是字符串类型
-	 * 
-	 * @param autoIncKey 若为-1表示不存在
-	 * @param pkey 若为 null 表示不存在
-	 */
-	public Primarykey(Long autoIncKey, String pkey) {
-		this.autoIncKey = autoIncKey;
-		this.pkey = pkey;
-	}
+    /**
+     * 主键有2中可能 数字类型(int Integer long Long)可视为long, 另一种是字符串类型
+     *
+     * @param autoIncKey 若为-1表示不存在
+     * @param pkey       若为 null 表示不存在
+     */
+    public Primarykey(Long autoIncKey, String pkey)
+    {
+        this.autoIncKey = autoIncKey;
+        this.pkey = pkey;
+    }
 
-	/**
-	 * 获取主键
-	 * 
-	 * @return 主键
-	 */
-	public Long getPrimarykey() {
-		return autoIncKey;
-	}
+    /**
+     * 获取主键
+     *
+     * @return 主键
+     */
+    public Long getPrimarykey()
+    {
+        return autoIncKey;
+    }
 
-	/**
-	 * 获取主键
-	 * 
-	 * @return 字符串类型的主键
-	 */
-	public String getSpecifyPrimarykey() {
-		return pkey;
-	}
+    /**
+     * 获取主键
+     *
+     * @return 字符串类型的主键
+     */
+    public String getSpecifyPrimarykey()
+    {
+        return pkey;
+    }
 
 }

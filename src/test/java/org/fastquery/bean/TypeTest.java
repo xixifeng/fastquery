@@ -26,7 +26,6 @@ import lombok.*;
 import org.fastquery.core.Id;
 
 /**
- *
  * @author xixifeng (fastquery@126.com)
  */
 @Setter
@@ -34,7 +33,8 @@ import org.fastquery.core.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class TypeTest {
+public class TypeTest
+{
 
     @Id
     private Long id;

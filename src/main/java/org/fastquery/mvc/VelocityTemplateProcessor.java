@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.mvc;
@@ -42,63 +42,72 @@ import org.glassfish.jersey.server.mvc.spi.TemplateProcessor;
 
 /**
  * jersey velocity模板处理器
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
-public class VelocityTemplateProcessor implements TemplateProcessor<String> { // NO_UCD
+public class VelocityTemplateProcessor implements TemplateProcessor<String>
+{ // NO_UCD
 
-	@Context
-	private HttpServletRequest request;
+    @Context
+    private HttpServletRequest request;
 
-	@Override
-	public String resolve(String path, final MediaType mediaType) {
-		return path;
-	}
+    @Override
+    public String resolve(String path, final MediaType mediaType)
+    {
+        return path;
+    }
 
-	@Override
-	public void writeTo(String templateReference, Viewable viewable, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
-			OutputStream out) throws IOException {
+    @Override
+    public void writeTo(String templateReference, Viewable viewable, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
+                        OutputStream out) throws IOException
+    {
 
-		// 获取 模板引擎
-		VelocityEngine velocityEngine = getVelocityEngine();
+        // 获取 模板引擎
+        VelocityEngine velocityEngine = getVelocityEngine();
 
-		// 实例化一个VelocityContext
-		VelocityContext context = (VelocityContext) viewable.getModel();
-		Enumeration<String> enums = request.getParameterNames();
-		while (enums.hasMoreElements()) {
-			String key = enums.nextElement();
-			context.put(key, request.getParameter(key));
-		}
-		// 把request放进模板上下文里
-		context.put("request", request);
+        // 实例化一个VelocityContext
+        VelocityContext context = (VelocityContext) viewable.getModel();
+        Enumeration<String> enums = request.getParameterNames();
+        while (enums.hasMoreElements())
+        {
+            String key = enums.nextElement();
+            context.put(key, request.getParameter(key));
+        }
+        // 把request放进模板上下文里
+        context.put("request", request);
 
-		// 渲染并输出
-		OutputStreamWriter outputStreamWriter = new OutputStreamWriter(out);
-		velocityEngine.mergeTemplate(templateReference, "utf8", context, outputStreamWriter);
-		outputStreamWriter.flush();
-		outputStreamWriter.close(); // 有必要关闭吗? 关闭了是否对jax-rs拦截器,servlet有影响,需要继续学习,参考jsp模板实现
-	}
+        // 渲染并输出
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(out);
+        velocityEngine.mergeTemplate(templateReference, "utf8", context, outputStreamWriter);
+        outputStreamWriter.flush();
+        outputStreamWriter.close(); // 有必要关闭吗? 关闭了是否对jax-rs拦截器,servlet有影响,需要继续学习,参考jsp模板实现
+    }
 
-	private VelocityEngine getVelocityEngine() {
-		// 当前servletContext环境有没有
-		Object ve = request.getServletContext().getAttribute("velocityEngine");
-		if (ve != null) {
-			return (VelocityEngine) ve;
-		}
+    private VelocityEngine getVelocityEngine()
+    {
+        // 当前servletContext环境有没有
+        Object ve = request.getServletContext().getAttribute("velocityEngine");
+        if (ve != null)
+        {
+            return (VelocityEngine) ve;
+        }
 
-		// 注册velocity
-		String path = request.getServletContext().getRealPath("/WEB-INF/classes/velocity.properties");
-		Properties properties = new Properties();
-		try (FileInputStream in = new FileInputStream(path)) {
-			properties.load(in);
-			properties.setProperty("file.resource.loader.path", request.getServletContext().getRealPath("/WEB-INF/vm"));
-		} catch (IOException e) {
-			throw new WebApplicationException(e);
-		}
+        // 注册velocity
+        String path = request.getServletContext().getRealPath("/WEB-INF/classes/velocity.properties");
+        Properties properties = new Properties();
+        try (FileInputStream in = new FileInputStream(path))
+        {
+            properties.load(in);
+            properties.setProperty("file.resource.loader.path", request.getServletContext().getRealPath("/WEB-INF/vm"));
+        }
+        catch (IOException e)
+        {
+            throw new WebApplicationException(e);
+        }
 
-		VelocityEngine velocityEngine = new VelocityEngine(properties);
-		request.getServletContext().setAttribute("velocityEngine", velocityEngine);
-		return velocityEngine;
-	}
+        VelocityEngine velocityEngine = new VelocityEngine(properties);
+        request.getServletContext().setAttribute("velocityEngine", velocityEngine);
+        return velocityEngine;
+    }
 
 }

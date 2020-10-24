@@ -15,49 +15,55 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.page;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class PageableImpl implements Pageable {
+public class PageableImpl implements Pageable
+{
 
-	private int page = 1;
-	private int size = 1;
+    private int page = 1;
+    private int size = 1;
 
-	/**
-	 * 构造分页
-	 * 
-	 * @param page 指定访问第几页(从1开始计数)
-	 * @param size 设定每页显示几条数据
-	 */
-	public PageableImpl(int page, int size) {
-		if (page > 1) {
-			this.page = page;
-		}
-		if (size > 1) {
-			this.size = size;
-		}
-	}
+    /**
+     * 构造分页
+     *
+     * @param page 指定访问第几页(从1开始计数)
+     * @param size 设定每页显示几条数据
+     */
+    public PageableImpl(int page, int size)
+    {
+        if (page > 1)
+        {
+            this.page = page;
+        }
+        if (size > 1)
+        {
+            this.size = size;
+        }
+    }
 
-	@Override
-	public int getPageIndex() {
-		return page;
-	}
+    @Override
+    public int getPageIndex()
+    {
+        return page;
+    }
 
-	@Override
-	public int getPageSize() {
-		return size;
-	}
+    @Override
+    public int getPageSize()
+    {
+        return size;
+    }
 
-	@Override
-	public int getOffset() {
-		return page * size - size;
-	}
+    @Override
+    public int getOffset()
+    {
+        return page * size - size;
+    }
 }

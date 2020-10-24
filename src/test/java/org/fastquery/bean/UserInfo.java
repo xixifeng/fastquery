@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.bean;
@@ -27,7 +27,6 @@ import org.fastquery.core.Id;
 import org.fastquery.core.Transient;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
 @Setter
@@ -35,24 +34,27 @@ import org.fastquery.core.Transient;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UserInfo {
+public class UserInfo
+{
 
-	@Id
-	private Integer id;
-	private String name="";
-	private Integer age;
-	@Transient
-	private String description;
+    @Id
+    private Integer id;
+    private String name = "";
+    private Integer age;
+    @Transient
+    private String description;
 
-	public UserInfo(String name, Integer age) {
-		this.name = name;
-		this.age = age;
-	}
+    public UserInfo(String name, Integer age)
+    {
+        this.name = name;
+        this.age = age;
+    }
 
-	public UserInfo(Integer id, String name, Integer age) {
-		this.id = id;
-		this.name = name;
-		this.age = age;
-	}
+    public UserInfo(Integer id, String name, Integer age)
+    {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+    }
 
 }

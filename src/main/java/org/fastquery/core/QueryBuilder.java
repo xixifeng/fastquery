@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
@@ -34,148 +34,173 @@ import org.fastquery.struct.SQLValue;
 import org.fastquery.util.TypeUtil;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class QueryBuilder {
+public class QueryBuilder
+{
 
-	private static final String COLON_REG = ":[A-Za-z0-9]+";
+    private static final String COLON_REG = ":[A-Za-z0-9]+";
 
-	private final String query;
-	private String countQuery;
-	
-	private ConditionList conditions;
-	private final Map<String, Object> parameters;
-	
-	public QueryBuilder(String query, Map<String, Object> parameters) {
-		this.query = query;
-		this.parameters = parameters;
-	}
-	
-	public QueryBuilder(String query, ConditionList conditions, Map<String, Object> parameters) {
-		this.query = query;
-		this.conditions = conditions;
-		this.parameters = parameters;
-	}
+    private final String query;
+    private String countQuery;
 
-	public QueryBuilder(String query, String countQuery, ConditionList conditions, Map<String, Object> parameters) {
-		this.query = query;
-		this.countQuery = countQuery;
-		this.conditions = conditions;
-		this.parameters = parameters;
-	}
-	
-	public SQLValue getQuerySQLValue() {
-		if(conditions !=null) {
-			StringBuilder conditionsBuilder = conditionBuilder();
-			String querySQL = query.replaceFirst(Placeholder.WHERE_REG, conditionsBuilder.toString());
-			return colonProcess(querySQL);	
-		} else {
-			return colonProcess(query);	
-		}
-	}
-	
-	public List<SQLValue> getQuerySQLValues() {
-		List<SQLValue> list = new ArrayList<>();
-		list.add(getQuerySQLValue());
-		return list;
-	}
+    private ConditionList conditions;
+    private final Map<String, Object> parameters;
 
-	public List<SQLValue> getPageQuerySQLValue() {
+    public QueryBuilder(String query, Map<String, Object> parameters)
+    {
+        this.query = query;
+        this.parameters = parameters;
+    }
 
-		Pageable pageable = QueryContext.getPageable();
-		int offset = pageable.getOffset();
-		int pageSize = pageable.getPageSize();
+    public QueryBuilder(String query, ConditionList conditions, Map<String, Object> parameters)
+    {
+        this.query = query;
+        this.conditions = conditions;
+        this.parameters = parameters;
+    }
 
-		List<SQLValue> list = new ArrayList<>(2);
+    public QueryBuilder(String query, String countQuery, ConditionList conditions, Map<String, Object> parameters)
+    {
+        this.query = query;
+        this.countQuery = countQuery;
+        this.conditions = conditions;
+        this.parameters = parameters;
+    }
 
-		PageDialect pageDialect = DialectScheduler.getCurrentPageDialect();
-		SQLValue querySQLValue = getQuerySQLValue();
-		String sql = querySQLValue.getSql();
-		// 当前页查询语句
-		String currentPageSQL = pageDialect.getCurrentPageSQL(sql, offset, pageSize);
-		querySQLValue.setSql(currentPageSQL);
-		list.add(querySQLValue);
+    public SQLValue getQuerySQLValue()
+    {
+        if (conditions != null)
+        {
+            StringBuilder conditionsBuilder = conditionBuilder();
+            String querySQL = query.replaceFirst(Placeholder.WHERE_REG, conditionsBuilder.toString());
+            return colonProcess(querySQL);
+        }
+        else
+        {
+            return colonProcess(query);
+        }
+    }
 
-		MethodInfo method = QueryContext.getMethodInfo();
-		if (method.isCount()) { // 表明需要求和
-			if(conditions != null) {
-				StringBuilder conditionsBuilder = conditionBuilder();
-				countQuery = countQuery.replaceFirst(Placeholder.WHERE_REG, conditionsBuilder.toString());
-			}
-			SQLValue countQuerySQLValue = colonProcess(countQuery);
-			list.add(countQuerySQLValue);
-		} else { // 不求和那么计算出下一页的第一条记录
-			offset = offset + pageSize;
-			String nextRecordSQL = pageDialect.getCurrentPageSQL(sql, offset, 1);
-			SQLValue nextPageSQLValue = new SQLValue();
-			nextPageSQLValue.setSql(nextRecordSQL);
-			nextPageSQLValue.setValues(querySQLValue.getValues());
-			list.add(nextPageSQLValue);
-		}
+    public List<SQLValue> getQuerySQLValues()
+    {
+        List<SQLValue> list = new ArrayList<>();
+        list.add(getQuerySQLValue());
+        return list;
+    }
 
-		return list;
-	}
+    public List<SQLValue> getPageQuerySQLValue()
+    {
 
-	private SQLValue colonProcess(String sqlTpl) {
-		List<Object> indexValue = new ArrayList<>();
-		List<String> colons = TypeUtil.matches(sqlTpl, COLON_REG);
-		for (String colon : colons) {
-			String key = colon.replace(":", "");
-			Object val = parameters.get(key);
-			if (val != null && !val.toString().trim().equals("")) {
-				if (val instanceof Iterable) {
-					@SuppressWarnings("unchecked")
-					Iterable<Object> iterable = (Iterable<Object>) val;
-					Iterator<Object> iterator = iterable.iterator();
-					StringBuilder sb = new StringBuilder();
-					while (iterator.hasNext()) {
-						indexValue.add(iterator.next());
-						sb.append('?');
-					}
-					sqlTpl = sqlTpl.replaceFirst(colon, sb.toString());
-				} else if (val.getClass().isArray()) {
-					List<Object> list = TypeUtil.toList(val);
-					StringBuilder sb = new StringBuilder();
-					list.forEach(v -> {
-						indexValue.add(v);
-						sb.append('?');
-					});
-					sqlTpl = sqlTpl.replaceFirst(colon, sb.toString());
-				} else {
-					indexValue.add(val);
-				}
-			}
-		}
+        Pageable pageable = QueryContext.getPageable();
+        int offset = pageable.getOffset();
+        int pageSize = pageable.getPageSize();
 
-		sqlTpl = sqlTpl.replaceAll(COLON_REG, "?");
+        List<SQLValue> list = new ArrayList<>(2);
 
-		SQLValue sqlValue = new SQLValue();
-		sqlValue.setSql(sqlTpl);
-		sqlValue.setValues(indexValue);
+        PageDialect pageDialect = DialectScheduler.getCurrentPageDialect();
+        SQLValue querySQLValue = getQuerySQLValue();
+        String sql = querySQLValue.getSql();
+        // 当前页查询语句
+        String currentPageSQL = pageDialect.getCurrentPageSQL(sql, offset, pageSize);
+        querySQLValue.setSql(currentPageSQL);
+        list.add(querySQLValue);
 
-		return sqlValue;
-	}
+        MethodInfo method = QueryContext.getMethodInfo();
+        if (method.isCount())
+        { // 表明需要求和
+            if (conditions != null)
+            {
+                StringBuilder conditionsBuilder = conditionBuilder();
+                countQuery = countQuery.replaceFirst(Placeholder.WHERE_REG, conditionsBuilder.toString());
+            }
+            SQLValue countQuerySQLValue = colonProcess(countQuery);
+            list.add(countQuerySQLValue);
+        }
+        else
+        { // 不求和那么计算出下一页的第一条记录
+            offset = offset + pageSize;
+            String nextRecordSQL = pageDialect.getCurrentPageSQL(sql, offset, 1);
+            SQLValue nextPageSQLValue = new SQLValue();
+            nextPageSQLValue.setSql(nextRecordSQL);
+            nextPageSQLValue.setValues(querySQLValue.getValues());
+            list.add(nextPageSQLValue);
+        }
 
-	private StringBuilder conditionBuilder() {
-		final StringBuilder conditionsBuilder = new StringBuilder();
+        return list;
+    }
 
-		conditions.stream().filter(condition -> { // 确定参与运算的条件
-			List<String> colons = TypeUtil.matches(condition, COLON_REG);
-			for (String colon : colons) {
-				String key = colon.replace(":", "");
-				Object val = parameters.get(key);
-				if (val == null || val.toString().trim().equals("")) {
-					return false;
-				}
-			}
-			return true;
-		}).forEach(condition -> {
-			conditionsBuilder.append(condition);
-			conditionsBuilder.append(' ');
-		});
-		int len = conditionsBuilder.length();
-		return len > 0 ? conditionsBuilder.deleteCharAt(len-1).insert(0, "where ") : conditionsBuilder;
-	}
+    private SQLValue colonProcess(String sqlTpl)
+    {
+        List<Object> indexValue = new ArrayList<>();
+        List<String> colons = TypeUtil.matches(sqlTpl, COLON_REG);
+        for (String colon : colons)
+        {
+            String key = colon.replace(":", "");
+            Object val = parameters.get(key);
+            if (val != null && !val.toString().trim().equals(""))
+            {
+                if (val instanceof Iterable)
+                {
+                    @SuppressWarnings("unchecked")
+                    Iterable<Object> iterable = (Iterable<Object>) val;
+                    Iterator<Object> iterator = iterable.iterator();
+                    StringBuilder sb = new StringBuilder();
+                    while (iterator.hasNext())
+                    {
+                        indexValue.add(iterator.next());
+                        sb.append('?');
+                    }
+                    sqlTpl = sqlTpl.replaceFirst(colon, sb.toString());
+                }
+                else if (val.getClass().isArray())
+                {
+                    List<Object> list = TypeUtil.toList(val);
+                    StringBuilder sb = new StringBuilder();
+                    list.forEach(v -> {
+                        indexValue.add(v);
+                        sb.append('?');
+                    });
+                    sqlTpl = sqlTpl.replaceFirst(colon, sb.toString());
+                }
+                else
+                {
+                    indexValue.add(val);
+                }
+            }
+        }
+
+        sqlTpl = sqlTpl.replaceAll(COLON_REG, "?");
+
+        SQLValue sqlValue = new SQLValue();
+        sqlValue.setSql(sqlTpl);
+        sqlValue.setValues(indexValue);
+
+        return sqlValue;
+    }
+
+    private StringBuilder conditionBuilder()
+    {
+        final StringBuilder conditionsBuilder = new StringBuilder();
+
+        conditions.stream().filter(condition -> { // 确定参与运算的条件
+            List<String> colons = TypeUtil.matches(condition, COLON_REG);
+            for (String colon : colons)
+            {
+                String key = colon.replace(":", "");
+                Object val = parameters.get(key);
+                if (val == null || val.toString().trim().equals(""))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }).forEach(condition -> {
+            conditionsBuilder.append(condition);
+            conditionsBuilder.append(' ');
+        });
+        int len = conditionsBuilder.length();
+        return len > 0 ? conditionsBuilder.deleteCharAt(len - 1).insert(0, "where ") : conditionsBuilder;
+    }
 
 }

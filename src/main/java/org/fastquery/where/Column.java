@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.where;
@@ -29,31 +29,31 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
 @Repeatable(Columns.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
-public @interface Column {
-	/**
-	 * id标识
-	 * 
-	 * @return String 
-	 */
-	String value();
-	
-	/**
-	 * 类
-	 * 
-	 * @return Class
-	 */
-	Class<?> clazz();
-	
-	/**
-	 * 指定查询排除的字段集
-	 * 
-	 * @return String[]
-	 */
-	String[] excludes() default {};
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+public @interface Column
+{
+    /**
+     * id标识
+     *
+     * @return String
+     */
+    String value();
+
+    /**
+     * 类
+     *
+     * @return Class
+     */
+    Class<?> clazz();
+
+    /**
+     * 指定查询排除的字段集
+     *
+     * @return String[]
+     */
+    String[] excludes() default {};
 }

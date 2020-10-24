@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
@@ -28,36 +28,38 @@ import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.hamcrest.Matchers.*;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class UserInfoDBServiceTest3 extends FastQueryTest  {
+public class UserInfoDBServiceTest3 extends FastQueryTest
+{
 
-	private final UserInfoDBService3 userInfoDBService = FQuery.getRepository(UserInfoDBService3.class);
+    private final UserInfoDBService3 userInfoDBService = FQuery.getRepository(UserInfoDBService3.class);
 
-	@Rule
-	public FastQueryTestRule rule = new FastQueryTestRule();
+    @Rule
+    public FastQueryTestRule rule = new FastQueryTestRule();
 
-	@Test
-	public void testUpdateBatch() {
+    @Test
+    public void testUpdateBatch()
+    {
 
-		// 修改 xk3 里的数据 (xk3是用jdbc连接的,未使用到连接池)
-		int effect = userInfoDBService.updateBatch("大张张", 66, 1, "xk3");
-		assertThat("断言该行修改操作一共影响了3行", effect, equalTo(3));
-	}
-	
-	@Test
-	public void findByName() {
-		String name = null;
-		userInfoDBService.findByName(name);
-		SQLValue sv = rule.getSQLValue();
-		assertThat(sv.getSql(), equalTo("select name from UserInfo where name like ? limit 1"));
-		assertThat(sv.getValues().get(0), equalTo("%谷子%"));
-	}
+        // 修改 xk3 里的数据 (xk3是用jdbc连接的,未使用到连接池)
+        int effect = userInfoDBService.updateBatch("大张张", 66, 1, "xk3");
+        assertThat("断言该行修改操作一共影响了3行", effect, equalTo(3));
+    }
+
+    @Test
+    public void findByName()
+    {
+        String name = null;
+        userInfoDBService.findByName(name);
+        SQLValue sv = rule.getSQLValue();
+        assertThat(sv.getSql(), equalTo("select name from UserInfo where name like ? limit 1"));
+        assertThat(sv.getValues().get(0), equalTo("%谷子%"));
+    }
 
 }

@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.jersey;
@@ -41,70 +41,77 @@ import org.fastquery.util.ClassUtil;
 import org.fastquery.util.LoadPrperties;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-class GenerateRepositoryImpl {
+class GenerateRepositoryImpl
+{
 
-	private static final Logger LOG = LoggerFactory.getLogger(GenerateRepositoryImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GenerateRepositoryImpl.class);
 
-	private final FqClassLoader classLoader;
+    private final FqClassLoader classLoader;
 
-	GenerateRepositoryImpl(FqClassLoader classLoader) {
-		this.classLoader = classLoader;
-		LOG.debug("GenerateRepositoryImpl 已实例化.");
-	}
+    GenerateRepositoryImpl(FqClassLoader classLoader)
+    {
+        this.classLoader = classLoader;
+        LOG.debug("GenerateRepositoryImpl 已实例化.");
+    }
 
-	@SuppressWarnings("unchecked")
-	private <T> Class<? extends T> generate(Class<T> repositoryClazz) {
-		String name = repositoryClazz.getName() + Placeholder.DB_SUF;
+    @SuppressWarnings("unchecked")
+    private <T> Class<? extends T> generate(Class<T> repositoryClazz)
+    {
+        String name = repositoryClazz.getName() + Placeholder.DB_SUF;
 
-		if (repositoryClazz.getAnnotation(Path.class) != null) { // 如果接口上标识有@Path 就生成rest实现类
-			String n = repositoryClazz.getName() + Placeholder.REST_SUF;
-			byte[] bts = AsmRest.generateBytes(repositoryClazz);
-			classLoader.defineClassByName(n, bts, true);
-		}
+        if (repositoryClazz.getAnnotation(Path.class) != null)
+        { // 如果接口上标识有@Path 就生成rest实现类
+            String n = repositoryClazz.getName() + Placeholder.REST_SUF;
+            byte[] bts = AsmRest.generateBytes(repositoryClazz);
+            classLoader.defineClassByName(n, bts, true);
+        }
 
-		byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
+        byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
 
-		/**
-		 * <pre>
-		// 把生成的文件存储起来
-		try (java.io.FileOutputStream fos = new java.io.FileOutputStream("/data/tmp/" + name + ".class")) {
-			fos.write(bytes);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} // 把生成的文件存储起来 end
-		</pre>
-		 */
-		return (Class<? extends T>) classLoader.defineClassByName(name, bytes, false);
-	}
+        /**
+         * <pre>
+         // 把生成的文件存储起来
+         try (java.io.FileOutputStream fos = new java.io.FileOutputStream("/data/tmp/" + name + ".class")) {
+         fos.write(bytes);
+         } catch (Exception e) {
+         e.printStackTrace();
+         } // 把生成的文件存储起来 end
+         </pre>
+         */
+        return (Class<? extends T>) classLoader.defineClassByName(name, bytes, false);
+    }
 
-	void persistent() {
+    void persistent()
+    {
 
-		Resource resource = new FQueryResourceImpl(classLoader);
+        Resource resource = new FQueryResourceImpl(classLoader);
 
-		// 1). 装载配置文件
-		Set<FastQueryJson> fqPropertie = LoadPrperties.load(resource);
+        // 1). 装载配置文件
+        Set<FastQueryJson> fqPropertie = LoadPrperties.load(resource);
 
-		List<Class<?>> clses = new ArrayList<>();
+        List<Class<?>> clses = new ArrayList<>();
 
-		// 3). 批量生成 Repository 的实现类
-		Set<String> basePackages;
-		for (FastQueryJson fQueryPropertie : fqPropertie) {
-			basePackages = fQueryPropertie.getBasePackages();
-			for (String basePackage : basePackages) {
-				List<Class<?>> classes = ClassUtil.getClasses(basePackage);
-				clses.addAll(classes);
-				// classes.forEach(this::generate)
-				for (Class<?> rcls : classes) {
-					generate(rcls); // 生成
-					QueryPool.put(rcls.getName(), resource);
-				}
-			}
-		}
+        // 3). 批量生成 Repository 的实现类
+        Set<String> basePackages;
+        for (FastQueryJson fQueryPropertie : fqPropertie)
+        {
+            basePackages = fQueryPropertie.getBasePackages();
+            for (String basePackage : basePackages)
+            {
+                List<Class<?>> classes = ClassUtil.getClasses(basePackage);
+                clses.addAll(classes);
+                // classes.forEach(this::generate)
+                for (Class<?> rcls : classes)
+                {
+                    generate(rcls); // 生成
+                    QueryPool.put(rcls.getName(), resource);
+                }
+            }
+        }
 
-		// 3). 生成 Repository之后的检测
-		AsmRepository.after(clses);
-	}
+        // 3). 生成 Repository之后的检测
+        AsmRepository.after(clses);
+    }
 }

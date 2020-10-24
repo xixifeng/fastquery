@@ -15,32 +15,35 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.pool;
+
 import java.util.Map;
 import java.util.Properties;
 
 import javax.sql.DataSource;
+
 import org.fastquery.core.ConnectionPoolProvider;
 import org.fastquery.core.Resource;
 import org.fastquery.util.XMLParse;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class HikariPoolProvider implements ConnectionPoolProvider {
+public class HikariPoolProvider implements ConnectionPoolProvider
+{
 
-	@Override
-	public DataSource getDataSource(Resource resource, String dataSourceName) {
-		Map<String, String> hikariMap = XMLParse.toMap(resource, "hikari.xml", dataSourceName,"bean");
-		Properties props = new Properties();
-		hikariMap.forEach(props::setProperty); // (k,v) -> props.setProperty(k, v)
-		return new com.zaxxer.hikari.HikariDataSource(new com.zaxxer.hikari.HikariConfig(props));
-	}
+    @Override
+    public DataSource getDataSource(Resource resource, String dataSourceName)
+    {
+        Map<String, String> hikariMap = XMLParse.toMap(resource, "hikari.xml", dataSourceName, "bean");
+        Properties props = new Properties();
+        hikariMap.forEach(props::setProperty); // (k,v) -> props.setProperty(k, v)
+        return new com.zaxxer.hikari.HikariDataSource(new com.zaxxer.hikari.HikariConfig(props));
+    }
 
 }

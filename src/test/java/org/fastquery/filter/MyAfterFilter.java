@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.filter;
@@ -28,21 +28,22 @@ import org.fastquery.core.QueryRepository;
 import org.fastquery.filter.AfterFilter;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class MyAfterFilter extends AfterFilter<QueryRepository> {
+public class MyAfterFilter extends AfterFilter<QueryRepository>
+{
 
-	@Override
-	public Object doFilter(QueryRepository repository, Method method, Object[] args, Object returnVal) {
+    @Override
+    public Object doFilter(QueryRepository repository, Method method, Object[] args, Object returnVal)
+    {
 
-		// repository: 当前拦截到的实例
-		// method: 当前拦截到的method
-		// args: 当前传递进来的参数
-		// returnVal 即将返回的值
+        // repository: 当前拦截到的实例
+        // method: 当前拦截到的method
+        // args: 当前传递进来的参数
+        // returnVal 即将返回的值
 
-		// 在这里可以中途修改 returnVal
+        // 在这里可以中途修改 returnVal
 
-		return returnVal;
-	}
+        return returnVal;
+    }
 }

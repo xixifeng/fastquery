@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.bean;
@@ -25,7 +25,6 @@ package org.fastquery.bean;
 import lombok.*;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
 @Setter
@@ -33,11 +32,12 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Course {
+public class Course
+{
 
-	private String name;
-	private Integer credit;
-	private Integer semester;
-	private Integer period;
-	private String no;
+    private String name;
+    private Integer credit;
+    private Integer semester;
+    private Integer period;
+    private String no;
 }

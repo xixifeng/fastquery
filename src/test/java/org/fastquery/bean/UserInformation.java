@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.bean;
@@ -26,7 +26,6 @@ import lombok.*;
 import org.fastquery.core.Transient;
 
 /**
- *
  * @author xixifeng (fastquery@126.com)
  */
 @Setter
@@ -34,14 +33,15 @@ import org.fastquery.core.Transient;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UserInformation {
+public class UserInformation
+{
 
-	private Integer uid;
-	private String myname;
-	private Integer myage;
+    private Integer uid;
+    private String myname;
+    private Integer myage;
 
-	@Transient
-	private String description;
+    @Transient
+    private String description;
 
 
 }

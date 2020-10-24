@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.bean;
@@ -26,7 +26,6 @@ import lombok.*;
 import org.fastquery.core.Id;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
 @Setter
@@ -34,11 +33,12 @@ import org.fastquery.core.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class City {
+public class City
+{
 
-	@Id
-	private Integer id;
-	private Integer code;
-	private String cityAbb;
-	private String cityName;
+    @Id
+    private Integer id;
+    private Integer code;
+    private String cityAbb;
+    private String cityName;
 }

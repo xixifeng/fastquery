@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.filter;
@@ -32,27 +32,30 @@ import org.fastquery.core.Repository;
 import java.util.Set;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-class AfterFilterChain<R extends Repository> extends AfterFilter<R> {
+class AfterFilterChain<R extends Repository> extends AfterFilter<R>
+{
 
-	// 在此用map 主要目的是为了去重,相同的class后面覆盖前面的.
-	// 用LinkedHashMap而不用hashMap 是为了有顺序
-	private final Map<Class<?>, AfterFilter<R>> afterFilters = new LinkedHashMap<>();
+    // 在此用map 主要目的是为了去重,相同的class后面覆盖前面的.
+    // 用LinkedHashMap而不用hashMap 是为了有顺序
+    private final Map<Class<?>, AfterFilter<R>> afterFilters = new LinkedHashMap<>();
 
-	public AfterFilterChain<R> addFilter(AfterFilter<R> f) {
-		afterFilters.put(f.getClass(), f);
-		return this;
-	}
+    public AfterFilterChain<R> addFilter(AfterFilter<R> f)
+    {
+        afterFilters.put(f.getClass(), f);
+        return this;
+    }
 
-	@Override
-	protected Object doFilter(R repository, Method method, Object[] args, Object returnVal) {
-		Set<Entry<Class<?>, AfterFilter<R>>> entries = afterFilters.entrySet();
-		Object rv = returnVal;
-		for (Entry<Class<?>, AfterFilter<R>> entry : entries) {
-			rv = entry.getValue().doFilter(repository, method, args, returnVal);
-		}
-		return rv;
-	}
+    @Override
+    protected Object doFilter(R repository, Method method, Object[] args, Object returnVal)
+    {
+        Set<Entry<Class<?>, AfterFilter<R>>> entries = afterFilters.entrySet();
+        Object rv = returnVal;
+        for (Entry<Class<?>, AfterFilter<R>> entry : entries)
+        {
+            rv = entry.getValue().doFilter(repository, method, args, returnVal);
+        }
+        return rv;
+    }
 }

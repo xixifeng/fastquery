@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
@@ -26,22 +26,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class ConditionList extends ArrayList<String> {
-	
-	private static final long serialVersionUID = 1L;
-	
-	public static ConditionList of(String...conditions) {
-		ConditionList conditionList = new ConditionList();
-		Collections.addAll(conditionList, conditions);
-		return conditionList;
-	}
-	
-	public ConditionList add(String...conditions) {
-		Collections.addAll(this, conditions);
-		return this;
-	}
-	
+public class ConditionList extends ArrayList<String>
+{
+
+    private static final long serialVersionUID = 1L;
+
+    public static ConditionList of(String... conditions)
+    {
+        ConditionList conditionList = new ConditionList();
+        Collections.addAll(conditionList, conditions);
+        return conditionList;
+    }
+
+    public ConditionList add(String... conditions)
+    {
+        Collections.addAll(this, conditions);
+        return this;
+    }
+
 }

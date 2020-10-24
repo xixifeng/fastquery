@@ -15,49 +15,55 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.page;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class Slice {
+public class Slice
+{
 
-	private int number; // 当前页码
-	private int size; // 每页多少条数据
+    private int number; // 当前页码
+    private int size; // 每页多少条数据
 
-	public Slice() {
-	}
+    public Slice()
+    {
+    }
 
-	/**
-	 * 构造 Slice(页片)
-	 * 
-	 * @param number 当前页码
-	 * @param size 每页多少条数据
-	 */
-	public Slice(int number, int size) {
-		this.number = number;
-		this.size = size;
-	}
+    /**
+     * 构造 Slice(页片)
+     *
+     * @param number 当前页码
+     * @param size   每页多少条数据
+     */
+    public Slice(int number, int size)
+    {
+        this.number = number;
+        this.size = size;
+    }
 
-	public int getNumber() {
-		return number;
-	}
+    public int getNumber()
+    {
+        return number;
+    }
 
-	public int getSize() {
-		return size;
-	}
+    public int getSize()
+    {
+        return size;
+    }
 
-	public void setNumber(int number) {
-		this.number = number;
-	}
+    public void setNumber(int number)
+    {
+        this.number = number;
+    }
 
-	public void setSize(int size) {
-		this.size = size;
-	}
+    public void setSize(int size)
+    {
+        this.size = size;
+    }
 }

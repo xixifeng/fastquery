@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.sqlserver.dao;
@@ -36,25 +36,25 @@ import org.fastquery.page.Pageable;
 import org.fastquery.where.Condition;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public interface WorldDB extends QueryRepository {
+public interface WorldDB extends QueryRepository
+{
 
-	@Query("select id,code,cityAbb,cityName from City")
-	Page<Map<String, Object>> findPage(Pageable pageable);	
-	
-	@QueryByNamed(render=false)
-	Page<City> findPage(@Param("id") Integer id,@Param("cityAbb") String cityAbb,Pageable pageable);
+    @Query("select id,code,cityAbb,cityName from City")
+    Page<Map<String, Object>> findPage(Pageable pageable);
 
-	@Query("select id,code,cityAbb,cityName from City #{#where}")
-	@Condition("id > :id")
-	@Condition("and cityAbb like :cityAbb")
-	Page<City> findPageWithWhere(@Param("id") Integer id,@Param("cityAbb") String cityAbb,@PageIndex int pageIndex,@PageSize int pageSize);
-	
-	@Query("select id,code,cityAbb,cityName from City #{#where}")
-	@Condition("id > :id")
-	@Condition("and cityAbb like :cityAbb")
-	Page<City> findPageWithWhere(@Param("id") Integer id,@Param("cityAbb") String cityAbb,Pageable pageable);
-	
+    @QueryByNamed(render = false)
+    Page<City> findPage(@Param("id") Integer id, @Param("cityAbb") String cityAbb, Pageable pageable);
+
+    @Query("select id,code,cityAbb,cityName from City #{#where}")
+    @Condition("id > :id")
+    @Condition("and cityAbb like :cityAbb")
+    Page<City> findPageWithWhere(@Param("id") Integer id, @Param("cityAbb") String cityAbb, @PageIndex int pageIndex, @PageSize int pageSize);
+
+    @Query("select id,code,cityAbb,cityName from City #{#where}")
+    @Condition("id > :id")
+    @Condition("and cityAbb like :cityAbb")
+    Page<City> findPageWithWhere(@Param("id") Integer id, @Param("cityAbb") String cityAbb, Pageable pageable);
+
 }

@@ -15,14 +15,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -38,33 +38,37 @@ import org.fastquery.util.TypeUtil;
 import org.junit.Test;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FQueryTest extends FastQueryTest  {
+public class FQueryTest extends FastQueryTest
+{
 
-	@Test
-	public void testGetRepository() {
-		assertThat(FQuery.getRepository(StudentDBService.class), notNullValue());
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testReset()
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IntrospectionException {
-		Class<PManager> clazz = PManager.class;
-		PManager tempPmanager = FQuery.reset(clazz);
-		clazz = (Class<PManager>) tempPmanager.getClass();
-		Field[] fields = clazz.getDeclaredFields();
-		for (Field field : fields) {
-			if (!TypeUtil.isWarrp(field.getType())) {
-				continue;
-			}
+    @Test
+    public void testGetRepository()
+    {
+        assertThat(FQuery.getRepository(StudentDBService.class), notNullValue());
+    }
 
-			Object readValue = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(tempPmanager);
-			assertThat(readValue, nullValue());
-		}
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReset()
+            throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IntrospectionException
+    {
+        Class<PManager> clazz = PManager.class;
+        PManager tempPmanager = FQuery.reset(clazz);
+        clazz = (Class<PManager>) tempPmanager.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields)
+        {
+            if (!TypeUtil.isWarrp(field.getType()))
+            {
+                continue;
+            }
 
-	}
+            Object readValue = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(tempPmanager);
+            assertThat(readValue, nullValue());
+        }
+
+    }
 
 }

@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.db;
@@ -25,8 +25,8 @@ package org.fastquery.db;
 import org.fastquery.core.QueryRepository;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public interface AccountDBService extends QueryRepository {
+public interface AccountDBService extends QueryRepository
+{
 }

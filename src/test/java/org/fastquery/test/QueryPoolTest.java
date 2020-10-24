@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
@@ -40,157 +40,177 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class QueryPoolTest extends FastQueryTest  {
+public class QueryPoolTest extends FastQueryTest
+{
 
-	static Resource resource;
+    static Resource resource;
 
-	public UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
+    public UserInfoDBService userInfoDBService = FQuery.getRepository(UserInfoDBService.class);
 
-	@BeforeClass
-	public static void beforeClass() throws Exception {
-		
-		QueryContextUtil.startQueryContext();
-		
-		resource = new Resource() {
-			@Override
-			public InputStream getResourceAsStream(String name) {
-				return QueryPoolTest.class.getClassLoader().getResourceAsStream(name);
-			}
+    @BeforeClass
+    public static void beforeClass() throws Exception
+    {
 
-			@Override
-			public boolean exist(String name) {
-				URL url = QueryPoolTest.class.getClassLoader().getResource(name);
-				return url != null;
-			}
-		};
-	}
-	
-	@AfterClass
-	public static void afterClass() throws Exception {
-		QueryContextUtil.clearQueryContext();
-	}
+        QueryContextUtil.startQueryContext();
 
-	@SuppressWarnings("unchecked")
-	private Set<Object> xml2QueryMapper(String className, Resource resource) throws Exception {
-		Method method = QueryPool.class.getDeclaredMethod("xml2QueryMapper", String.class, Resource.class);
-		method.setAccessible(true);
-		return (Set<Object>) method.invoke(null, className, resource);
-	}
+        resource = new Resource()
+        {
+            @Override
+            public InputStream getResourceAsStream(String name)
+            {
+                return QueryPoolTest.class.getClassLoader().getResourceAsStream(name);
+            }
 
-	private String render(String tpl, String logTag, Map<String, Object> map) throws Exception {
-		Method method = QueryPool.class.getDeclaredMethod("render", String.class, String.class, Map.class);
-		method.setAccessible(true);
-		return method.invoke(null, tpl, logTag, map).toString();
-	}
-	
-	private String queryMapper$getId(Object queryMapper) throws Exception {
-		Method method = queryMapper.getClass().getDeclaredMethod("getId");
-		method.setAccessible(true);
-		return (String) method.invoke(queryMapper);
-	}
-	
-	private String queryMapper$getTemplate(Object queryMapper) throws Exception {
-		Method method = queryMapper.getClass().getDeclaredMethod("getTemplate");
-		method.setAccessible(true);
-		return (String) method.invoke(queryMapper);
-	}
+            @Override
+            public boolean exist(String name)
+            {
+                URL url = QueryPoolTest.class.getClassLoader().getResource(name);
+                return url != null;
+            }
+        };
+    }
 
-	@Test
-	public void testXml2QueryMapper() throws Exception {
-		Set<Object> queryMappers = xml2QueryMapper("org.fastquery.dao.QueryByNamedDBExample", resource);
-		for (Object queryMapper : queryMappers) {
-			String id = queryMapper$getId(queryMapper);
-			String template = queryMapper$getTemplate(queryMapper);
-			if ("findUAll".equals(id)) {
-				assertThat(template, equalToIgnoringWhiteSpace("select id,name,age from UserInfo limit 3"));
-			} else if ("findUserAll".equals(id)) {
-				assertThat(template, equalToIgnoringWhiteSpace("select name from UserInfo limit 3"));
-			} else if ("findUserInfo".equals(id)) {
-				assertThat(template, equalToIgnoringWhiteSpace("select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`"));
-			}
-		}
-	}
+    @AfterClass
+    public static void afterClass() throws Exception
+    {
+        QueryContextUtil.clearQueryContext();
+    }
 
-	@Test
-	public void render1() throws Exception {
-		String template = "$abc${abc}";
-		Map<String, Object> map = new HashMap<>();
-		map.put("abc", "hi");
-		String str = render(template, "render", map);
-		assertThat(str, equalTo("hihi"));
-	}
-	
-	@Test
-	public void render2() throws Exception {
-		String ok = "true";
-		String err = "false";
-		String template = "#if($state || $state == 0)"
-				+ ok
-				+ "#else "
-				+ err
-				+ " #end";
-		Map<String, Object> map = new HashMap<>();
-		map.put("state", (byte)0);
-		String str = render(template, "render", map);
-		assertThat(str, equalTo(ok));
-		
-		map.put("state", (byte)1);
-		str = render(template, "render", map);
-		assertThat(str, equalTo(ok));
-		
-		map.put("state", (byte)1);
-		str = render(template, "render", map);
-		assertThat(str, equalTo(ok));
-		
-		map.put("state", (byte)-1);
-		str = render(template, "render", map);
-		assertThat(str, equalTo(ok));
-		
-		map.put("state", null);
-		str = render(template, "render", map);
-		assertThat(str.trim(), equalTo(err));
-	}
-	
-	@Test
-	public void druidXml1() {
-				
-		Map<String, String> map = XMLParse.toMap(resource, "druid.xml", "xkdb1","bean");
-		Set<String> keys = map.keySet();
-		int len = keys.size();
-		assertThat(len, is(15));
-		assertThat(map.get("url"), equalTo("jdbc:mysql://db.fastquery.org:3306/xk?serverTimezone=Asia/Shanghai"));
-		assertThat(map.get("username"), equalTo("xk"));
-		assertThat(map.get("password"), equalTo("abc123"));
-		assertThat(map.get("filters"), equalTo("stat"));
-		assertThat(map.get("maxActive"), equalTo("20"));
-		assertThat(map.get("initialSize"), equalTo("1"));
-		assertThat(map.get("maxWait"), equalTo("60000"));
-		assertThat(map.get("minIdle"), equalTo("1"));
-		assertThat(map.get("timeBetweenEvictionRunsMillis"), equalTo("60000"));
-		assertThat(map.get("minEvictableIdleTimeMillis"), equalTo("300000"));
-		assertThat(map.get("testWhileIdle"), equalTo("true"));
-		assertThat(map.get("testOnBorrow"), equalTo("false"));
-		assertThat(map.get("testOnReturn"), equalTo("false"));
-		assertThat(map.get("poolPreparedStatements"), equalTo("true"));
-		assertThat(map.get("maxOpenPreparedStatements"), equalTo("20"));
-	}
-	
-	@Test
-	public void druidXml2() {
-		Map<String, String> map = XMLParse.toMap(resource, "druid.xml", "xkdb2","bean");
-		Set<String> keys = map.keySet();
-		int len = keys.size();
-		assertThat(len, is(3));
-		assertThat(map.get("url"), equalTo("jdbc:mysql://db.fastquery.org:3306/xk?serverTimezone=Asia/Shanghai"));
-		assertThat(map.get("username"), equalTo("xk"));
-		assertThat(map.get("password"), equalTo("abc123"));
-	}
+    @SuppressWarnings("unchecked")
+    private Set<Object> xml2QueryMapper(String className, Resource resource) throws Exception
+    {
+        Method method = QueryPool.class.getDeclaredMethod("xml2QueryMapper", String.class, Resource.class);
+        method.setAccessible(true);
+        return (Set<Object>) method.invoke(null, className, resource);
+    }
+
+    private String render(String tpl, String logTag, Map<String, Object> map) throws Exception
+    {
+        Method method = QueryPool.class.getDeclaredMethod("render", String.class, String.class, Map.class);
+        method.setAccessible(true);
+        return method.invoke(null, tpl, logTag, map).toString();
+    }
+
+    private String queryMapper$getId(Object queryMapper) throws Exception
+    {
+        Method method = queryMapper.getClass().getDeclaredMethod("getId");
+        method.setAccessible(true);
+        return (String) method.invoke(queryMapper);
+    }
+
+    private String queryMapper$getTemplate(Object queryMapper) throws Exception
+    {
+        Method method = queryMapper.getClass().getDeclaredMethod("getTemplate");
+        method.setAccessible(true);
+        return (String) method.invoke(queryMapper);
+    }
+
+    @Test
+    public void testXml2QueryMapper() throws Exception
+    {
+        Set<Object> queryMappers = xml2QueryMapper("org.fastquery.dao.QueryByNamedDBExample", resource);
+        for (Object queryMapper : queryMappers)
+        {
+            String id = queryMapper$getId(queryMapper);
+            String template = queryMapper$getTemplate(queryMapper);
+            if ("findUAll".equals(id))
+            {
+                assertThat(template, equalToIgnoringWhiteSpace("select id,name,age from UserInfo limit 3"));
+            }
+            else if ("findUserAll".equals(id))
+            {
+                assertThat(template, equalToIgnoringWhiteSpace("select name from UserInfo limit 3"));
+            }
+            else if ("findUserInfo".equals(id))
+            {
+                assertThat(template, equalToIgnoringWhiteSpace("select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`"));
+            }
+        }
+    }
+
+    @Test
+    public void render1() throws Exception
+    {
+        String template = "$abc${abc}";
+        Map<String, Object> map = new HashMap<>();
+        map.put("abc", "hi");
+        String str = render(template, "render", map);
+        assertThat(str, equalTo("hihi"));
+    }
+
+    @Test
+    public void render2() throws Exception
+    {
+        String ok = "true";
+        String err = "false";
+        String template = "#if($state || $state == 0)"
+                + ok
+                + "#else "
+                + err
+                + " #end";
+        Map<String, Object> map = new HashMap<>();
+        map.put("state", (byte) 0);
+        String str = render(template, "render", map);
+        assertThat(str, equalTo(ok));
+
+        map.put("state", (byte) 1);
+        str = render(template, "render", map);
+        assertThat(str, equalTo(ok));
+
+        map.put("state", (byte) 1);
+        str = render(template, "render", map);
+        assertThat(str, equalTo(ok));
+
+        map.put("state", (byte) -1);
+        str = render(template, "render", map);
+        assertThat(str, equalTo(ok));
+
+        map.put("state", null);
+        str = render(template, "render", map);
+        assertThat(str.trim(), equalTo(err));
+    }
+
+    @Test
+    public void druidXml1()
+    {
+
+        Map<String, String> map = XMLParse.toMap(resource, "druid.xml", "xkdb1", "bean");
+        Set<String> keys = map.keySet();
+        int len = keys.size();
+        assertThat(len, is(15));
+        assertThat(map.get("url"), equalTo("jdbc:mysql://db.fastquery.org:3306/xk?serverTimezone=Asia/Shanghai"));
+        assertThat(map.get("username"), equalTo("xk"));
+        assertThat(map.get("password"), equalTo("abc123"));
+        assertThat(map.get("filters"), equalTo("stat"));
+        assertThat(map.get("maxActive"), equalTo("20"));
+        assertThat(map.get("initialSize"), equalTo("1"));
+        assertThat(map.get("maxWait"), equalTo("60000"));
+        assertThat(map.get("minIdle"), equalTo("1"));
+        assertThat(map.get("timeBetweenEvictionRunsMillis"), equalTo("60000"));
+        assertThat(map.get("minEvictableIdleTimeMillis"), equalTo("300000"));
+        assertThat(map.get("testWhileIdle"), equalTo("true"));
+        assertThat(map.get("testOnBorrow"), equalTo("false"));
+        assertThat(map.get("testOnReturn"), equalTo("false"));
+        assertThat(map.get("poolPreparedStatements"), equalTo("true"));
+        assertThat(map.get("maxOpenPreparedStatements"), equalTo("20"));
+    }
+
+    @Test
+    public void druidXml2()
+    {
+        Map<String, String> map = XMLParse.toMap(resource, "druid.xml", "xkdb2", "bean");
+        Set<String> keys = map.keySet();
+        int len = keys.size();
+        assertThat(len, is(3));
+        assertThat(map.get("url"), equalTo("jdbc:mysql://db.fastquery.org:3306/xk?serverTimezone=Asia/Shanghai"));
+        assertThat(map.get("username"), equalTo("xk"));
+        assertThat(map.get("password"), equalTo("abc123"));
+    }
 }
 
 

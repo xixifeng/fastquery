@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
@@ -29,23 +29,24 @@ import java.lang.annotation.Target;
 
 /**
  * 给参数命名
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Param {
-	/**
-	 * value值
-	 * 
-	 * @return String
-	 */
-	String value();
+public @interface Param
+{
+    /**
+     * value值
+     *
+     * @return String
+     */
+    String value();
 
-	/**
-	 * "" 表示没有设置默认值
-	 * 
-	 * @return String
-	 */
-	String defaultVal() default "";
+    /**
+     * "" 表示没有设置默认值
+     *
+     * @return String
+     */
+    String defaultVal() default "";
 }

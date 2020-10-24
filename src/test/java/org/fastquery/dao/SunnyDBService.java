@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.dao;
@@ -27,29 +27,29 @@ import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public interface SunnyDBService extends QueryRepository {
+public interface SunnyDBService extends QueryRepository
+{
 
-	@Modifying
-	@Query("delete from Card where id = ?1")
-	int delete(int id);
+    @Modifying
+    @Query("delete from Card where id = ?1")
+    int delete(int id);
 
-	@Modifying
-	@Query("delete from Card where id = ?1")
-	boolean deleteById(int id);
+    @Modifying
+    @Query("delete from Card where id = ?1")
+    boolean deleteById(int id);
 
-	@Modifying
-	@Query("delete from Card where number = ?1")
-	int deleteByNumber(String number);
+    @Modifying
+    @Query("delete from Card where number = ?1")
+    int deleteByNumber(String number);
 
-	@Query("select id from Card where id = ?1")
-	boolean exists(long id);
+    @Query("select id from Card where id = ?1")
+    boolean exists(long id);
 
-	@Query("select id from Card where number = ?1")
-	boolean exists(String number);
+    @Query("select id from Card where number = ?1")
+    boolean exists(String number);
 
-	@Query("select id from Tenant where id = ?1")
-	boolean existsTenant(Long id);
+    @Query("select id from Tenant where id = ?1")
+    boolean existsTenant(Long id);
 }

@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
@@ -28,56 +28,69 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FQueryResourceImpl implements Resource {
+public class FQueryResourceImpl implements Resource
+{
 
-	private final ClassLoader classLoader;
+    private final ClassLoader classLoader;
 
-	public FQueryResourceImpl(ClassLoader classLoader) {
-		this.classLoader = classLoader;
-	}
+    public FQueryResourceImpl(ClassLoader classLoader)
+    {
+        this.classLoader = classLoader;
+    }
 
-	@Override
-	public InputStream getResourceAsStream(String name) {
-		if (!exist(name)) {
-			return null;
-		}
-		
-		String fcd = System.getProperty("fastquery.config.dir");
-		if(fcd != null) {
-			File file = new File(fcd,name);
-			if(file.exists()) {
-				if("c3p0-config.xml".equals(name)) {
-					System.setProperty("com.mchange.v2.c3p0.cfg.xml",file.getAbsolutePath());  
-				}
-				try {
-					return new FileInputStream(file);
-				} catch (FileNotFoundException e) {
-					throw new RepositoryException(e);
-				}
-			}
-		}
-		
-		return classLoader.getResourceAsStream(name);
-	}
+    @Override
+    public InputStream getResourceAsStream(String name)
+    {
+        if (!exist(name))
+        {
+            return null;
+        }
 
-	@Override
-	public boolean exist(String name) {
-		
-		if (name == null || name.charAt(0) == '/') {
-			return false;
-		}
-		
-		String fcd = System.getProperty("fastquery.config.dir");
-		if(fcd != null) {
-			File file = new File(fcd,name);
-			if(file.exists()) {
-				return true;
-			}
-		}
-		
-		return classLoader.getResource(name) != null;
-	}
+        String fcd = System.getProperty("fastquery.config.dir");
+        if (fcd != null)
+        {
+            File file = new File(fcd, name);
+            if (file.exists())
+            {
+                if ("c3p0-config.xml".equals(name))
+                {
+                    System.setProperty("com.mchange.v2.c3p0.cfg.xml", file.getAbsolutePath());
+                }
+                try
+                {
+                    return new FileInputStream(file);
+                }
+                catch (FileNotFoundException e)
+                {
+                    throw new RepositoryException(e);
+                }
+            }
+        }
+
+        return classLoader.getResourceAsStream(name);
+    }
+
+    @Override
+    public boolean exist(String name)
+    {
+
+        if (name == null || name.charAt(0) == '/')
+        {
+            return false;
+        }
+
+        String fcd = System.getProperty("fastquery.config.dir");
+        if (fcd != null)
+        {
+            File file = new File(fcd, name);
+            if (file.exists())
+            {
+                return true;
+            }
+        }
+
+        return classLoader.getResource(name) != null;
+    }
 }

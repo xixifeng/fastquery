@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
@@ -28,7 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Map;
 import java.util.Properties;
@@ -36,44 +36,47 @@ import java.util.Properties;
 import static org.hamcrest.Matchers.*;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class UserInfoDBServiceTest2 extends FastQueryTest  {
+public class UserInfoDBServiceTest2 extends FastQueryTest
+{
 
-	private final UserInfoDBService2 userInfoDBService = FQuery.getRepository(UserInfoDBService2.class);
+    private final UserInfoDBService2 userInfoDBService = FQuery.getRepository(UserInfoDBService2.class);
 
-	@Rule
-	public FastQueryTestRule rule = new FastQueryTestRule();
+    @Rule
+    public FastQueryTestRule rule = new FastQueryTestRule();
 
-	@BeforeClass
-	public static void beforeClass() {
-		// 数据源名称
-		String dataSourceName = "xk1";
+    @BeforeClass
+    public static void beforeClass()
+    {
+        // 数据源名称
+        String dataSourceName = "xk1";
 
-		// 连接池配置
-		Properties properties = new Properties();
-		properties.setProperty("driverClass", "com.mysql.cj.jdbc.Driver");
-		properties.setProperty("jdbcUrl", "jdbc:mysql://db.fastquery.org:3306/xk1?user=xk1&password=abc1&serverTimezone=Asia/Shanghai");
+        // 连接池配置
+        Properties properties = new Properties();
+        properties.setProperty("driverClass", "com.mysql.cj.jdbc.Driver");
+        properties.setProperty("jdbcUrl", "jdbc:mysql://db.fastquery.org:3306/xk1?user=xk1&password=abc1&serverTimezone=Asia/Shanghai");
 
-		// 创建一个数据源
-		FQuery.createDataSource(dataSourceName, properties);
-	}
+        // 创建一个数据源
+        FQuery.createDataSource(dataSourceName, properties);
+    }
 
-	@Test
-	public void findOne() {
-		int age = 1000;
-		// 数据库中age没有大于1千的记录
-		// 断言: 查询返回的值应该是一个空对象,不是null.
-		Map<String, Object> map = userInfoDBService.findOne(age, "xkdb2");
-		assertThat(map, notNullValue());
-		assertThat(map.isEmpty(), is(true));
-	}
+    @Test
+    public void findOne()
+    {
+        int age = 1000;
+        // 数据库中age没有大于1千的记录
+        // 断言: 查询返回的值应该是一个空对象,不是null.
+        Map<String, Object> map = userInfoDBService.findOne(age, "xkdb2");
+        assertThat(map, notNullValue());
+        assertThat(map.isEmpty(), is(true));
+    }
 
-	@Test
-	public void testUpdateBatch() {
-		int effect = userInfoDBService.updateBatch("小张张", 26, 1, "xk1");
-		assertThat("断言该行修改操作一共影响了3行", effect, equalTo(3));
-	}
+    @Test
+    public void testUpdateBatch()
+    {
+        int effect = userInfoDBService.updateBatch("小张张", 26, 1, "xk1");
+        assertThat("断言该行修改操作一共影响了3行", effect, equalTo(3));
+    }
 
 }

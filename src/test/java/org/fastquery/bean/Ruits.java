@@ -23,9 +23,16 @@
 package org.fastquery.bean;
 
 /**
- *
  * @author xixifeng (fastquery@126.com)
  */
-public enum Ruits {
-    苹果, 香蕉, 西瓜, 芒果, 橘子, 梨,葡萄, 樱桃;
+public enum Ruits
+{
+    苹果,
+    香蕉,
+    西瓜,
+    芒果,
+    橘子,
+    梨,
+    葡萄,
+    樱桃;
 }

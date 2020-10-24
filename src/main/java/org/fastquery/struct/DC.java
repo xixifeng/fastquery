@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.struct;
@@ -27,23 +27,27 @@ import java.sql.Connection;
 import javax.sql.DataSource;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class DC {
+public class DC
+{
 
-	private final DataSource ds;
-	private final Connection conn;
-	
-	public DC(DataSource ds, Connection conn) {
-		this.ds = ds;
-		this.conn = conn;
-	}
+    private final DataSource ds;
+    private final Connection conn;
 
-	public DataSource getDs() {
-		return ds;
-	}
-	public Connection getConn() {
-		return conn;
-	}
+    public DC(DataSource ds, Connection conn)
+    {
+        this.ds = ds;
+        this.conn = conn;
+    }
+
+    public DataSource getDs()
+    {
+        return ds;
+    }
+
+    public Connection getConn()
+    {
+        return conn;
+    }
 }

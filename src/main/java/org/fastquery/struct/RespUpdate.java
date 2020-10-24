@@ -15,36 +15,40 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.struct;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class RespUpdate {
+public class RespUpdate
+{
 
-	private int effect; // 影响行数
-	private Long pk; // 主健
+    private int effect; // 影响行数
+    private Long pk; // 主健
 
-	public int getEffect() {
-		return effect;
-	}
+    public int getEffect()
+    {
+        return effect;
+    }
 
-	public Long getPk() {
-		return pk;
-	}
+    public Long getPk()
+    {
+        return pk;
+    }
 
-	public void setEffect(int effect) {
-		this.effect = effect;
-	}
+    public void setEffect(int effect)
+    {
+        this.effect = effect;
+    }
 
-	public void setPk(Long pk) {
-		this.pk = pk;
-	}
+    public void setPk(Long pk)
+    {
+        this.pk = pk;
+    }
 
 }

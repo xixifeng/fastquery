@@ -25,8 +25,8 @@ package org.fastquery.example;
 import org.fastquery.core.QueryRepository;
 
 /**
- *
  * @author xixifeng (fastquery@126.com)
  */
-public interface TypeTestDB extends QueryRepository {
+public interface TypeTestDB extends QueryRepository
+{
 }

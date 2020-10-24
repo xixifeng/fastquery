@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.db2;
@@ -28,13 +28,13 @@ import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public interface CC extends QueryRepository {
-	@Query("show databases like 'cc'")
-	String findDatabaseName();
-	
-	@Query("show variables like 'port'")
-	Map<String, Object> findDatabasePort();
+public interface CC extends QueryRepository
+{
+    @Query("show databases like 'cc'")
+    String findDatabaseName();
+
+    @Query("show variables like 'port'")
+    Map<String, Object> findDatabasePort();
 }

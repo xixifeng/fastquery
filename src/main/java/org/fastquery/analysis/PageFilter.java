@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.analysis;
@@ -32,40 +32,45 @@ import org.fastquery.page.Page;
 import org.fastquery.util.TypeUtil;
 
 /**
- * 
  * Page 语法安全检测
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
-class PageFilter implements MethodFilter {
+class PageFilter implements MethodFilter
+{
 
-	@Override
-	public void doFilter(Method method) {
-		if (method.getReturnType() == Page.class) {
+    @Override
+    public void doFilter(Method method)
+    {
+        if (method.getReturnType() == Page.class)
+        {
 
-			// 部分校验已经提取到 全局 PageableFilter里去了
+            // 部分校验已经提取到 全局 PageableFilter里去了
 
-			// 7). 如果用@NotCount标识,那么@Query中的countId必须是默认值"id",countQuery的值必须为"".
-			// 不求总行数,countId和countQuery设置值是没有意义的.
-			Query query = method.getAnnotation(Query.class);
-			if (method.getAnnotation(NotCount.class) != null) {
-				// 这里query不可能为null的,若为null根本就进入不了该filter
-				String countId = query.countField();
-				String countQuery = query.countQuery();
-				if (!"id".equals(countId) || !"".equals(countQuery)) {
-					this.abortWith(method, "如果用@NotCount标识,不能设置@Query中的countId的值和countQuery的值.不求总行数,设置countId和countQuery的值是没有意义的.");
-				}
-			}
+            // 7). 如果用@NotCount标识,那么@Query中的countId必须是默认值"id",countQuery的值必须为"".
+            // 不求总行数,countId和countQuery设置值是没有意义的.
+            Query query = method.getAnnotation(Query.class);
+            if (method.getAnnotation(NotCount.class) != null)
+            {
+                // 这里query不可能为null的,若为null根本就进入不了该filter
+                String countId = query.countField();
+                String countQuery = query.countQuery();
+                if (!"id".equals(countId) || !"".equals(countQuery))
+                {
+                    this.abortWith(method, "如果用@NotCount标识,不能设置@Query中的countId的值和countQuery的值.不求总行数,设置countId和countQuery的值是没有意义的.");
+                }
+            }
 
-			// 8). #{#limit} 禁止重复出现
-			String sql = query.value();
-			List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE);
-			if (strs.size() > 1) {
-				this.abortWith(method, String.format("%s中,禁止重复出现%s", sql, Placeholder.LIMIT));
-			}
+            // 8). #{#limit} 禁止重复出现
+            String sql = query.value();
+            List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE);
+            if (strs.size() > 1)
+            {
+                this.abortWith(method, String.format("%s中,禁止重复出现%s", sql, Placeholder.LIMIT));
+            }
 
-		}
+        }
 
-	}
+    }
 
 }

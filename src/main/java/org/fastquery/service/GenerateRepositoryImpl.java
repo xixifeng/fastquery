@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.service;
@@ -38,89 +38,97 @@ import org.fastquery.util.ClassUtil;
 import org.fastquery.util.LoadPrperties;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-class GenerateRepositoryImpl {
+class GenerateRepositoryImpl
+{
 
-	private static final Logger LOG = LoggerFactory.getLogger(GenerateRepositoryImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GenerateRepositoryImpl.class);
 
-	private final FqClassLoader classLoader = FqClassLoader.getInstance();
+    private final FqClassLoader classLoader = FqClassLoader.getInstance();
 
-	private static class LazyHolder {
-		private static final GenerateRepositoryImpl INSTANCE = new GenerateRepositoryImpl();
+    private static class LazyHolder
+    {
+        private static final GenerateRepositoryImpl INSTANCE = new GenerateRepositoryImpl();
 
-		private LazyHolder() {
-		}
-	}
+        private LazyHolder()
+        {
+        }
+    }
 
-	static GenerateRepositoryImpl getInstance() {
-		return LazyHolder.INSTANCE;
-	}
-
-
-	private List<Class<?>> clses = new ArrayList<>();
-
-	private GenerateRepositoryImpl() {
-
-		LOG.debug("GenerateRepositoryImpl 已实例化.");
-
-		Resource resource = new FQueryResourceImpl(classLoader);
-
-		// 1). 装载配置文件
-		Set<FastQueryJson> fqPropertie = LoadPrperties.load(resource);
-
-		// 3). 批量生成 Repository 的实现类
-		fqPropertie.forEach(fQueryPropertie -> {
-			Set<String> basePackages = fQueryPropertie.getBasePackages();
-			basePackages.forEach(basePackage -> {
-				List<Class<?>> classes = ClassUtil.getClasses(basePackage);
-				clses.addAll(classes);
-				// classes.forEach(this::generate)
-				classes.forEach(rcls -> {
-					generate(rcls); // 生成
-					QueryPool.put(rcls.getName(), resource);
-				});
-			});
-		});
-		
-		// 3). 生成 Repository之后的检测
-		AsmRepository.after(clses);
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T> Class<? extends T> generate(Class<T> repositoryClazz) {
-		String name = repositoryClazz.getName() + Placeholder.DB_SUF;
-
-		byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
+    static GenerateRepositoryImpl getInstance()
+    {
+        return LazyHolder.INSTANCE;
+    }
 
 
-		/**
-		 * <pre>
-		// 把生成的文件存储起来
-		try (java.io.FileOutputStream fos = new java.io.FileOutputStream("/data/tmp/fquery/" + name + ".class")) {
-			fos.write(bytes);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} // 把生成的文件存储起来 end
-		</pre>
-		 */
+    private List<Class<?>> clses = new ArrayList<>();
+
+    private GenerateRepositoryImpl()
+    {
+
+        LOG.debug("GenerateRepositoryImpl 已实例化.");
+
+        Resource resource = new FQueryResourceImpl(classLoader);
+
+        // 1). 装载配置文件
+        Set<FastQueryJson> fqPropertie = LoadPrperties.load(resource);
+
+        // 3). 批量生成 Repository 的实现类
+        fqPropertie.forEach(fQueryPropertie -> {
+            Set<String> basePackages = fQueryPropertie.getBasePackages();
+            basePackages.forEach(basePackage -> {
+                List<Class<?>> classes = ClassUtil.getClasses(basePackage);
+                clses.addAll(classes);
+                // classes.forEach(this::generate)
+                classes.forEach(rcls -> {
+                    generate(rcls); // 生成
+                    QueryPool.put(rcls.getName(), resource);
+                });
+            });
+        });
+
+        // 3). 生成 Repository之后的检测
+        AsmRepository.after(clses);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Class<? extends T> generate(Class<T> repositoryClazz)
+    {
+        String name = repositoryClazz.getName() + Placeholder.DB_SUF;
+
+        byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
 
 
-		return (Class<? extends T>) classLoader.defineClassByName(name, bytes, bytes.length);
-	}
+        /**
+         * <pre>
+         // 把生成的文件存储起来
+         try (java.io.FileOutputStream fos = new java.io.FileOutputStream("/data/tmp/fquery/" + name + ".class")) {
+         fos.write(bytes);
+         } catch (Exception e) {
+         e.printStackTrace();
+         } // 把生成的文件存储起来 end
+         </pre>
+         */
 
-	public FqClassLoader getClassLoader() {
-		return classLoader;
-	}
 
-	List<Class<?>> getClasses() {
-		return clses;
-	}
+        return (Class<? extends T>) classLoader.defineClassByName(name, bytes, bytes.length);
+    }
 
-	void cleanClasses(){
-		clses.clear();
-		clses = null;
-	}
+    public FqClassLoader getClassLoader()
+    {
+        return classLoader;
+    }
+
+    List<Class<?>> getClasses()
+    {
+        return clses;
+    }
+
+    void cleanClasses()
+    {
+        clses.clear();
+        clses = null;
+    }
 }
 

@@ -15,75 +15,77 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
 
 /**
  * 占位符/正则 常量
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
-public final class Placeholder {
+public final class Placeholder
+{
 
-	private Placeholder() {
-		throw new IllegalStateException("Placeholder is Utility class");
-	}
+    private Placeholder()
+    {
+        throw new IllegalStateException("Placeholder is Utility class");
+    }
 
-	/**
-	 * 生成db类的后缀名称
-	 */
-	public static final String DB_SUF = "a$";
-	/**
-	 * 生成rest类的后缀名称
-	 */
-	public static final String REST_SUF = "b$";
+    /**
+     * 生成db类的后缀名称
+     */
+    public static final String DB_SUF = "a$";
+    /**
+     * 生成rest类的后缀名称
+     */
+    public static final String REST_SUF = "b$";
 
-	public static final String TABLE = "#{#table}";
-	static final String TABLE_REG = "\\#\\{\\#table\\}";
+    public static final String TABLE = "#{#table}";
+    static final String TABLE_REG = "\\#\\{\\#table\\}";
 
-	public static final String ID = "#{#id}";
-	static final String ID_REG = "\\#\\{\\#id\\}";
+    public static final String ID = "#{#id}";
+    static final String ID_REG = "\\#\\{\\#id\\}";
 
-	public static final String SETS_REG = "\\#\\{\\#sets\\}";
-	public static final String WHERE_REG = "\\#\\{\\#where\\}";
+    public static final String SETS_REG = "\\#\\{\\#sets\\}";
+    public static final String WHERE_REG = "\\#\\{\\#where\\}";
 
-	public static final String LIMIT = "#{#limit}";
-	public static final String LIMIT_RGE = "\\#\\{\\#limit\\}";
+    public static final String LIMIT = "#{#limit}";
+    public static final String LIMIT_RGE = "\\#\\{\\#limit\\}";
 
-	public static final String SP1_REG = "\\?\\d+";
+    public static final String SP1_REG = "\\?\\d+";
 
-	/**
-	 * 搜索出"?"后面的数字
-	 */
-	public static final String SEARCH_NUM = "(?<=\\?)\\d+";
+    /**
+     * 搜索出"?"后面的数字
+     */
+    public static final String SEARCH_NUM = "(?<=\\?)\\d+";
 
-	/**
-	 * 匹配冒号表达式
-	 */
-	public static final String COLON_REG = ":+[A-Za-z0-9]+";
+    /**
+     * 匹配冒号表达式
+     */
+    public static final String COLON_REG = ":+[A-Za-z0-9]+";
 
-	/**
-	 * 匹配EL表达式,可能包含有_ . ( ) 如: 在模板中调用 ${_method.getString()} 
-	 */
-	public static final String EL_REG = "\\$\\{?[A-Za-z0-9_\\.()]+\\}?";
+    /**
+     * 匹配EL表达式,可能包含有_ . ( ) 如: 在模板中调用 ${_method.getString()}
+     */
+    public static final String EL_REG = "\\$\\{?[A-Za-z0-9_\\.()]+\\}?";
 
-	/**
-	 * 匹配EL表达式或匹配冒号表达式
-	 */
-	public static final String EL_OR_COLON = EL_REG + "|" + COLON_REG;
+    /**
+     * 匹配EL表达式或匹配冒号表达式
+     */
+    public static final String EL_OR_COLON = EL_REG + "|" + COLON_REG;
 
-	/**
-	 * 匹配微笑表达式
-	 */
-	public static final String SMILE = "`-[^`]*\\?[^`]*-`";
+    /**
+     * 匹配微笑表达式
+     */
+    public static final String SMILE = "`-[^`]*\\?[^`]*-`";
 
-	public static final String SMILE_BIG = "`-[^`]*[^`]*-`";
+    public static final String SMILE_BIG = "`-[^`]*[^`]*-`";
 
-	public static final String PERCENT = "%+";
+    public static final String PERCENT = "%+";
 
-	public static final String ARRAY_REFERENCE = "[\\$A-Za-z0-9_]+\\[[A-Za-z0-9`_\\.(),\\s]+]";
+    public static final String ARRAY_REFERENCE = "[\\$A-Za-z0-9_]+\\[[A-Za-z0-9`_\\.(),\\s]+]";
 }

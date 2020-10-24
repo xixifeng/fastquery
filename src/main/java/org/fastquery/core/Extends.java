@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
@@ -31,10 +31,12 @@ import java.lang.annotation.Target;
 
 /**
  * 标识在子类上,用于记录当前方法的父方法含有哪些注解
+ *
  * @author mei.sir@aliyun.cn
  */
 @Target(METHOD)
 @Retention(RUNTIME)
-public @interface Extends {
-	Class<? extends Annotation>[] value() default {};
+public @interface Extends
+{
+    Class<? extends Annotation>[] value() default {};
 }

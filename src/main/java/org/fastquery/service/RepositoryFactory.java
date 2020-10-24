@@ -32,11 +32,12 @@ import java.lang.reflect.InvocationTargetException;
  * @author xixifeng (fastquery@126.com)
  **/
 @Slf4j
-public class RepositoryFactory<T>  implements FactoryBean<T>
+public class RepositoryFactory<T> implements FactoryBean<T>
 {
     private Class<T> dbInterface;
 
-    public RepositoryFactory(Class<T> dbInterface) {
+    public RepositoryFactory(Class<T> dbInterface)
+    {
         this.dbInterface = dbInterface;
     }
 

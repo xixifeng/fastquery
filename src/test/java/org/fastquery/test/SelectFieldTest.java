@@ -27,39 +27,41 @@ import org.fastquery.core.SelectField;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- *
  * @author xixifeng (fastquery@126.com)
  */
-public class SelectFieldTest {
+public class SelectFieldTest
+{
 
     @Test
-    public void getFields() {
+    public void getFields()
+    {
         SelectField<UserInfo> selectField = new SelectField<>(UserInfo.class, true);
-        assertThat(selectField.getFields(),equalTo("id,name,age"));
+        assertThat(selectField.getFields(), equalTo("id,name,age"));
 
-        selectField = new SelectField<>(UserInfo.class,false);
-        assertThat(selectField.getFields(),equalTo("id,name,age"));
+        selectField = new SelectField<>(UserInfo.class, false);
+        assertThat(selectField.getFields(), equalTo("id,name,age"));
 
-        selectField = new SelectField<>(UserInfo.class,true,"name");
-        assertThat(selectField.getFields(),equalTo("name"));
-        selectField = new SelectField<>(UserInfo.class,true,"name","age");
-        assertThat(selectField.getFields(),equalTo("name,age"));
+        selectField = new SelectField<>(UserInfo.class, true, "name");
+        assertThat(selectField.getFields(), equalTo("name"));
+        selectField = new SelectField<>(UserInfo.class, true, "name", "age");
+        assertThat(selectField.getFields(), equalTo("name,age"));
 
-        selectField = new SelectField<>(UserInfo.class,false,"name");
-        assertThat(selectField.getFields(),equalTo("id,age"));
-        selectField = new SelectField<>(UserInfo.class,false,"name","id");
-        assertThat(selectField.getFields(),equalTo("age"));
+        selectField = new SelectField<>(UserInfo.class, false, "name");
+        assertThat(selectField.getFields(), equalTo("id,age"));
+        selectField = new SelectField<>(UserInfo.class, false, "name", "id");
+        assertThat(selectField.getFields(), equalTo("age"));
     }
 
     @Test
-    public void getFields2() {
-        SelectField<UserInfo> selectField = new SelectField<>(UserInfo.class,false,"id","age","name");
-        assertThat(selectField.getFields(),equalTo("1"));
+    public void getFields2()
+    {
+        SelectField<UserInfo> selectField = new SelectField<>(UserInfo.class, false, "id", "age", "name");
+        assertThat(selectField.getFields(), equalTo("1"));
 
-        selectField = new SelectField<>(UserInfo.class,true,"id","age","name");
-        assertThat(selectField.getFields(),equalTo("id,name,age"));
+        selectField = new SelectField<>(UserInfo.class, true, "id", "age", "name");
+        assertThat(selectField.getFields(), equalTo("id,name,age"));
     }
 }

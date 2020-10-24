@@ -15,30 +15,36 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.pool;
+
 import javax.sql.DataSource;
+
 import org.fastquery.core.ConnectionPoolProvider;
 import org.fastquery.core.Resource;
 import org.fastquery.util.XMLParse;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class DruidPoolProvider implements ConnectionPoolProvider {
+public class DruidPoolProvider implements ConnectionPoolProvider
+{
 
-	@Override
-	public DataSource getDataSource(Resource resource, String dataSourceName) {
-		try {
-			return com.alibaba.druid.pool.DruidDataSourceFactory.createDataSource(XMLParse.toMap(resource, "druid.xml", dataSourceName, "bean"));
-		} catch (Exception e) {
-			throw new ExceptionInInitializerError(e);
-		}
-	}
+    @Override
+    public DataSource getDataSource(Resource resource, String dataSourceName)
+    {
+        try
+        {
+            return com.alibaba.druid.pool.DruidDataSourceFactory.createDataSource(XMLParse.toMap(resource, "druid.xml", dataSourceName, "bean"));
+        }
+        catch (Exception e)
+        {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
 }

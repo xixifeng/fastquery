@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.analysis;
@@ -29,32 +29,39 @@ import org.fastquery.where.Set;
 
 /**
  * Set注解校验
- *  
+ *
  * @author mei.sir@aliyun.cn
  */
-class SetFilter implements MethodFilter {
+class SetFilter implements MethodFilter
+{
 
-	@Override
-	public void doFilter(Method method) {
-		
-		// 1). @Set#ignore() 指定的class 必须有一个不带参数且public的构造方法
-		// 2). if$ 和 ignoreScript 不能共存
-		Set[] sets = method.getAnnotationsByType(Set.class);
-		for (Set set : sets) {
-				Class<? extends Judge> judge = set.ignore();
-				try {
-					judge.newInstance();
-				} catch (InstantiationException | IllegalAccessException e) {
-					this.abortWith(method, set.ignore() + " 必须有一个不带参数并且用public修饰的构造方法");
-				}
-				
-				// > 2)
-				if(!"true".equals(set.if$()) && !"false".equals(set.ignoreScript())) {
-					this.abortWith(method, "@set中的if$属性和ignoreScript属性不能同时被自定义");
-				}
+    @Override
+    public void doFilter(Method method)
+    {
 
-		}
-		
-	}
+        // 1). @Set#ignore() 指定的class 必须有一个不带参数且public的构造方法
+        // 2). if$ 和 ignoreScript 不能共存
+        Set[] sets = method.getAnnotationsByType(Set.class);
+        for (Set set : sets)
+        {
+            Class<? extends Judge> judge = set.ignore();
+            try
+            {
+                judge.newInstance();
+            }
+            catch (InstantiationException | IllegalAccessException e)
+            {
+                this.abortWith(method, set.ignore() + " 必须有一个不带参数并且用public修饰的构造方法");
+            }
+
+            // > 2)
+            if (!"true".equals(set.if$()) && !"false".equals(set.ignoreScript()))
+            {
+                this.abortWith(method, "@set中的if$属性和ignoreScript属性不能同时被自定义");
+            }
+
+        }
+
+    }
 
 }

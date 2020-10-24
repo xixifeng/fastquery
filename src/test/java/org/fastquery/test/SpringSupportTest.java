@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
@@ -33,15 +33,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.annotation.Resource;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
 @ContextConfiguration(locations = {"classpath:beans.xml"})
 @RunWith(value = SpringJUnit4ClassRunner.class)
-public class SpringSupportTest extends FastQueryTest {
+public class SpringSupportTest extends FastQueryTest
+{
 
     @Resource
     private UserInfoDBService userInfoDBService;
@@ -50,9 +50,10 @@ public class SpringSupportTest extends FastQueryTest {
     private TypeFeatureDBService typeFeatureDBService;
 
     @Test
-    public void notNullVal(){
-        assertThat(userInfoDBService,notNullValue());
-        assertThat(typeFeatureDBService,notNullValue());
+    public void notNullVal()
+    {
+        assertThat(userInfoDBService, notNullValue());
+        assertThat(typeFeatureDBService, notNullValue());
     }
 
 }

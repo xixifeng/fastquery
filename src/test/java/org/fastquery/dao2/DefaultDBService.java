@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.dao2;
@@ -28,14 +28,14 @@ import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Safe;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public interface DefaultDBService extends QueryRepository {
-	
-	@Query("$s")
-	String sqlFun(@Param("s") String sql);
+public interface DefaultDBService extends QueryRepository
+{
 
-	@Query("select id from userinfo where ${columnName} = ?2")
-	boolean exists(@Safe @Param("columnName") String columnName, Object columnValue);
+    @Query("$s")
+    String sqlFun(@Param("s") String sql);
+
+    @Query("select id from userinfo where ${columnName} = ?2")
+    boolean exists(@Safe @Param("columnName") String columnName, Object columnValue);
 }

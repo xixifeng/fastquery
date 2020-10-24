@@ -15,22 +15,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.where;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class DefaultJudge extends Judge { // NO_UCD
+public class DefaultJudge extends Judge
+{ // NO_UCD
 
-	@Override
-	public boolean ignore() {
-		return false;
-	}
-	
+    @Override
+    public boolean ignore()
+    {
+        return false;
+    }
+
 }

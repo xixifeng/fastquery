@@ -23,10 +23,10 @@
 package org.fastquery.bean;
 
 /**
- *
  * @author xixifeng (fastquery@126.com)
  */
-public enum  Gender {
+public enum Gender
+{
 
     男("Man"),
     女("Woman"),
@@ -38,11 +38,13 @@ public enum  Gender {
 
     private String enName;
 
-    Gender(String enName) {
+    Gender(String enName)
+    {
         this.enName = enName;
     }
 
-    public String getEnName() {
+    public String getEnName()
+    {
         return this.enName;
     }
 }

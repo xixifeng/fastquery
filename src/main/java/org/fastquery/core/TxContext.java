@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
@@ -35,80 +35,101 @@ import org.slf4j.LoggerFactory;
 
 /**
  * tx 上下文
+ *
  * @author mei.sir@aliyun.cn
  */
-class TxContext {
+class TxContext
+{
 
-	private static final Logger LOG = LoggerFactory.getLogger(TxContext.class);
-	
-	private static final ThreadLocal<TxContext> threadLocal = new ThreadLocal<>();
-	
-	private final List<DC> dclist = new ArrayList<>();
-	
-	static void start() {
-		threadLocal.set(new TxContext());
-	}
-	
-	static TxContext getTxContext() {
-		return threadLocal.get();
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(TxContext.class);
 
-	static boolean enabled() {
-		return getTxContext() != null;
-	}
-	
-	// 如果在列中已经存在了,就不添加
-	Connection addConn(DataSource ds) throws SQLException {
-		for (DC dc : dclist) {
-			if(dc.getDs() == ds) {
-				return dc.getConn();
-			}
-		}
-		
-		DC dc = new DC(ds, ds.getConnection());
-		dc.getConn().setAutoCommit(false);
-		dclist.add(dc);
-		
-		return dc.getConn();
-	}
-	
-	void commit() throws SQLException {
-		int len = dclist.size();
-		for (int i = len - 1; i >= 0; i--) {
-				dclist.get(i).getConn().commit();
-		}
-	}
-	
-	void rollback() {
-		int len = dclist.size();
-		for (int i = len - 1; i >= 0; i--) {
-				try {
-					dclist.get(i).getConn().rollback();
-				} catch (SQLException e) {
-					LOG.error("conn rollback败",e);
-				}
-		}
-	}
-	
-	private void clear() {
-		// 先关闭所有连接
-		int len = dclist.size();
-		for (int i = len - 1; i >= 0; i--) {
-			try {
-				dclist.get(i).getConn().close();
-			} catch (SQLException e) {
-				LOG.error("conn 关闭失败",e);
-			}
-		}
-		
-		// 清空集合
-		dclist.clear();
-		
-		// 移出范围
-		threadLocal.remove();
-	}
-	
-	static void end() {
-		getTxContext().clear();	
-	}
+    private static final ThreadLocal<TxContext> threadLocal = new ThreadLocal<>();
+
+    private final List<DC> dclist = new ArrayList<>();
+
+    static void start()
+    {
+        threadLocal.set(new TxContext());
+    }
+
+    static TxContext getTxContext()
+    {
+        return threadLocal.get();
+    }
+
+    static boolean enabled()
+    {
+        return getTxContext() != null;
+    }
+
+    // 如果在列中已经存在了,就不添加
+    Connection addConn(DataSource ds) throws SQLException
+    {
+        for (DC dc : dclist)
+        {
+            if (dc.getDs() == ds)
+            {
+                return dc.getConn();
+            }
+        }
+
+        DC dc = new DC(ds, ds.getConnection());
+        dc.getConn().setAutoCommit(false);
+        dclist.add(dc);
+
+        return dc.getConn();
+    }
+
+    void commit() throws SQLException
+    {
+        int len = dclist.size();
+        for (int i = len - 1; i >= 0; i--)
+        {
+            dclist.get(i).getConn().commit();
+        }
+    }
+
+    void rollback()
+    {
+        int len = dclist.size();
+        for (int i = len - 1; i >= 0; i--)
+        {
+            try
+            {
+                dclist.get(i).getConn().rollback();
+            }
+            catch (SQLException e)
+            {
+                LOG.error("conn rollback败", e);
+            }
+        }
+    }
+
+    private void clear()
+    {
+        // 先关闭所有连接
+        int len = dclist.size();
+        for (int i = len - 1; i >= 0; i--)
+        {
+            try
+            {
+                dclist.get(i).getConn().close();
+            }
+            catch (SQLException e)
+            {
+                LOG.error("conn 关闭失败", e);
+            }
+        }
+
+        // 清空集合
+        dclist.clear();
+
+        // 移出范围
+        threadLocal.remove();
+    }
+
+    static void end()
+    {
+        getTxContext().clear();
+    }
 }

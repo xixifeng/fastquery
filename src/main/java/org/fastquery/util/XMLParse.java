@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.util;
@@ -44,93 +44,116 @@ import org.xml.sax.SAXException;
 
 /**
  * 解析XML
+ *
  * @author mei.sir@aliyun.cn
  */
-public class XMLParse {
+public class XMLParse
+{
 
-	private XMLParse() {
-	}
-		
-	public static boolean exists(Resource resource, String resourceName, String dataSourceName,String tagName) {
-		return toWho(resource, resourceName, dataSourceName,tagName, Objects::nonNull); // ele -> ele != null
-	}
-	
-	public static Map<String, String> toMap(Resource resource, String resourceName, String dataSourceName,String tagName) {
-		return toWho(resource, resourceName, dataSourceName,tagName,unitElement -> {
+    private XMLParse()
+    {
+    }
 
-			String key;
-			String val;
-			Node node;
-			
-			Map<String, String> map = new HashMap<>();			
-			NodeList childNodes = unitElement.getChildNodes();
-			
-			for (int j = 0; j < childNodes.getLength(); j++) {
-				node = childNodes.item(j);
-				if (node.getNodeType() == Node.ELEMENT_NODE) {
-					unitElement = (Element) node;
-					key = unitElement.getAttribute("name");
-					val = unitElement.getTextContent();
-					if(val==null || "".equals(val)) {
-						val = unitElement.getAttribute("value");
-					}
-					if(val==null || "".equals(val)) {
-						val = unitElement.getAttribute("class");
-					}
-					check(resourceName, key, val); // 存之前检测
-					map.put(key, val);
-				}
-			}
-			return map;
-		});
-	}
+    public static boolean exists(Resource resource, String resourceName, String dataSourceName, String tagName)
+    {
+        return toWho(resource, resourceName, dataSourceName, tagName, Objects::nonNull); // ele -> ele != null
+    }
 
-	private static void check(String resourceName, String key, String val) {
-		if ("".equals(key) || "".equals(val)) {
-			throw new RepositoryException(resourceName + " 配置错误,name属性和value属性或class属性必须合法");
-		}
-	}
-	
-	private static <R> R toWho(Resource resource, String resourceName, String dataSourceName,String tagName, Function<Element, R> fun) {
-		
-		if (resource.exist(resourceName)) {
-			try (InputStream inputStream = resource.getResourceAsStream(resourceName)) {
+    public static Map<String, String> toMap(Resource resource, String resourceName, String dataSourceName, String tagName)
+    {
+        return toWho(resource, resourceName, dataSourceName, tagName, unitElement -> {
 
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				// 如下设置可禁用外部实体处理
-				factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-				DocumentBuilder builder;
-				Document document;
+            String key;
+            String val;
+            Node node;
 
-				builder = factory.newDocumentBuilder();
-				document = builder.parse(inputStream);
+            Map<String, String> map = new HashMap<>();
+            NodeList childNodes = unitElement.getChildNodes();
 
-				Element element = document.getDocumentElement();
+            for (int j = 0; j < childNodes.getLength(); j++)
+            {
+                node = childNodes.item(j);
+                if (node.getNodeType() == Node.ELEMENT_NODE)
+                {
+                    unitElement = (Element) node;
+                    key = unitElement.getAttribute("name");
+                    val = unitElement.getTextContent();
+                    if (val == null || "".equals(val))
+                    {
+                        val = unitElement.getAttribute("value");
+                    }
+                    if (val == null || "".equals(val))
+                    {
+                        val = unitElement.getAttribute("class");
+                    }
+                    check(resourceName, key, val); // 存之前检测
+                    map.put(key, val);
+                }
+            }
+            return map;
+        });
+    }
 
-				NodeList nodes = element.getElementsByTagName(tagName);
-				if(nodes.getLength() == 0) {
-					nodes = document.getElementsByTagName(tagName);
-				}
-				Element unitElement;
-				String named;
-				for (int i = 0; i < nodes.getLength(); i++) {
-					unitElement = (Element) nodes.item(i);
-					named = unitElement.getAttribute("name");
-					if (dataSourceName.equals(named)) {
-						return fun.apply(unitElement);
-					}
-				}
+    private static void check(String resourceName, String key, String val)
+    {
+        if ("".equals(key) || "".equals(val))
+        {
+            throw new RepositoryException(resourceName + " 配置错误,name属性和value属性或class属性必须合法");
+        }
+    }
 
-				throw new ExceptionInInitializerError(resourceName + " 中的没有找到节点:" + dataSourceName);
+    private static <R> R toWho(Resource resource, String resourceName, String dataSourceName, String tagName, Function<Element, R> fun)
+    {
 
-			} catch (IOException | ParserConfigurationException | SAXException e) {
-				throw new ExceptionInInitializerError(e);
-			}
+        if (resource.exist(resourceName))
+        {
+            try (InputStream inputStream = resource.getResourceAsStream(resourceName))
+            {
 
-		} else {
-			throw new ExceptionInInitializerError(dataSourceName + ".properties 或 " + resourceName + " 没有找到.");
-		}
-	}
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                // 如下设置可禁用外部实体处理
+                factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+                DocumentBuilder builder;
+                Document document;
+
+                builder = factory.newDocumentBuilder();
+                document = builder.parse(inputStream);
+
+                Element element = document.getDocumentElement();
+
+                NodeList nodes = element.getElementsByTagName(tagName);
+                if (nodes.getLength() == 0)
+                {
+                    nodes = document.getElementsByTagName(tagName);
+                }
+                Element unitElement;
+                String named;
+                for (int i = 0; i < nodes.getLength(); i++)
+                {
+                    unitElement = (Element) nodes.item(i);
+                    named = unitElement.getAttribute("name");
+                    if (dataSourceName.equals(named))
+                    {
+                        return fun.apply(unitElement);
+                    }
+                }
+
+                throw new ExceptionInInitializerError(resourceName + " 中的没有找到节点:" + dataSourceName);
+
+            }
+            catch (IOException | ParserConfigurationException | SAXException e)
+            {
+                throw new ExceptionInInitializerError(e);
+            }
+
+        }
+        else
+        {
+            throw new ExceptionInInitializerError(dataSourceName + ".properties 或 " + resourceName + " 没有找到.");
+        }
+    }
 
 }
 

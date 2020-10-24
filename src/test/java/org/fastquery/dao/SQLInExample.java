@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.dao;
@@ -32,28 +32,28 @@ import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public interface SQLInExample extends QueryRepository {
+public interface SQLInExample extends QueryRepository
+{
 
-	@Query("select * from UserInfo where name in (?1)")
-	List<UserInfo> findByNameIn(String... names);
+    @Query("select * from UserInfo where name in (?1)")
+    List<UserInfo> findByNameIn(String... names);
 
-	@Query("select * from UserInfo where name in (?1) and id > ?2")
-	List<UserInfo> findByNameListIn(List<String> names, Integer id);
+    @Query("select * from UserInfo where name in (?1) and id > ?2")
+    List<UserInfo> findByNameListIn(List<String> names, Integer id);
 
-	@Query("select * from UserInfo as u where u.id in (?1)")
-	UserInfo[] findByIn(int... ids);
-	
-	@Query("select * from UserInfo as u where u.id in (?1)")
-	UserInfo[] findByIn(String... ids);
-	
-	@Query("select * from UserInfo as u where u.id in (?1)")
-	UserInfo[] findByIn(List<Integer> ids);
+    @Query("select * from UserInfo as u where u.id in (?1)")
+    UserInfo[] findByIn(int... ids);
 
-	@Query("select * from student where sex = :sex and age > :age and name in(:names)")
-	List<Student> findByIn(@Param(value = "sex") String sex, @Param("age") Integer age,
-			@Param("names") Set<String> names);
+    @Query("select * from UserInfo as u where u.id in (?1)")
+    UserInfo[] findByIn(String... ids);
+
+    @Query("select * from UserInfo as u where u.id in (?1)")
+    UserInfo[] findByIn(List<Integer> ids);
+
+    @Query("select * from student where sex = :sex and age > :age and name in(:names)")
+    List<Student> findByIn(@Param(value = "sex") String sex, @Param("age") Integer age,
+                           @Param("names") Set<String> names);
 
 }

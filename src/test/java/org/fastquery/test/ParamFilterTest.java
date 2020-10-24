@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
@@ -28,114 +28,121 @@ import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Param;
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
-import static org.junit.Assert.assertThat;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class ParamFilterTest extends FastQueryTest  {
+public class ParamFilterTest extends FastQueryTest
+{
 
-	public static String paramFilter(Method method, Object[] args, String sql) throws Exception {
-		Method m = TypeUtil.class.getDeclaredMethod("paramFilter", MethodInfo.class, Object[].class, String.class);
-		m.setAccessible(true);
-		return m.invoke(null, new MethodInfo(method), args, sql).toString();
-	}
+    public static String paramFilter(Method method, Object[] args, String sql) throws Exception
+    {
+        Method m = TypeUtil.class.getDeclaredMethod("paramFilter", MethodInfo.class, Object[].class, String.class);
+        m.setAccessible(true);
+        return m.invoke(null, new MethodInfo(method), args, sql).toString();
+    }
 
-	public void m1(@Param("name1") String name, @Param("age1") Integer age) {
-	}
+    public void m1(@Param("name1") String name, @Param("age1") Integer age)
+    {
+    }
 
-	private Method getMethod1() throws NoSuchMethodException {
-		return ParamFilterTest.class.getMethod("m1", String.class, Integer.class);
-	}
+    private Method getMethod1() throws NoSuchMethodException
+    {
+        return ParamFilterTest.class.getMethod("m1", String.class, Integer.class);
+    }
 
-	@Test
-	public void paramFilter11() throws Exception {
-		Method method = getMethod1();
-		String name = "小王子";
-		int age = 6;
-		Object[] args = { name, age };
-		String sql = "";
-		String str = paramFilter(method, args, sql);
-		assertThat(str, equalTo(sql));
+    @Test
+    public void paramFilter11() throws Exception
+    {
+        Method method = getMethod1();
+        String name = "小王子";
+        int age = 6;
+        Object[] args = {name, age};
+        String sql = "";
+        String str = paramFilter(method, args, sql);
+        assertThat(str, equalTo(sql));
 
-		sql = "$name1_";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo(sql));
+        sql = "$name1_";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo(sql));
 
-		sql = "$name1	_";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo(name + "	_"));
+        sql = "$name1	_";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo(name + "	_"));
 
-		sql = "_$name1";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo("_" + name));
+        sql = "_$name1";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo("_" + name));
 
-		sql = "_$name1$name1";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo("_" + name + name));
+        sql = "_$name1$name1";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo("_" + name + name));
 
-		sql = "$name123$age12";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo(sql));
-	}
+        sql = "$name123$age12";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo(sql));
+    }
 
-	@Test
-	public void paramFilter12() throws Exception {
-		Method method = getMethod1();
-		String name = "小王子";
-		int age = 6;
-		Object[] args = { name, age };
-		String sql = "";
-		String str = paramFilter(method, args, sql);
-		assertThat(str, equalTo(sql));
+    @Test
+    public void paramFilter12() throws Exception
+    {
+        Method method = getMethod1();
+        String name = "小王子";
+        int age = 6;
+        Object[] args = {name, age};
+        String sql = "";
+        String str = paramFilter(method, args, sql);
+        assertThat(str, equalTo(sql));
 
-		sql = "${name1_}";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo(sql));
+        sql = "${name1_}";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo(sql));
 
-		sql = "${name1}	_";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo(name + "	_"));
+        sql = "${name1}	_";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo(name + "	_"));
 
-		sql = "_${name1}";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo("_" + name));
+        sql = "_${name1}";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo("_" + name));
 
-		sql = "_${name1}${name1}";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo("_" + name + name));
+        sql = "_${name1}${name1}";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo("_" + name + name));
 
-		sql = "${name123}${age12}";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo(sql));
-	}
+        sql = "${name123}${age12}";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo(sql));
+    }
 
-	@Test
-	public void paramFilter13() throws Exception {
-		Method method = getMethod1();
-		String name = "小王子";
-		int age = 6;
-		Object[] args = { name, age };
-		String sql = ":name1";
-		String str = paramFilter(method, args, sql);
-		assertThat(str, equalTo("?1"));
+    @Test
+    public void paramFilter13() throws Exception
+    {
+        Method method = getMethod1();
+        String name = "小王子";
+        int age = 6;
+        Object[] args = {name, age};
+        String sql = ":name1";
+        String str = paramFilter(method, args, sql);
+        assertThat(str, equalTo("?1"));
 
-		sql = ":age1";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo("?2"));
+        sql = ":age1";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo("?2"));
 
-		sql = ":age1 :name1";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo("?2 ?1"));
+        sql = ":age1 :name1";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo("?2 ?1"));
 
-		sql = ":age1:name1";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo("?2?1"));
+        sql = ":age1:name1";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo("?2?1"));
 
-		sql = ":age:name";
-		str = paramFilter(method, args, sql);
-		assertThat(str, equalTo(":age:name"));
-	}
+        sql = ":age:name";
+        str = paramFilter(method, args, sql);
+        assertThat(str, equalTo(":age:name"));
+    }
 }

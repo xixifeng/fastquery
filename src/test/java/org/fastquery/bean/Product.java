@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.bean;
@@ -25,7 +25,6 @@ package org.fastquery.bean;
 import lombok.*;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
 @Setter
@@ -33,16 +32,18 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Product {
-	
- 	private Integer pid;
-	private Integer lid;
-	private String pname;
-	private String description;
+public class Product
+{
 
-	public Product(Integer pid, Integer lid, String pname) {
-		this.pid = pid;
-		this.lid = lid;
-		this.pname = pname;
-	}
+    private Integer pid;
+    private Integer lid;
+    private String pname;
+    private String description;
+
+    public Product(Integer pid, Integer lid, String pname)
+    {
+        this.pid = pid;
+        this.lid = lid;
+        this.pname = pname;
+    }
 }

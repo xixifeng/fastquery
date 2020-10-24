@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
@@ -39,121 +39,137 @@ import org.junit.Test;
 import static org.hamcrest.Matchers.*;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class SQLInExampleTest extends FastQueryTest  {
+public class SQLInExampleTest extends FastQueryTest
+{
 
-	private final SQLInExample db = FQuery.getRepository(SQLInExample.class);
+    private final SQLInExample db = FQuery.getRepository(SQLInExample.class);
 
-	@Rule
-	public FastQueryTestRule rule = new FastQueryTestRule();
+    @Rule
+    public FastQueryTestRule rule = new FastQueryTestRule();
 
-	@Test
-	public void testFindByNameIn1() {
-		String name = "袁承志";
-		List<UserInfo> userinfos = db.findByNameIn(name);
-		if (userinfos.isEmpty())
-			return;
-		for (UserInfo u : userinfos) {
-			assertThat(u.getName(), equalTo(name));
-		}
-	}
+    @Test
+    public void testFindByNameIn1()
+    {
+        String name = "袁承志";
+        List<UserInfo> userinfos = db.findByNameIn(name);
+        if (userinfos.isEmpty())
+            return;
+        for (UserInfo u : userinfos)
+        {
+            assertThat(u.getName(), equalTo(name));
+        }
+    }
 
-	@Test
-	public void testFindByNameIn2() {
-		String name1 = "袁承志";
-		String name2 = "安小惠";
-		List<UserInfo> userinfos = db.findByNameIn(name1, name2);
-		if (userinfos.isEmpty())
-			return;
-		for (UserInfo u : userinfos) {
-			assertThat(u.getName().equals(name1) || u.getName().equals(name2), is(true));
-		}
-	}
+    @Test
+    public void testFindByNameIn2()
+    {
+        String name1 = "袁承志";
+        String name2 = "安小惠";
+        List<UserInfo> userinfos = db.findByNameIn(name1, name2);
+        if (userinfos.isEmpty())
+            return;
+        for (UserInfo u : userinfos)
+        {
+            assertThat(u.getName().equals(name1) || u.getName().equals(name2), is(true));
+        }
+    }
 
-	@Test
-	public void findByNameListIn() {
-		String name1 = "袁承志";
-		String name2 = "安小惠";
-		String name3 = "小青小青86545lk";
-		Integer id = 2398;
-		List<String> names = new ArrayList<>();
-		names.add(name1);
-		names.add(name2);
-		names.add(name3);
-		List<UserInfo> userinfos = db.findByNameListIn(names, id);
-		userinfos.forEach(u -> {
-			assertThat(u.getName().equals(name1) || u.getName().equals(name2), is(true));
-			assertThat(u.getName(), not(is(name3)));
-			assertThat(u.getId(), greaterThan(id));
-		});
-	}
+    @Test
+    public void findByNameListIn()
+    {
+        String name1 = "袁承志";
+        String name2 = "安小惠";
+        String name3 = "小青小青86545lk";
+        Integer id = 2398;
+        List<String> names = new ArrayList<>();
+        names.add(name1);
+        names.add(name2);
+        names.add(name3);
+        List<UserInfo> userinfos = db.findByNameListIn(names, id);
+        userinfos.forEach(u -> {
+            assertThat(u.getName().equals(name1) || u.getName().equals(name2), is(true));
+            assertThat(u.getName(), not(is(name3)));
+            assertThat(u.getId(), greaterThan(id));
+        });
+    }
 
-	@Test
-	public void findByIn1() {
-		int[] ids = { 1, 2, 3 };
-		UserInfo[] userInfos = db.findByIn(ids);
-		for (UserInfo u : userInfos) {
-			assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
-		}
-	}
+    @Test
+    public void findByIn1()
+    {
+        int[] ids = {1, 2, 3};
+        UserInfo[] userInfos = db.findByIn(ids);
+        for (UserInfo u : userInfos)
+        {
+            assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
+        }
+    }
 
-	@Test
-	public void findByIn2() {
-		String sex = "女";
-		Integer age = 10;
-		String name1 = "小蚂蚁";
-		String name2 = "蜘蛛";
-		String name3 = "钱大平";
-		Set<String> names = new HashSet<>();
-		names.add(name1);
-		names.add(name2);
-		names.add(name3);
+    @Test
+    public void findByIn2()
+    {
+        String sex = "女";
+        Integer age = 10;
+        String name1 = "小蚂蚁";
+        String name2 = "蜘蛛";
+        String name3 = "钱大平";
+        Set<String> names = new HashSet<>();
+        names.add(name1);
+        names.add(name2);
+        names.add(name3);
 
-		List<Student> students = db.findByIn(sex, age, names);
-		assertThat(students.isEmpty(), is(false));
-		students.forEach(s -> {
-			assertThat(s.getName().equals(name1) || s.getName().equals(name2) || s.getName().equals(name3), is(true));
-			assertThat(s.getAge(), greaterThan(10));
-			assertThat(s.getSex(), is(sex));
-		});
-	}
+        List<Student> students = db.findByIn(sex, age, names);
+        assertThat(students.isEmpty(), is(false));
+        students.forEach(s -> {
+            assertThat(s.getName().equals(name1) || s.getName().equals(name2) || s.getName().equals(name3), is(true));
+            assertThat(s.getAge(), greaterThan(10));
+            assertThat(s.getSex(), is(sex));
+        });
+    }
 
-	@Test
-	public void findByIn3() {
-		int[] ids = null;
-		UserInfo[] userInfos = db.findByIn(ids);
-		for (UserInfo u : userInfos) {
-			assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
-		}
-	}
-	
-	@Test
-	public void findByIn4() {
-		int[] ids = {};
-		UserInfo[] userInfos = db.findByIn(ids);
-		for (UserInfo u : userInfos) {
-			assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
-		}
-	}
-	
-	@Test
-	public void findByIn5() {
-		List<Integer> ids = new ArrayList<>();
-		UserInfo[] userInfos = db.findByIn(ids);
-		for (UserInfo u : userInfos) {
-			assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
-		}
-	}
-	
-	@Test
-	public void findByIn6() {
-		String[] ids = {};
-		UserInfo[] userInfos = db.findByIn(ids);
-		for (UserInfo u : userInfos) {
-			assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
-		}
-	}
+    @Test
+    public void findByIn3()
+    {
+        int[] ids = null;
+        UserInfo[] userInfos = db.findByIn(ids);
+        for (UserInfo u : userInfos)
+        {
+            assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
+        }
+    }
+
+    @Test
+    public void findByIn4()
+    {
+        int[] ids = {};
+        UserInfo[] userInfos = db.findByIn(ids);
+        for (UserInfo u : userInfos)
+        {
+            assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
+        }
+    }
+
+    @Test
+    public void findByIn5()
+    {
+        List<Integer> ids = new ArrayList<>();
+        UserInfo[] userInfos = db.findByIn(ids);
+        for (UserInfo u : userInfos)
+        {
+            assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
+        }
+    }
+
+    @Test
+    public void findByIn6()
+    {
+        String[] ids = {};
+        UserInfo[] userInfos = db.findByIn(ids);
+        for (UserInfo u : userInfos)
+        {
+            assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
+        }
+    }
 
 }

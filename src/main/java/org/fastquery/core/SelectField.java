@@ -30,52 +30,64 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
  * @author xixifeng (fastquery@126.com)
  */
-public class SelectField<T> {
+public class SelectField<T>
+{
 
     private Class<T> clazz;
     private boolean contain;
     private String[] fields = {};
 
-    public SelectField(Class<T> clazz, boolean contain, String... fields) {
-        Objects.requireNonNull(clazz,"clazz 不能为null");
+    public SelectField(Class<T> clazz, boolean contain, String... fields)
+    {
+        Objects.requireNonNull(clazz, "clazz 不能为null");
         this.clazz = clazz;
         this.contain = contain;
-        if(fields != null) {
+        if (fields != null)
+        {
             this.fields = fields;
         }
     }
 
-    public String getFields(){
+    public String getFields()
+    {
         List<Field> fields = BeanUtil.mapFields(this.clazz);
         StringBuilder sb = new StringBuilder(6 * fields.size()); // 一个 field 大概包含 6 个字符
         fields.forEach(f -> {
             String fieldName = f.getName();
-            if(contain) {
-                 if(this.fields.length == 0 || ArrayUtils.contains(this.fields, fieldName)) {
-                     sb.append(',');
-                     sb.append(f.getName());
-                 }
-            } else {
-                if(this.fields.length == 0 || !ArrayUtils.contains(this.fields, fieldName)) {
+            if (contain)
+            {
+                if (this.fields.length == 0 || ArrayUtils.contains(this.fields, fieldName))
+                {
+                    sb.append(',');
+                    sb.append(f.getName());
+                }
+            }
+            else
+            {
+                if (this.fields.length == 0 || !ArrayUtils.contains(this.fields, fieldName))
+                {
                     sb.append(',');
                     sb.append(f.getName());
                 }
             }
         });
         int len = sb.length();
-        if (len > 0) {
+        if (len > 0)
+        {
             sb.deleteCharAt(0);
-        } else {
+        }
+        else
+        {
             sb.append(1);
         }
 
         return sb.toString();
     }
 
-    public Class<T> getClazz() {
+    public Class<T> getClazz()
+    {
         return clazz;
     }
 }

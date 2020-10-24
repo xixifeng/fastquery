@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
@@ -30,10 +30,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * 标识属性是临时的,save对象时,该属性不存储到数据库里
- * 
+ *
  * @author mei.sir@aliyun.cn
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface Transient {
+public @interface Transient
+{
 }

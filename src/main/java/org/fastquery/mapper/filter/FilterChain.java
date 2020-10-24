@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.mapper.filter;
@@ -28,25 +28,28 @@ import java.util.List;
 import org.w3c.dom.Element;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FilterChain implements Filter {
+public class FilterChain implements Filter
+{
 
-	private final List<Filter> filters = new ArrayList<>();
+    private final List<Filter> filters = new ArrayList<>();
 
-	public FilterChain addFilter(Filter filter) {
-		filters.add(filter);
-		return this;
-	}
+    public FilterChain addFilter(Filter filter)
+    {
+        filters.add(filter);
+        return this;
+    }
 
-	@Override
-	public Element doFilter(String xmlName, Element element) {
-		Element e = element;
-		for (Filter filter : filters) {
-			e = filter.doFilter(xmlName, element);
-		}
-		return e;
-	}
+    @Override
+    public Element doFilter(String xmlName, Element element)
+    {
+        Element e = element;
+        for (Filter filter : filters)
+        {
+            e = filter.doFilter(xmlName, element);
+        }
+        return e;
+    }
 
 }

@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
@@ -29,44 +29,46 @@ import org.fastquery.example.VisitorDBServcie;
 import org.fastquery.service.FQuery;
 import org.junit.Rule;
 import org.junit.Test;
+
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class SaveToIdTest extends FastQueryTest  {
+public class SaveToIdTest extends FastQueryTest
+{
 
-	private final VisitorDBServcie vdbs = FQuery.getRepository(VisitorDBServcie.class);
+    private final VisitorDBServcie vdbs = FQuery.getRepository(VisitorDBServcie.class);
 
-	@Rule
-	public FastQueryTestRule rule = new FastQueryTestRule();
+    @Rule
+    public FastQueryTestRule rule = new FastQueryTestRule();
 
-	@Test
-	public void saveToId1() {
-		Long punitId = 174L;
-		String vname = "OTU\\";
-		String idCard = "&";
-		String mobile = "\\";
-		String email = "<";
-		Byte gender = (byte) 0;
-		String toAddr = "";
-		String remark = "来访";
-		Long lastDate = 1506233249L;
-		Long createDate = 1506233208L;
-		String iden = "J6X1HH15ExIkvqSNSHXb";
-		Integer dId = 1;
+    @Test
+    public void saveToId1()
+    {
+        Long punitId = 174L;
+        String vname = "OTU\\";
+        String idCard = "&";
+        String mobile = "\\";
+        String email = "<";
+        Byte gender = (byte) 0;
+        String toAddr = "";
+        String remark = "来访";
+        Long lastDate = 1506233249L;
+        Long createDate = 1506233208L;
+        String iden = "J6X1HH15ExIkvqSNSHXb";
+        Integer dId = 1;
 
-		Visitor v = new Visitor(punitId, vname, idCard, mobile, email, gender, toAddr, remark, lastDate, iden, dId);
-		v.setCreateDate(createDate);
+        Visitor v = new Visitor(punitId, vname, idCard, mobile, email, gender, toAddr, remark, lastDate, iden, dId);
+        v.setCreateDate(createDate);
 
-		BigInteger bigInteger = vdbs.saveToId(v);
-		assertThat(bigInteger.longValue(), greaterThanOrEqualTo(1L));
+        BigInteger bigInteger = vdbs.saveToId(v);
+        assertThat(bigInteger.longValue(), greaterThanOrEqualTo(1L));
 
-		int effect = vdbs.deleteByIden(iden);
+        int effect = vdbs.deleteByIden(iden);
 
-		assertThat(effect, is(1));
+        assertThat(effect, is(1));
 
-	}
+    }
 }

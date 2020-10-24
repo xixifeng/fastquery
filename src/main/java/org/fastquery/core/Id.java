@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
@@ -29,17 +29,18 @@ import java.lang.annotation.Target;
 
 /**
  * 标识是表的主键或者用来编号
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
-@Target({ ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD })
+@Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD})
 @Retention(value = RetentionPolicy.RUNTIME)
-public @interface Id {
+public @interface Id
+{
 
-	/**
-	 * 编号
-	 * 
-	 * @return byte
-	 */
-	byte value() default 0X00;
+    /**
+     * 编号
+     *
+     * @return byte
+     */
+    byte value() default 0X00;
 }

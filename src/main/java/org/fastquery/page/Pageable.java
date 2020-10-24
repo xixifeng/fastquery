@@ -15,37 +15,37 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.page;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public interface Pageable {
+public interface Pageable
+{
 
-	/**
-	 * 或取当前页索引(从1开始计数)
-	 * 
-	 * @return 当前页索引
-	 */
-	int getPageIndex();
+    /**
+     * 或取当前页索引(从1开始计数)
+     *
+     * @return 当前页索引
+     */
+    int getPageIndex();
 
-	/**
-	 * 或取当前页数据条数
-	 * 
-	 * @return 记录数
-	 */
-	int getPageSize();
+    /**
+     * 或取当前页数据条数
+     *
+     * @return 记录数
+     */
+    int getPageSize();
 
-	/**
-	 * 翻页的偏移量
-	 * 
-	 * @return 偏移量
-	 */
-	int getOffset();
+    /**
+     * 翻页的偏移量
+     *
+     * @return 偏移量
+     */
+    int getOffset();
 }

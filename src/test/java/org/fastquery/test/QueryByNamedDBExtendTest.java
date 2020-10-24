@@ -15,14 +15,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.hamcrest.Matchers.*;
 
@@ -33,32 +33,35 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class QueryByNamedDBExtendTest extends FastQueryTest {
-	
-	private final QueryByNamedDBExtend db = FQuery.getRepository(QueryByNamedDBExtend.class);
-	
-	@Rule
-	public FastQueryTestRule rule = new FastQueryTestRule();
-	
-	@Test
-	public void findUAll() {
-		assertThat(db.findUAll().size(), is(3));
-	}
-	
-	@Test
-	public void findLittle() {
-		assertThat(db.findLittle().size(), is(3));
-		SQLValue sqlValue = rule.getSQLValue();
-		assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo limit 3"));
-	}
-	
-	@Test
-	public void findSome() {
-		assertThat(db.findSome().size(), is(5));
-		SQLValue sqlValue = rule.getSQLValue();
-		assertThat(sqlValue.getSql(), equalTo("select `no`, `name` from Student limit 5"));
-	}
+public class QueryByNamedDBExtendTest extends FastQueryTest
+{
+
+    private final QueryByNamedDBExtend db = FQuery.getRepository(QueryByNamedDBExtend.class);
+
+    @Rule
+    public FastQueryTestRule rule = new FastQueryTestRule();
+
+    @Test
+    public void findUAll()
+    {
+        assertThat(db.findUAll().size(), is(3));
+    }
+
+    @Test
+    public void findLittle()
+    {
+        assertThat(db.findLittle().size(), is(3));
+        SQLValue sqlValue = rule.getSQLValue();
+        assertThat(sqlValue.getSql(), equalTo("select id,name,age from UserInfo limit 3"));
+    }
+
+    @Test
+    public void findSome()
+    {
+        assertThat(db.findSome().size(), is(5));
+        SQLValue sqlValue = rule.getSQLValue();
+        assertThat(sqlValue.getSql(), equalTo("select `no`, `name` from Student limit 5"));
+    }
 }

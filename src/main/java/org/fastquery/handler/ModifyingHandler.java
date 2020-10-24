@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.handler;
@@ -40,120 +40,143 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public final class ModifyingHandler {
+public final class ModifyingHandler
+{
 
-	private ModifyingHandler() {
-	}
+    private ModifyingHandler()
+    {
+    }
 
-	private static class LazyHolder {
-		private static final ModifyingHandler INSTANCE = new ModifyingHandler();
+    private static class LazyHolder
+    {
+        private static final ModifyingHandler INSTANCE = new ModifyingHandler();
 
-		private LazyHolder() {
-		}
-	}
+        private LazyHolder()
+        {
+        }
+    }
 
-	public static ModifyingHandler getInstance() {
-		return LazyHolder.INSTANCE;
-	}
+    public static ModifyingHandler getInstance()
+    {
+        return LazyHolder.INSTANCE;
+    }
 
-	// 对于改操作可根据其返回值分类如下(也就是说只允许这这些类型,在生成类之前已经做预处理,越界类型是进来不了的)
-	// 1). 返回值是void
-	// 2). 返回值是int,int[]
-	// 3). 返回值是Map<String,Object> 只对insert或update有效
-	// 4). 返回值是JSONObject类型 只对insert或update有效
-	// 5). 返回值是Primarykey
-	// 6). 返回值是boolean
-	// 7). 返回值是实体 只对insert或update有效
-	// 为什么要分类?
-	// 如果全部集中处理的话,代码堆积会很多,可读性差,不利于扩展.
-	// 对于复杂的事情,一定要找适合的模式,尽可能地分化成的小的模块
-	public Object voidType() {
-		return null;
-	}
+    // 对于改操作可根据其返回值分类如下(也就是说只允许这这些类型,在生成类之前已经做预处理,越界类型是进来不了的)
+    // 1). 返回值是void
+    // 2). 返回值是int,int[]
+    // 3). 返回值是Map<String,Object> 只对insert或update有效
+    // 4). 返回值是JSONObject类型 只对insert或update有效
+    // 5). 返回值是Primarykey
+    // 6). 返回值是boolean
+    // 7). 返回值是实体 只对insert或update有效
+    // 为什么要分类?
+    // 如果全部集中处理的话,代码堆积会很多,可读性差,不利于扩展.
+    // 对于复杂的事情,一定要找适合的模式,尽可能地分化成的小的模块
+    public Object voidType()
+    {
+        return null;
+    }
 
-	public Map<String, Object> mapType(Long autoIncKey, Class<?> convertType) {
-		Modifying modifying = QueryContext.getMethodInfo().getModifying();
-		String keyFieldName = modifying.id(); // 不可能为null
-		String tableName = modifying.table();
-		List<Object> values = new ArrayList<>(1);
-		Object e;
-		if (autoIncKey != null) {
-			e = autoIncKey;
-		} else {
-			Object pkey = getId();
-			if (pkey == null) {
-				throw new RepositoryException("针对改需求,需要主键值,可是没有找到主键值,请在方法参数中用@Id标识哪个是主键.");
-			}
-			e = pkey;
-		}
-		
-		values.add(e);
-		Map<String, Object> keyval = null;
-		
-		StringBuilder sqlBuilder = new StringBuilder();
-		sqlBuilder.append("select ");
-		sqlBuilder.append(modifying.selectFields());
-		sqlBuilder.append(" from ");
-		sqlBuilder.append(tableName);
-		sqlBuilder.append(" where ");
-		sqlBuilder.append(keyFieldName);
-		sqlBuilder.append(" = ?");
-		SQLValue sqlValue = new SQLValue(sqlBuilder.toString(), values);
-		List<Map<String, Object>> keyvals = DB.find(sqlValue);
-		if (!keyvals.isEmpty()) {
-			keyval = keyvals.get(0);
-		}
+    public Map<String, Object> mapType(Long autoIncKey, Class<?> convertType)
+    {
+        Modifying modifying = QueryContext.getMethodInfo().getModifying();
+        String keyFieldName = modifying.id(); // 不可能为null
+        String tableName = modifying.table();
+        List<Object> values = new ArrayList<>(1);
+        Object e;
+        if (autoIncKey != null)
+        {
+            e = autoIncKey;
+        }
+        else
+        {
+            Object pkey = getId();
+            if (pkey == null)
+            {
+                throw new RepositoryException("针对改需求,需要主键值,可是没有找到主键值,请在方法参数中用@Id标识哪个是主键.");
+            }
+            e = pkey;
+        }
 
-		if (keyval != null && convertType == String.class) {
-			Map<String, Object> map2 = new HashMap<>();
-			keyval.forEach((k, v) -> map2.put(k, v != null ? v.toString() : null));
-			return map2;
-		}
+        values.add(e);
+        Map<String, Object> keyval = null;
 
-		return keyval;
-	}
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("select ");
+        sqlBuilder.append(modifying.selectFields());
+        sqlBuilder.append(" from ");
+        sqlBuilder.append(tableName);
+        sqlBuilder.append(" where ");
+        sqlBuilder.append(keyFieldName);
+        sqlBuilder.append(" = ?");
+        SQLValue sqlValue = new SQLValue(sqlBuilder.toString(), values);
+        List<Map<String, Object>> keyvals = DB.find(sqlValue);
+        if (!keyvals.isEmpty())
+        {
+            keyval = keyvals.get(0);
+        }
 
-	public JSONObject jsonObjectType(Long autoIncKey) {
-		Map<String, Object> map = mapType(autoIncKey, Object.class);
-		return new JSONObject(map);
-	}
+        if (keyval != null && convertType == String.class)
+        {
+            Map<String, Object> map2 = new HashMap<>();
+            keyval.forEach((k, v) -> map2.put(k, v != null ? v.toString() : null));
+            return map2;
+        }
 
-	// 如果不存在主键直接返回null
-	public Primarykey primarykeyType(Long autoIncKey) {
-		Object pkey = getId();
-		if ((autoIncKey == null) && (pkey == null)) {
-			return null;
-		}
-		return new Primarykey(autoIncKey, pkey == null ? null : pkey.toString());
-	}
+        return keyval;
+    }
 
-	public boolean booleanType(List<RespUpdate> respUpdates) {
-		return intType(respUpdates) >= 0;
-	}
+    public JSONObject jsonObjectType(Long autoIncKey)
+    {
+        Map<String, Object> map = mapType(autoIncKey, Object.class);
+        return new JSONObject(map);
+    }
 
-	public Object beanType(Long autoIncKey) {
-		Map<String, Object> map = mapType(autoIncKey, Object.class);
-		return JSON.toJavaObject(new JSONObject(map), QueryContext.getReturnType());
-	}
+    // 如果不存在主键直接返回null
+    public Primarykey primarykeyType(Long autoIncKey)
+    {
+        Object pkey = getId();
+        if ((autoIncKey == null) && (pkey == null))
+        {
+            return null;
+        }
+        return new Primarykey(autoIncKey, pkey == null ? null : pkey.toString());
+    }
 
-	public int intType(List<RespUpdate> respUpdates) {
-		int sum = 0;
-		for (RespUpdate respUpdate : respUpdates) {
-			sum += respUpdate.getEffect();
-		}
-		return sum;
-	}
+    public boolean booleanType(List<RespUpdate> respUpdates)
+    {
+        return intType(respUpdates) >= 0;
+    }
 
-	private Object getId() { // 获取指定的主健,没有找到返回null
-		Object[] args = QueryContext.getArgs();
-		int index = TypeUtil.findId(QueryContext.getMethodInfo().getParameters());
-		if (index != -1) {
-			return args[index];
-		} else {
-			return null;
-		}
-	}
+    public Object beanType(Long autoIncKey)
+    {
+        Map<String, Object> map = mapType(autoIncKey, Object.class);
+        return JSON.toJavaObject(new JSONObject(map), QueryContext.getReturnType());
+    }
+
+    public int intType(List<RespUpdate> respUpdates)
+    {
+        int sum = 0;
+        for (RespUpdate respUpdate : respUpdates)
+        {
+            sum += respUpdate.getEffect();
+        }
+        return sum;
+    }
+
+    private Object getId()
+    { // 获取指定的主健,没有找到返回null
+        Object[] args = QueryContext.getArgs();
+        int index = TypeUtil.findId(QueryContext.getMethodInfo().getParameters());
+        if (index != -1)
+        {
+            return args[index];
+        }
+        else
+        {
+            return null;
+        }
+    }
 }

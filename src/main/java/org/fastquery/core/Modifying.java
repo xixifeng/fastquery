@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
@@ -30,32 +30,33 @@ import java.lang.annotation.Target;
 
 /**
  * 标识改操作
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Documented
-public @interface Modifying {
+public @interface Modifying
+{
 
-	/**
-	 * 主键字段的名称,默认值"id"
-	 * 
-	 * @return String
-	 */
-	String id() default "id";
+    /**
+     * 主键字段的名称,默认值"id"
+     *
+     * @return String
+     */
+    String id() default "id";
 
-	/**
-	 * 指定当前正在修改的表
-	 * 
-	 * @return String
-	 */
-	String table() default "";
-	
-	/**
-	 * 改操作若返回实体,selectFields 用来明确指定查询相应表的哪几个字段,默认是 "*",字段与字段之间请用英文逗号隔开
-	 * 
-	 * @return String
-	 */
-	String selectFields() default "*";
+    /**
+     * 指定当前正在修改的表
+     *
+     * @return String
+     */
+    String table() default "";
+
+    /**
+     * 改操作若返回实体,selectFields 用来明确指定查询相应表的哪几个字段,默认是 "*",字段与字段之间请用英文逗号隔开
+     *
+     * @return String
+     */
+    String selectFields() default "*";
 }

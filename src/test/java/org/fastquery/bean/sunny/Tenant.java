@@ -15,40 +15,45 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.bean.sunny;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class Tenant {
-	private Long id;
-	private String name;
+public class Tenant
+{
+    private Long id;
+    private String name;
 
-	public Tenant(Long id, String name) {
-		this.id = id;
-		this.name = name;
-	}
+    public Tenant(Long id, String name)
+    {
+        this.id = id;
+        this.name = name;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId()
+    {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName()
+    {
+        return name;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id)
+    {
+        this.id = id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
 }

@@ -15,14 +15,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.hamcrest.Matchers.*;
 
@@ -34,34 +34,41 @@ import org.fastquery.core.Resource;
 import org.junit.Test;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class FQueryResourceImplTest {
+public class FQueryResourceImplTest
+{
 
-	private final Resource resource = new FQueryResourceImpl(this.getClass().getClassLoader());
+    private final Resource resource = new FQueryResourceImpl(this.getClass().getClassLoader());
 
-	@Test
-	public void testGetResourceAsStream() {
-		try (InputStream inputStream = resource.getResourceAsStream("queries/org.fastquery.dao.UserInfoDBService.queries.xml");
-				ByteArrayOutputStream bo = new ByteArrayOutputStream()) {
-			int b;
-			while ((b = inputStream.read()) != -1) {
-				bo.write(b);
-			}
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
+    @Test
+    public void testGetResourceAsStream()
+    {
+        try (InputStream inputStream = resource.getResourceAsStream("queries/org.fastquery.dao.UserInfoDBService.queries.xml");
+             ByteArrayOutputStream bo = new ByteArrayOutputStream())
+        {
+            int b;
+            while ((b = inputStream.read()) != -1)
+            {
+                bo.write(b);
+            }
+        }
+        catch (Exception e)
+        {
+            fail(e.toString());
+        }
+    }
 
-	@Test
-	public void testExist1() {
-		assertThat(resource.exist("fastquery.json"), is(true));
-	}
-	
-	@Test
-	public void testExist2() {
-		assertThat(resource.exist("c3p0-config.xml"), is(true));
-	}
+    @Test
+    public void testExist1()
+    {
+        assertThat(resource.exist("fastquery.json"), is(true));
+    }
+
+    @Test
+    public void testExist2()
+    {
+        assertThat(resource.exist("c3p0-config.xml"), is(true));
+    }
 
 }

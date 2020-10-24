@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.filter;
@@ -33,49 +33,56 @@ import java.util.Set;
 import org.fastquery.core.Repository;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-class BeforeFilterChain<R extends Repository> extends BeforeFilter<R> {
+class BeforeFilterChain<R extends Repository> extends BeforeFilter<R>
+{
 
-	private static final ThreadLocal<Object> THREADLOCAL = new ThreadLocal<>(); // 存储:中断时留下的返回值
+    private static final ThreadLocal<Object> THREADLOCAL = new ThreadLocal<>(); // 存储:中断时留下的返回值
 
-	// 在此用map 主要目的是为了去重,相同的class后面覆盖前面的.
-	// 用LinkedHashMap而不用hashMap 是为了有顺序
-	private final Map<Class<?>, BeforeFilter<R>> beforeFilters = new LinkedHashMap<>();
+    // 在此用map 主要目的是为了去重,相同的class后面覆盖前面的.
+    // 用LinkedHashMap而不用hashMap 是为了有顺序
+    private final Map<Class<?>, BeforeFilter<R>> beforeFilters = new LinkedHashMap<>();
 
-	public BeforeFilterChain<R> addFilter(BeforeFilter<R> f) {
-		beforeFilters.put(f.getClass(), f);
-		return this;
-	}
+    public BeforeFilterChain<R> addFilter(BeforeFilter<R> f)
+    {
+        beforeFilters.put(f.getClass(), f);
+        return this;
+    }
 
-	@Override
-	protected void doFilter(R repository, Method method, Object[] args) {
+    @Override
+    protected void doFilter(R repository, Method method, Object[] args)
+    {
 
-		// 这里的循环需要中途跳出循环,用Lambda语法,还不知道如何跳出循环,因此不能用
+        // 这里的循环需要中途跳出循环,用Lambda语法,还不知道如何跳出循环,因此不能用
 
-		Set<Entry<Class<?>, BeforeFilter<R>>> entries = beforeFilters.entrySet();
-		for (Entry<Class<?>, BeforeFilter<R>> entry : entries) {
-			if (THREADLOCAL.get() != void.class) { // 如果是非void.class 表明中断啦
-				break;
-			}
-			entry.getValue().doFilter(repository, method, args);
-		}
+        Set<Entry<Class<?>, BeforeFilter<R>>> entries = beforeFilters.entrySet();
+        for (Entry<Class<?>, BeforeFilter<R>> entry : entries)
+        {
+            if (THREADLOCAL.get() != void.class)
+            { // 如果是非void.class 表明中断啦
+                break;
+            }
+            entry.getValue().doFilter(repository, method, args);
+        }
 
-	}
+    }
 
-	static void set(Object returnVal) {
-		THREADLOCAL.set(returnVal);
-	}
-	
-	void unload() {
-		THREADLOCAL.remove();
-	}
+    static void set(Object returnVal)
+    {
+        THREADLOCAL.set(returnVal);
+    }
 
-	public Object start(R repository, Method method, Object[] args) {
-		// 设置初始值
-		THREADLOCAL.set(void.class);
-		this.doFilter(repository, method, args);
-		return THREADLOCAL.get();
-	}
+    void unload()
+    {
+        THREADLOCAL.remove();
+    }
+
+    public Object start(R repository, Method method, Object[] args)
+    {
+        // 设置初始值
+        THREADLOCAL.set(void.class);
+        this.doFilter(repository, method, args);
+        return THREADLOCAL.get();
+    }
 }

@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.filter;
@@ -30,20 +30,21 @@ import org.fastquery.example.StudentDBService;
 import org.fastquery.filter.AfterFilter;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class MyAfterFilter1 extends AfterFilter<StudentDBService> {
+public class MyAfterFilter1 extends AfterFilter<StudentDBService>
+{
 
-	private static final Logger LOG = LoggerFactory.getLogger(MyAfterFilter1.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MyAfterFilter1.class);
 
-	@Override
-	public Object doFilter(StudentDBService repository, Method method, Object[] args, Object returnVal) {
-		// returnVal : 表示当前方法执行后返回的结果
-		// 在真正交给客户之前,可以在这儿修改它.
-		// .... ...
-		LOG.debug("MyAfterFilter1...");
-		return returnVal;
-	}
+    @Override
+    public Object doFilter(StudentDBService repository, Method method, Object[] args, Object returnVal)
+    {
+        // returnVal : 表示当前方法执行后返回的结果
+        // 在真正交给客户之前,可以在这儿修改它.
+        // .... ...
+        LOG.debug("MyAfterFilter1...");
+        return returnVal;
+    }
 
 }

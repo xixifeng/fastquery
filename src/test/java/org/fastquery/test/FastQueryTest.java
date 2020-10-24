@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
@@ -28,28 +28,31 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class FastQueryTest {
-	
-	@Test
-	public void init() {
-		// 
-	}
+public class FastQueryTest
+{
 
-	@BeforeClass
-	public static void bc() {
-		// 测试自定义位置
-		System.setProperty("fastquery.config.dir",System.getProperty("user.dir") + "/src/test/resources/testFiles");
-	}
-	
-	public static String countSQLInference(String classAddr,String sql,String countField) throws Exception {
-		Class<?> clazz = Class.forName(classAddr);
-		Method method = clazz.getDeclaredMethod("getInstance");
-		method.setAccessible(true);
-		Object pageDialectObj = method.invoke(null);
-		Method countSQLInferenceMethod = clazz.getMethod("countSQLInference", String.class,String.class);
-		return countSQLInferenceMethod.invoke(pageDialectObj, sql,countField).toString();
-	}
+    @Test
+    public void init()
+    {
+        //
+    }
+
+    @BeforeClass
+    public static void bc()
+    {
+        // 测试自定义位置
+        System.setProperty("fastquery.config.dir", System.getProperty("user.dir") + "/src/test/resources/testFiles");
+    }
+
+    public static String countSQLInference(String classAddr, String sql, String countField) throws Exception
+    {
+        Class<?> clazz = Class.forName(classAddr);
+        Method method = clazz.getDeclaredMethod("getInstance");
+        method.setAccessible(true);
+        Object pageDialectObj = method.invoke(null);
+        Method countSQLInferenceMethod = clazz.getMethod("countSQLInference", String.class, String.class);
+        return countSQLInferenceMethod.invoke(pageDialectObj, sql, countField).toString();
+    }
 }

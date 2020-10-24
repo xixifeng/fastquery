@@ -25,37 +25,46 @@ package org.fastquery.struct;
 import java.util.List;
 
 /**
- *
  * @author xixifeng (fastquery@126.com)
  */
-public class Reference {
+public class Reference
+{
     private String name;
     private List<String> fields;
 
-    public Reference(){}
+    public Reference()
+    {
+    }
 
-    public Reference(String name, List<String> fields) {
+    public Reference(String name, List<String> fields)
+    {
         this.name = name;
         this.fields = fields;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
-    public void setName(String name) {
+
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public List<String> getFields() {
+    public List<String> getFields()
+    {
         return fields;
     }
 
-    public void setFields(List<String> fields) {
+    public void setFields(List<String> fields)
+    {
         this.fields = fields;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Reference{" +
                 "name='" + name + '\'' +
                 ", fields=" + fields +

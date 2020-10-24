@@ -15,26 +15,28 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.pool;
 
 import javax.sql.DataSource;
+
 import org.fastquery.core.ConnectionPoolProvider;
 import org.fastquery.core.Resource;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class PostgreSQLDriverProvider implements ConnectionPoolProvider {
+public class PostgreSQLDriverProvider implements ConnectionPoolProvider
+{
 
-	@Override
-	public DataSource getDataSource(Resource resource, String dataSourceName) {
-		return this.jdbc(org.postgresql.ds.PGSimpleDataSource.class, resource, dataSourceName);
-	}
+    @Override
+    public DataSource getDataSource(Resource resource, String dataSourceName)
+    {
+        return this.jdbc(org.postgresql.ds.PGSimpleDataSource.class, resource, dataSourceName);
+    }
 
 }

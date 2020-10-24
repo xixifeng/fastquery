@@ -15,14 +15,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import java.io.BufferedReader;
@@ -44,89 +44,110 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class RepVersion extends FastQueryTest  {
+public class RepVersion extends FastQueryTest
+{
 
-	private static final Logger LOG = LoggerFactory.getLogger(RepVersion.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RepVersion.class);
 
-	private static final String REG = "\\d+\\.\\d+\\.\\d+(\\.enforce)*";
+    private static final String REG = "\\d+\\.\\d+\\.\\d+(\\.enforce)*";
 
-	private static String showInputDialog(String initialSelectionValue) {
-		JFrame jf = new JFrame();
-		jf.setAlwaysOnTop(true);
-		String s;
-		while ("".equals((s = JOptionPane.showInputDialog(jf,"请输入发布版本号: ", initialSelectionValue))) || s == null || !Pattern.matches(REG, s)) {
-			LOG.warn("输入的版本号是空，重新输入");
-		}
-		return s;
-	}
+    private static String showInputDialog(String initialSelectionValue)
+    {
+        JFrame jf = new JFrame();
+        jf.setAlwaysOnTop(true);
+        String s;
+        while ("".equals((s = JOptionPane.showInputDialog(jf, "请输入发布版本号: ", initialSelectionValue))) || s == null || !Pattern.matches(REG, s))
+        {
+            LOG.warn("输入的版本号是空，重新输入");
+        }
+        return s;
+    }
 
-	private static String confirm(String v, String initialSelectionValue) {
-		JFrame jf = new JFrame();
-		jf.setAlwaysOnTop(true);
-		int n = JOptionPane.showConfirmDialog(jf, "发布的版本号为: " + v + " 吗?", "版本确认", JOptionPane.YES_NO_OPTION);
-		if (n == JOptionPane.YES_OPTION) {
-			return v;
-		} else {
-			return confirm(showInputDialog(initialSelectionValue), initialSelectionValue);
-		}
-	}
+    private static String confirm(String v, String initialSelectionValue)
+    {
+        JFrame jf = new JFrame();
+        jf.setAlwaysOnTop(true);
+        int n = JOptionPane.showConfirmDialog(jf, "发布的版本号为: " + v + " 吗?", "版本确认", JOptionPane.YES_NO_OPTION);
+        if (n == JOptionPane.YES_OPTION)
+        {
+            return v;
+        }
+        else
+        {
+            return confirm(showInputDialog(initialSelectionValue), initialSelectionValue);
+        }
+    }
 
-	private static String confirm(String initialSelectionValue) {
-		return confirm(showInputDialog(initialSelectionValue), initialSelectionValue);
-	}
+    private static String confirm(String initialSelectionValue)
+    {
+        return confirm(showInputDialog(initialSelectionValue), initialSelectionValue);
+    }
 
-	@Test
-	public void main() throws IOException {
+    @Test
+    public void main() throws IOException
+    {
 
-		String userDir = System.getProperty("user.dir");
+        String userDir = System.getProperty("user.dir");
 
-		String initialSelectionValue = "";
+        String initialSelectionValue = "";
 
-		try (BufferedReader br = new BufferedReader(
-				new InputStreamReader(new FileInputStream(new File(userDir, "/pom.xml"))))) {
-			String lineTxt;
-			while ((lineTxt = br.readLine()) != null) {
-				if (lineTxt.endsWith("<!-- fastquery.version -->")) {
-					initialSelectionValue = TypeUtil.matches(lineTxt, REG).get(0);
-					break;
-				}
-			}
-		} catch (IOException e) {
-			throw e;
-		}
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(new FileInputStream(new File(userDir, "/pom.xml")))))
+        {
+            String lineTxt;
+            while ((lineTxt = br.readLine()) != null)
+            {
+                if (lineTxt.endsWith("<!-- fastquery.version -->"))
+                {
+                    initialSelectionValue = TypeUtil.matches(lineTxt, REG).get(0);
+                    break;
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            throw e;
+        }
 
-		String version = confirm(initialSelectionValue);
-		LOG.debug("最终确认的版本号是: " + version);
+        String version = confirm(initialSelectionValue);
+        LOG.debug("最终确认的版本号是: " + version);
 
-		String[] names = { "/pom.xml", "/README.md" };
-		for (String name : names) {
-			File tmp = File.createTempFile("temp", ".fquery");// 创建临时文件
-			File f = new File(userDir, name);
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-					BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tmp)))) {
-				String lineTxt;
-				while ((lineTxt = br.readLine()) != null) {
-					if (lineTxt.endsWith("<!-- fastquery.version -->") || lineTxt.startsWith("compile 'org.fastquery:fastquery") ) {
-						bw.write(lineTxt.replaceAll(REG, version) + "\n");
-					} else {
-						bw.write(lineTxt + "\n");
-					}
-				}
-				bw.flush();
-				br.close();
-				LOG.debug("f: {}",f.getAbsolutePath());
-				LOG.debug("tmp.toPath():{}",tmp.toPath());
-				assertThat(f.delete(), is(true));
-				//Files.move(tmp.toPath(), f.toPath());
-				Files.copy(tmp.toPath(), f.toPath());
-			} catch (IOException e) {
-				throw e;
-			}
-		}
+        String[] names = {"/pom.xml", "/README.md"};
+        for (String name : names)
+        {
+            File tmp = File.createTempFile("temp", ".fquery");// 创建临时文件
+            File f = new File(userDir, name);
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+                 BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tmp))))
+            {
+                String lineTxt;
+                while ((lineTxt = br.readLine()) != null)
+                {
+                    if (lineTxt.endsWith("<!-- fastquery.version -->") || lineTxt.startsWith("compile 'org.fastquery:fastquery"))
+                    {
+                        bw.write(lineTxt.replaceAll(REG, version) + "\n");
+                    }
+                    else
+                    {
+                        bw.write(lineTxt + "\n");
+                    }
+                }
+                bw.flush();
+                br.close();
+                LOG.debug("f: {}", f.getAbsolutePath());
+                LOG.debug("tmp.toPath():{}", tmp.toPath());
+                assertThat(f.delete(), is(true));
+                //Files.move(tmp.toPath(), f.toPath());
+                Files.copy(tmp.toPath(), f.toPath());
+            }
+            catch (IOException e)
+            {
+                throw e;
+            }
+        }
 
-	}
+    }
 
 }

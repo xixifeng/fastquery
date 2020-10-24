@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.analysis;
@@ -28,27 +28,29 @@ import org.fastquery.core.RepositoryException;
 
 /**
  * Method 检测过滤器
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
 @FunctionalInterface
-interface MethodFilter {
+interface MethodFilter
+{
 
-	/**
-	 * 过滤
-	 * 
-	 * @param method 待检测的Method
-	 */
-	void doFilter(Method method);
+    /**
+     * 过滤
+     *
+     * @param method 待检测的Method
+     */
+    void doFilter(Method method);
 
-	/**
-	 * 终止(扯断链条)
-	 * 
-	 * @param method 当前方法
-	 * @param msg 终止理由
-	 */
-	default void abortWith(Method method, String msg) {
-		throw new RepositoryException(String.format("%s->: %s ", method.toString(), msg));
-	}
+    /**
+     * 终止(扯断链条)
+     *
+     * @param method 当前方法
+     * @param msg    终止理由
+     */
+    default void abortWith(Method method, String msg)
+    {
+        throw new RepositoryException(String.format("%s->: %s ", method.toString(), msg));
+    }
 
 }

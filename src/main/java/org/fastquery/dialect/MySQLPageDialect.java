@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.dialect;
@@ -30,34 +30,42 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-class MySQLPageDialect implements PageDialect {
-	
-	private MySQLPageDialect(){
-	}
-	private static class LazyHolder {
-		private static final MySQLPageDialect INSTANCE = new MySQLPageDialect();
-		private LazyHolder() {
-		}
-	}
-	
-	static PageDialect getInstance() {
-		return LazyHolder.INSTANCE;
-	}
+class MySQLPageDialect implements PageDialect
+{
 
-	@Override
-	public String getCurrentPageSQL(String querySQL,int offset, int pageSize) {
-		
-		// limit语句
-		String limit = " limit " + offset + ',' + pageSize;
+    private MySQLPageDialect()
+    {
+    }
 
-		List<String> strs = TypeUtil.matches(querySQL, Placeholder.LIMIT_RGE);
-		if (strs.isEmpty()) { // 如果没有#{#limit}, 默认在末尾增加.
-			querySQL += Placeholder.LIMIT;
-		}
-		
-		return querySQL.replaceAll(Placeholder.LIMIT_RGE, Matcher.quoteReplacement(limit));
-	}
+    private static class LazyHolder
+    {
+        private static final MySQLPageDialect INSTANCE = new MySQLPageDialect();
+
+        private LazyHolder()
+        {
+        }
+    }
+
+    static PageDialect getInstance()
+    {
+        return LazyHolder.INSTANCE;
+    }
+
+    @Override
+    public String getCurrentPageSQL(String querySQL, int offset, int pageSize)
+    {
+
+        // limit语句
+        String limit = " limit " + offset + ',' + pageSize;
+
+        List<String> strs = TypeUtil.matches(querySQL, Placeholder.LIMIT_RGE);
+        if (strs.isEmpty())
+        { // 如果没有#{#limit}, 默认在末尾增加.
+            querySQL += Placeholder.LIMIT;
+        }
+
+        return querySQL.replaceAll(Placeholder.LIMIT_RGE, Matcher.quoteReplacement(limit));
+    }
 }

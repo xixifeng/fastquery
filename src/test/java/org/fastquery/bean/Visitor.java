@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.bean;
@@ -27,46 +27,45 @@ import org.fastquery.core.Id;
 import org.fastquery.core.Transient;
 
 /**
- * 
  * 普通实体
- * 
  */
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Visitor {
+public class Visitor
+{
 
-	@Id
-	private Long id;
-	private Long punitId = 0L;
-	private String vname;
-	private String idCard;
-	private String mobile;
-	private String email;
-	private Byte gender = (byte) 0;
-	private String toAddr;
-	private String remark;
-	private Long lastDate;
-	private Long createDate;
-	private String iden;
-	private Integer dId;
-	@Transient
-	private String description;
+    @Id
+    private Long id;
+    private Long punitId = 0L;
+    private String vname;
+    private String idCard;
+    private String mobile;
+    private String email;
+    private Byte gender = (byte) 0;
+    private String toAddr;
+    private String remark;
+    private Long lastDate;
+    private Long createDate;
+    private String iden;
+    private Integer dId;
+    @Transient
+    private String description;
 
-	public Visitor(Long punitId, String vname, String idCard, String mobile, String email, Byte gender, String toAddr, String remark, Long lastDate,String iden, Integer dId)
-	{
-		this.punitId = punitId;
-		this.vname = vname;
-		this.idCard = idCard;
-		this.mobile = mobile;
-		this.email = email;
-		this.gender = gender;
-		this.toAddr = toAddr;
-		this.remark = remark;
-		this.lastDate = lastDate;
-		this.iden = iden;
-		this.dId = dId;
-	}
+    public Visitor(Long punitId, String vname, String idCard, String mobile, String email, Byte gender, String toAddr, String remark, Long lastDate, String iden, Integer dId)
+    {
+        this.punitId = punitId;
+        this.vname = vname;
+        this.idCard = idCard;
+        this.mobile = mobile;
+        this.email = email;
+        this.gender = gender;
+        this.toAddr = toAddr;
+        this.remark = remark;
+        this.lastDate = lastDate;
+        this.iden = iden;
+        this.dId = dId;
+    }
 }

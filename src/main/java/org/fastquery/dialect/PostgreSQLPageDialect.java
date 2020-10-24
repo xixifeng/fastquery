@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.dialect;
@@ -25,34 +25,41 @@ package org.fastquery.dialect;
 import org.fastquery.page.PageDialect;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-class PostgreSQLPageDialect implements PageDialect {
-	
-	private PostgreSQLPageDialect(){
-	}
-	private static class LazyHolder {
-		private static final PostgreSQLPageDialect INSTANCE = new PostgreSQLPageDialect();
-		private LazyHolder() {
-		}
-	}
-	
-	static PageDialect getInstance() {
-		return LazyHolder.INSTANCE;
-	}
+class PostgreSQLPageDialect implements PageDialect
+{
 
-	@Override
-	public String getCurrentPageSQL(String querySQL, int offset, int pageSize) {
+    private PostgreSQLPageDialect()
+    {
+    }
 
-		StringBuilder sb = new StringBuilder();
-		sb.append(querySQL);
-		sb.append(" limit ");
-		sb.append(pageSize);
-		sb.append(" offset ");
-		sb.append(offset);
+    private static class LazyHolder
+    {
+        private static final PostgreSQLPageDialect INSTANCE = new PostgreSQLPageDialect();
 
-		return sb.toString();
-	}
+        private LazyHolder()
+        {
+        }
+    }
+
+    static PageDialect getInstance()
+    {
+        return LazyHolder.INSTANCE;
+    }
+
+    @Override
+    public String getCurrentPageSQL(String querySQL, int offset, int pageSize)
+    {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(querySQL);
+        sb.append(" limit ");
+        sb.append(pageSize);
+        sb.append(" offset ");
+        sb.append(offset);
+
+        return sb.toString();
+    }
 
 }

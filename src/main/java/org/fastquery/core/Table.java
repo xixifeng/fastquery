@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
@@ -28,15 +28,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
 @Target(ElementType.TYPE)
 @Retention(value = RetentionPolicy.RUNTIME)
-public @interface Table {
-	/**
-	 * 表名称
-	 * @return String
-	 */
-	String value();
+public @interface Table
+{
+    /**
+     * 表名称
+     *
+     * @return String
+     */
+    String value();
 }

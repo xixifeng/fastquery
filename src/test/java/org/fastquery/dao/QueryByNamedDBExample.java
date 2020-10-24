@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.dao;
@@ -37,48 +37,50 @@ import org.fastquery.page.Pageable;
 import com.alibaba.fastjson.JSONArray;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public interface QueryByNamedDBExample extends QueryRepository {
+public interface QueryByNamedDBExample extends QueryRepository
+{
 
-	// @QueryByNamed 中的value值如果没有指定,默认是当前方法名.
-	// 从该类的配置文件里寻找id="findUserInfoAll"节点,然后绑定其SQL代码段
-	@QueryByNamed
-	JSONArray findUserInfoAll();
+    // @QueryByNamed 中的value值如果没有指定,默认是当前方法名.
+    // 从该类的配置文件里寻找id="findUserInfoAll"节点,然后绑定其SQL代码段
+    @QueryByNamed
+    JSONArray findUserInfoAll();
 
-	@QueryByNamed(render = false)
-	JSONArray findUAll();
+    @QueryByNamed(render = false)
+    JSONArray findUAll();
 
-	@QueryByNamed("findUserInfoOne")
-	UserInfo findUserInfoOne(@Param("id") Integer id);
+    @QueryByNamed("findUserInfoOne")
+    UserInfo findUserInfoOne(@Param("id") Integer id);
 
-	@QueryByNamed("findUserInfoByNameAndAge")
-	JSONArray findUserInfoByNameAndAge(@Param("name") String name, @Param("age") Integer age);
+    @QueryByNamed("findUserInfoByNameAndAge")
+    JSONArray findUserInfoByNameAndAge(@Param("name") String name, @Param("age") Integer age);
 
-	@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
-	Page<Student> findPage(Pageable pageable, @Param("no") String no, @Param("name") String name, @Param("age") Integer age);
+    @QueryByNamed("findPage")
+        // 引用id为"findPage"的分页模板
+    Page<Student> findPage(Pageable pageable, @Param("no") String no, @Param("name") String name, @Param("age") Integer age);
 
-	@NotCount
-	@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
-	Page<Student> findPage2(Pageable pageable, @Param("no") String no, @Param("name") String name, @Param("age") Integer age);
+    @NotCount
+    @QueryByNamed("findPage")
+        // 引用id为"findPage"的分页模板
+    Page<Student> findPage2(Pageable pageable, @Param("no") String no, @Param("name") String name, @Param("age") Integer age);
 
-	@Modifying
-	@QueryByNamed("updateUserInfoById")
-	int updateUserInfoById(@Param("id") int id, @Param("name") String name, @Param("age") int age);
+    @Modifying
+    @QueryByNamed("updateUserInfoById")
+    int updateUserInfoById(@Param("id") int id, @Param("name") String name, @Param("age") int age);
 
-	@QueryByNamed
-	List<UserInfo> findUserInfoByFuzzyName(@Param("name") String name);
+    @QueryByNamed
+    List<UserInfo> findUserInfoByFuzzyName(@Param("name") String name);
 
-	@QueryByNamed
-	List<UserInfo> findUserInfo(@Param("id") Integer id, @Param("name") String name, @Param("age") Integer age, @Param("num") Integer num);
+    @QueryByNamed
+    List<UserInfo> findUserInfo(@Param("id") Integer id, @Param("name") String name, @Param("age") Integer age, @Param("num") Integer num);
 
-	@QueryByNamed("findUserInfo")
-	List<UserInfo> findUserInfo2(@Param("id") Integer id, @Param("age") Integer age);
+    @QueryByNamed("findUserInfo")
+    List<UserInfo> findUserInfo2(@Param("id") Integer id, @Param("age") Integer age);
 
-	@QueryByNamed("findCon")
-	List<UserInfo> findCon1(@Param("id") Integer id, @Param("age") Integer age);
+    @QueryByNamed("findCon")
+    List<UserInfo> findCon1(@Param("id") Integer id, @Param("age") Integer age);
 
-	@QueryByNamed
-	List<UserInfo> findCon2(@Param("id") Integer id, @Param("age") Integer age);
+    @QueryByNamed
+    List<UserInfo> findCon2(@Param("id") Integer id, @Param("age") Integer age);
 }

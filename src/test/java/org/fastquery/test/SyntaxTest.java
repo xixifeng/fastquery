@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
@@ -39,51 +39,55 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public class SyntaxTest extends FastQueryTest  {
+public class SyntaxTest extends FastQueryTest
+{
 
-	private static final Logger LOG = LoggerFactory.getLogger(SyntaxTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SyntaxTest.class);
 
-	@Test(expected = IndexOutOfBoundsException.class)
-	public void listEmpty() {
-		List<Map<String, Object>> maps = new ArrayList<>();
-		maps.get(0); // 这样引用是错误的
-	}
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void listEmpty()
+    {
+        List<Map<String, Object>> maps = new ArrayList<>();
+        maps.get(0); // 这样引用是错误的
+    }
 
-	@Test
-	public void test1() throws NoSuchMethodException, SecurityException {
-		Method method = SyntaxTest.class.getMethod("todo", String.class, String.class, int.class);
-		Annotation[][] annotations = method.getParameterAnnotations();
-		Annotation annotation = annotations[0][0];
-		assertThat(annotation instanceof Param, is(true));
-		annotation = annotations[1][0];
-		assertThat(annotation instanceof Param, is(true));
+    @Test
+    public void test1() throws NoSuchMethodException, SecurityException
+    {
+        Method method = SyntaxTest.class.getMethod("todo", String.class, String.class, int.class);
+        Annotation[][] annotations = method.getParameterAnnotations();
+        Annotation annotation = annotations[0][0];
+        assertThat(annotation instanceof Param, is(true));
+        annotation = annotations[1][0];
+        assertThat(annotation instanceof Param, is(true));
 
-		Parameter[] parameters = method.getParameters();
-		Param param = parameters[0].getAnnotation(Param.class);
-		assertThat(param, notNullValue());
+        Parameter[] parameters = method.getParameters();
+        Param param = parameters[0].getAnnotation(Param.class);
+        assertThat(param, notNullValue());
 
-		param = parameters[1].getAnnotation(Param.class);
-		assertThat(param, notNullValue());
+        param = parameters[1].getAnnotation(Param.class);
+        assertThat(param, notNullValue());
 
-		param = parameters[2].getAnnotation(Param.class);
-		assertThat(param, nullValue());
-	}
+        param = parameters[2].getAnnotation(Param.class);
+        assertThat(param, nullValue());
+    }
 
-	public void todo(@Param("abc") String sx, @Param("efg") String efg, int s) {
-	}
+    public void todo(@Param("abc") String sx, @Param("efg") String efg, int s)
+    {
+    }
 
-	@Test
-	public void testReg() {
-		LOG.debug(String.valueOf(Pattern.matches("", "")));
-		// s.replaceAll(""+param.value()+"\\b", "?"+(i+1));
-		assertThat("abckdwgew:name&".replaceAll(":name\\b", "?"), equalTo("abckdwgew?&"));
-		assertThat("abckdwgew:name &".replaceAll("name\\b", "?"), equalTo("abckdwgew? &"));
-		LOG.debug("-->: " + ("abckdwgew:name222 &".replaceAll("name\\b", "?")));
-		assertThat(":name22".replaceAll("name\\b", "?"), equalTo(":name22"));
-		assertThat(":name22 ".replaceAll("name\\b", "?"), equalTo(":name22 "));
-		assertThat(":name,".replaceAll("name\\b", "?"), equalTo("?,"));
-	}
+    @Test
+    public void testReg()
+    {
+        LOG.debug(String.valueOf(Pattern.matches("", "")));
+        // s.replaceAll(""+param.value()+"\\b", "?"+(i+1));
+        assertThat("abckdwgew:name&".replaceAll(":name\\b", "?"), equalTo("abckdwgew?&"));
+        assertThat("abckdwgew:name &".replaceAll("name\\b", "?"), equalTo("abckdwgew? &"));
+        LOG.debug("-->: " + ("abckdwgew:name222 &".replaceAll("name\\b", "?")));
+        assertThat(":name22".replaceAll("name\\b", "?"), equalTo(":name22"));
+        assertThat(":name22 ".replaceAll("name\\b", "?"), equalTo(":name22 "));
+        assertThat(":name,".replaceAll("name\\b", "?"), equalTo("?,"));
+    }
 }

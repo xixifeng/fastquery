@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.dao;
@@ -28,17 +28,18 @@ import org.fastquery.core.QueryRepository;
 import com.alibaba.fastjson.JSONArray;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public interface QueryByNamedDBExtend extends QueryRepository {
-	
-	@QueryByNamed(render = false)
-	JSONArray findUAll();
-	
-	// 两个方法指定同一个模板id值
-	@QueryByNamed("findSome")
-	JSONArray findLittle();
-	@QueryByNamed("findSome")
-	JSONArray findSome();
+public interface QueryByNamedDBExtend extends QueryRepository
+{
+
+    @QueryByNamed(render = false)
+    JSONArray findUAll();
+
+    // 两个方法指定同一个模板id值
+    @QueryByNamed("findSome")
+    JSONArray findLittle();
+
+    @QueryByNamed("findSome")
+    JSONArray findSome();
 }

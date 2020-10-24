@@ -30,7 +30,6 @@ import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
 /**
- *
  * @author xixifeng (fastquery@126.com)
  */
 public class AsmRepositoryTest
@@ -40,14 +39,14 @@ public class AsmRepositoryTest
     @Test
     public void getParameterDef() throws Exception
     {
-        String str = AsmRepository.getParameterDef(new Class<?>[] { String[][].class, String.class });
-        assertThat(str,containsString("java.lang.String[][] p0,"));
-        str = AsmRepository.getParameterDef(new Class<?>[] { String[].class, String.class });
-        assertThat(str,containsString("java.lang.String[] p0,"));
-        str = AsmRepository.getParameterDef(new Class<?>[] { String[][][].class, String.class });
-        log.info(str,equalTo("java.lang.String[][][] p0,java.lang.String p1"));
-        str = AsmRepository.getParameterDef(new Class<?>[] { int[].class});
-        assertThat(str,equalTo("int[] p0"));
+        String str = AsmRepository.getParameterDef(new Class<?>[]{String[][].class, String.class});
+        assertThat(str, containsString("java.lang.String[][] p0,"));
+        str = AsmRepository.getParameterDef(new Class<?>[]{String[].class, String.class});
+        assertThat(str, containsString("java.lang.String[] p0,"));
+        str = AsmRepository.getParameterDef(new Class<?>[]{String[][][].class, String.class});
+        log.info(str, equalTo("java.lang.String[][][] p0,java.lang.String p1"));
+        str = AsmRepository.getParameterDef(new Class<?>[]{int[].class});
+        assertThat(str, equalTo("int[] p0"));
     }
 
 }

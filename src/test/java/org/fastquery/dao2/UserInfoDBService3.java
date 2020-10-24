@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.dao2;
@@ -30,18 +30,18 @@ import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Transactional;
 
 /**
- * 
  * @author xixifeng (fastquery@126.com)
  */
-public interface UserInfoDBService3 extends QueryRepository {
-	
-	@Transactional
-	@Modifying
-	@Query("update `userinfo` set `name`=?1 where id=?3")
-	@Query("update `userinfo` set `age`=?2 where id=?3")
-	@Query("update `userinfo` set `name`=?1,`age`=?2 where id=?3")
-	int updateBatch(String name, Integer age, Integer id, @Source String dataSource);
-	
-	@Query(value="select name from UserInfo where name like ?1 limit 1")
-	int findByName(@Param(value="name",defaultVal="%谷子%") String name);
+public interface UserInfoDBService3 extends QueryRepository
+{
+
+    @Transactional
+    @Modifying
+    @Query("update `userinfo` set `name`=?1 where id=?3")
+    @Query("update `userinfo` set `age`=?2 where id=?3")
+    @Query("update `userinfo` set `name`=?1,`age`=?2 where id=?3")
+    int updateBatch(String name, Integer age, Integer id, @Source String dataSource);
+
+    @Query(value = "select name from UserInfo where name like ?1 limit 1")
+    int findByName(@Param(value = "name", defaultVal = "%谷子%") String name);
 }

@@ -15,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.test;
@@ -29,21 +29,27 @@ import org.fastquery.core.QueryContext;
 import static org.junit.Assert.fail;
 
 /**
- * 
  * @author mei.sir@aliyun.cn
  */
-public class QueryContextHelper {
+public class QueryContextHelper
+{
 
-	private QueryContextHelper(){}
-	
-	public static QueryContext getQueryContext() {
-		try {
-			Method getQueryContextMethod = QueryContext.class.getDeclaredMethod("getQueryContext");
-			getQueryContextMethod.setAccessible(true);
-			return (QueryContext) getQueryContextMethod.invoke(null);
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-		return null;
-	}
+    private QueryContextHelper()
+    {
+    }
+
+    public static QueryContext getQueryContext()
+    {
+        try
+        {
+            Method getQueryContextMethod = QueryContext.class.getDeclaredMethod("getQueryContext");
+            getQueryContextMethod.setAccessible(true);
+            return (QueryContext) getQueryContextMethod.invoke(null);
+        }
+        catch (Exception e)
+        {
+            fail(e.getMessage());
+        }
+        return null;
+    }
 }

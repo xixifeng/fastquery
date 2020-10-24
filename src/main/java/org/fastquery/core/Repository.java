@@ -15,21 +15,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * For more information, please see http://www.fastquery.org/.
- * 
+ *
  */
 
 package org.fastquery.core;
 
 /**
  * 默认Repository
- * 
+ *
  * @author xixifeng (fastquery@126.com)
  */
-public interface Repository {
-	// 当前Repository接口的class
-	default Class<? extends Repository> getInterfaceClass() {
-		return null;
-	}
+public interface Repository
+{
+    // 当前Repository接口的class
+    default Class<? extends Repository> getInterfaceClass()
+    {
+        return null;
+    }
 }
