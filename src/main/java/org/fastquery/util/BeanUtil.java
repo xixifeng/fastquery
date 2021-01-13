@@ -589,6 +589,10 @@ public final class BeanUtil
                     Id id = field.getAnnotation(Id.class);
                     if (val != null && id == null)
                     {
+                        if (field.getType() == EnumSet.class)
+                        {
+                            val = TypeUtil.enumSet2Val((EnumSet) val);
+                        }
                         args.add(val);
                         sb.append(' ');
                         sb.append(field.getName());

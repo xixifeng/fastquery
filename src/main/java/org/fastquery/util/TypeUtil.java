@@ -777,7 +777,8 @@ public class TypeUtil
     public static <B> List<B> listMap2ListBean(List<Map<String, Object>> maps, Class<B> b)
     {
         List<B> bs = new ArrayList<>();
-        maps.forEach(map -> bs.add(JSON.toJavaObject(new JSONObject(map), b)));
+        // JSON.toJavaObject(new JSONObject(map), b)
+        maps.forEach(map -> bs.add((B) TypeUtil.map2Obj(b, map)));
         return bs;
     }
 
@@ -1134,7 +1135,7 @@ public class TypeUtil
         return obj;
     }
 
-    public static String enumSet2Val(Set<Enum<?>> enumSet)
+    public static <E extends Enum<E>> String enumSet2Val(EnumSet<E> enumSet)
     {
         if (enumSet == null)
         {
@@ -1142,7 +1143,7 @@ public class TypeUtil
         }
         else
         {
-            Iterator<Enum<?>> iterator = enumSet.iterator();
+            Iterator<E> iterator = enumSet.iterator();
             StringBuilder sb = new StringBuilder();
             while (iterator.hasNext())
             {

@@ -29,6 +29,8 @@ import org.fastquery.core.Modifying;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
+import org.fastquery.page.Page;
+import org.fastquery.page.Pageable;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -46,13 +48,16 @@ public interface TypeFeatureDBService extends QueryRepository
     @Query("select id, name, gender, ruits from type_feature where find_in_set('${one}',ruits) and find_in_set('${two}',ruits)")
     List<TypeFeature> findByRuits(@Param("one") Ruits one, @Param("two") Ruits two);
 
+    @Query("select id, name, gender, ruits from type_feature where find_in_set('${one}',ruits) and find_in_set('${two}',ruits)")
+    Page<TypeFeature> findByRuitsPage(@Param("one") Ruits one, @Param("two") Ruits two, Pageable pageable);
+
     @Query("select gender from type_feature limit 3")
     List<Gender> findGenders();
 
     @Query("select ruits from type_feature limit 3")
     List<EnumSet<Ruits>> findRuits();
 
-    @Query("select id, name, gender , ruits from type_feature where id = ?1")
+    @Query("select id, name, gender , ruits, sort from type_feature where id = ?1")
     TypeFeature findOneById(Long id);
 
     @Query("select gender from type_feature where id = ?1")

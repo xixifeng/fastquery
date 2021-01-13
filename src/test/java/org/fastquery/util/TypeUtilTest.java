@@ -27,11 +27,14 @@ import static org.junit.Assert.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.fastquery.bean.Ruits;
 import org.fastquery.core.Id;
 import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Param;
@@ -42,10 +45,12 @@ import org.fastquery.util.TypeUtil;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class TypeUtilTest
 {
     @Test
@@ -481,6 +486,14 @@ public class TypeUtilTest
 
         String newStr = TypeUtil.unStatementReference(str);
         assertThat(newStr, equalTo("jkge,kwjlkeg as id, gweklge.name as name, `e.jgke` , d.xo, number kwe"));
+    }
+
+    @Test
+    public void enumSet2Val(){
+        EnumSet<Ruits> ruits = EnumSet.of(Ruits.梨, Ruits.香蕉, Ruits.西瓜, Ruits.芒果, Ruits.橘子);
+        String val = TypeUtil.enumSet2Val(ruits);
+        log.info("val : {}", val);
+        assertThat(val,equalTo("香蕉,西瓜,芒果,橘子,梨"));
     }
 
 }

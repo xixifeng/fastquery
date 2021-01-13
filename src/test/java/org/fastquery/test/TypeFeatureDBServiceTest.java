@@ -22,12 +22,15 @@
 
 package org.fastquery.test;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Gender;
 import org.fastquery.bean.Ruits;
 import org.fastquery.bean.TypeFeature;
 import org.fastquery.dao.TypeFeatureDBService;
 import org.fastquery.page.Page;
+import org.fastquery.page.PageableImpl;
+import org.fastquery.page.Slice;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
@@ -78,6 +81,31 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
         tfs.forEach(t -> {
             assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.苹果, Ruits.橘子)), is(true));
         });
+    }
+
+    @Test
+    public void findByRuitsPage()
+    {
+        Ruits one = Ruits.苹果;
+        Ruits two = Ruits.橘子;
+        Page<TypeFeature> page = db.findByRuitsPage(one, two, new PageableImpl(1,3));
+        List<TypeFeature> typeFeatures = page.getContent();
+        log.info(JSON.toJSONString(page,true));
+        typeFeatures.forEach(t -> {
+            assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.苹果, Ruits.橘子)), is(true));
+            assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.梨)), is(false));
+        });
+        assertThat(page.isFirst(),is(true));
+        assertThat(page.isHasContent(),is(true));
+        assertThat(page.isHasNext(), is(true));
+        assertThat(page.isHasPrevious(), is(false));
+        assertThat(page.isLast(), is(false));
+        Slice slice = page.getNextPageable();
+        assertThat(slice.getNumber(), is(2));
+        assertThat(slice.getSize(), is(3));
+        assertThat(page.getSize(),is(3));
+        assertThat(page.getTotalElements(), is(4L));
+        assertThat(page.getTotalPages(),is(2));
     }
 
     @Test
@@ -145,7 +173,7 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
         assertThat(typeFeature.getGender(), equalTo(gender));
         sqlValue = rule.getSQLValue();
         sql = sqlValue.getSql();
-        assertThat(sql, equalTo("select id, name, gender , ruits from type_feature where id = ?"));
+        assertThat(sql, equalTo("select id, name, gender , ruits, sort from type_feature where id = ?"));
 
         typeFeature = db.find(TypeFeature.class, id);
         assertThat(typeFeature.getId(), equalTo(id));
@@ -153,7 +181,30 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
         assertThat(typeFeature.getGender(), equalTo(gender));
         sqlValue = rule.getSQLValue();
         sql = sqlValue.getSql();
-        assertThat(sql, equalTo("select id, name, gender , ruits from type_feature where id = ?"));
+        assertThat(sql, equalTo("select id, name, gender , ruits, sort from type_feature where id = ?"));
+    }
+
+    @Test
+    public void updateTypeFeature2()
+    {
+        Long id = 13L;
+        String name = "小草";
+        Gender gender = Gender.女;
+        int sort = 8;
+        EnumSet<Ruits> ruits = EnumSet.of(Ruits.西瓜, Ruits.樱桃, Ruits.橘子);
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.setId(id);
+        typeFeature.setName(name);
+        typeFeature.setGender(gender);
+        typeFeature.setRuits(ruits);
+        typeFeature.setSort(sort);
+        int i = db.executeUpdate(typeFeature);
+        assertThat(i,is(1));
+        TypeFeature t = db.findOneById(id);
+        assertThat(t.getId(), is(id));
+        assertThat(t.getName(), is(name));
+        assertThat(t.getRuits().containsAll(ruits), is(true));
+        assertThat(t.getSort(),is(sort));
     }
 
     @Test
