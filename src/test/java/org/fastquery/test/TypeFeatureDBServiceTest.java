@@ -121,6 +121,29 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
     }
 
     @Test
+    public void findByRuitsPage2()
+    {
+        Page<TypeFeature> page = db.findByRuitsPage(new PageableImpl(1,3));
+        log.info(JSON.toJSONString(page,true));
+        assertThat(page.isFirst(),is(true));
+        assertThat(page.isHasContent(),is(true));
+        assertThat(page.isHasNext(), is(true));
+        assertThat(page.isHasPrevious(), is(false));
+        assertThat(page.isLast(), is(false));
+        Slice slice = page.getNextPageable();
+        assertThat(slice.getNumber(), is(2));
+        assertThat(slice.getSize(), is(3));
+        assertThat(page.getSize(),is(3));
+        assertThat(page.getTotalElements(), is(33L));
+        assertThat(page.getTotalPages(),is(11));
+        // 测试每一页
+        for (int i = 2; i <= 11 ; i++)
+        {
+            db.findByRuitsPage(new PageableImpl(i,3));
+        }
+    }
+
+    @Test
     public void findGenders()
     {
         List<Gender> genders = db.findGenders();

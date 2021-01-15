@@ -57,6 +57,9 @@ public interface TypeFeatureDBService extends QueryRepository
     @Query("select id, name, gender, ruits from type_feature where find_in_set('${one}',ruits) and find_in_set('${two}',ruits)")
     Page<TypeFeature> findByRuitsPage(@Param("one") Ruits one, @Param("two") Ruits two, Pageable pageable);
 
+    @Query("select id, name, gender, ruits from type_feature")
+    Page<TypeFeature> findByRuitsPage(Pageable pageable);
+
     @Query("select gender from type_feature limit 3")
     List<Gender> findGenders();
 
