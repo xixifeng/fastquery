@@ -64,11 +64,23 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
         Gender gender = Gender.男;
         List<TypeFeature> tfs = db.findByGender(gender);
         assertThat(tfs, notNullValue());
-        assertThat(tfs.size(), is(13));
-        tfs.forEach(t -> {
-            assertThat(t.getGender(), equalTo(Gender.男));
-            assertThat(t.getRuits(), notNullValue());
-            assertThat(t.getRuits().isEmpty(), is(false));
+        assertThat(tfs.size(), is(14));
+        tfs.forEach(t -> assertThat(t.getGender(), equalTo(Gender.男)));
+    }
+
+    @Test
+    public void findRuitsWithNullEmpty()
+    {
+        TypeFeature t1 = db.findRuitsWithNullEmpty("阿飞");
+        assertThat(t1.getRuits(),nullValue());
+        TypeFeature t2 = db.findRuitsWithNullEmpty("peter");
+        assertThat(t2.getRuits().isEmpty(),is(true));
+
+        List<TypeFeature> list = db.findRuitsWithNullEmpty("peter","阿飞");
+        assertThat(list.size(), is(2));
+        list.forEach(t -> {
+            EnumSet<Ruits> rs = t.getRuits();
+            assertThat(rs == null || rs.isEmpty(), is(true));
         });
     }
 

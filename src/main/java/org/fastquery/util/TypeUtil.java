@@ -1061,15 +1061,23 @@ public class TypeUtil
 
     public static EnumSet toEnumSet(String value, Class<Enum> clazz)
     {
-        List<Enum> enums = new ArrayList<>();
-        String[] names = StringUtils.split(value, ',');
-        for (String name : names)
-        {
-            Enum e = EnumUtils.getEnum(clazz, name);
-            Objects.requireNonNull(e, name + " 转换成 " + clazz + " 失败！");
-            enums.add(e);
+        if(value == null) {
+            return null;
+        } else {
+            List<Enum> enums = new ArrayList<>();
+            String[] names = StringUtils.split(value, ',');
+            for (String name : names)
+            {
+                Enum e = EnumUtils.getEnum(clazz, name);
+                Objects.requireNonNull(e, name + " 转换成 " + clazz + " 失败！");
+                enums.add(e);
+            }
+            if(enums.isEmpty()) {
+                return EnumSet.noneOf(clazz);
+            } else {
+                return EnumSet.copyOf(enums);
+            }
         }
-        return EnumSet.copyOf(enums);
     }
 
     public static Object map2Obj(Class<?> beanType, Map<String, Object> map)
@@ -1123,7 +1131,12 @@ public class TypeUtil
                 }
                 Field field = beanType.getDeclaredField(k);
                 field.setAccessible(true);
-                EnumSet enumSet = EnumSet.copyOf(enums);
+                EnumSet enumSet;
+                if(enums.isEmpty()) {
+                    enumSet = EnumSet.noneOf((Class<Enum>) enumSetFeilds.get(k));
+                } else {
+                    enumSet = EnumSet.copyOf(enums);
+                }
                 field.set(obj, enumSet);
             }
             catch (NoSuchFieldException | IllegalAccessException e)

@@ -44,6 +44,12 @@ public interface TypeFeatureDBService extends QueryRepository
     @Query("select id, name, gender, ruits from type_feature where gender = ?1")
     List<TypeFeature> findByGender(Gender gender);
 
+    @Query("select id, name, gender, ruits from type_feature where name = ?1")
+    TypeFeature findRuitsWithNullEmpty(String name);
+
+    @Query("select id, name, gender, ruits from type_feature where name = ?1 or name = ?2")
+    List<TypeFeature> findRuitsWithNullEmpty(String name1,String name2);
+
     // 查询爱吃苹果和香蕉的
     @Query("select id, name, gender, ruits from type_feature where find_in_set('${one}',ruits) and find_in_set('${two}',ruits)")
     List<TypeFeature> findByRuits(@Param("one") Ruits one, @Param("two") Ruits two);
