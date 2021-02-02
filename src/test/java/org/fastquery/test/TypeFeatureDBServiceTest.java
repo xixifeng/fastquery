@@ -24,6 +24,7 @@ package org.fastquery.test;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.EnumUtils;
 import org.fastquery.bean.Gender;
 import org.fastquery.bean.Ruits;
 import org.fastquery.bean.TypeFeature;
@@ -35,6 +36,8 @@ import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -141,6 +144,32 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
         {
             db.findByRuitsPage(new PageableImpl(i,3));
         }
+    }
+
+    @Test
+    public void findPage()
+    {
+        TypeFeature equals = null;
+        TypeFeature likes = new TypeFeature();
+        String sort = null;
+        boolean notCount = false;
+        int pageIndex = 1;
+        int pageSize = 10;
+        boolean contain = true;
+        Page<TypeFeature> page = db.findPage(equals,likes,sort,notCount,pageIndex,pageSize,contain);
+        int totalPages = page.getTotalPages();
+        for (int i = 2; i <= totalPages ; i++)
+        {
+            db.findPage(equals,likes,sort,notCount,i,pageSize,contain);
+        }
+
+        List<EnumSet<Ruits>> rrs = new ArrayList<>();
+        page = db.findPage(equals,likes,sort,notCount,4,pageSize,contain);
+        page.getContent().forEach(t -> {
+            rrs.add(t.getRuits());
+        });
+        assertThat(rrs.contains(null),is(true));
+        assertThat(rrs.contains(EnumSet.noneOf(Ruits.class)),is(true));
     }
 
     @Test
