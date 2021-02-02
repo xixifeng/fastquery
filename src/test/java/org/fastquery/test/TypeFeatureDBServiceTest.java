@@ -37,10 +37,8 @@ import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
+
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -327,6 +325,43 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
         List<Long> fieldValues = Arrays.asList(1L, 2L, 3L);
         List<TypeFeature> list = db.findByIn(TypeFeature.class, "id", fieldValues, 3, true, "name");
         assertThat(list.size(), is(3));
+    }
+
+    @Test
+    public void updateRuits(){
+        Collection<TypeFeature> entities = new ArrayList<>();
+        TypeFeature t1 = new TypeFeature(1L,"蒙奇",Gender.男,EnumSet.of(Ruits.梨,Ruits.香蕉,Ruits.橘子),1);
+        TypeFeature t2 = new TypeFeature(2L,"丽莎",Gender.女,EnumSet.of(Ruits.西瓜,Ruits.葡萄),2);
+        TypeFeature t3 = new TypeFeature(3L,"老张",Gender.男,EnumSet.of(Ruits.香蕉),3);
+        TypeFeature t4 = new TypeFeature(4L,"朱万",Gender.男,EnumSet.noneOf(Ruits.class),4);
+        TypeFeature t5 = new TypeFeature(5L,"小李",Gender.女,null,5);
+        TypeFeature t6 = new TypeFeature(6L,"小兰",null,null,6);
+        entities.add(t1);
+        entities.add(t2);
+        entities.add(t3);
+        entities.add(t4);
+        entities.add(t5);
+        entities.add(t6);
+        int effect = db.update(entities);
+        assertThat(effect,is(6));
+        TypeFeature t = db.findOneById(1L);
+        assertThat(t.getName(),equalTo("蒙奇"));
+        assertThat(t.getGender().toString(), equalTo("男"));
+        assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.梨,Ruits.香蕉,Ruits.橘子)),is(true));
+        assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.西瓜,Ruits.葡萄)),is(false));
+        assertThat(t.getSort(),is(1));
+
+        t = db.findOneById(4L);
+        assertThat(t.getName(),equalTo("朱万"));
+        assertThat(t.getGender().toString(), equalTo("男"));
+        assertThat(t.getRuits().isEmpty(),is(true));
+        assertThat(t.getSort(),is(4));
+
+        t = db.findOneById(6L);
+        assertThat(t.getName(),equalTo("小兰"));
+        assertThat(t.getGender().toString(), equalTo("女"));
+        assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.西瓜,Ruits.樱桃)),is(true));
+        assertThat(t.getSort(),is(6));
     }
 
 }

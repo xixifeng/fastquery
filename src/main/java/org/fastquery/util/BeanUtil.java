@@ -801,8 +801,14 @@ public final class BeanUtil
                         }
                         else
                         {
+                            String s = fieldVal.toString();
+                            if(fieldVal instanceof EnumSet)
+                            {
+                                s = StringUtils.substringBetween(s,"[","]");
+                                s = StringUtils.replace(s,", ",",");
+                            }
                             sets.append('\'');
-                            sets.append(fieldVal);
+                            sets.append(s);
                             sets.append("' ");
                         }
                     }
