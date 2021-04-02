@@ -478,7 +478,7 @@ public class MethodQueryTest extends FastQueryTest
         assertThat(page.getTotalPages(), is(-1));
         List<String> sqlValues = rule.getExecutedSQLs();
         assertThat(sqlValues.size(), is(2));
-        assertThat(sqlValues.get(0), equalTo("select id,name,age from UserInfo where age = ?  order by id desc limit 0,3"));
+        assertThat(sqlValues.get(0), equalTo("select id,name,age from UserInfo where age = ? order by id desc limit 0,3"));
 
         userInfo.setAge(null);
         userInfo.setName("张三");
@@ -487,7 +487,7 @@ public class MethodQueryTest extends FastQueryTest
         assertThat(page.getTotalPages(), not(-1));
         sqlValues = rule.getExecutedSQLs();
         assertThat(sqlValues.size(), is(2));
-        assertThat(sqlValues.get(0), equalTo("select name,age from UserInfo where name = ?  order by id desc limit 0,3"));
+        assertThat(sqlValues.get(0), equalTo("select name,age from UserInfo where name = ? order by id desc limit 0,3"));
 
         userInfo.setAge(18);
         userInfo.setName("张三gewgewkljgklwjgxx"); // 没有这条数据
@@ -496,7 +496,7 @@ public class MethodQueryTest extends FastQueryTest
         assertThat(page.getTotalPages(), is(0));
         sqlValues = rule.getExecutedSQLs();
         assertThat(sqlValues.size(), is(1));
-        assertThat(sqlValues.get(0), equalTo("select name from UserInfo where name = ? and age = ?  order by id desc limit 0,3"));
+        assertThat(sqlValues.get(0), equalTo("select name from UserInfo where name = ? and age = ? order by id desc limit 0,3"));
 
         userInfo.setAge(null);
         userInfo.setName(null); // 没有这条数据
@@ -518,13 +518,15 @@ public class MethodQueryTest extends FastQueryTest
     {
         TypeFeature typeFeature = new TypeFeature();
         typeFeature.setGender(Gender.女);
+        typeFeature.setSort(0);
         TypeFeature likes = new TypeFeature();
         likes.setName("Ru%");
+        likes.setSort(0);
         Page<TypeFeature> page = userInfoDBService.findPage(typeFeature, likes, "order by sort DESC", false, 1, 1, true);
         List<String> sqlValues = rule.getExecutedSQLs();
         assertThat(sqlValues.size(), is(2));
-        assertThat(sqlValues.get(0), equalTo("select id,name,gender,ruits,sort from type_feature where name like ? and gender = ?  order by sort DESC limit 0,1"));
-        assertThat(sqlValues.get(1), equalTo("select count(id) from type_feature where name like ? and gender = ? "));
+        assertThat(sqlValues.get(0), equalTo("select id,name,gender,ruits,sort from type_feature where gender = ? and sort = ? and ( name like ? or sort like ? ) order by sort DESC limit 0,1"));
+        assertThat(sqlValues.get(1), equalTo("select count(id) from type_feature where gender = ? and sort = ? and ( name like ? or sort like ? )"));
     }
 }
 

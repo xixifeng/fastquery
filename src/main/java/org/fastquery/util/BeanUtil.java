@@ -473,10 +473,22 @@ public final class BeanUtil
                     }
                     if (fv != null)
                     {
-                        conditions.add(field.getName() + " = :" + field.getName() + " and");
+                        conditions.add(field.getName() + " = :" + field.getName() +" and");
                         parameters.put(field.getName(), fv);// 同时把这个?号的值记下来
                     }
                 }
+            }
+        }
+
+        // 接下来是 like 条件集
+        conditions.add("(");
+        int andSize = conditions.size();
+
+        for (Field field : fields)
+        {
+            if (allowField(field))
+            {
+                field.setAccessible(true);
 
                 if (likes != null)
                 {
@@ -491,21 +503,39 @@ public final class BeanUtil
                     }
                     if (lv != null)
                     {
-                        conditions.add(field.getName() + " like :" + field.getName() + " and");
+                        conditions.add(field.getName() + " like :" + field.getName() +" or");
                         parameters.put(field.getName(), lv);// 同时把这个?号的值记下来
                     }
                 }
             }
         }
+        if(andSize != conditions.size())
+        {
+            // 去掉末尾的 or
+            int lastIndex = conditions.size() - 1;
+            String lastCondition = conditions.get(lastIndex);
+            lastCondition = lastCondition.substring(0, lastCondition.length() - 3);
+            conditions.set(lastIndex, lastCondition);
+            conditions.add(")");
+        }
+        else
+        {
+            conditions.remove(andSize-1); // 去掉 "（"
+            // 去掉 "(" 前面的 "and"
+            if (!conditions.isEmpty())
+            {
+                int lastIndex = andSize - 2;
+                String lastCondition = conditions.get(lastIndex);
+                lastCondition = lastCondition.substring(0, lastCondition.length() - 4);
+                conditions.set(lastIndex, lastCondition);
+            }
+        }
+
         String query;
         String countQuery;
         // 取出最后一个,去掉"and"
         if (!conditions.isEmpty())
         {
-            int lastIndex = conditions.size() - 1;
-            String lastCondition = conditions.get(lastIndex);
-            lastCondition = lastCondition.substring(0, lastCondition.length() - 3);
-            conditions.set(lastIndex, lastCondition);
             query = String.format("select %s from %s #{#where} %s", selectFields, tableName, sort);
             countQuery = String.format("select count(id) from %s #{#where}", tableName);
         }
