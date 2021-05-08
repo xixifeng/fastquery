@@ -747,7 +747,7 @@ public class UserInfoDBServiceTest extends FastQueryTest
     public void referenceForBean()
     {
         Department department = db.findDepartment(1L);
-        assertThat(department.toString(), equalTo("Department(departmentId=1, departmentName=研发, emps=[Employee(id=1, departmentId=null, name=小明), Employee(id=2, departmentId=null, name=张三), Employee(id=3, departmentId=null, name=李思)])"));
+        assertThat(department.toString(), equalTo("Department(departmentId=1, departmentName=研发, emps=[Employee(id=1, departmentId=null, name=小明, ssid=null), Employee(id=2, departmentId=null, name=张三, ssid=null), Employee(id=3, departmentId=null, name=李思, ssid=null)])"));
     }
 
     @Test
@@ -761,11 +761,11 @@ public class UserInfoDBServiceTest extends FastQueryTest
             Long departmentId = d.getDepartmentId();
             if (departmentId == 1L)
             {
-                assertThat(d.getEmps().toString(), equalTo("[Employee(id=1, departmentId=null, name=小明), Employee(id=2, departmentId=null, name=张三), Employee(id=3, departmentId=null, name=李思)]"));
+                assertThat(d.getEmps().toString(), equalTo("[Employee(id=1, departmentId=null, name=小明, ssid=null), Employee(id=2, departmentId=null, name=张三, ssid=null), Employee(id=3, departmentId=null, name=李思, ssid=null)]"));
             }
             else if (departmentId == 2L)
             {
-                assertThat(d.getEmps().toString(), equalTo("[Employee(id=4, departmentId=null, name=小红), Employee(id=5, departmentId=null, name=小黑), Employee(id=6, departmentId=null, name=小贝)]"));
+                assertThat(d.getEmps().toString(), equalTo("[Employee(id=4, departmentId=null, name=小红, ssid=null), Employee(id=5, departmentId=null, name=小黑, ssid=null), Employee(id=6, departmentId=null, name=小贝, ssid=null)]"));
             }
         });
     }
