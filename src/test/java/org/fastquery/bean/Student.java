@@ -43,6 +43,8 @@ public class Student
     private String dept;
     @Transient
     private String description;
+    @Transient
+    private Long ssid;
 
     public Student(String no, String name, String sex, Integer age, String dept)
     {
@@ -51,5 +53,15 @@ public class Student
         this.sex = sex;
         this.age = age;
         this.dept = dept;
+    }
+
+    public Student(String no, String name, String sex, Integer age, String dept, String description)
+    {
+        this.no = no;
+        this.name = name;
+        this.sex = sex;
+        this.age = age;
+        this.dept = dept;
+        this.description = description;
     }
 }

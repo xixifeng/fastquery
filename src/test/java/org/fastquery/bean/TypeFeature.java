@@ -25,6 +25,7 @@ package org.fastquery.bean;
 import lombok.*;
 import org.fastquery.core.Id;
 import org.fastquery.core.Table;
+import org.fastquery.core.Transient;
 
 import java.util.EnumSet;
 
@@ -46,4 +47,15 @@ public class TypeFeature
     private Gender gender;
     private EnumSet<Ruits> ruits;
     private Integer sort;
+    @Transient
+    private Long ssid;
+
+    public TypeFeature(Long id, String name, Gender gender, EnumSet<Ruits> ruits, Integer sort)
+    {
+        this.id = id;
+        this.name = name;
+        this.gender = gender;
+        this.ruits = ruits;
+        this.sort = sort;
+    }
 }

@@ -22,6 +22,8 @@
 
 package org.fastquery.dao;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -52,8 +54,13 @@ public interface SQLInExample extends QueryRepository
     @Query("select * from UserInfo as u where u.id in (?1)")
     UserInfo[] findByIn(List<Integer> ids);
 
+    @Query("select * from UserInfo as u where u.id in (?1)")
+    UserInfo[] findByObjIn(Collection<?> ids);
+
+    @Query("select id from UserInfo as u where u.id in (?1)")
+    List<Integer> findBoolByObjIn(Object ids);
+
     @Query("select * from student where sex = :sex and age > :age and name in(:names)")
     List<Student> findByIn(@Param(value = "sex") String sex, @Param("age") Integer age,
                            @Param("names") Set<String> names);
-
 }

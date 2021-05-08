@@ -43,6 +43,8 @@ public class UserInfo
     private Integer age;
     @Transient
     private String description;
+    @Transient
+    private Long ssid;
 
     public UserInfo(String name, Integer age)
     {
@@ -57,4 +59,11 @@ public class UserInfo
         this.age = age;
     }
 
+    public UserInfo(Integer id, String name, Integer age, String description)
+    {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.description = description;
+    }
 }

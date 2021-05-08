@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.dao.SQLInExample;
@@ -41,6 +42,7 @@ import static org.hamcrest.Matchers.*;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class SQLInExampleTest extends FastQueryTest
 {
 
@@ -164,12 +166,37 @@ public class SQLInExampleTest extends FastQueryTest
     @Test
     public void findByIn6()
     {
+        List<Integer> ids = new ArrayList<>();
+        UserInfo[] userInfos = db.findByObjIn(ids);
+        for (UserInfo u : userInfos)
+        {
+            assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
+        }
+    }
+
+    @Test
+    public void findByIn7()
+    {
         String[] ids = {};
         UserInfo[] userInfos = db.findByIn(ids);
         for (UserInfo u : userInfos)
         {
             assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
         }
+    }
+
+    @Test
+    public void findBoolByObjIn()
+    {
+        List<Integer> ids = new ArrayList<>();
+        ids.add(1);
+        ids.add(2);
+        ids.add(2);
+        ids.add(3);
+        ids.add(3);
+        ids.add(-3);
+        List<Integer> integers = db.findBoolByObjIn(ids);
+        log.info("booleans: {}",integers);
     }
 
 }

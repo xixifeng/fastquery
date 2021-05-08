@@ -24,6 +24,7 @@ package org.fastquery.bean;
 
 import lombok.*;
 import org.fastquery.core.Id;
+import org.fastquery.core.Transient;
 
 /**
  * @author xixifeng (fastquery@126.com)
@@ -40,4 +41,6 @@ public class Employee
     private Long id;
     private Long departmentId;
     private String name;
+    @Transient
+    private Long ssid;
 }
