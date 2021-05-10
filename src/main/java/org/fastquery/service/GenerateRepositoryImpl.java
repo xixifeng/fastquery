@@ -88,8 +88,7 @@ class GenerateRepositoryImpl
         AsmRepository.after(clses);
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> Class<? extends T> generate(Class<T> repositoryClazz)
+    private <T> void generate(Class<T> repositoryClazz)
     {
         String name = repositoryClazz.getName() + Placeholder.DB_SUF;
 
@@ -107,8 +106,7 @@ class GenerateRepositoryImpl
          </pre>
          */
 
-
-        return (Class<? extends T>) classLoader.defineClassByName(name, bytes, bytes.length);
+        classLoader.defineClassByName(name, bytes, bytes.length);
     }
 
     public FqClassLoader getClassLoader()

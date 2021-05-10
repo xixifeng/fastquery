@@ -65,14 +65,12 @@ public class AsmRepository
 
     static String getMethodDef(Method method)
     {
-        StringBuilder sb = new StringBuilder("public ");
-        sb.append(getReturnTypeName(method));
-        sb.append(' ');
-        sb.append(method.getName());
-        sb.append('(');
-        sb.append(getParameterDef(method.getParameterTypes()));
-        sb.append(')');
-        return sb.toString();
+        return "public " + getReturnTypeName(method) +
+                ' ' +
+                method.getName() +
+                '(' +
+                getParameterDef(method.getParameterTypes()) +
+                ')';
     }
 
     public static String getParameterDef(Class<?>[] parameterTypes)

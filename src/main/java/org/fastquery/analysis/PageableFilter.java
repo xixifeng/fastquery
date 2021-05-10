@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 import org.fastquery.page.Page;
 import org.fastquery.page.PageIndex;
@@ -87,31 +88,39 @@ class PageableFilter implements MethodFilter
         { // 2). 方法参数中,要么出现Pageable类型,要么存在@PageIndex和@PageSize
             this.abortWith(method, "这是分页,参数中要么存在Pageable类型的参数(不能是Pageable的子类),要么存在@PageIndex和@PageSize");
         }
-        else if (TypeUtil.hasType(Pageable.class, parameters) && hasPageAnn(parameters))
+        else
+        {
+            pageCheck(this, method, parameters);
+        }
+    }
+
+    public static void pageCheck(MethodFilter filter,Method method, Parameter[] parameters)
+    {
+        if (TypeUtil.hasType(Pageable.class, parameters) && hasPageAnn(parameters))
         { // 3). 参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize,不能同时都出现
-            this.abortWith(method, "这是分页,参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize,不能同时都出现.");
+            filter.abortWith(method, "这是分页,参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize,不能同时都出现.");
         }
         else if (TypeUtil.countRepeated(PageIndex.class, parameters) > 1)
         {// 4). @PageIndex或@PageSize 最多只能出现一次
-            this.abortWith(method, "@PageIndex 最多只能出现一次");
+            filter.abortWith(method, "@PageIndex 最多只能出现一次");
         }
         else if (TypeUtil.countRepeated(PageSize.class, parameters) > 1)
         {
-            this.abortWith(method, "@PageSize 最多只能出现一次");
+            filter.abortWith(method, "@PageSize 最多只能出现一次");
         }
         else if (TypeUtil.countRepeated(PageIndex.class, parameters) + TypeUtil.countRepeated(PageSize.class, parameters) == 1)
         {// 5). @PageIndex或@PageSize 不能独存
-            this.abortWith(method, "@PageIndex或@PageSize 不能独存,要么都不要出现.");
+            filter.abortWith(method, "@PageIndex或@PageSize 不能独存,要么都不要出现.");
         }
         else if (TypeUtil.findAnnotationIndex(PageIndex.class, parameters) != -1
-                && TypeUtil.findParameter(PageIndex.class, parameters).getType() != int.class)
+                && Objects.requireNonNull(TypeUtil.findParameter(PageIndex.class, parameters)).getType() != int.class)
         {// 6). @PageIndex或@PageSize 只能标识在int类型上
-            this.abortWith(method, "@PageIndex 只能标识在int类型的参数上");
+            filter.abortWith(method, "@PageIndex 只能标识在int类型的参数上");
         }
         else if (TypeUtil.findAnnotationIndex(PageSize.class, parameters) != -1
-                && TypeUtil.findParameter(PageSize.class, parameters).getType() != int.class)
+                && Objects.requireNonNull(TypeUtil.findParameter(PageSize.class, parameters)).getType() != int.class)
         {
-            this.abortWith(method, "@PageSize 只能标识在int类型的参数上");
+            filter.abortWith(method, "@PageSize 只能标识在int类型的参数上");
         }
     }
 
@@ -134,7 +143,7 @@ class PageableFilter implements MethodFilter
         }
     }
 
-    private boolean hasPageAnn(Parameter[] parameters)
+    private static boolean hasPageAnn(Parameter[] parameters)
     {
         return (TypeUtil.findAnnotationIndex(PageIndex.class, parameters) != -1) && TypeUtil.findAnnotationIndex(PageSize.class, parameters) != -1;
     }

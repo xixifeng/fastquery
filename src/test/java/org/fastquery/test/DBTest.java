@@ -31,7 +31,7 @@ import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,11 +49,11 @@ public class DBTest extends FastQueryTest
 
     // 调用: DB.modify
     @SuppressWarnings("unchecked")
-    private static List<RespUpdate> modify(List<SQLValue> sqlValues, boolean hasPK) throws Exception
+    private static List<RespUpdate> modify(List<SQLValue> sqlValues) throws Exception
     {
         Method method = DB.class.getDeclaredMethod("modify", List.class, boolean.class);
         method.setAccessible(true);
-        return (List<RespUpdate>) method.invoke(null, sqlValues, hasPK);
+        return (List<RespUpdate>) method.invoke(null, sqlValues, true);
     }
 
     @Rule
@@ -67,7 +67,7 @@ public class DBTest extends FastQueryTest
 
         sqlValues.add(new SQLValue("DELETE FROM `userinfo` WHERE id = ?", objs));
 
-        return modify(sqlValues, true);
+        return modify(sqlValues);
     }
 
     public void update() throws Exception
@@ -85,7 +85,7 @@ public class DBTest extends FastQueryTest
         sqlValues.add(new SQLValue("INSERT INTO `userinfo`(`name`, `age`) VALUES (?,?)", Arrays.asList("回家孩子10", 30)));
         sqlValues.add(new SQLValue("INSERT INTO `userinfo`(`name`, `age`) VALUES (?,?)", Arrays.asList("回家孩子11", 31)));
 
-        List<RespUpdate> rus = modify(sqlValues, true);
+        List<RespUpdate> rus = modify(sqlValues);
         assertThat(rus.size(), is(11));
         rus.forEach(ru -> {
             assertThat(ru.getEffect(), greaterThanOrEqualTo(1));

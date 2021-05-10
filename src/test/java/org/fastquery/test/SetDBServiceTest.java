@@ -22,7 +22,7 @@
 
 package org.fastquery.test;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
@@ -78,7 +78,6 @@ public class SetDBServiceTest extends FastQueryTest
         if ((name == null || "".equals(name)) && credit == null && semester == null && period == null)
         {
             // 这种情形 已在SetDBServiceTest2中测试
-            return;
         }
         else
         {
@@ -156,7 +155,6 @@ public class SetDBServiceTest extends FastQueryTest
     @Test
     public void updateCourse2$2()
     {
-        String name = null;
         Integer credit = 4;
         String no = "c08";
         int effect = db.updateCourse2(null, credit, 9, 5, no);

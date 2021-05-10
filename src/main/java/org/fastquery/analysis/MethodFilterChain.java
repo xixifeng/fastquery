@@ -36,10 +36,9 @@ class MethodFilterChain implements MethodFilter
 
     private final List<MethodFilter> methodFilters = new ArrayList<>();
 
-    MethodFilterChain addFilter(MethodFilter methodFilter)
+    void addFilter(MethodFilter methodFilter)
     {
         methodFilters.add(methodFilter);
-        return this;
     }
 
     @Override

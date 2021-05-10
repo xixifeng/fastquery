@@ -22,86 +22,27 @@
 
 package org.fastquery.dsm;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 对 fastquery.json 文件的映射
+ * 对 fastquery.json 文件的映射 <br>
+ *
+ * 注意: 已经根据dataSourceName重写了hashCode和equals,用于标识该对象在比较时作为唯一标识. 修改这个属性要特别注意.
+ * 如果把这个对象放入到hash集合中,而在外界修改了这个属性,那么会出现内存溢出
  *
  * @author xixifeng (fastquery@126.com)
  */
+@Setter
+@Getter
+@EqualsAndHashCode(of = "dataSourceName")
 public class FastQueryJson
 {
-
     private String config;
     private String dataSourceName; // 重写它hashCode和equals,用它来标识唯一标识.
     private Set<String> basePackages = new HashSet<>();
-
-    public String getConfig()
-    {
-        return config;
-    }
-
-    public void setConfig(String config)
-    {
-        this.config = config;
-    }
-
-    public String getDataSourceName()
-    {
-        return dataSourceName;
-    }
-
-    /**
-     * 设置数据源名称 <br>
-     * 注意: 已经根据dataSourceName重写了hashCode和equals,用于标识该对象在比较时作为唯一标识. 修改这个属性要特别注意.
-     * 如果把这个对象放入到hash集合中,而在外界修改了这个属性,那么会出现内存溢出
-     *
-     * @param dataSourceName 数据源名称
-     */
-    public void setDataSourceName(String dataSourceName)
-    {
-        this.dataSourceName = dataSourceName;
-    }
-
-    public Set<String> getBasePackages()
-    {
-        return basePackages;
-    }
-
-    public void setBasePackages(Set<String> basePackages)
-    {
-        this.basePackages = basePackages;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((dataSourceName == null) ? 0 : dataSourceName.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        FastQueryJson other = (FastQueryJson) obj;
-        if (dataSourceName == null)
-        {
-            if (other.dataSourceName != null)
-                return false;
-        }
-        else if (!dataSourceName.equals(other.dataSourceName))
-        {
-            return false;
-        }
-        return true;
-    }
 }

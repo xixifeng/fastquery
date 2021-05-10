@@ -30,7 +30,6 @@ import java.util.Random;
 import java.util.UUID;
 import static org.hamcrest.Matchers.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao2.DefaultDBService;

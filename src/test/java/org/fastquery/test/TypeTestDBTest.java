@@ -31,7 +31,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 /**
@@ -49,9 +49,9 @@ public class TypeTestDBTest extends FastQueryTest
     @Test
     public void batchUpdate()
     {
-        Long id1 = 1L;
-        Long id3 = 3L;
-        Long id5 = 5L;
+        long id1 = 1L;
+        long id3 = 3L;
+        long id5 = 5L;
         TypeTest tt1 = new TypeTest(id1, true, false, true, "男");
         TypeTest tt2 = new TypeTest(id3, false, true, false, "女");
         TypeTest tt3 = new TypeTest(id5, true, false, true, "男");
@@ -78,26 +78,20 @@ public class TypeTestDBTest extends FastQueryTest
     @Test
     public void save()
     {
-        boolean deleted = true;
-        boolean activated = false;
-        boolean auth = true;
         String gender = "男";
-        TypeTest tt = new TypeTest(deleted, activated, auth, gender);
+        TypeTest tt = new TypeTest(true, false, true, gender);
         TypeTest t = db.save(tt);
-        assertThat(t.getDeleted().booleanValue(), is(deleted));
-        assertThat(t.getActivated().booleanValue(), is(activated));
-        assertThat(t.getAuth().booleanValue(), is(auth));
+        assertThat(t.getDeleted(), is(true));
+        assertThat(t.getActivated(), is(false));
+        assertThat(t.getAuth(), is(true));
         assertThat(t.getGender(), equalTo(gender));
 
-        deleted = false;
-        activated = true;
-        auth = false;
         gender = "女";
-        tt = new TypeTest(deleted, activated, auth, gender);
+        tt = new TypeTest(false, true, false, gender);
         t = db.save(tt);
-        assertThat(t.getDeleted().booleanValue(), is(deleted));
-        assertThat(t.getActivated().booleanValue(), is(activated));
-        assertThat(t.getAuth().booleanValue(), is(auth));
+        assertThat(t.getDeleted(), is(false));
+        assertThat(t.getActivated(), is(true));
+        assertThat(t.getAuth(), is(false));
         assertThat(t.getGender(), equalTo(gender));
     }
 

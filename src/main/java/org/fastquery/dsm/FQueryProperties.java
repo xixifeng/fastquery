@@ -140,10 +140,4 @@ public class FQueryProperties
             putDataSource(dataSourceName, cpds);
         }
     }
-
-    public static void removeDataSource(String dataSourceName)
-    { // NO_UCD
-        dataSources.remove(dataSourceName);
-    }
-
 }

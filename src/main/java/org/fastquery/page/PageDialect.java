@@ -66,18 +66,16 @@ public interface PageDialect
         // 计算求和语句
         // 把select 与 from 之间的 内容变为 count(countField)
         int fromIndex = tmp.lastIndexOf("from") - 1;
-        StringBuilder sb = new StringBuilder();
-        sb.append("select count(");
-        sb.append(countField);
-        sb.append(')');
-        sb.append(querySQL.substring(fromIndex));
 
         // 求和语句不需要order by(排序)
         // (?i) : 表示不区分大小写
         // 过滤order by 后面的字符串(包含本身)
         //countSQL = countSQL.replaceFirst("(?i)(order by )(.|\n)+", "")
 
-        return sb.toString();
+        return "select count(" +
+                countField +
+                ')' +
+                querySQL.substring(fromIndex);
     }
 
 }

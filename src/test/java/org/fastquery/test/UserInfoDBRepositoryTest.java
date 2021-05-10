@@ -22,7 +22,7 @@
 
 package org.fastquery.test;
 
-import org.fastquery.dao2.UserInfoDBService3;
+import org.fastquery.dao2.UserInfoDBRepository;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
@@ -35,10 +35,10 @@ import static org.hamcrest.Matchers.*;
 /**
  * @author xixifeng (fastquery@126.com)
  */
-public class UserInfoDBServiceTest3 extends FastQueryTest
+public class UserInfoDBRepositoryTest extends FastQueryTest
 {
 
-    private final UserInfoDBService3 userInfoDBService = FQuery.getRepository(UserInfoDBService3.class);
+    private final UserInfoDBRepository userInfoDBService = FQuery.getRepository(UserInfoDBRepository.class);
 
     @Rule
     public FastQueryTestRule rule = new FastQueryTestRule();
@@ -55,8 +55,7 @@ public class UserInfoDBServiceTest3 extends FastQueryTest
     @Test
     public void findByName()
     {
-        String name = null;
-        userInfoDBService.findByName(name);
+        userInfoDBService.findByName(null);
         SQLValue sv = rule.getSQLValue();
         assertThat(sv.getSql(), equalTo("select name from UserInfo where name like ? limit 1"));
         assertThat(sv.getValues().get(0), equalTo("%谷子%"));

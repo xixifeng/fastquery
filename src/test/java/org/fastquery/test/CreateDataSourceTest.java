@@ -22,7 +22,7 @@
 
 package org.fastquery.test;
 
-import org.fastquery.dao2.UserInfoDBService2;
+import org.fastquery.dao2.UserInfoDB;
 import org.fastquery.service.FQuery;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -38,10 +38,10 @@ import static org.hamcrest.Matchers.*;
 /**
  * @author xixifeng (fastquery@126.com)
  */
-public class UserInfoDBServiceTest2 extends FastQueryTest
+public class CreateDataSourceTest extends FastQueryTest
 {
 
-    private final UserInfoDBService2 userInfoDBService = FQuery.getRepository(UserInfoDBService2.class);
+    private final UserInfoDB userInfoDBService = FQuery.getRepository(UserInfoDB.class);
 
     @Rule
     public FastQueryTestRule rule = new FastQueryTestRule();

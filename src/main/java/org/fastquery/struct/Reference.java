@@ -22,52 +22,22 @@
 
 package org.fastquery.struct;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
 public class Reference
 {
     private String name;
     private List<String> fields;
-
-    public Reference()
-    {
-    }
-
-    public Reference(String name, List<String> fields)
-    {
-        this.name = name;
-        this.fields = fields;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public List<String> getFields()
-    {
-        return fields;
-    }
-
-    public void setFields(List<String> fields)
-    {
-        this.fields = fields;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "Reference{" +
-                "name='" + name + '\'' +
-                ", fields=" + fields +
-                '}';
-    }
 }

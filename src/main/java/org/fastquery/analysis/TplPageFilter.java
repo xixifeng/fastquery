@@ -76,39 +76,9 @@ class TplPageFilter implements MethodFilter
             this.abortWith(method, "这是分页,参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize");
         }
         else
-            // 3). 参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize,不能同时都出现
-            if (TypeUtil.hasType(Pageable.class, parameters) && hasPageAnn(parameters))
-            {
-                this.abortWith(method, "这是分页,参数中要么存在Pageable类型的参数,要么存在@PageIndex和@PageSize,不能同时都出现.");
-            }
-            else
-                // 4). @PageIndex或@PageSize 最多只能出现一次
-                if (TypeUtil.countRepeated(PageIndex.class, parameters) > 1)
-                {
-                    this.abortWith(method, "@PageIndex 最多只能出现一次");
-                }
-                else if (TypeUtil.countRepeated(PageSize.class, parameters) > 1)
-                {
-                    this.abortWith(method, "@PageSize 最多只能出现一次");
-                }
-                else
-                    // 5). @PageIndex或@PageSize 不能独存
-                    if (TypeUtil.countRepeated(PageIndex.class, parameters) + TypeUtil.countRepeated(PageSize.class, parameters) == 1)
-                    {
-                        this.abortWith(method, "@PageIndex或@PageSize 不能独存,要么都不要出现.");
-                    }
-                    else
-                        // 6). @PageIndex或@PageSize 只能标识在int类型上
-                        if (TypeUtil.findAnnotationIndex(PageIndex.class, parameters) != -1
-                                && TypeUtil.findParameter(PageIndex.class, parameters).getType() != int.class)
-                        {
-                            this.abortWith(method, "@PageIndex 只能标识在int类型的参数上");
-                        }
-                        else if (TypeUtil.findAnnotationIndex(PageSize.class, parameters) != -1
-                                && TypeUtil.findParameter(PageSize.class, parameters).getType() != int.class)
-                        {
-                            this.abortWith(method, "@PageSize 只能标识在int类型的参数上");
-                        }
+        {
+            PageableFilter.pageCheck(this, method, parameters);
+        }
     }
 
     private boolean hasPageAnn(Parameter[] parameters)

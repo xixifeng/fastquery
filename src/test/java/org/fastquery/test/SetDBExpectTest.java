@@ -39,7 +39,7 @@ import org.junit.runner.RunWith;
  * @author mei.sir@aliyun.cn
  */
 @RunWith(Theories.class)
-public class SetDBServiceTest2 extends FastQueryTest
+public class SetDBExpectTest extends FastQueryTest
 {
 
     private final SetDBService db = FQuery.getRepository(SetDBService.class);

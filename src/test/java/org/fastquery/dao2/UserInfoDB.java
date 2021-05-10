@@ -22,18 +22,30 @@
 
 package org.fastquery.dao2;
 
+import java.util.Map;
+
 import org.fastquery.core.Source;
 import org.fastquery.core.Modifying;
-import org.fastquery.core.Param;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Transactional;
 
+import com.alibaba.fastjson.JSONArray;
+
 /**
  * @author xixifeng (fastquery@126.com)
  */
-public interface UserInfoDBService3 extends QueryRepository
+public interface UserInfoDB extends QueryRepository
 {
+
+    @Query("select id,name,age from `userinfo` as u where u.age>?1")
+    JSONArray findUserInfoByAge(Integer age, @Source String source);
+
+    @Query("select id,name,age from `userinfo` as u where u.age>?1")
+    Map<String, Object> findOne(Integer age, @Source String dataSource);
+
+    // @Query("select id,name,age from `userinfo` as u where u.id>?1")
+    // List<UserInfo> findSome(Integer id);
 
     @Transactional
     @Modifying
@@ -42,6 +54,4 @@ public interface UserInfoDBService3 extends QueryRepository
     @Query("update `userinfo` set `name`=?1,`age`=?2 where id=?3")
     int updateBatch(String name, Integer age, Integer id, @Source String dataSource);
 
-    @Query(value = "select name from UserInfo where name like ?1 limit 1")
-    int findByName(@Param(value = "name", defaultVal = "%谷子%") String name);
 }

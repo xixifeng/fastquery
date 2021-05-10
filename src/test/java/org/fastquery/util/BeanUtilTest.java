@@ -118,8 +118,6 @@ public class BeanUtilTest
         List<UserInfo> userInfos = new ArrayList<>();
         String str = BeanUtil.toInsertSQL(userInfos, null, false);
         assertThat(str, nullValue());
-        str = BeanUtil.toInsertSQL(null, null, false);
-        assertThat(str, nullValue());
     }
 
     @Test
@@ -171,7 +169,7 @@ public class BeanUtilTest
     {
         UserInfo userInfo = new UserInfo(33, "函数式编程", 18);
 
-        String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk", true, new SelectField<UserInfo>(UserInfo.class, false).getFields());
+        String sql = BeanUtil.toSelectSQL(userInfo, 36, "xk", true, new SelectField<>(UserInfo.class, false).getFields());
         assertThat(sql, equalTo("select id,name,age from xk.UserInfo where id = 36"));
     }
 

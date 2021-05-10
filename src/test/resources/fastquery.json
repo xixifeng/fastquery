@@ -70,7 +70,7 @@
     {
         "config": "c3p0",            // 表示由c3p0负责提供数据源
         "basePackages": [   
-             "org.fastquery.dao2.UserInfoDBService2"
+             "org.fastquery.dao2.UserInfoDB"
         ]
     }
     
@@ -79,7 +79,7 @@
         "config": "mySQLDriver",            // 表示由jdbc负责提供数据源
         "dataSourceName": "xk3",     // 数据源的名称
         "basePackages": [   
-             "org.fastquery.dao2.UserInfoDBService3",
+             "org.fastquery.dao2.UserInfoDBRepository",
              "org.fastquery.dao2.DefaultDBService"
         ]
     }

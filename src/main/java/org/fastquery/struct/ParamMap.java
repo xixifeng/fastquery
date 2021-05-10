@@ -22,32 +22,21 @@
 
 package org.fastquery.struct;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author mei.sir@aliyun.cn
  */
+@AllArgsConstructor
+@Getter
 public class ParamMap
 {
 
     private final Map<Integer, Integer> rps;
     private final List<Object> objs;
-
-    public ParamMap(Map<Integer, Integer> rps, List<Object> objs)
-    {
-        this.rps = rps;
-        this.objs = objs;
-    }
-
-    public Map<Integer, Integer> getRps()
-    {
-        return rps;
-    }
-
-    public List<Object> getObjs()
-    {
-        return objs;
-    }
 
 }

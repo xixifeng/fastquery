@@ -24,7 +24,6 @@ package org.fastquery.test;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.EnumUtils;
 import org.fastquery.bean.Gender;
 import org.fastquery.bean.Ruits;
 import org.fastquery.bean.TypeFeature;
@@ -91,9 +90,7 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
         List<TypeFeature> tfs = db.findByRuits(Ruits.苹果, Ruits.橘子);
         log.error("tfs:{},len:{}", tfs, tfs.size());
         assertThat(tfs, not(empty()));
-        tfs.forEach(t -> {
-            assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.苹果, Ruits.橘子)), is(true));
-        });
+        tfs.forEach(t -> assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.苹果, Ruits.橘子)), is(true)));
     }
 
     @Test
@@ -147,25 +144,19 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
     @Test
     public void findPage()
     {
-        TypeFeature equals = null;
         TypeFeature likes = new TypeFeature();
-        String sort = null;
-        boolean notCount = false;
         int pageIndex = 1;
         int pageSize = 10;
-        boolean contain = true;
-        Page<TypeFeature> page = db.findPage(equals,likes,sort,notCount,pageIndex,pageSize,contain);
+        Page<TypeFeature> page = db.findPage(null,likes, null, false,pageIndex,pageSize, true);
         int totalPages = page.getTotalPages();
         for (int i = 2; i <= totalPages ; i++)
         {
-            db.findPage(equals,likes,sort,notCount,i,pageSize,contain);
+            db.findPage(null,likes, null, false,i,pageSize, true);
         }
 
         List<EnumSet<Ruits>> rrs = new ArrayList<>();
-        page = db.findPage(equals,likes,sort,notCount,4,pageSize,contain);
-        page.getContent().forEach(t -> {
-            rrs.add(t.getRuits());
-        });
+        page = db.findPage(null,likes, null, false,4,pageSize, true);
+        page.getContent().forEach(t -> rrs.add(t.getRuits()));
         assertThat(rrs.contains(null),is(true));
         assertThat(rrs.contains(EnumSet.noneOf(Ruits.class)),is(true));
     }
@@ -175,9 +166,7 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
     {
         List<Gender> genders = db.findGenders();
         assertThat(genders.isEmpty(), is(false));
-        genders.forEach(gender -> {
-            assertThat(gender, either(is(Gender.男)).or(is(Gender.女)));
-        });
+        genders.forEach(gender -> assertThat(gender, either(is(Gender.男)).or(is(Gender.女))));
     }
 
     @Test
@@ -186,9 +175,7 @@ public class TypeFeatureDBServiceTest extends FastQueryTest
         EnumSet<Ruits> opts = EnumSet.of(Ruits.苹果, Ruits.香蕉, Ruits.西瓜, Ruits.芒果, Ruits.橘子, Ruits.梨, Ruits.葡萄, Ruits.樱桃);
         List<EnumSet<Ruits>> ruits = db.findRuits();
         assertThat(ruits.isEmpty(), is(false));
-        ruits.forEach(e -> {
-            assertThat(opts.containsAll(e), is(true));
-        });
+        ruits.forEach(e -> assertThat(opts.containsAll(e), is(true)));
     }
 
     @Test

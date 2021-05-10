@@ -22,33 +22,17 @@
 
 package org.fastquery.struct;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author mei.sir@aliyun.cn
  */
+@Setter
+@Getter
 public class RespUpdate
 {
 
     private int effect; // 影响行数
     private Long pk; // 主健
-
-    public int getEffect()
-    {
-        return effect;
-    }
-
-    public Long getPk()
-    {
-        return pk;
-    }
-
-    public void setEffect(int effect)
-    {
-        this.effect = effect;
-    }
-
-    public void setPk(Long pk)
-    {
-        this.pk = pk;
-    }
-
 }

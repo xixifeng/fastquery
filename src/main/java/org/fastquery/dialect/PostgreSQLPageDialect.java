@@ -52,14 +52,11 @@ class PostgreSQLPageDialect implements PageDialect
     public String getCurrentPageSQL(String querySQL, int offset, int pageSize)
     {
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(querySQL);
-        sb.append(" limit ");
-        sb.append(pageSize);
-        sb.append(" offset ");
-        sb.append(offset);
-
-        return sb.toString();
+        return querySQL +
+                " limit " +
+                pageSize +
+                " offset " +
+                offset;
     }
 
 }

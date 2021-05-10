@@ -37,12 +37,13 @@ import org.junit.runners.Suite.SuiteClasses;
 // 指定运行器
 @RunWith(Suite.class)
 @SuiteClasses({
-        FQueryTest.class, StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBServiceTest2.class, UserInfoDBServiceTest3.class,
+        FQueryTest.class, StudentDBServiceTest.class, UserInfoDBServiceTest.class, CreateDataSourceTest.class, UserInfoDBRepositoryTest.class,
         TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class, BeanUtilTest.class, PageTest.class, FastQueryJSONObjectTest.class,
         FQueryResourceImplTest.class, SunnyDBServiceTest.class, SaveToIdTest.class, PlaceholderTest.class, DBTest.class, ProductDBServiceTest.class,
-        FQueryPropertiesTest.class, QueryPoolTest.class, ParamFilterTest.class, ConditionTest.class, MySQLPageDialectTest.class, DefaultMethodTest.class,
-        RepVersion.class, SetDBServiceTest.class, SetDBServiceTest2.class, SharpExprParserTest.class,
+        QueryPoolTest.class, ParamFilterTest.class, ConditionTest.class, MySQLPageDialectTest.class, DefaultMethodTest.class,
+        RepVersion.class, SetDBServiceTest.class, SetDBExpectTest.class, SharpExprParserTest.class,
         TransactionalTest.class, QueryByNamedDBExtendTest.class, JudgeTest.class, Script2ClassTest.class, TxTest.class, WorldDBTest.class, TypeTestDBTest.class, SelectFieldTest.class, TypeFeatureDBServiceTest.class, AsmRepositoryTest.class, SpringSupportTest.class
+        , FQueryPropertiesTest.class
 })
 public class AllRuleTest
 {

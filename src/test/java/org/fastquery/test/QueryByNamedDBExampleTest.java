@@ -103,7 +103,6 @@ public class QueryByNamedDBExampleTest extends FastQueryTest
     @Test
     public void findUserInfoByNameAndAge2()
     {
-        String name = null;
         Integer age = 8;
         JSONArray jsonArray = db.findUserInfoByNameAndAge(null, age);
         for (Object object : jsonArray)
@@ -157,7 +156,6 @@ public class QueryByNamedDBExampleTest extends FastQueryTest
         int size = 5; // 指定每页显示5条数据
 
         String no = "95";
-        String name = null;
         Integer age = 8;
 
         Page<Student> pageObj = db.findPage(new PageableImpl(page, size), no, null, age);
@@ -204,7 +202,6 @@ public class QueryByNamedDBExampleTest extends FastQueryTest
         int size = 5; // 指定每页显示5条数据
 
         String no = "95";
-        String name = null;
         Integer age = 8;
 
         Page<Student> pageObj = db.findPage2(new PageableImpl(page, size), no, null, age);

@@ -22,48 +22,25 @@
 
 package org.fastquery.page;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
+ * 构造 Slice(页片)
+ *
  * @author xixifeng (fastquery@126.com)
  */
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
 public class Slice
 {
 
-    private int number; // 当前页码
-    private int size; // 每页多少条数据
-
-    public Slice()
-    {
-    }
-
-    /**
-     * 构造 Slice(页片)
-     *
-     * @param number 当前页码
-     * @param size   每页多少条数据
-     */
-    public Slice(int number, int size)
-    {
-        this.number = number;
-        this.size = size;
-    }
-
-    public int getNumber()
-    {
-        return number;
-    }
-
-    public int getSize()
-    {
-        return size;
-    }
-
-    public void setNumber(int number)
-    {
-        this.number = number;
-    }
-
-    public void setSize(int size)
-    {
-        this.size = size;
-    }
+    // 当前页码
+    private int number;
+    // 每页多少条数据
+    private int size;
 }

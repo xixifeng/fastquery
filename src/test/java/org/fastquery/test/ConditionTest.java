@@ -80,7 +80,6 @@ public class ConditionTest extends FastQueryTest
     public void findUserInfo2()
     {
         String tname = "from UserInfo";
-        String w1 = null;
         db.findUserInfo2(null, "name like ?1", tname);
         SQLValue sqlValue = rule.getSQLValue();
         String sql = sqlValue.getSql();
@@ -91,8 +90,6 @@ public class ConditionTest extends FastQueryTest
     public void findUserInfo3()
     {
         String tname = "from UserInfo";
-        String w1 = null;
-        String w2 = null;
         db.findUserInfo(null, null, tname);
         SQLValue sqlValue = rule.getSQLValue();
         String sql = sqlValue.getSql();

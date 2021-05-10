@@ -22,8 +22,6 @@
 
 package org.fastquery.util;
 
-import static org.junit.Assert.*;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -41,7 +39,6 @@ import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
 import org.fastquery.core.Query;
 import org.fastquery.struct.Reference;
-import org.fastquery.util.TypeUtil;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;

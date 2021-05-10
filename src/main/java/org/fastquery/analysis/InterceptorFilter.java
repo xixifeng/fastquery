@@ -134,25 +134,21 @@ class InterceptorFilter implements MethodFilter
      */
     private void filterScopeError(Method method, Annotation annotation, ParameterizedType parameterizedType, Class<?> iclazz, Class<?> t)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\n");
-        sb.append(annotation);
-        sb.append("\n");
 
-        sb.append(parameterizedType.getRawType().getTypeName());
-        sb.append("<");
-        sb.append(t.getSimpleName());
-        sb.append("> 这个拦截器的作用范围不在");
-        sb.append(iclazz);
-        sb.append("上(也就说放在这个类上是非法的)!\n");
-
-        sb.append("它可以放在");
-        sb.append(t.getSimpleName());
-        sb.append("类上\n");
-
-        sb.append("举例说明:若有一个拦截器叫A<T>,那么这个拦截器可以用放在T类或T的子类里.反之是违规操作\n");
-
-        this.abortWith(method, sb.toString());
+        String sb = "\n" +
+                annotation +
+                "\n" +
+                parameterizedType.getRawType().getTypeName() +
+                "<" +
+                t.getSimpleName() +
+                "> 这个拦截器的作用范围不在" +
+                iclazz +
+                "上(也就说放在这个类上是非法的)!\n" +
+                "它可以放在" +
+                t.getSimpleName() +
+                "类上\n" +
+                "举例说明:若有一个拦截器叫A<T>,那么这个拦截器可以用放在T类或T的子类里.反之是违规操作\n";
+        this.abortWith(method, sb);
     }
 
 }

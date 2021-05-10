@@ -103,15 +103,14 @@ public final class ModifyingHandler
         values.add(e);
         Map<String, Object> keyval = null;
 
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("select ");
-        sqlBuilder.append(modifying.selectFields());
-        sqlBuilder.append(" from ");
-        sqlBuilder.append(tableName);
-        sqlBuilder.append(" where ");
-        sqlBuilder.append(keyFieldName);
-        sqlBuilder.append(" = ?");
-        SQLValue sqlValue = new SQLValue(sqlBuilder.toString(), values);
+        String sqlBuilder = "select " +
+                modifying.selectFields() +
+                " from " +
+                tableName +
+                " where " +
+                keyFieldName +
+                " = ?";
+        SQLValue sqlValue = new SQLValue(sqlBuilder, values);
         List<Map<String, Object>> keyvals = DB.find(sqlValue);
         if (!keyvals.isEmpty())
         {
@@ -142,7 +141,7 @@ public final class ModifyingHandler
         {
             return null;
         }
-        return new Primarykey(autoIncKey, pkey == null ? null : pkey.toString());
+        return new Primarykey(autoIncKey);
     }
 
     public boolean booleanType(List<RespUpdate> respUpdates)

@@ -63,7 +63,7 @@ public class TxTest extends FastQueryTest
         assertThat(effect, equalTo(-1));
     }
 
-    private int u1(Integer id, String name, Integer age)
+    private void u1(Integer id, String name, Integer age)
     {
         UserInfo userInfo = new UserInfo(id, name, age);
         int effect = studentDBService.executeSaveOrUpdate(userInfo);
@@ -72,7 +72,6 @@ public class TxTest extends FastQueryTest
         assertThat(u1.getId(), equalTo(id));
         assertThat(u1.getName(), equalTo(name));
         assertThat(u1.getAge(), equalTo(age));
-        return effect;
     }
 
     @Test

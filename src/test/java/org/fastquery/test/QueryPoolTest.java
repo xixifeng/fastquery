@@ -82,18 +82,18 @@ public class QueryPoolTest extends FastQueryTest
     }
 
     @SuppressWarnings("unchecked")
-    private Set<Object> xml2QueryMapper(String className, Resource resource) throws Exception
+    private Set<Object> xml2QueryMapper(Resource resource) throws Exception
     {
         Method method = QueryPool.class.getDeclaredMethod("xml2QueryMapper", String.class, Resource.class);
         method.setAccessible(true);
-        return (Set<Object>) method.invoke(null, className, resource);
+        return (Set<Object>) method.invoke(null, "org.fastquery.dao.QueryByNamedDBExample", resource);
     }
 
-    private String render(String tpl, String logTag, Map<String, Object> map) throws Exception
+    private String render(String tpl, Map<String, Object> map) throws Exception
     {
         Method method = QueryPool.class.getDeclaredMethod("render", String.class, String.class, Map.class);
         method.setAccessible(true);
-        return method.invoke(null, tpl, logTag, map).toString();
+        return method.invoke(null, tpl, "render", map).toString();
     }
 
     private String queryMapper$getId(Object queryMapper) throws Exception
@@ -113,7 +113,7 @@ public class QueryPoolTest extends FastQueryTest
     @Test
     public void testXml2QueryMapper() throws Exception
     {
-        Set<Object> queryMappers = xml2QueryMapper("org.fastquery.dao.QueryByNamedDBExample", resource);
+        Set<Object> queryMappers = xml2QueryMapper(resource);
         for (Object queryMapper : queryMappers)
         {
             String id = queryMapper$getId(queryMapper);
@@ -139,7 +139,7 @@ public class QueryPoolTest extends FastQueryTest
         String template = "$abc${abc}";
         Map<String, Object> map = new HashMap<>();
         map.put("abc", "hi");
-        String str = render(template, "render", map);
+        String str = render(template, map);
         assertThat(str, equalTo("hihi"));
     }
 
@@ -155,23 +155,23 @@ public class QueryPoolTest extends FastQueryTest
                 + " #end";
         Map<String, Object> map = new HashMap<>();
         map.put("state", (byte) 0);
-        String str = render(template, "render", map);
+        String str = render(template, map);
         assertThat(str, equalTo(ok));
 
         map.put("state", (byte) 1);
-        str = render(template, "render", map);
+        str = render(template, map);
         assertThat(str, equalTo(ok));
 
         map.put("state", (byte) 1);
-        str = render(template, "render", map);
+        str = render(template, map);
         assertThat(str, equalTo(ok));
 
         map.put("state", (byte) -1);
-        str = render(template, "render", map);
+        str = render(template, map);
         assertThat(str, equalTo(ok));
 
         map.put("state", null);
-        str = render(template, "render", map);
+        str = render(template, map);
         assertThat(str.trim(), equalTo(err));
     }
 

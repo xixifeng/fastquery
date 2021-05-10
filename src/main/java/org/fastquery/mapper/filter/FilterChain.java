@@ -35,10 +35,9 @@ public class FilterChain implements Filter
 
     private final List<Filter> filters = new ArrayList<>();
 
-    public FilterChain addFilter(Filter filter)
+    public void addFilter(Filter filter)
     {
         filters.add(filter);
-        return this;
     }
 
     @Override

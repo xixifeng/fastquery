@@ -101,10 +101,6 @@ public class RepVersion extends FastQueryTest
                 }
             }
         }
-        catch (IOException e)
-        {
-            throw e;
-        }
 
         String version = confirm(initialSelectionValue);
         log.debug("最终确认的版本号是: " + version);
@@ -136,10 +132,6 @@ public class RepVersion extends FastQueryTest
                 assertThat(f.delete(), is(true));
                 //Files.move(tmp.toPath(), f.toPath());
                 Files.copy(tmp.toPath(), f.toPath());
-            }
-            catch (IOException e)
-            {
-                throw e;
             }
         }
 

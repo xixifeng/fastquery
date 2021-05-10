@@ -160,7 +160,7 @@ JRE 8+
 		     {
 		        "config": "c3p0",              // 表示由c3p0负责提供数据源
 		        "basePackages": [   
-		             "org.fastquery.dao2.UserInfoDBService2"
+		             "org.fastquery.dao2.UserInfoDB"
 		        ]
 		     }
 		  ] 
@@ -444,7 +444,27 @@ Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable page
 List<Map<String, Object>> between(@Param("age1") Integer age1,@Param("age2") Integer age2);	
 ```
 该例中`@Condition`使用到了`$`表达式,`$age1`,`${age2}`仅作为模板替换,age1为null,即便设置`ignoreNull=true`也不会影响条件的增减.**总之,`$` 表达式不会动摇条件的存在**.  
+
 单个`@Condition`针对出现多个`SQL`参数的情形,如 `@Condition("or age between ?5 and ?6")` 或 `@Condition("or age between :age1 and :age2")` 参数 `?5`、`?6`、`:age1`、 `:age2`中的任意一个为`null`都会导致该行条件移除.
+
+## 类型映射
+
+不是强类型映射，只要 Java 类型的存储空间 `>=` `SQL`类型的存储空间。换言之，只要 Java 类型装得下就行，反之，不行。
+
+| Java      | SQL                               |
+| --------- | --------------------------------- |
+| Boolean   | `BIT(1)`, `TINYINT(1)`, `CHAR(1)` |
+| Byte      | TINYINT                           |
+| Short     | SMALLINT                          |
+| Integer   | INT                               |
+| Long      | BIGINT                            |
+| Float     | FLOAT                             |
+| Double    | DOUBLE                            |
+| Character | CHAR(1)                           |
+| Enum      | ENUM                              |
+| EnumSet   | SET                               |
+| String    | 所有类型                          |
+
 
 ## count
 
@@ -815,11 +835,22 @@ UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
 JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") String orderby);
 ```
 
+`$表达式` 的值如果不可避免需要从用户层录入，并且不可控，为了安全起见，防止 SQL 注入，请使用 `@Safe` 标识形参，如
+
+```java
+@Query("select * from `userinfo` ${orderby}")
+JSONArray findUserInfo(@Param(value="orderby") @Safe String orderby);
+```
+
+那么，框架会严格检测 `orderby`的实参是否有注入风险，一旦存在注入嫌疑，拒绝请求。
+
 ## 微笑表达式
+
 定义: **以<code>\`-</code> 作为开始,以<code>-\`</code>作为结尾,包裹着若干字符,因为<code>\`- -\`</code>酷似微笑表情,因此将这样的表达式称之为`微笑表达式`.** <br>例如: <code> \`-%${name}%-\` </code>. **\`** 反撇号的位置如下图所示:<br>
 ![反撇号示意图](file/fanpie.png "反撇号示意图")    
 作用:  
 1.可以作为实参的模板,举例: 查询出姓"张"的用户.没有`微笑表达式`时的写法:
+
 ```java
 db.findLikeName(name + "%");
 ```
@@ -1475,8 +1506,29 @@ String findOneCourse();
 - 标识在方法上:表示其拦截的作用范围是当前方法
 - 一个方法的拦截器总和=它的所属类的拦截器+自己的拦截器
 
-## WEB 支持
-### 应用在 Jersey 环境
+## 支持
+### 应用在 Spring 环境
+
+配置扫描范围：
+
+```xml
+<context:component-scan base-package="org.fastquery.service" />
+```
+
+或者
+
+```java
+@ComponentScan("org.fastquery.service")
+```
+
+使用 db 接口处, 使用注入得到实例对象
+
+```java
+@javax.annotation.Resource
+private UserInfoDB userInfoDB;
+```
+
+### ~~应用在 Jersey 环境~~ (自 1.0.110 版本起，放弃对 Jsersey 容器的支持)
 
 ```xml
 <dependency>
@@ -1492,7 +1544,7 @@ String findOneCourse();
 </dependency>
 ```
 
-让Jersey容器管理FastQuery:
+~~让 Jersey 容器管理 FastQuery~~: (自 1.0.110+ 不再支持)
 
 ```java
 import javax.ws.rs.ApplicationPath;
@@ -1506,7 +1558,7 @@ public class MyApplication extends ResourceConfig {
 }
 ```
 
-FastQuery支持JAX-RS注解,不需实现类,便能构建极简的RESTful.不得不简单的设计,可见一斑.
+~~FastQuery 支持 JAX-RS 注解, 不需实现类, 便能构建极简的 RESTful. 不得不简单的设计, 可见一斑.~~
 
 ```java
 @Path("userInfo")
@@ -1523,10 +1575,10 @@ public interface UserInfoDBService extends QueryRepository {
 }
 ```
 
-没错, **不用去写任何实现类**, 访问 `http://<your host>/rest/userInfo/findAll?pageIndex=1&pageSize=5`, 就可以看到效果.  
-**DB接口不仅能当做WEB Service(服务),同时也是一个DB接口**.除非逻辑是数据即服务,否则,不提倡`DAO`层跟`HTTP`服务融在一起.JAX-RS Resource的实现类,在WEB容器初始化之前就已经被`FastQuery`推导创建好了.
+~~没错, **不用去写任何实现类**, 访问 `http://<your host>/rest/userInfo/findAll?pageIndex=1&pageSize=5`, 就可以看到效果.  
+**DB接口不仅能当做WEB Service(服务),同时也是一个DB接口**.除非逻辑是数据即服务,否则,不提倡`DAO`层跟`HTTP`服务融在一起.JAX-RS Resource的实现类,在WEB容器初始化之前就已经被`FastQuery`推导创建好了.~~
 
-### 配置支持HttpSign
+### ~~配置支持HttpSign~~ (自 1.0.110+ 不再支持)
 [HttpSign](https://github.com/xixifeng/httpsign) 是一种RESTful接口签名认证的实现.  
 
 ```xml
@@ -1657,5 +1709,4 @@ build: maven
 ## 反馈问题
 https://gitee.com/xixifeng.com/fastquery/issues  
 FastQuery秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://gitee.com/xixifeng.com/fastquery/issues)来向我们反馈.  
-
 

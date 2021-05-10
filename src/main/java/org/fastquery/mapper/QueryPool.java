@@ -97,7 +97,7 @@ public class QueryPool
         pers.add("");
         for (String per : pers)
         {
-            String perxml = new StringBuilder().append(per).append(className).append(".queries.xml").toString();
+            String perxml = per + className + ".queries.xml";
             if (resource.exist(perxml))
             {
                 return perxml;
@@ -128,10 +128,12 @@ public class QueryPool
 
         try (InputStream inputStream = resource.getResourceAsStream(xmlName))
         {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
+            df.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
+            df.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
             // 如下设置可禁用外部实体处理
-            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            df.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            DocumentBuilder builder = df.newDocumentBuilder();
             Document document = builder.parse(inputStream);
             Element element = document.getDocumentElement();
             NodeList nodeList = element.getChildNodes();
@@ -192,16 +194,9 @@ public class QueryPool
         return node.getNodeType() == Node.ELEMENT_NODE && nodeName.equals(node.getNodeName());
     }
 
-    /**
-     * 融合模板 融合 <query>节点下的<XXX>和<parts> 然后返回字符串
-     *
-     * @param postion
-     * @param gparts
-     * @param element
-     * @param xxx
-     * @param defaultText 如果没有找到<XXX>节点元素是否直接取<query>下的textContent, true表示是.
-     * @return 注意: 如果既没有<XXX>又不允许defaultText为true, 那么就返回null.
-     */
+    // 融合模板 融合 <query>节点下的<XXX>和<parts> 然后返回字符串
+    // defaultText 如果没有找到<XXX>节点元素是否直接取<query>下的textContent, true表示是.
+    // 注意: 如果既没有<XXX>又不允许defaultText为true, 那么就返回null.
     private static String fuseValTpl(String postion, Map<String, String> gparts, Element element, String xxx, boolean defaultText)
     {
         // 判断这个节点是否有子节点 value
@@ -378,7 +373,7 @@ public class QueryPool
         }
         // 处理@Param End
 
-        String logTag = new StringBuilder(className).append('.').append(id).toString();
+        String logTag = className + '.' + id;
 
         String str = render(tpl, logTag, map).trim().replaceAll("\\s+", " ");
 

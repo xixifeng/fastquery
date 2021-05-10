@@ -83,7 +83,7 @@ public class FQueryPropertiesTest extends FastQueryTest
     }
 
     @Test
-    public void testGetDataSources() throws SQLException
+    public void testGetDataSources()
     {
 
         Map<String, DataSource> maps = getDataSources();
@@ -110,10 +110,10 @@ public class FQueryPropertiesTest extends FastQueryTest
         sourceName = FQueryProperties.findDataSourceName("org.fastquery.dao.SunnyDBService");
         assertThat(sourceName, equalTo("sunnydb"));
 
-        sourceName = FQueryProperties.findDataSourceName("org.fastquery.dao2.UserInfoDBService2");
+        sourceName = FQueryProperties.findDataSourceName("org.fastquery.dao2.UserInfoDB");
         assertThat(sourceName, nullValue());
 
-        sourceName = FQueryProperties.findDataSourceName("org.fastquery.dao2.UserInfoDBService3");
+        sourceName = FQueryProperties.findDataSourceName("org.fastquery.dao2.UserInfoDBRepository");
         assertThat(sourceName, equalTo("xk3"));
 
         sourceName = FQueryProperties.findDataSourceName("org.fastquery.db");

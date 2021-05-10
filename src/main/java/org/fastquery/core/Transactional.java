@@ -22,11 +22,15 @@
 
 package org.fastquery.core;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
  * 事务
  *
  * @author xixifeng (fastquery@126.com)
  */
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Transactional
 { // NO_UCD
 

@@ -522,7 +522,7 @@ public class MethodQueryTest extends FastQueryTest
         TypeFeature likes = new TypeFeature();
         likes.setName("Ru%");
         likes.setSort(0);
-        Page<TypeFeature> page = userInfoDBService.findPage(typeFeature, likes, "order by sort DESC", false, 1, 1, true);
+        userInfoDBService.findPage(typeFeature, likes, "order by sort DESC", false, 1, 1, true);
         List<String> sqlValues = rule.getExecutedSQLs();
         assertThat(sqlValues.size(), is(2));
         assertThat(sqlValues.get(0), equalTo("select id,name,gender,ruits,sort from type_feature where gender = ? and sort = ? and ( name like ? or sort like ? ) order by sort DESC limit 0,1"));

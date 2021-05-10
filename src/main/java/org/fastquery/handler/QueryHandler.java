@@ -353,7 +353,7 @@ public class QueryHandler
         if (TypeUtil.hasDefaultConstructor(returnType))
         {
             return TypeUtil.map2Obj(returnType, keyvals.get(0));
-            //return JSON.toJavaObject(new JSONObject(keyvals.get(0)), returnType);
+            //return JSON.toJavaObject(new JSONObject(keyvals.get(0)), returnType)
         }
         else
         {

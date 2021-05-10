@@ -22,7 +22,7 @@
 
 package org.fastquery.test;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import java.lang.reflect.Method;

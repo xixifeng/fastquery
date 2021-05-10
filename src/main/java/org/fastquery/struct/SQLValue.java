@@ -23,6 +23,9 @@
 package org.fastquery.struct;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.Placeholder;
@@ -37,6 +40,8 @@ import org.fastquery.util.TypeUtil;
  * @author mei.sir@aliyun.cn
  */
 @Slf4j
+@Setter
+@Getter
 public class SQLValue
 {
     private String sql; // 待执行的sql
@@ -105,25 +110,5 @@ public class SQLValue
             }
         }
         return ssms;
-    }
-
-    public String getSql()
-    {
-        return sql;
-    }
-
-    public List<Object> getValues()
-    {
-        return values;
-    }
-
-    public void setSql(String sql)
-    {
-        this.sql = sql;
-    }
-
-    public void setValues(List<Object> values)
-    {
-        this.values = values;
     }
 }

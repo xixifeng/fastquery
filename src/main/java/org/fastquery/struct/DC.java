@@ -22,6 +22,9 @@
 
 package org.fastquery.struct;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.sql.Connection;
 
 import javax.sql.DataSource;
@@ -29,25 +32,10 @@ import javax.sql.DataSource;
 /**
  * @author mei.sir@aliyun.cn
  */
+@AllArgsConstructor
+@Getter
 public class DC
 {
-
     private final DataSource ds;
     private final Connection conn;
-
-    public DC(DataSource ds, Connection conn)
-    {
-        this.ds = ds;
-        this.conn = conn;
-    }
-
-    public DataSource getDs()
-    {
-        return ds;
-    }
-
-    public Connection getConn()
-    {
-        return conn;
-    }
 }

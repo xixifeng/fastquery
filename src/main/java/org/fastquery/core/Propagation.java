@@ -27,7 +27,7 @@ package org.fastquery.core;
  *
  * @author mei.sir@aliyun.cn
  */
-enum Propagation
+public enum Propagation
 { // NO_UCD
 
     /**

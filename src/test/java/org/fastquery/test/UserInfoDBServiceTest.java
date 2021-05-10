@@ -523,9 +523,8 @@ public class UserInfoDBServiceTest extends FastQueryTest
     @Test
     public void findUserSome2()
     {
-        String name = null;
         Integer age = null;
-        List<Map<String, Object>> maps = db.findUserSome2(age, name);
+        List<Map<String, Object>> maps = db.findUserSome2(age, null);
         maps.forEach(m -> m.forEach((k, v) -> {
             if ("age".equals(k))
                 assertThat(v, nullValue());

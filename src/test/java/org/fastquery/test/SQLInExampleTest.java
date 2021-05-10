@@ -22,7 +22,7 @@
 
 package org.fastquery.test;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -133,8 +133,7 @@ public class SQLInExampleTest extends FastQueryTest
     @Test
     public void findByIn3()
     {
-        int[] ids = null;
-        UserInfo[] userInfos = db.findByIn(ids);
+        UserInfo[] userInfos = db.findByIn((int[]) null);
         for (UserInfo u : userInfos)
         {
             assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
@@ -184,19 +183,4 @@ public class SQLInExampleTest extends FastQueryTest
             assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
         }
     }
-
-    @Test
-    public void findBoolByObjIn()
-    {
-        List<Integer> ids = new ArrayList<>();
-        ids.add(1);
-        ids.add(2);
-        ids.add(2);
-        ids.add(3);
-        ids.add(3);
-        ids.add(-3);
-        List<Integer> integers = db.findBoolByObjIn(ids);
-        log.info("booleans: {}",integers);
-    }
-
 }
