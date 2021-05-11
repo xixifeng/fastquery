@@ -37,7 +37,7 @@ import org.junit.Test;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
-public class SunnyDBServiceTest extends FastQueryTest
+public class SunnyDBServiceTest extends TestFastQuery
 {
     private final SunnyDBService sunnyDBService = FQuery.getRepository(SunnyDBService.class);
 

@@ -50,7 +50,7 @@ import com.mysql.cj.jdbc.MysqlDataSource;
 /**
  * @author mei.sir@aliyun.cn
  */
-public class TxTest extends FastQueryTest
+public class TxTest extends TestFastQuery
 {
 
     private final StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);

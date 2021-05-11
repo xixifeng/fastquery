@@ -47,7 +47,7 @@ import org.junit.runner.RunWith;
  */
 @Slf4j
 @RunWith(Theories.class)
-public class SetDBServiceTest extends FastQueryTest
+public class SetDBServiceTest extends TestFastQuery
 {
     private static SetDBService db = FQuery.getRepository(SetDBService.class);
 

@@ -56,7 +56,7 @@ import static org.hamcrest.Matchers.*;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
-public class UserInfoDBServiceTest extends FastQueryTest
+public class UserInfoDBServiceTest extends TestFastQuery
 {
     private final UserInfoDBService db = FQuery.getRepository(UserInfoDBService.class);
 

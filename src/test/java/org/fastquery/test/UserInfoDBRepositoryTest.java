@@ -35,7 +35,7 @@ import static org.hamcrest.Matchers.*;
 /**
  * @author xixifeng (fastquery@126.com)
  */
-public class UserInfoDBRepositoryTest extends FastQueryTest
+public class UserInfoDBRepositoryTest extends TestFastQuery
 {
 
     private final UserInfoDBRepository userInfoDBService = FQuery.getRepository(UserInfoDBRepository.class);

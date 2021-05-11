@@ -44,7 +44,7 @@ import org.junit.Test;
  * @author mei.sir@aliyun.cn
  */
 @Slf4j
-public class RepVersion extends FastQueryTest
+public class RepVersion extends TestFastQuery
 {
     private static final String REG = "\\d+\\.\\d+\\.\\d+(\\.enforce)*";
 

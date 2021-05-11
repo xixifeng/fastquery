@@ -45,7 +45,7 @@ import com.alibaba.fastjson.JSONObject;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
-public class StudentDBServiceTest extends FastQueryTest
+public class StudentDBServiceTest extends TestFastQuery
 {
     @Rule
     public FastQueryTestRule rule = new FastQueryTestRule();

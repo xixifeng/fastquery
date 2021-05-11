@@ -38,7 +38,7 @@ import static org.hamcrest.Matchers.*;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
-public class TypeTestDBTest extends FastQueryTest
+public class TypeTestDBTest extends TestFastQuery
 {
 
     private TypeTestDB db = FQuery.getRepository(TypeTestDB.class);

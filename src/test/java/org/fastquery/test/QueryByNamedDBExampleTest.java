@@ -47,7 +47,7 @@ import static org.hamcrest.Matchers.*;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
-public class QueryByNamedDBExampleTest extends FastQueryTest
+public class QueryByNamedDBExampleTest extends TestFastQuery
 {
     @Rule
     public FastQueryTestRule rule = new FastQueryTestRule();

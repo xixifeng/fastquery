@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * @author mei.sir@aliyun.cn
  */
-public class FastQueryTest
+public class TestFastQuery
 {
 
     @Test

@@ -41,7 +41,7 @@ import org.junit.Test;
 /**
  * @author mei.sir@aliyun.cn
  */
-public class WorldDBTest extends FastQueryTest
+public class WorldDBTest extends TestFastQuery
 {
 
     @Rule

@@ -37,7 +37,7 @@ import org.junit.Test;
 /**
  * @author mei.sir@aliyun.cn
  */
-public class ProductDBServiceTest extends FastQueryTest
+public class ProductDBServiceTest extends TestFastQuery
 {
 
     private final ProductDBService pdbs = FQuery.getRepository(ProductDBService.class);

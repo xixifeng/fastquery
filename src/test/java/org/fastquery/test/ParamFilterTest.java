@@ -35,7 +35,7 @@ import static org.hamcrest.Matchers.*;
 /**
  * @author mei.sir@aliyun.cn
  */
-public class ParamFilterTest extends FastQueryTest
+public class ParamFilterTest extends TestFastQuery
 {
 
     public static String paramFilter(Method method, Object[] args, String sql) throws Exception

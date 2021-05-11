@@ -45,7 +45,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
-public class TypeFeatureDBServiceTest extends FastQueryTest
+public class TypeFeatureDBServiceTest extends TestFastQuery
 {
     private TypeFeatureDBService db = FQuery.getRepository(TypeFeatureDBService.class);
 

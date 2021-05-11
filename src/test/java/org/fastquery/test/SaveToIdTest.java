@@ -36,7 +36,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * @author mei.sir@aliyun.cn
  */
-public class SaveToIdTest extends FastQueryTest
+public class SaveToIdTest extends TestFastQuery
 {
 
     private final VisitorDBServcie vdbs = FQuery.getRepository(VisitorDBServcie.class);

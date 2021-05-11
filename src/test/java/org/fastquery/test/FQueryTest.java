@@ -40,7 +40,7 @@ import org.junit.Test;
 /**
  * @author xixifeng (fastquery@126.com)
  */
-public class FQueryTest extends FastQueryTest
+public class FQueryTest extends TestFastQuery
 {
 
     @Test

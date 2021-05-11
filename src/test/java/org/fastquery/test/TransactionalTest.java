@@ -32,7 +32,7 @@ import org.junit.rules.ExpectedException;
 /**
  * @author mei.sir@aliyun.cn
  */
-public class TransactionalTest extends FastQueryTest
+public class TransactionalTest extends TestFastQuery
 {
 
     private final ProductDBService pdbs = FQuery.getRepository(ProductDBService.class);

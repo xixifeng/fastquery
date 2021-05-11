@@ -40,7 +40,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @ContextConfiguration(locations = {"classpath:beans.xml"})
 @RunWith(value = SpringJUnit4ClassRunner.class)
-public class SpringSupportTest extends FastQueryTest
+public class SpringSupportTest extends TestFastQuery
 {
 
     @Resource

@@ -31,7 +31,7 @@ import org.junit.Test;
 /**
  * @author mei.sir@aliyun.cn
  */
-public class MySQLPageDialectTest extends FastQueryTest
+public class MySQLPageDialectTest extends TestFastQuery
 {
 
     @Test

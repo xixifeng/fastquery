@@ -39,7 +39,7 @@ import static org.hamcrest.Matchers.*;
 /**
  * @author mei.sir@aliyun.cn
  */
-public class ConditionTest extends FastQueryTest
+public class ConditionTest extends TestFastQuery
 {
 
     private final ConditionDBService db = FQuery.getRepository(ConditionDBService.class);

@@ -42,7 +42,7 @@ import org.junit.Test;
  * @author mei.sir@aliyun.cn
  */
 @Slf4j
-public class DefaultMethodTest extends FastQueryTest
+public class DefaultMethodTest extends TestFastQuery
 {
 
     private final DefaultDBService db = FQuery.getRepository(DefaultDBService.class);

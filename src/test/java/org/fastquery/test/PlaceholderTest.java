@@ -38,7 +38,7 @@ import org.junit.Test;
  * @author mei.sir@aliyun.cn
  */
 @Slf4j
-public class PlaceholderTest extends FastQueryTest
+public class PlaceholderTest extends TestFastQuery
 {
     @Test
     public void Q_MATCH()

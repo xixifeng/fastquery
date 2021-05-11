@@ -43,7 +43,7 @@ import java.util.stream.Stream;
  * @author mei.sir@aliyun.cn
  */
 @Slf4j
-public class DBTest extends FastQueryTest
+public class DBTest extends TestFastQuery
 {
     private final StudentDBService db = FQuery.getRepository(StudentDBService.class);
 

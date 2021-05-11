@@ -34,7 +34,7 @@ import org.junit.Test;
 /**
  * @author mei.sir@aliyun.cn
  */
-public class SharpExprParserTest extends FastQueryTest
+public class SharpExprParserTest extends TestFastQuery
 {
 
     @Test

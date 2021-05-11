@@ -39,7 +39,7 @@ import static org.hamcrest.Matchers.*;
 /**
  * @author xixifeng (fastquery@126.com)
  */
-public class FastQueryJSONObjectTest extends FastQueryTest
+public class FastQueryJSONObjectTest extends TestFastQuery
 {
 
     @BeforeClass

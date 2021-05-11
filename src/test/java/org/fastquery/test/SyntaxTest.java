@@ -39,7 +39,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
-public class SyntaxTest extends FastQueryTest
+public class SyntaxTest extends TestFastQuery
 {
     @Test
     public void listEmpty()

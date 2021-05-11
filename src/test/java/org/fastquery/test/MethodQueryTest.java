@@ -30,7 +30,6 @@ import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.page.Page;
 import org.fastquery.service.FQuery;
-import org.fastquery.core.SelectField;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
@@ -52,7 +51,7 @@ import java.util.Map;
  * @author xixifeng (fastquery@126.com)
  */
 @RunWith(Theories.class)
-public class MethodQueryTest extends FastQueryTest
+public class MethodQueryTest extends TestFastQuery
 {
 
     @Rule

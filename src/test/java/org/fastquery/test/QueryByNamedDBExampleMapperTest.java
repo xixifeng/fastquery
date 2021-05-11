@@ -43,7 +43,7 @@ import static org.hamcrest.Matchers.*;
  *
  * @author xixifeng (fastquery@126.com)
  */
-public class QueryByNamedDBExampleMapperTest extends FastQueryTest
+public class QueryByNamedDBExampleMapperTest extends TestFastQuery
 {
 
     private final String className = "org.fastquery.dao.QueryByNamedDBExample";

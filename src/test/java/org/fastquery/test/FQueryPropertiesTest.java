@@ -23,7 +23,6 @@
 package org.fastquery.test;
 
 import java.lang.reflect.Field;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 import javax.sql.DataSource;
@@ -38,7 +37,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author mei.sir@aliyun.cn
  */
 @Slf4j
-public class FQueryPropertiesTest extends FastQueryTest
+public class FQueryPropertiesTest extends TestFastQuery
 {
     @SuppressWarnings("unchecked")
     public Map<String, String> getDataSourceIndexs()

@@ -45,7 +45,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * @author xixifeng (fastquery@126.com)
  */
-public class QueryPoolTest extends FastQueryTest
+public class QueryPoolTest extends TestFastQuery
 {
 
     static Resource resource;

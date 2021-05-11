@@ -35,7 +35,7 @@ import org.junit.Test;
 /**
  * @author mei.sir@aliyun.cn
  */
-public class QueryByNamedDBExtendTest extends FastQueryTest
+public class QueryByNamedDBExtendTest extends TestFastQuery
 {
 
     private final QueryByNamedDBExtend db = FQuery.getRepository(QueryByNamedDBExtend.class);

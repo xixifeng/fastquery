@@ -43,7 +43,7 @@ import static org.hamcrest.Matchers.*;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
-public class SQLInExampleTest extends FastQueryTest
+public class SQLInExampleTest extends TestFastQuery
 {
 
     private final SQLInExample db = FQuery.getRepository(SQLInExample.class);
