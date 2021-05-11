@@ -26,6 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Student;
 import org.fastquery.core.Primarykey;
@@ -34,7 +35,9 @@ import org.fastquery.example.StudentDBService;
 import org.fastquery.filter.SkipFilter;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
+
 import static org.hamcrest.Matchers.*;
+
 import org.junit.Rule;
 import org.junit.Test;
 import com.alibaba.fastjson.JSON;
@@ -75,7 +78,7 @@ public class StudentDBServiceTest extends TestFastQuery
         List<SQLValue> sqlValues = rule.getListSQLValue();
         assertThat(sqlValues.size(), is(1));
         SQLValue sqlValue = sqlValues.get(0);
-        assertThat(sqlValue.getSql(), equalToIgnoringWhiteSpace("update student s set s.age=?,s.name=? where  s.no=?"));
+        assertThat(sqlValue.getSql(), equalToCompressingWhiteSpace("update student s set s.age=?,s.name=? where  s.no=?"));
         assertThat(sqlValue.getSql(), equalTo("update student s set s.age=?,s.name=? where  s.no=?"));
         List<Object> values = sqlValue.getValues();
         assertThat(values.size(), is(3));
@@ -390,7 +393,7 @@ public class StudentDBServiceTest extends TestFastQuery
     }
 
     @Test
-    public void findAllStudent2()
+    public void findAllStudentForSQL1()
     {
         studentDBService.findAllStudent(null, "张", 16, "化学系", "数学系", "无派系", null, null, null);
         SQLValue sqlValue = rule.getSQLValue();
@@ -403,8 +406,14 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(values.get(2), equalTo("化学系"));
         assertThat(values.get(3), equalTo("数学系"));
         assertThat(values.get(4), equalTo("无派系"));
+    }
 
-
+    @Test
+    public void findAllStudentForSQL2()
+    {
+        SQLValue sqlValue;
+        String sql;
+        List<Object> values;
         studentDBService.findAllStudent(null, null, 16, "化学系", "数学系", "无派系", null, null, null);
         sqlValue = rule.getSQLValue();
         sql = sqlValue.getSql();
@@ -415,8 +424,14 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(values.get(1), equalTo("化学系"));
         assertThat(values.get(2), equalTo("数学系"));
         assertThat(values.get(3), equalTo("无派系"));
+    }
 
-
+    @Test
+    public void findAllStudentForSQL3()
+    {
+        SQLValue sqlValue;
+        String sql;
+        List<Object> values;
         studentDBService.findAllStudent(null, null, null, "化学系", "数学系", "无派系", null, null, null);
         sqlValue = rule.getSQLValue();
         sql = sqlValue.getSql();
@@ -426,7 +441,14 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(values.get(0), equalTo("化学系"));
         assertThat(values.get(1), equalTo("数学系"));
         assertThat(values.get(2), equalTo("无派系"));
+    }
 
+    @Test
+    public void findAllStudentForSQL4()
+    {
+        SQLValue sqlValue;
+        String sql;
+        List<Object> values;
         studentDBService.findAllStudent(null, null, null, null, "数学系", "无派系", null, null, null);
         sqlValue = rule.getSQLValue();
         sql = sqlValue.getSql();
@@ -436,7 +458,14 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(values.get(0), nullValue());
         assertThat(values.get(1), equalTo("数学系"));
         assertThat(values.get(2), equalTo("无派系"));
+    }
 
+    @Test
+    public void findAllStudentForSQL5()
+    {
+        SQLValue sqlValue;
+        String sql;
+        List<Object> values;
         studentDBService.findAllStudent(null, null, null, null, null, "无派系", null, null, null);
         sqlValue = rule.getSQLValue();
         sql = sqlValue.getSql();
@@ -446,7 +475,14 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(values.get(0), nullValue());
         assertThat(values.get(1), nullValue());
         assertThat(values.get(2), equalTo("无派系"));
+    }
 
+    @Test
+    public void findAllStudentForSQL6()
+    {
+        SQLValue sqlValue;
+        String sql;
+        List<Object> values;
         studentDBService.findAllStudent(null, null, null, null, null, null, null, null, null);
         sqlValue = rule.getSQLValue();
         sql = sqlValue.getSql();
@@ -456,7 +492,14 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(values.get(0), nullValue());
         assertThat(values.get(1), nullValue());
         assertThat(values.get(2), nullValue());
+    }
 
+    @Test
+    public void findAllStudentForSQL7()
+    {
+        SQLValue sqlValue;
+        String sql;
+        List<Object> values;
         studentDBService.findAllStudent(null, "张", 16, null, "数学系", "无派系", null, null, null);
         sqlValue = rule.getSQLValue();
         sql = sqlValue.getSql();
@@ -468,7 +511,14 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(values.get(2), nullValue());
         assertThat(values.get(3), equalTo("数学系"));
         assertThat(values.get(4), equalTo("无派系"));
+    }
 
+    @Test
+    public void findAllStudentForSQL8()
+    {
+        SQLValue sqlValue;
+        String sql;
+        List<Object> values;
         studentDBService.findAllStudent(null, null, 16, "化学系", null, "无派系", null, null, null);
         sqlValue = rule.getSQLValue();
         sql = sqlValue.getSql();
@@ -479,7 +529,14 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(values.get(1), equalTo("化学系"));
         assertThat(values.get(2), nullValue());
         assertThat(values.get(3), equalTo("无派系"));
+    }
 
+    @Test
+    public void findAllStudentForSQL9()
+    {
+        SQLValue sqlValue;
+        String sql;
+        List<Object> values;
         studentDBService.findAllStudent(null, null, null, "化学系", "数学系", null, null, null, null);
         sqlValue = rule.getSQLValue();
         sql = sqlValue.getSql();
