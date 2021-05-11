@@ -24,23 +24,13 @@ package org.fastquery.test;
 
 import java.lang.reflect.Method;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 /**
  * @author mei.sir@aliyun.cn
  */
 public class TestFastQuery
 {
 
-    @Test
-    public void init()
-    {
-        //
-    }
-
-    @BeforeClass
-    public static void bc()
+    static
     {
         // 测试自定义位置
         System.setProperty("fastquery.config.dir", System.getProperty("user.dir") + "/src/test/resources/testFiles");

@@ -24,16 +24,18 @@ package org.fastquery.bean;
 
 import lombok.*;
 import org.fastquery.core.Id;
+import org.fastquery.core.Table;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Table("TypeTest")
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class TypeTest
+public class BoolType
 {
 
     @Id
@@ -43,7 +45,7 @@ public class TypeTest
     private Boolean auth;
     private String gender;
 
-    public TypeTest(Boolean deleted, Boolean activated, Boolean auth, String gender)
+    public BoolType(Boolean deleted, Boolean activated, Boolean auth, String gender)
     {
         this.deleted = deleted;
         this.activated = activated;
