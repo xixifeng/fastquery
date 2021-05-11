@@ -26,13 +26,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.hamcrest.Matchers.*;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.SetDBService;
 import org.fastquery.service.FQuery;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.theories.Theories;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 /**
@@ -44,33 +43,31 @@ public class SetDBExpectTest extends TestFastQuery
 
     private final SetDBService db = FQuery.getRepository(SetDBService.class);
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private final String no = "c03";
 
     @Test
     public void testUpdateCourse1()
     {
-
-        // 断言会抛出 RepositoryException
-        thrown.expect(RepositoryException.class);
-        thrown.expectMessage(containsString("@Set 修改选项全部被忽略了"));
-
-        int effect = db.updateCourse(null, null, null, null, no);
-        assertThat(effect, is(1));
+        try
+        {
+            db.updateCourse(null, null, null, null, no);
+        }catch (Exception e) {
+            assertThat(e instanceof RepositoryException, is(true));
+            assertThat(ExceptionUtils.getMessage(e),containsString("@Set 修改选项全部被忽略了"));
+        }
     }
 
     @Test
     public void testUpdateCourse2()
     {
-
-        // 断言会抛出 RepositoryException
-        thrown.expect(RepositoryException.class);
-        thrown.expectMessage(containsString("@Set 修改选项全部被忽略了"));
-
-        int effect = db.updateCourse("", null, null, null, no);
-        assertThat(effect, is(1));
+        try
+        {
+            db.updateCourse("", null, null, null, no);
+        }
+        catch (Exception e){
+            assertThat(e instanceof RepositoryException, is(true));
+            assertThat(ExceptionUtils.getMessage(e),containsString("@Set 修改选项全部被忽略了"));
+        }
     }
 
 }

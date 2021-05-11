@@ -24,7 +24,7 @@ package org.fastquery.asm;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 /**
@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.*;
 public class AsmRepositoryTest
 {
     @Test
-    public void getParameterDef() throws Exception
+    public void getParameterDef()
     {
         String str = AsmRepository.getParameterDef(new Class<?>[]{String[][].class, String.class});
         assertThat(str, containsString("java.lang.String[][] p0,"));

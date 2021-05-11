@@ -22,9 +22,14 @@
 
 package org.fastquery.bean.sunny;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Setter
+@Getter
 public class Tenant
 {
     private Long id;
@@ -35,25 +40,4 @@ public class Tenant
         this.id = id;
         this.name = name;
     }
-
-    public Long getId()
-    {
-        return id;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setId(Long id)
-    {
-        this.id = id;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
 }
