@@ -37,7 +37,6 @@ import org.fastquery.core.Id;
 import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Param;
 import org.fastquery.core.Placeholder;
-import org.fastquery.core.Query;
 import org.fastquery.struct.Reference;
 import org.junit.Test;
 
@@ -69,12 +68,6 @@ public class TypeUtilTest
         Method method = TypeUtilTest.class.getMethod("todo", Integer.class, Integer.class);
         Parameter[] parameters = method.getParameters();
         assertThat(TypeUtil.findAnnotationIndex(Id.class, parameters), is(0));
-    }
-
-    // 别删除用做测试用
-    @Query("select * from Student #{#where} order by desc")
-    public void method01()
-    {
     }
 
     @Test
