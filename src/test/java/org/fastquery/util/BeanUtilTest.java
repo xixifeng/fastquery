@@ -32,6 +32,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import com.alibaba.fastjson.JSON;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Fish;
 import org.fastquery.bean.Student;
@@ -47,19 +48,11 @@ import org.junit.Test;
 @Slf4j
 public class BeanUtilTest
 {
+    @Setter
     final static class T
     {
+        // 有被使用
         private Integer key;
-
-        public Integer getKey()
-        {
-            return key;
-        }
-
-        public void setKey(Integer key)
-        {
-            this.key = key;
-        }
     }
 
     @Test
@@ -110,6 +103,11 @@ public class BeanUtilTest
         T t = new T();
         sql = BeanUtil.toInsertSQL(t);
         assertThat(sql, equalTo("insert into T(key) values(null)"));
+
+        t = new T();
+        t.setKey(789);
+        sql = BeanUtil.toInsertSQL(t);
+        assertThat(sql, equalTo("insert into T(key) values(789)"));
     }
 
     @Test
