@@ -1521,7 +1521,7 @@ String findOneCourse();
 @ComponentScan("org.fastquery.service")
 ```
 
-使用 db 接口处, 使用注入得到实例对象
+使用 db 接口处, 注入得到实例对象
 
 ```java
 @javax.annotation.Resource
