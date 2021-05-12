@@ -29,6 +29,9 @@ import org.fastquery.bean.UserInfo;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;
 import org.fastquery.core.Repository;
+import org.fastquery.filter.After;
+import org.fastquery.filter.ConditionDBAfterFilter;
+import org.fastquery.filter.MyAfterFilter;
 import org.fastquery.page.Page;
 import org.fastquery.page.Pageable;
 import org.fastquery.where.Condition;
@@ -37,6 +40,7 @@ import org.fastquery.where.Judge;
 /**
  * @author mei.sir@aliyun.cn
  */
+@After(ConditionDBAfterFilter.class)
 public interface ConditionDBService extends Repository
 {
 

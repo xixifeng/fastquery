@@ -21,11 +21,13 @@
  */
 
 package org.fastquery.util;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1061,9 +1063,12 @@ public class TypeUtil
 
     public static EnumSet toEnumSet(String value, Class<Enum> clazz)
     {
-        if(value == null) {
+        if (value == null)
+        {
             return null;
-        } else {
+        }
+        else
+        {
             List<Enum> enums = new ArrayList<>();
             String[] names = StringUtils.split(value, ',');
             for (String name : names)
@@ -1072,9 +1077,12 @@ public class TypeUtil
                 Objects.requireNonNull(e, name + " 转换成 " + clazz + " 失败！");
                 enums.add(e);
             }
-            if(enums.isEmpty()) {
+            if (enums.isEmpty())
+            {
                 return EnumSet.noneOf(clazz);
-            } else {
+            }
+            else
+            {
                 return EnumSet.copyOf(enums);
             }
         }
@@ -1132,9 +1140,12 @@ public class TypeUtil
                 Field field = beanType.getDeclaredField(k);
                 field.setAccessible(true);
                 EnumSet enumSet;
-                if(enums.isEmpty()) {
+                if (enums.isEmpty())
+                {
                     enumSet = EnumSet.noneOf((Class<Enum>) enumSetFeilds.get(k));
-                } else {
+                }
+                else
+                {
                     enumSet = EnumSet.copyOf(enums);
                 }
                 field.set(obj, enumSet);
@@ -1148,28 +1159,22 @@ public class TypeUtil
         return obj;
     }
 
-    public static <E extends Enum<E>> String enumSet2Val(EnumSet<E> enumSet)
+    public static <E extends Enum<E>> String enumSet2Val(Set<E> enumSet)
     {
-        if (enumSet == null)
+        Objects.requireNonNull(enumSet,"enumSet must not be null");
+        Iterator<E> iterator = enumSet.iterator();
+        StringBuilder sb = new StringBuilder();
+        while (iterator.hasNext())
         {
-            return null;
+            sb.append(iterator.next().name());
+            sb.append(',');
         }
-        else
+        int len = sb.length();
+        if (len > 1)
         {
-            Iterator<E> iterator = enumSet.iterator();
-            StringBuilder sb = new StringBuilder();
-            while (iterator.hasNext())
-            {
-                sb.append(iterator.next().name());
-                sb.append(',');
-            }
-            int len = sb.length();
-            if (len > 1)
-            {
-                sb.deleteCharAt(len - 1);
-            }
-            return sb.toString();
+            sb.deleteCharAt(len - 1);
         }
+        return sb.toString();
     }
 
     public static String repeatChar(int size, char x)

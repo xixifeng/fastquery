@@ -142,23 +142,22 @@ public final class BeanUtil
                 {
                     throw new RepositoryException(e);
                 }
-                if (val != null && field.getType() == EnumSet.class)
-                {
-                    val = TypeUtil.enumSet2Val((EnumSet) val);
-                }
+
                 if (val != null)
                 {
                     if (val instanceof Number || val instanceof Boolean)
                     {
                         sb.append(val);
+                        sb.append(',');
                     }
                     else
                     {
+                        val = field.getType() == EnumSet.class ? TypeUtil.enumSet2Val((Set<Enum>) val) : val;
                         sb.append('\'');
                         sb.append(escapeSql(val.toString()));
                         sb.append('\'');
+                        sb.append(',');
                     }
-                    sb.append(',');
                 }
                 else if (field.getAnnotation(Id.class) == null)
                 {
