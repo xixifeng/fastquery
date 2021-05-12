@@ -101,7 +101,7 @@ class GenerateRepositoryImpl
          try (java.io.FileOutputStream fos = new java.io.FileOutputStream("/data/tmp/fquery/" + name + ".class")) {
          fos.write(bytes);
          } catch (Exception e) {
-         e.printStackTrace();
+           log.warn(e);
          } // 把生成的文件存储起来 end
          </pre>
          */

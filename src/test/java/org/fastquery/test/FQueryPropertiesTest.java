@@ -27,8 +27,10 @@ import java.util.Map;
 import java.util.Set;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.dsm.FQueryProperties;
 import org.junit.Test;
+import static org.junit.Assert.fail;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,7 +53,7 @@ public class FQueryPropertiesTest extends TestFastQuery
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            fail(e.getMessage());
         }
         return null;
     }
@@ -68,7 +70,7 @@ public class FQueryPropertiesTest extends TestFastQuery
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            fail(e.getMessage());
         }
         return null;
     }

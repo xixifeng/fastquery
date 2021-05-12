@@ -1096,19 +1096,16 @@ public class TypeUtil
         Field[] fields = beanType.getDeclaredFields();
         for (Field field : fields)
         {
-            if (field.getType() == EnumSet.class)
+            if (field.getType() == EnumSet.class && field.getGenericType() instanceof ParameterizedType)
             {
-                if (field.getGenericType() instanceof ParameterizedType)
+                ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+                if (parameterizedType.getActualTypeArguments()[0].getClass() == Class.class)
                 {
-                    ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-                    if (parameterizedType.getActualTypeArguments()[0].getClass() == Class.class)
-                    {
-                        enumSetFeilds.put(field.getName(), parameterizedType.getActualTypeArguments()[0]);
-                    }
-                    else
-                    {
-                        throw new RepositoryException("禁止出现EnumSet<?通配符>");
-                    }
+                    enumSetFeilds.put(field.getName(), parameterizedType.getActualTypeArguments()[0]);
+                }
+                else
+                {
+                    throw new RepositoryException("禁止出现EnumSet<?通配符>");
                 }
             }
         }
@@ -1127,33 +1124,24 @@ public class TypeUtil
         // 3. 实现反序列化
         Object obj = JSON.toJavaObject(new JSONObject(map), beanType);
         enumSetValues.forEach((k, v) -> {
-            try
+            List<Enum> enums = new ArrayList<>();
+            String[] names = StringUtils.split(v, ',');
+            for (String name : names)
             {
-                List<Enum> enums = new ArrayList<>();
-                String[] names = StringUtils.split(v, ',');
-                for (String name : names)
-                {
-                    Enum e = EnumUtils.getEnum((Class<Enum>) enumSetFeilds.get(k), name);
-                    Objects.requireNonNull(e, "不能为 null");
-                    enums.add(e);
-                }
-                Field field = beanType.getDeclaredField(k);
-                field.setAccessible(true);
-                EnumSet enumSet;
-                if (enums.isEmpty())
-                {
-                    enumSet = EnumSet.noneOf((Class<Enum>) enumSetFeilds.get(k));
-                }
-                else
-                {
-                    enumSet = EnumSet.copyOf(enums);
-                }
-                field.set(obj, enumSet);
+                Enum e = EnumUtils.getEnum((Class<Enum>) enumSetFeilds.get(k), name);
+                Objects.requireNonNull(e, "不能为 null");
+                enums.add(e);
             }
-            catch (NoSuchFieldException | IllegalAccessException e)
+            EnumSet enumSet;
+            if (enums.isEmpty())
             {
-                e.printStackTrace();
+                enumSet = EnumSet.noneOf((Class<Enum>) enumSetFeilds.get(k));
             }
+            else
+            {
+                enumSet = EnumSet.copyOf(enums);
+            }
+            getFieldAndSetVal(beanType,obj,k,enumSet);
         });
         // xxx end
         return obj;
@@ -1161,7 +1149,7 @@ public class TypeUtil
 
     public static <E extends Enum<E>> Object enumSet2Val(Object obj)
     {
-        if(obj instanceof EnumSet)
+        if (obj instanceof EnumSet)
         {
             @SuppressWarnings("unchecked")
             EnumSet<E> enumSet = (EnumSet<E>) obj;
@@ -1213,5 +1201,19 @@ public class TypeUtil
             throw new RepositoryException(e);
         }
         return val;
+    }
+
+    public static void getFieldAndSetVal(Class<?> beanType, Object bean, String fieldName, Object val)
+    {
+        try
+        {
+            Field field =  beanType.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(bean, val);
+        }
+        catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException e)
+        {
+            throw new RepositoryException(e);
+        }
     }
 }
