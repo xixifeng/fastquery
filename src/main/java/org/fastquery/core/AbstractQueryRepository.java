@@ -57,7 +57,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
 
     private static final Class<QueryRepository> c = QueryRepository.class;
 
-    private static final MethodInfo[] m = new MethodInfo[40];
+    private final MethodInfo[] m = new MethodInfo[40];
 
     private void cache(int j, String name, Class<?>... parameterTypes)
     {

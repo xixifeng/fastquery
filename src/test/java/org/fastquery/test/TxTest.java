@@ -114,12 +114,7 @@ public class TxTest extends TestFastQuery
         assertThat(aa.findDatabasePort().get("Value"), equalTo("3306"));
         aa.delete("Fish", "id", 4);
         Fish fish = aa.save(new Fish(id, name, num));
-        assertThat(fish.getId(), equalTo(id));
-        assertThat(fish.getName(), equalTo(name));
-        assertThat(fish.getNum(), equalTo(num));
-
-        assertThat(bb.findDatabaseName(), equalTo("bb"));
-        assertThat(bb.findDatabasePort().get("Value"), equalTo("3306"));
+        part2(id, name, num, fish);
         bb.delete("Fish", "id", 4);
         fish = bb.save(new Fish(id, name, num));
         assertThat(fish.getId(), equalTo(id));
@@ -181,45 +176,23 @@ public class TxTest extends TestFastQuery
     @Test
     public void tx2()
     {
-		
-		/*
-		 
-		 Fish fish = aa.find(Fish.class, id);
-				assertThat(fish.getId(), equalTo(id));
-				assertThat(fish.getName(), not(equalTo(name)));
-				assertThat(fish.getNum(), not(equalTo(num)));
-		 */
-
-
         Integer id = 1;
         String name = "乌龟";
         Integer num = 300;
         int effect = aa.tx(() -> {
 
             Fish fish = aa.update(new Fish(id, name, num));
-            assertThat(fish.getId(), equalTo(id));
-            assertThat(fish.getName(), equalTo(name));
-            assertThat(fish.getNum(), equalTo(num));
-            assertThat(aa.findDatabaseName(), equalTo("aa"));
-            assertThat(aa.findDatabasePort().get("Value"), equalTo("3306"));
+            part1(id, name, num, fish);
 
             fish = bb.update(new Fish(id, name, num));
-            assertThat(fish.getId(), equalTo(id));
-            assertThat(fish.getName(), equalTo(name));
-            assertThat(fish.getNum(), equalTo(num));
-            assertThat(bb.findDatabaseName(), equalTo("bb"));
-            assertThat(bb.findDatabasePort().get("Value"), equalTo("3306"));
+            part2(id, name, num, fish);
 
             aa.save(new Fish(name, num));
             bb.save(new Fish(name, num));
             cc.save(new Fish(name, num));
 
             fish = cc.update(new Fish(id, name, num));
-            assertThat(fish.getId(), equalTo(id));
-            assertThat(fish.getName(), equalTo(name));
-            assertThat(fish.getNum(), equalTo(num));
-            assertThat(cc.findDatabaseName(), equalTo("cc"));
-            assertThat(cc.findDatabasePort().get("Value"), equalTo("3307"));
+            part3(id, name, num, fish);
 
             int i = aa.delete("Fish", "id", 1);
             assertThat(i, is(1));
@@ -254,6 +227,33 @@ public class TxTest extends TestFastQuery
         });
 
         assertThat(effect, is(-1));
+    }
+
+    public void part3(Integer id, String name, Integer num, Fish fish)
+    {
+        assertThat(fish.getId(), equalTo(id));
+        assertThat(fish.getName(), equalTo(name));
+        assertThat(fish.getNum(), equalTo(num));
+        assertThat(cc.findDatabaseName(), equalTo("cc"));
+        assertThat(cc.findDatabasePort().get("Value"), equalTo("3307"));
+    }
+
+    public void part2(Integer id, String name, Integer num, Fish fish)
+    {
+        assertThat(fish.getId(), equalTo(id));
+        assertThat(fish.getName(), equalTo(name));
+        assertThat(fish.getNum(), equalTo(num));
+        assertThat(bb.findDatabaseName(), equalTo("bb"));
+        assertThat(bb.findDatabasePort().get("Value"), equalTo("3306"));
+    }
+
+    public void part1(Integer id, String name, Integer num, Fish fish)
+    {
+        assertThat(fish.getId(), equalTo(id));
+        assertThat(fish.getName(), equalTo(name));
+        assertThat(fish.getNum(), equalTo(num));
+        assertThat(aa.findDatabaseName(), equalTo("aa"));
+        assertThat(aa.findDatabasePort().get("Value"), equalTo("3306"));
     }
 
 
