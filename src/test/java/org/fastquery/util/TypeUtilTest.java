@@ -481,7 +481,7 @@ public class TypeUtilTest
     @Test
     public void enumSet2Val(){
         EnumSet<Ruits> ruits = EnumSet.of(Ruits.梨, Ruits.香蕉, Ruits.西瓜, Ruits.芒果, Ruits.橘子);
-        String val = TypeUtil.enumSet2Val(ruits);
+        Object val = TypeUtil.enumSet2Val(ruits);
         log.info("val : {}", val);
         assertThat(val,equalTo("香蕉,西瓜,芒果,橘子,梨"));
     }

@@ -132,32 +132,22 @@ public final class BeanUtil
         {
             if (allowField(field))
             {
-                Object val;
-                try
-                {
-                    field.setAccessible(true);
-                    val = field.get(bean);
-                }
-                catch (IllegalAccessException | IllegalArgumentException e)
-                {
-                    throw new RepositoryException(e);
-                }
+                Object val = getFieldVal(bean, field);
 
                 if (val != null)
                 {
                     if (val instanceof Number || val instanceof Boolean)
                     {
                         sb.append(val);
-                        sb.append(',');
                     }
                     else
                     {
-                        val = field.getType() == EnumSet.class ? TypeUtil.enumSet2Val((Set<Enum>) val) : val;
+                        val = TypeUtil.enumSet2Val(val);
                         sb.append('\'');
                         sb.append(escapeSql(val.toString()));
                         sb.append('\'');
-                        sb.append(',');
                     }
+                    sb.append(',');
                 }
                 else if (field.getAnnotation(Id.class) == null)
                 {
@@ -167,6 +157,21 @@ public final class BeanUtil
         }
         sb.setCharAt(sb.length() - 1, ')');
         return sb.toString();
+    }
+
+    private static <B> Object getFieldVal(B bean, Field field)
+    {
+        Object val;
+        try
+        {
+            field.setAccessible(true);
+            val = field.get(bean);
+        }
+        catch (IllegalAccessException | IllegalArgumentException e)
+        {
+            throw new RepositoryException(e);
+        }
+        return val;
     }
 
     // use select one
@@ -179,16 +184,7 @@ public final class BeanUtil
         {
             if (allowField(field))
             {
-                Object val;
-                try
-                {
-                    field.setAccessible(true);
-                    val = field.get(bean);
-                }
-                catch (IllegalAccessException | IllegalArgumentException e)
-                {
-                    throw new RepositoryException(e);
-                }
+                Object val = getFieldVal(bean, field);
                 if (ignoreId)
                 {
                     if (val != null && field.getAnnotation(Id.class) == null)
@@ -567,7 +563,7 @@ public final class BeanUtil
         String tableName = getEntitySimpleName(cls);
         if (dbName != null)
         {
-            return new StringBuilder().append(dbName).append('.').append(tableName).toString();
+            return dbName + '.' + tableName;
         }
         else
         {
@@ -619,10 +615,7 @@ public final class BeanUtil
                     Id id = field.getAnnotation(Id.class);
                     if (val != null && id == null)
                     {
-                        if (field.getType() == EnumSet.class)
-                        {
-                            val = TypeUtil.enumSet2Val((EnumSet) val);
-                        }
+                        val = TypeUtil.enumSet2Val(val);
                         args.add(val);
                         sb.append(' ');
                         sb.append(field.getName());

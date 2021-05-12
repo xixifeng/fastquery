@@ -149,6 +149,7 @@ public class TxTest extends TestFastQuery
             ldc.setAccessible(true);
             Object obj = ldc.invoke(null);
             Field field = tc.getDeclaredField("dclist");
+
             field.setAccessible(true);
             return (List<DC>) field.get(obj);
         }

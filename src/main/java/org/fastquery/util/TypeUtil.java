@@ -1159,22 +1159,30 @@ public class TypeUtil
         return obj;
     }
 
-    public static <E extends Enum<E>> String enumSet2Val(Set<E> enumSet)
+    public static <E extends Enum<E>> Object enumSet2Val(Object obj)
     {
-        Objects.requireNonNull(enumSet,"enumSet must not be null");
-        Iterator<E> iterator = enumSet.iterator();
-        StringBuilder sb = new StringBuilder();
-        while (iterator.hasNext())
+        if(obj instanceof EnumSet)
         {
-            sb.append(iterator.next().name());
-            sb.append(',');
+            @SuppressWarnings("unchecked")
+            EnumSet<E> enumSet = (EnumSet<E>) obj;
+            Iterator<E> iterator = enumSet.iterator();
+            StringBuilder sb = new StringBuilder();
+            while (iterator.hasNext())
+            {
+                sb.append(iterator.next().name());
+                sb.append(',');
+            }
+            int len = sb.length();
+            if (len > 1)
+            {
+                sb.deleteCharAt(len - 1);
+            }
+            return sb.toString();
         }
-        int len = sb.length();
-        if (len > 1)
+        else
         {
-            sb.deleteCharAt(len - 1);
+            return obj;
         }
-        return sb.toString();
     }
 
     public static String repeatChar(int size, char x)
