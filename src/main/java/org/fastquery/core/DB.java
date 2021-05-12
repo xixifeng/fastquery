@@ -194,7 +194,7 @@ public class DB
                 return (String[][]) obj;
             }
         }
-        return null;
+        return new String[0][0];
     }
 
     private static Predicate<Map<String, Object>> getPredicate()

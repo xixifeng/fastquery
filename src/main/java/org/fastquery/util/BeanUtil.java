@@ -174,15 +174,12 @@ public final class BeanUtil
                         values.add(val);
                     }
                 }
-                else
+                else if (val != null)
                 {
-                    if (val != null)
-                    {
-                        sb.append(AND);
-                        sb.append(field.getName());
-                        sb.append(" = ?");
-                        values.add(val);
-                    }
+                    sb.append(AND);
+                    sb.append(field.getName());
+                    sb.append(" = ?");
+                    values.add(val);
                 }
             }
         }
@@ -710,19 +707,16 @@ public final class BeanUtil
                 // 找出主键字段
                 Field[] fields = getFields(clazz);
                 Field key = getKey(clazz, fields);
-                key.setAccessible(true);
 
-                StringBuilder sql = new StringBuilder();
-                sql.append(UPDATE);
-                sql.append(tableName);
-                sql.append(" set ");
-                sql.append(getSets(beans, fields, key));
-                sql.append(WHERE);
-                sql.append(key.getName());
-                sql.append(" in(");
-                sql.append(getIds(beans, key));
-                sql.append(')');
-                return sql.toString();
+                return UPDATE +
+                        tableName +
+                        " set " +
+                        getSets(beans, fields, key) +
+                        WHERE +
+                        key.getName() +
+                        " in(" +
+                        getIds(beans, key) +
+                        ')';
             }
         }
 
