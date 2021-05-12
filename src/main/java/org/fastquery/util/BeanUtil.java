@@ -44,6 +44,7 @@ public final class BeanUtil
     private static final String NOT_ID = " 必须有@Id标识,并且主键不能为null";
 
     private static final String WHERE = " where ";
+    public static final String AND = " and ";
 
     private BeanUtil()
     {
@@ -167,7 +168,7 @@ public final class BeanUtil
                 {
                     if (val != null && field.getAnnotation(Id.class) == null)
                     {
-                        sb.append(" and ");
+                        sb.append(AND);
                         sb.append(field.getName());
                         sb.append(" = ?");
                         values.add(val);
@@ -177,7 +178,7 @@ public final class BeanUtil
                 {
                     if (val != null)
                     {
-                        sb.append(" and ");
+                        sb.append(AND);
                         sb.append(field.getName());
                         sb.append(" = ?");
                         values.add(val);
@@ -245,14 +246,6 @@ public final class BeanUtil
     }
     // use select one end
 
-    /**
-     *
-     *
-     * @param clazz 实体class
-     * @param fields 实体的字段
-     * @param beans 实体集
-     * @return sql 中的 values 部分
-     */
     /**
      * 把实体集合转换成sql中的values部分
      *
@@ -330,14 +323,12 @@ public final class BeanUtil
         {
             insertStr = "insert into";
         }
-        StringBuilder insertsql = new StringBuilder();
-        insertsql.append(insertStr);
-        insertsql.append(' ');
-        insertsql.append(tableName);
-        insertsql.append(fs);
-        insertsql.append(' ');
-        insertsql.append(values);
-        return insertsql.toString();
+        return insertStr +
+                ' ' +
+                tableName +
+                fs +
+                ' ' +
+                values;
     }
 
     public static String arr2InsertSQL(Object[] beans, String dbName, boolean ignoreRepeat)
@@ -422,16 +413,13 @@ public final class BeanUtil
         Field[] fields = cls.getDeclaredFields();
         for (Field field : fields)
         {
-            if (allowField(field))
+            if (allowField(field) && bean != null)
             {
-                if (bean != null)
+                Object fv = TypeUtil.getFieldVal(bean, field);
+                if (fv != null)
                 {
-                    Object fv = TypeUtil.getFieldVal(bean, field);
-                    if (fv != null)
-                    {
-                        conditions.add(field.getName() + " = :" + field.getName() + " and");
-                        parameters.put(field.getName(), fv);// 同时把这个?号的值记下来
-                    }
+                    conditions.add(field.getName() + " = :" + field.getName() + " and");
+                    parameters.put(field.getName(), fv);// 同时把这个?号的值记下来
                 }
             }
         }
@@ -748,7 +736,6 @@ public final class BeanUtil
         {
             if (field != key && allowField(field))
             {
-                field.setAccessible(true);
                 String fieldName = field.getName();
                 sets.append(fieldName);
                 sets.append(" = case ");
@@ -756,8 +743,8 @@ public final class BeanUtil
                 sets.append(' ');
                 for (B b : beans)
                 {
-                    Object keyVal = getFieldVal(key, b);
-                    Object fieldVal = getFieldVal(field, b);
+                    Object keyVal = TypeUtil.getFieldVal(b,key);
+                    Object fieldVal = TypeUtil.getFieldVal(b,field);
                     sets.append("when ");
                     sets.append(keyVal);
                     sets.append(" then ");
@@ -801,7 +788,7 @@ public final class BeanUtil
         StringBuilder ids = new StringBuilder();
         for (B b : beans)
         {
-            Object keyVal = getFieldVal(key, b);
+            Object keyVal = TypeUtil.getFieldVal(b,key);
             if (keyVal == null)
             {
                 throw new RepositoryException("主键的值不能为null");
@@ -812,21 +799,6 @@ public final class BeanUtil
         ids.deleteCharAt(ids.length() - 1);
         return ids;
     }
-
-    private static Object getFieldVal(Field key, Object obj)
-    {
-        Object keyVal;
-        try
-        {
-            keyVal = key.get(obj);
-        }
-        catch (IllegalArgumentException | IllegalAccessException e)
-        {
-            throw new RepositoryException(key + "无法获取值", e);
-        }
-        return keyVal;
-    }
-
     public static String toDelete(String tableName, String keyName, long keyVal, String dbName)
     {
         StringBuilder sq = new StringBuilder();
@@ -961,13 +933,13 @@ public final class BeanUtil
      */
     public static String[] toEachOne(String sql)
     {
-        String[] strs = StringUtils.splitByWholeSeparator(sql, " and ");
+        String[] strs = StringUtils.splitByWholeSeparator(sql, AND);
         int len = strs.length;
         String[] sqls = new String[len];
         sqls[0] = strs[0];
         if (len > 1)
         {
-            String base = StringUtils.substringBefore(strs[0], " where ") + " where ";
+            String base = StringUtils.substringBefore(strs[0], WHERE) + WHERE;
             for (int i = 1; i < strs.length; i++)
             {
                 sqls[i] = base + strs[i];
@@ -986,7 +958,7 @@ public final class BeanUtil
         sb.append(selectFields);
         sb.append(" from ");
         sb.append(getTableName(null, clazz));
-        sb.append(" where ");
+        sb.append(WHERE);
         sb.append(fieldName);
         if (fieldValues == null || fieldValues.isEmpty())
         {
