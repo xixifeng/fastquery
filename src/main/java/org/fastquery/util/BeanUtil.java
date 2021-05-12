@@ -25,6 +25,7 @@ package org.fastquery.util;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -136,14 +137,14 @@ public final class BeanUtil
                 {
                     field.setAccessible(true);
                     val = field.get(bean);
-                    if (val != null && field.getType() == EnumSet.class)
-                    {
-                        val = TypeUtil.enumSet2Val((EnumSet) val);
-                    }
                 }
                 catch (IllegalAccessException | IllegalArgumentException e)
                 {
                     throw new RepositoryException(e);
+                }
+                if (val != null && field.getType() == EnumSet.class)
+                {
+                    val = TypeUtil.enumSet2Val((EnumSet) val);
                 }
                 if (val != null)
                 {
@@ -473,7 +474,7 @@ public final class BeanUtil
                     }
                     if (fv != null)
                     {
-                        conditions.add(field.getName() + " = :" + field.getName() +" and");
+                        conditions.add(field.getName() + " = :" + field.getName() + " and");
                         parameters.put(field.getName(), fv);// 同时把这个?号的值记下来
                     }
                 }
@@ -503,13 +504,13 @@ public final class BeanUtil
                     }
                     if (lv != null)
                     {
-                        conditions.add(field.getName() + " like :" + field.getName() +" or");
+                        conditions.add(field.getName() + " like :" + field.getName() + " or");
                         parameters.put(field.getName(), lv);// 同时把这个?号的值记下来
                     }
                 }
             }
         }
-        if(andSize != conditions.size())
+        if (andSize != conditions.size())
         {
             // 去掉末尾的 or
             int lastIndex = conditions.size() - 1;
@@ -520,7 +521,7 @@ public final class BeanUtil
         }
         else
         {
-            conditions.remove(andSize-1); // 去掉 "（"
+            conditions.remove(andSize - 1); // 去掉 "（"
             // 去掉 "(" 前面的 "and"
             if (!conditions.isEmpty())
             {
@@ -832,10 +833,10 @@ public final class BeanUtil
                         else
                         {
                             String s = fieldVal.toString();
-                            if(fieldVal instanceof EnumSet)
+                            if (fieldVal instanceof EnumSet)
                             {
-                                s = StringUtils.substringBetween(s,"[","]");
-                                s = StringUtils.replace(s,", ",",");
+                                s = StringUtils.substringBetween(s, "[", "]");
+                                s = StringUtils.replace(s, ", ", ",");
                             }
                             sets.append('\'');
                             sets.append(s);
