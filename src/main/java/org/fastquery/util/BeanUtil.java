@@ -401,6 +401,16 @@ public final class BeanUtil
         }
     }
 
+    // 修改指定 index 元素的值，将此元素的末尾 num 个字符删掉
+    // 注意：
+    private static void updateConditionListLastElement(ConditionList conditions, int num)
+    {
+        int lastIndex = conditions.size() - 1;
+        String lastCondition = conditions.get(lastIndex);
+        lastCondition = lastCondition.substring(0, lastCondition.length() - num);
+        conditions.set(lastIndex, lastCondition);
+    }
+
     public static QueryBuilder toSelectSQL(Class<?> cls, Object bean, Object likes, String dbName, String sort, String selectFields)
     {
         ConditionList conditions = new ConditionList();
@@ -408,54 +418,28 @@ public final class BeanUtil
         // 表名称
         String tableName = getTableName(dbName, cls);
         Field[] fields = cls.getDeclaredFields();
-        for (Field field : fields)
-        {
-            if (allowField(field) && bean != null)
-            {
-                Object fv = TypeUtil.getFieldVal(bean, field);
-                if (fv != null)
-                {
-                    conditions.add(field.getName() + " = :" + field.getName() + " and");
-                    parameters.put(field.getName(), fv);// 同时把这个?号的值记下来
-                }
-            }
-        }
+
+        addCondition(bean, conditions, parameters, fields, "=", " and");
 
         // 接下来是 like 条件集
         conditions.add("(");
         int andSize = conditions.size();
 
-        for (Field field : fields)
-        {
-            if (allowField(field) && likes != null)
-            {
-                Object lv = TypeUtil.getFieldVal(likes, field);
-                if (lv != null)
-                {
-                    conditions.add(field.getName() + " like :" + field.getName() + " or");
-                    parameters.put(field.getName(), lv);// 同时把这个?号的值记下来
-                }
-            }
-        }
+        addCondition(likes, conditions, parameters, fields, "like", " or");
+
         if (andSize != conditions.size())
         {
-            // 去掉末尾的 or
-            int lastIndex = conditions.size() - 1;
-            String lastCondition = conditions.get(lastIndex);
-            lastCondition = lastCondition.substring(0, lastCondition.length() - 3);
-            conditions.set(lastIndex, lastCondition);
+            // 去掉末尾的 " or"
+            updateConditionListLastElement(conditions, 3);
             conditions.add(")");
         }
         else
         {
             conditions.remove(andSize - 1); // 去掉 "（"
-            // 去掉 "(" 前面的 "and"
+            // 接下来后面的 " and"
             if (!conditions.isEmpty())
             {
-                int lastIndex = andSize - 2;
-                String lastCondition = conditions.get(lastIndex);
-                lastCondition = lastCondition.substring(0, lastCondition.length() - 4);
-                conditions.set(lastIndex, lastCondition);
+                updateConditionListLastElement(conditions, 4);
             }
         }
 
@@ -474,6 +458,26 @@ public final class BeanUtil
         }
 
         return new QueryBuilder(query, countQuery, conditions, parameters);
+    }
+
+    // 增加一个条件单元，顺便把占位符 ？ 也记下来
+    private static void addCondition(Object bean, ConditionList conditions, Map<String, Object> parameters, Field[] fields, String symbol, String opration)
+    {
+        if (bean != null)
+        {
+            for (Field field : fields)
+            {
+                if (allowField(field))
+                {
+                    Object fv = TypeUtil.getFieldVal(bean, field);
+                    if (fv != null)
+                    {
+                        conditions.add(field.getName() + " " + symbol + " :" + field.getName() + opration);
+                        parameters.put(field.getName(), fv);// 同时把这个?号的值记下来
+                    }
+                }
+            }
+        }
     }
 
     public static Field[] getFields(Class<?> cls)
@@ -737,8 +741,8 @@ public final class BeanUtil
                 sets.append(' ');
                 for (B b : beans)
                 {
-                    Object keyVal = TypeUtil.getFieldVal(b,key);
-                    Object fieldVal = TypeUtil.getFieldVal(b,field);
+                    Object keyVal = TypeUtil.getFieldVal(b, key);
+                    Object fieldVal = TypeUtil.getFieldVal(b, field);
                     sets.append("when ");
                     sets.append(keyVal);
                     sets.append(" then ");
@@ -782,7 +786,7 @@ public final class BeanUtil
         StringBuilder ids = new StringBuilder();
         for (B b : beans)
         {
-            Object keyVal = TypeUtil.getFieldVal(b,key);
+            Object keyVal = TypeUtil.getFieldVal(b, key);
             if (keyVal == null)
             {
                 throw new RepositoryException("主键的值不能为null");
@@ -793,6 +797,7 @@ public final class BeanUtil
         ids.deleteCharAt(ids.length() - 1);
         return ids;
     }
+
     public static String toDelete(String tableName, String keyName, long keyVal, String dbName)
     {
         StringBuilder sq = new StringBuilder();

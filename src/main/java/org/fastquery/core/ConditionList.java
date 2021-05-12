@@ -30,9 +30,6 @@ import java.util.Collections;
  */
 public class ConditionList extends ArrayList<String>
 {
-
-    private static final long serialVersionUID = 1L;
-
     public static ConditionList of(String... conditions)
     {
         ConditionList conditionList = new ConditionList();

@@ -693,10 +693,10 @@ public class TypeUtil
         // 如果传递null 还要求参与运算.
         // sql中null无法跟比较运算符(如 =, <, 或者 <>),一起运算,必须使用 is null 和 is not null 操作符.
         value = value.replaceAll("\\s+", " "); // 把多个空白换成一个空格
-        value = value.replaceAll("=\\?", "= ?"); // 将"=?" 替换成 "= ?"
-        value = value.replaceAll(" = \\?" + index, " is null");
-        value = value.replaceAll(" <> \\?" + index, " is not null");
-        value = value.replaceAll(" != \\?" + index, " is not null");
+        value = value.replace("=?", "= ?"); // 将"=?" 替换成 "= ?"
+        value = value.replace(" = ?" + index, " is null");
+        value = value.replace(" <> ?" + index, " is not null");
+        value = value.replace(" != ?" + index, " is not null");
         return value;
     }
 
