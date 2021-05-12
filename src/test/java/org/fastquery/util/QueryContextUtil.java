@@ -50,8 +50,7 @@ public class QueryContextUtil
     {
         Class<QueryContext> clazz = QueryContext.class;
         Field field = clazz.getDeclaredField("threadLocal");
-        field.setAccessible(true);
-        return (ThreadLocal<QueryContext>) field.get(null);
+        return (ThreadLocal<QueryContext>) TypeUtil.getFieldVal(null, field);
     }
 
     public static void setCurrentMethod(Method method) throws Exception

@@ -89,22 +89,15 @@ public final class BeanUtil
         {
             if (allowField(field))
             {
-                try
+                Object obj = TypeUtil.getFieldVal(bean, field);
+                if (field.getAnnotation(Id.class) == null || obj != null)
                 {
-                    field.setAccessible(true);
-                    if (field.getAnnotation(Id.class) == null || field.get(bean) != null)
-                    {
-                        // 接纳的值:
-                        // 1. 不是主键的字段
-                        // 或
-                        // 2. 不为null的字段
-                        sb.append(field.getName());
-                        sb.append(',');
-                    }
-                }
-                catch (IllegalAccessException | IllegalArgumentException e)
-                {
-                    throw new RepositoryException(e);
+                    // 接纳的值:
+                    // 1. 不是主键的字段
+                    // 或
+                    // 2. 不为null的字段
+                    sb.append(field.getName());
+                    sb.append(',');
                 }
             }
         }
@@ -132,7 +125,7 @@ public final class BeanUtil
         {
             if (allowField(field))
             {
-                Object val = getFieldVal(bean, field);
+                Object val = TypeUtil.getFieldVal(bean, field);
 
                 if (val != null)
                 {
@@ -159,21 +152,6 @@ public final class BeanUtil
         return sb.toString();
     }
 
-    private static <B> Object getFieldVal(B bean, Field field)
-    {
-        Object val;
-        try
-        {
-            field.setAccessible(true);
-            val = field.get(bean);
-        }
-        catch (IllegalAccessException | IllegalArgumentException e)
-        {
-            throw new RepositoryException(e);
-        }
-        return val;
-    }
-
     // use select one
     // [0] where 部分， [1] sql语言中"?"对应的实参
     private static <B> Object[] toWhere(Field[] fields, B bean, boolean ignoreId)
@@ -184,7 +162,7 @@ public final class BeanUtil
         {
             if (allowField(field))
             {
-                Object val = getFieldVal(bean, field);
+                Object val = TypeUtil.getFieldVal(bean, field);
                 if (ignoreId)
                 {
                     if (val != null && field.getAnnotation(Id.class) == null)
@@ -384,15 +362,7 @@ public final class BeanUtil
                 if (val == null)
                 {
                     // 顺便取主键的值
-                    try
-                    {
-                        field.setAccessible(true);
-                        objs[1] = field.get(bean);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new RepositoryException(e);
-                    }
+                    objs[1] = TypeUtil.getFieldVal(bean, field);
                 }
                 break;
             }
@@ -454,19 +424,9 @@ public final class BeanUtil
         {
             if (allowField(field))
             {
-                field.setAccessible(true);
-
                 if (bean != null)
                 {
-                    Object fv;
-                    try
-                    {
-                        fv = field.get(bean);
-                    }
-                    catch (IllegalArgumentException | IllegalAccessException e)
-                    {
-                        throw new RepositoryException(e);
-                    }
+                    Object fv = TypeUtil.getFieldVal(bean, field);
                     if (fv != null)
                     {
                         conditions.add(field.getName() + " = :" + field.getName() + " and");
@@ -482,26 +442,13 @@ public final class BeanUtil
 
         for (Field field : fields)
         {
-            if (allowField(field))
+            if (allowField(field) && likes != null)
             {
-                field.setAccessible(true);
-
-                if (likes != null)
+                Object lv = TypeUtil.getFieldVal(likes, field);
+                if (lv != null)
                 {
-                    Object lv;
-                    try
-                    {
-                        lv = field.get(likes);
-                    }
-                    catch (IllegalArgumentException | IllegalAccessException e)
-                    {
-                        throw new RepositoryException(e);
-                    }
-                    if (lv != null)
-                    {
-                        conditions.add(field.getName() + " like :" + field.getName() + " or");
-                        parameters.put(field.getName(), lv);// 同时把这个?号的值记下来
-                    }
+                    conditions.add(field.getName() + " like :" + field.getName() + " or");
+                    parameters.put(field.getName(), lv);// 同时把这个?号的值记下来
                 }
             }
         }
@@ -610,8 +557,8 @@ public final class BeanUtil
             {
                 if (allowField(field))
                 {
-                    field.setAccessible(true);
-                    Object val = field.get(bean);
+
+                    Object val = TypeUtil.getFieldVal(bean, field);
                     Id id = field.getAnnotation(Id.class);
                     if (val != null && id == null)
                     {
@@ -682,8 +629,7 @@ public final class BeanUtil
             {
                 if (allowField(field))
                 {
-                    field.setAccessible(true);
-                    Object val = field.get(bean);
+                    Object val = TypeUtil.getFieldVal(bean, field);
                     if (val != null && !wps.contains(":" + field.getName()))
                     {
                         args.add(val);
@@ -971,15 +917,7 @@ public final class BeanUtil
         {
             if (field.getAnnotation(Id.class) != null)
             {
-                try
-                {
-                    field.setAccessible(true);
-                    key = field.get(entity);
-                }
-                catch (Exception e)
-                {
-                    throw new RepositoryException(e);
-                }
+                key = TypeUtil.getFieldVal(entity, field);
                 break;
             }
         }
@@ -1067,4 +1005,5 @@ public final class BeanUtil
         sqlValue.setValues(fieldValues);
         return sqlValue;
     }
+
 }

@@ -1200,4 +1200,18 @@ public class TypeUtil
         return sb.toString();
     }
 
+    public static <B> Object getFieldVal(B bean, Field field)
+    {
+        Object val;
+        try
+        {
+            field.setAccessible(true);
+            val = field.get(bean);
+        }
+        catch (IllegalAccessException | IllegalArgumentException e)
+        {
+            throw new RepositoryException(e);
+        }
+        return val;
+    }
 }

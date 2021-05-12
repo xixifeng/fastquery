@@ -41,6 +41,8 @@ import org.fastquery.db2.CC;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.DC;
+import org.fastquery.util.BeanUtil;
+import org.fastquery.util.TypeUtil;
 import org.junit.Test;
 
 import com.alibaba.druid.pool.DruidDataSource;
@@ -149,9 +151,7 @@ public class TxTest extends TestFastQuery
             ldc.setAccessible(true);
             Object obj = ldc.invoke(null);
             Field field = tc.getDeclaredField("dclist");
-
-            field.setAccessible(true);
-            return (List<DC>) field.get(obj);
+            return (List<DC>) TypeUtil.getFieldVal(obj,field);
         }
         catch (Exception e)
         {
