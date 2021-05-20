@@ -45,7 +45,7 @@ class MuestionFilter implements MethodFilter
         for (Query query : queries)
         {
             String value = query.value();
-            Set<String> strs = TypeUtil.matchesNotrepeat(value, Placeholder.SP1_REG);
+            Set<String> strs = TypeUtil.matchesNotrepeat(value, Placeholder.SP1_REG_PATT);
             strs.forEach(str -> {
                 int index = Integer.parseInt(str.replace("?", ""));
                 if (index > parameterCount)

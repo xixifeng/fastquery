@@ -63,7 +63,7 @@ class PageFilter implements MethodFilter
 
             // 8). #{#limit} 禁止重复出现
             String sql = query.value();
-            List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE);
+            List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE_PATT);
             if (strs.size() > 1)
             {
                 this.abortWith(method, String.format("%s中,禁止重复出现%s", sql, Placeholder.LIMIT));

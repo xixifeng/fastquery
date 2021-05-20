@@ -28,6 +28,7 @@ import java.lang.reflect.Parameter;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +54,7 @@ public class TypeUtilTest
     public void testMatches()
     {
         String sql = "select id,name,age from #{#limit} `userinfo` #{#where}";
-        List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE);
+        List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE_PATT);
         assertThat(strs.size(), equalTo(1));
         assertThat(strs.get(0), equalTo("#{#limit}"));
     }
@@ -195,7 +196,7 @@ public class TypeUtilTest
     public void matches()
     {
         String where = "name=:name and age = :age or sex = :sex";
-        List<String> strs = TypeUtil.matches(where, ":\\S+\\b");
+        List<String> strs = TypeUtil.matches(where, Pattern.compile(":\\S+\\b"));
         assertThat(strs.size(), is(3));
         assertThat(strs.get(0), equalTo(":name"));
         assertThat(strs.get(1), equalTo(":age"));

@@ -45,7 +45,7 @@ public class PlaceholderTest extends TestFastQuery
     {
         String str = "select * from UserInfo where name like `- - ?_  --- -`   and age like `-_?-` and akjgew `-  ?_-` and sge`-  ?                     -`";
 
-        List<String> ssms = TypeUtil.matches(str, Placeholder.SMILE);
+        List<String> ssms = TypeUtil.matches(str, Placeholder.SMILE_PATT);
 
         for (String string : ssms)
         {
@@ -69,7 +69,7 @@ public class PlaceholderTest extends TestFastQuery
     public void SL_REG1()
     {
         String str = ":a[]%:b% %:c%";
-        List<String> ssms = TypeUtil.matches(str, Placeholder.COLON_REG);
+        List<String> ssms = TypeUtil.matches(str, Placeholder.COLON_REG_PATT);
         assertThat(ssms.size(), is(3));
         assertThat(ssms.get(0), equalTo(":a"));
         assertThat(ssms.get(1), equalTo(":b"));
@@ -80,7 +80,7 @@ public class PlaceholderTest extends TestFastQuery
     public void SL_REG2()
     {
         String str = "_:%aa_b  %:Ccc_d%:eeE:F_:1%%%%_jkjgwoxl:abc";
-        List<String> ssms = TypeUtil.matches(str, Placeholder.COLON_REG);
+        List<String> ssms = TypeUtil.matches(str, Placeholder.COLON_REG_PATT);
         assertThat(ssms.size(), is(5));
         assertThat(ssms.get(0), equalTo(":Ccc"));
         assertThat(ssms.get(1), equalTo(":eeE"));
@@ -93,7 +93,7 @@ public class PlaceholderTest extends TestFastQuery
     public void SL_REG3()
     {
         String str = ":id,:name,:age";
-        List<String> ssms = TypeUtil.matches(str, Placeholder.COLON_REG);
+        List<String> ssms = TypeUtil.matches(str, Placeholder.COLON_REG_PATT);
         assertThat(ssms.size(), is(3));
         assertThat(ssms.get(0), equalTo(":id"));
         assertThat(ssms.get(1), equalTo(":name"));
@@ -140,7 +140,7 @@ public class PlaceholderTest extends TestFastQuery
     public void SEARCH_NUM()
     {
         String s = "`-%?103%?1kjgw?2?398klgw?3-`";
-        List<String> strs = TypeUtil.matches(s, Placeholder.SEARCH_NUM);
+        List<String> strs = TypeUtil.matches(s, Placeholder.SEARCH_NUM_PATT);
         for (String str : strs)
         {
             assertThat(Pattern.matches("\\d+", str), is(true));
@@ -151,7 +151,7 @@ public class PlaceholderTest extends TestFastQuery
     public void EL_OR_COLON()
     {
         String str = "jklgjw ,gwlljlgw `- :name_ :info- $name_ $ok.ax -` and ${abc_} conm ${mark} orfkljgw xg ${a} lgwiouo$_iwk$ jhlkgikw $abc}";
-        List<String> strs = TypeUtil.matches(str, Placeholder.EL_OR_COLON);
+        List<String> strs = TypeUtil.matches(str, Placeholder.EL_OR_COLON_PATT);
         assertThat(strs.size(), is(9));
         assertThat(strs.get(0), equalTo(":name"));
         assertThat(strs.get(1), equalTo(":info"));

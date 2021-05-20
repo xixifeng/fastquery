@@ -67,8 +67,8 @@ class MarkFilter implements MethodFilter
             }
         }
 
-        String slreg = Placeholder.COLON_REG;
-        String preg = Placeholder.EL_REG;
+        Pattern slreg = Placeholder.COLON_REG_PATT;
+        Pattern preg = Placeholder.EL_REG_PATT;
 
         // 把能与SL_REG和preg匹配的表达式收集起来
         Set<String> ps = new HashSet<>();
@@ -111,23 +111,23 @@ class MarkFilter implements MethodFilter
 
     private void expressionSpec(Method method, String s)
     {
-        if (!TypeUtil.matches(s, ":\\s+").isEmpty())
+        if (!TypeUtil.matches(s, Pattern.compile(":\\s+")).isEmpty())
         {
             this.abortWith(method, "表达式不符合规范:冒号\":\"后面不能是空白");
         }
-        else if (!TypeUtil.matches(s, "\\$\\{?\\s+").isEmpty())
+        else if (!TypeUtil.matches(s, Pattern.compile("\\$\\{?\\s+")).isEmpty())
         {
             this.abortWith(method, "表达式不符合规范:不能出现\"${ \" 或 \"$ \"");
         }
-        else if (!TypeUtil.matches(s, "\\{\\s+").isEmpty())
+        else if (!TypeUtil.matches(s, Pattern.compile("\\{\\s+")).isEmpty())
         {
             this.abortWith(method, "表达式不符合规范:不能出现\"{ \"");
         }
-        else if (!TypeUtil.matches(s, "\\s+\\}").isEmpty())
+        else if (!TypeUtil.matches(s, Pattern.compile("\\s+}")).isEmpty())
         {
             this.abortWith(method, "表达式不符合规范:不能出现\" }\"");
         }
-        else if (!TypeUtil.matches(s, "[^\\$#]\\{").isEmpty())
+        else if (!TypeUtil.matches(s, Pattern.compile("[^$#]\\{")).isEmpty())
         {
             this.abortWith(method, "表达式不符合规范:\"{\"前必须连接\"$\"或\"#\"");
         }
@@ -135,10 +135,10 @@ class MarkFilter implements MethodFilter
 
     private void checkSmile(Method method, String s)
     {
-        List<String> smiles = TypeUtil.matches(s, Placeholder.SMILE_BIG);
+        List<String> smiles = TypeUtil.matches(s, Placeholder.SMILE_BIG_PATT);
         for (String smile : smiles)
         {
-            int len = TypeUtil.matches(smile, Placeholder.EL_OR_COLON).size();
+            int len = TypeUtil.matches(smile, Placeholder.EL_OR_COLON_PATT).size();
             if (len != 1)
             {
                 this.abortWith(method, "微笑表达式中的内容必须只能包含一个$表达式或一个冒号表达式,而它包含了" + len + "个表达式");
@@ -147,9 +147,9 @@ class MarkFilter implements MethodFilter
         smiles.clear();
     }
 
-    private void checkColon(Method method, Set<String> params, String slreg, String p)
+    private void checkColon(Method method, Set<String> params, Pattern slreg, String p)
     {
-        String s = Pattern.matches(slreg, p) ? p.replaceFirst(":", "") : p.replace("${", "").replace("}", "").replace("$", "");
+        String s = slreg.matcher(p).matches() ? p.replaceFirst(":", "") : p.replace("${", "").replace("}", "").replace("$", "");
         if (!params.contains(s) && s.indexOf(':') == -1)
         {
             this.abortWith(method, String.format("发现存在%s,而从参数中没有找到@Param(\"%s\"),这种语法是不被允许的.", p, s));
@@ -158,8 +158,8 @@ class MarkFilter implements MethodFilter
 
     private void checkEL(Method method, String p)
     {
-        int c1 = TypeUtil.matches(p, "\\{").size();
-        int c2 = TypeUtil.matches(p, "\\}").size();
+        int c1 = TypeUtil.matches(p, Pattern.compile("\\{")).size();
+        int c2 = TypeUtil.matches(p, Pattern.compile("}")).size();
         if (c1 != c2 || c1 > 1)
         {
             this.abortWith(method, String.format("\"%s\"中的\"{\"和\"}\"分别只能出现一次或都不出现,据分析\"{\"出现%d次,而\"}\"出现%d次", p, c1, c2));

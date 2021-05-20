@@ -72,7 +72,7 @@ class QueryFilterHelper
             // 追加条件 End
 
             String where = sb.toString();
-            if (!"".equals(where) && TypeUtil.matches(query.value(), Placeholder.WHERE_REG).size() != 1)
+            if (!"".equals(where) && TypeUtil.matches(query.value(), Placeholder.WHERE_REG_PATT).size() != 1)
             {
                 throw new RepositoryException(method + " 如果存在@Condition(条件注解),那么@Query中的value值,必须存在#{#where},有且只能出现一次");
             }

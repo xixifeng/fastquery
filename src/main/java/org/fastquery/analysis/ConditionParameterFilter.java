@@ -101,7 +101,7 @@ class ConditionParameterFilter implements MethodFilter
     private void checkConditionEL(Method method, String value)
     {
         // 获取$表达式
-        Set<String> ps = TypeUtil.matchesNotrepeat(value, Placeholder.EL_REG);
+        Set<String> ps = TypeUtil.matchesNotrepeat(value, Placeholder.EL_REG_PATT);
         Parameter[] parameters = method.getParameters();
         ps.forEach(p -> {
             for (Parameter parameter : parameters)
@@ -118,7 +118,7 @@ class ConditionParameterFilter implements MethodFilter
 
     private void checkWhereCount(Method method, Query[] queries)
     {
-        int countWhere = TypeUtil.matches(queries[0].value(), Placeholder.WHERE_REG).size();
+        int countWhere = TypeUtil.matches(queries[0].value(), Placeholder.WHERE_REG_PATT).size();
         if (countWhere > 1)
         {
             this.abortWith(method, "@Query中的value值,有且只能出现一次#{#where}");

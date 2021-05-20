@@ -23,6 +23,7 @@
 package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
+import java.util.regex.Pattern;
 
 import org.fastquery.util.TypeUtil;
 
@@ -57,7 +58,7 @@ class ReturnTypeFilter implements MethodFilter
         // 返回值如果是一维数组,也只能允许是基本类型的数组
         String typeName = returnType.getTypeName();
         // 计算"[]" 出现的个数
-        int count = TypeUtil.matches(typeName, "\\[\\]").size();
+        int count = TypeUtil.matches(typeName, Pattern.compile("\\[\\]")).size();
         if (count > 1)
         {
             this.abortWith(method,

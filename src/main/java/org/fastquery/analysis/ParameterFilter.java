@@ -24,7 +24,9 @@ package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.fastquery.core.Placeholder;
 import org.fastquery.util.TypeUtil;
 
 /**
@@ -46,9 +48,9 @@ class ParameterFilter implements MethodFilter
 
         // 1). 检测SQL参数的书写规则
         // 计算出sql 中出现 "\\?\\d+" 几次, "?"后面进跟数字表明是一个参数
-        int sqlParameterCount = TypeUtil.matches(sql, "\\?\\d+").size(); // sql中的参数个数
+        int sqlParameterCount = TypeUtil.matches(sql, Placeholder.SP1_REG_PATT).size(); // sql中的参数个数
         // 统计"?"的个数
-        int sx = TypeUtil.matches(sql, "\\?").size();
+        int sx = TypeUtil.matches(sql, Pattern.compile("\\?")).size();
         // 如果SQL中出想的"\\?"出现的个数如果跟 "\\?\\d+" 出现的个数不相等, 则可以断言是sql参数的书写语法没有遵守"?"后面紧跟数字这一法则.
         if (sx != sqlParameterCount)
         {
@@ -57,7 +59,7 @@ class ParameterFilter implements MethodFilter
 
         // 2).检测SQL语句中指定的参数,需要方法多少个参数去支持
         // 计算出sql语句中的参数个数,去重.(例如:同时SQL中同时出现两次?1,算一个)
-        int sqlParameterCountNoRepeat = TypeUtil.matchesNotrepeat(sql, "\\?\\d+").size();
+        int sqlParameterCountNoRepeat = TypeUtil.matchesNotrepeat(sql, Placeholder.SP1_REG_PATT).size();
         int methodParameterCount = method.getParameterCount();
         // 如果sql中的参数个数(去重) > 方法中的参数个数
         if (sqlParameterCountNoRepeat > methodParameterCount)

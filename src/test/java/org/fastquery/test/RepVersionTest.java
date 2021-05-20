@@ -47,6 +47,7 @@ import org.junit.Test;
 public class RepVersionTest extends TestFastQuery
 {
     private static final String REG = "\\d+\\.\\d+\\.\\d+(\\.enforce)*";
+    private static final Pattern REG_PATT = Pattern.compile("\\d+\\.\\d+\\.\\d+(\\.enforce)*");
 
     private static String showInputDialog(String initialSelectionValue)
     {
@@ -96,7 +97,7 @@ public class RepVersionTest extends TestFastQuery
             {
                 if (lineTxt.endsWith("<!-- fastquery.version -->"))
                 {
-                    initialSelectionValue = TypeUtil.matches(lineTxt, REG).get(0);
+                    initialSelectionValue = TypeUtil.matches(lineTxt, REG_PATT).get(0);
                     break;
                 }
             }
