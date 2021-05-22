@@ -719,7 +719,7 @@ class QueryProcess
         Class<?> clazz = (Class<?>) iargs[0];
         Objects.requireNonNull(clazz);
         String fieldName = (String) iargs[1];
-        if (fieldName == null || "".equals(fieldName))
+        if (fieldName == null || StringUtils.EMPTY.equals(fieldName))
         {
             fieldName = "1";
         }

@@ -22,6 +22,7 @@
 
 package org.fastquery.mapper.filter.part;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.mapper.filter.Filter;
 import org.w3c.dom.Element;
 
@@ -50,7 +51,7 @@ public class PartSyntaxFilter implements Filter
 
         // 1). part节点必须有name属性
         String name = element.getAttribute("name");
-        if ("".equals(name))
+        if (StringUtils.EMPTY.equals(name))
         {
             this.abortWith("解析" + xmlName + "错误,原因:没有给<part>节点设置name属性.大概位置:它被" + ps + "包裹着");
         }

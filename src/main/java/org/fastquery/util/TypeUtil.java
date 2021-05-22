@@ -30,18 +30,11 @@ import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.fastquery.core.*;
 import org.fastquery.struct.Reference;
 import org.fastquery.asm.Script2Class;
-import org.fastquery.core.Id;
-import org.fastquery.core.MethodInfo;
-import org.fastquery.core.Param;
-import org.fastquery.core.Placeholder;
-import org.fastquery.core.Query;
-import org.fastquery.core.QueryBuilder;
-import org.fastquery.core.QueryByNamed;
-import org.fastquery.core.QueryContext;
-import org.fastquery.core.RepositoryException;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.PageIndex;
 import org.fastquery.page.PageSize;
@@ -61,7 +54,7 @@ public class TypeUtil
     }
 
     // 给定一个"正则匹配"匹配在另一个字符串,把匹配上的字符串存入一个数组里. 这样一来即可以用,又可以统计出现次数!
-    public static List<String> matches(String str, String regex)
+    public static List<String> matches(String str, Pattern regex)
     {
         List<String> empty = new ArrayList<>();
         if (str == null)
@@ -72,7 +65,7 @@ public class TypeUtil
     }
 
     // 集合中没有重复
-    public static Set<String> matchesNotrepeat(String str, String regex)
+    public static Set<String> matchesNotrepeat(String str, Pattern regex)
     {
         Set<String> empty = new HashSet<>();
         if (str == null)
@@ -82,12 +75,11 @@ public class TypeUtil
         return matcheAll(regex, str, empty);
     }
 
-    private static <E extends Collection<String>> E matcheAll(String regex, String str, E collection)
+    private static <E extends Collection<String>> E matcheAll(Pattern regex, String str, E collection)
     {
         // 将给定的正则表达式编译到模式中。
-        Pattern p = Pattern.compile(regex);
         // 创建匹配给定输入与此模式的匹配器。
-        Matcher m = p.matcher(str);
+        Matcher m = regex.matcher(str);
         String val;
         // 尝试查找与该模式匹配的输入序列的下一个子序列。
         while (m.find())
@@ -114,12 +106,12 @@ public class TypeUtil
      */
     public static int[] getSQLParameter(String sql)
     {
-        List<String> subs = matches(sql, Placeholder.SP1_REG);
+        List<String> subs = matches(sql, RegexCache.SP1_REG_PATT);
         int len = subs.size();
         int[] ints = new int[len];
         for (int i = 0; i < len; i++)
         {
-            ints[i] = Integer.parseInt(subs.get(i).replace("?", ""));
+            ints[i] = Integer.parseInt(subs.get(i).replace(StrConst.QUE, StringUtils.EMPTY));
         }
         return ints;
     }
@@ -159,7 +151,7 @@ public class TypeUtil
             Object mp = args[paramIndex]; // 这个值有可能是null
             if (mp == null)
             {
-                objs.add(getParamDefVal(paramIndex, null));
+                objs.add(getParamDefVal(paramIndex));
             }
             else
             {
@@ -214,16 +206,16 @@ public class TypeUtil
         return increment;
     }
 
-    private static Object getParamDefVal(int paramIndex, Object mp)
+    private static Object getParamDefVal(int paramIndex)
     {
         Param param = QueryContext.getMethodInfo().getParameters()[paramIndex].getAnnotation(Param.class);
-        if (param != null && !param.defaultVal().trim().equals(""))
+        if (param != null && !param.defaultVal().trim().equals(StringUtils.EMPTY))
         {
             return param.defaultVal();
         }
         else
         {
-            return mp;
+            return null;
         }
     }
 
@@ -231,7 +223,7 @@ public class TypeUtil
     {
         if (overlap < 1)
         {
-            return "";
+            return StringUtils.EMPTY;
         }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < overlap; i++)
@@ -253,7 +245,7 @@ public class TypeUtil
     public static String replace(String str, int index, int overlap)
     {
         if (str == null || index < 0 || overlap < 1)
-            return "";
+            return StringUtils.EMPTY;
         StringBuilder sb = new StringBuilder(str);
         int arisen = 0; // 记录"?"是第几次出现
         int len = sb.length();
@@ -420,7 +412,10 @@ public class TypeUtil
     // 将 str中的 ${tagName} 和 $tagName 统统替换成 replacement
     private static String replaceAllEL(String str, String tagName, String replacement)
     {
-        return str.replaceAll("\\$\\{" + tagName + "}", replacement).replaceAll("\\$" + tagName + "\\b", replacement);
+        Pattern p1 = RegexCache.getPattern("\\$\\{" + tagName + "}");
+        Pattern p2 = RegexCache.getPattern("\\$" + tagName + "\\b");
+        str = RegExUtils.replaceAll(str, p1, replacement);
+        return RegExUtils.replaceAll(str, p2, replacement);
     }
 
     /**
@@ -459,7 +454,8 @@ public class TypeUtil
                     // 将 ":xx" 格式的 替换成 "?num"
                     // 替换时必须加单词分界符(\\b),举例说明: sql中同时存在":ABCD",":A",
                     // 不加单词分界符,":A"替换成"?num"后,会使":ABCD"变成":?numBCD"
-                    s = s.replaceAll(":" + param.value() + "\\b", "?" + (i + 1));
+                    Pattern pattern = RegexCache.getPattern(":" + param.value() + "\\b");
+                    s = RegExUtils.replaceAll(s, pattern, StrConst.QUE + (i + 1));
                 }
             }
         }
@@ -489,7 +485,8 @@ public class TypeUtil
                 {
                     Param param = (Param) ann;
                     // Pattern.quote(":"+param.value())
-                    s = s.replaceAll(":" + param.value() + "\\b", "?" + (i + 1));
+                    Pattern p = RegexCache.getPattern(":" + param.value() + "\\b");
+                    s = RegExUtils.replaceAll(s, p, StrConst.QUE + (i + 1));
                 }
             }
         }
@@ -504,7 +501,7 @@ public class TypeUtil
 
     private static boolean getFactor2(Condition condition, Object arg)
     {
-        return arg != null && "".equals(arg.toString()) && condition.ignoreEmpty();
+        return arg != null && StringUtils.EMPTY.equals(arg.toString()) && condition.ignoreEmpty();
     }
 
     private static boolean getFactor3(Condition condition, int index)
@@ -543,7 +540,7 @@ public class TypeUtil
                 for (String allow : allows)
                 {
                     // 因为注解的特性 allows的集合中的成员永远不可能出现null
-                    if (!Pattern.matches(allow, arg.toString()))
+                    if (!RegexCache.getPattern(allow).matcher(arg.toString()).matches())
                     { // 不在允许范围立即忽略
                         return true;
                     }
@@ -561,7 +558,7 @@ public class TypeUtil
             String[] ignores = condition.ignoreRule();
             for (String ignore : ignores)
             {
-                if (Pattern.matches(ignore, arg.toString()))
+                if (RegexCache.getPattern(ignore).matcher(arg.toString()).matches())
                 {
                     return true;
                 }
@@ -583,11 +580,11 @@ public class TypeUtil
     {
 
         // 忽略因子列表,任何一个都可以导致忽略
-        Set<String> pars = TypeUtil.matchesNotrepeat(value, Placeholder.SP1_REG);
+        Set<String> pars = TypeUtil.matchesNotrepeat(value, RegexCache.SP1_REG_PATT);
         Object[] args = QueryContext.getArgs();
         for (String par : pars)
         {
-            int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
+            int index = Integer.parseInt(par.replace(StrConst.QUE, StringUtils.EMPTY)); // 计数是1开始的
             Object arg = args[index - 1];
             if (getFactor1(condition, arg) || getFactor2(condition, arg) || getFactor5(condition, arg) || getFactor6(condition, arg))
             {
@@ -608,7 +605,7 @@ public class TypeUtil
         if (!"true".equals(condition.if$()) && !Script2Class.getJudge(conditionPosition).ignore())
         { // 如果if结果为假
             String elseValue = condition.else$();
-            if ("".equals(elseValue))
+            if (StringUtils.EMPTY.equals(elseValue))
             {
                 return null;
             }
@@ -626,11 +623,11 @@ public class TypeUtil
     private static String elseVal(String elseValue)
     {
         elseValue = paramFilter(QueryContext.getMethodInfo(), QueryContext.getArgs(), elseValue);
-        Set<String> pars = TypeUtil.matchesNotrepeat(elseValue, Placeholder.SP1_REG);
+        Set<String> pars = TypeUtil.matchesNotrepeat(elseValue, RegexCache.SP1_REG_PATT);
         Object[] args = QueryContext.getArgs();
         for (String par : pars)
         {
-            int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
+            int index = Integer.parseInt(par.replace(StrConst.QUE, StringUtils.EMPTY)); // 计数是1开始的
             if (args[index - 1] == null)
             { // ?num 对应的实参是null,要附加处理下
                 elseValue = extReplaceAll(elseValue, index);
@@ -680,7 +677,7 @@ public class TypeUtil
         }
         // 追加条件 End
 
-        if (!"".equals(sb.toString()))
+        if (!StringUtils.EMPTY.equals(sb.toString()))
         {
             sb.insert(0, "where");
         }
@@ -692,7 +689,7 @@ public class TypeUtil
     {
         // 如果传递null 还要求参与运算.
         // sql中null无法跟比较运算符(如 =, <, 或者 <>),一起运算,必须使用 is null 和 is not null 操作符.
-        value = value.replaceAll("\\s+", " "); // 把多个空白换成一个空格
+        value = RegExUtils.replaceAll(value, RegexCache.MOR_BLANK_PATT, StringUtils.SPACE); // 把多个空白换成一个空格
         value = value.replace("=?", "= ?"); // 将"=?" 替换成 "= ?"
         value = value.replace(" = ?" + index, " is null");
         value = value.replace(" <> ?" + index, " is not null");
@@ -728,9 +725,9 @@ public class TypeUtil
             String sets = SetParser.process();
             if (sets != null)
             {
-                sql = sql.replaceFirst(Placeholder.SETS_REG, Matcher.quoteReplacement(sets));
+                sql = RegExUtils.replaceFirst(sql, RegexCache.SETS_REG_PATT, Matcher.quoteReplacement(sets));
             }
-            sql = sql.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(getWhereSQL(method, args)));
+            sql = RegExUtils.replaceFirst(sql, RegexCache.WHERE_REG_PATT, Matcher.quoteReplacement(getWhereSQL(method, args)));
             sqls.add(sql);
         }
         return sqls;
@@ -744,11 +741,12 @@ public class TypeUtil
      */
     static String filterComments(String str)
     {
+        // 这些正则只是在初始化阶段用一次，因此不必做缓存
         // 过滤 //
-        String s = str.replaceAll("//(.)+\\n", "");
-        s = s.replaceAll("//(.)?\\n", "");
+        String s = str.replaceAll("//(.)+\\n", StringUtils.EMPTY);
+        s = s.replaceAll("//(.)?\\n", StringUtils.EMPTY);
         // 过滤多行注释
-        s = s.replaceAll("/\\*[\\s\\S]*?\\*/", "");
+        s = s.replaceAll("/\\*[\\s\\S]*?\\*/", StringUtils.EMPTY);
         return s;
     }
 
@@ -848,8 +846,9 @@ public class TypeUtil
         else
         {
             // 为了方便处理先把首尾空白去掉,把省下的空白换成空格
-            StringBuilder sb = new StringBuilder(str.trim().replaceAll("\\s+", " "));
-            int i = sb.indexOf(" "); // 查找第一个空格
+            str = RegExUtils.replaceAll(str.trim(), RegexCache.MOR_BLANK_PATT, StringUtils.SPACE);
+            StringBuilder sb = new StringBuilder(str);
+            int i = sb.indexOf(StringUtils.SPACE); // 查找第一个空格
             if (i != -1)
             { // 如果还存在空格, 就把第1个空格前面的部分删除掉
                 sb.delete(0, i + 1);
@@ -879,21 +878,24 @@ public class TypeUtil
 
                 // sorce 不会受 where 的变化的变化
                 String sorce = where; // 把值copy一份
-
-                where = where.trim().replaceFirst("(?i)^where\\b", "");
+                Pattern p1 = RegexCache.getPattern("(?i)^where\\b");
+                Pattern p2 = RegexCache.getPattern("(?i)^or\\b");
+                Pattern p3 = RegexCache.getPattern("(?i)^and\\b");
+                where = RegExUtils.replaceFirst(where.trim(), p1, StringUtils.EMPTY);
                 // 如果第一个单词是"or"或者and,则去掉
-                where = where.trim().replaceFirst("(?i)^or\\b", "");
-                where = where.trim().replaceFirst("(?i)^and\\b", "");
+                where = RegExUtils.replaceFirst(where.trim(), p2, StringUtils.EMPTY);
+                where = RegExUtils.replaceFirst(where.trim(), p3, StringUtils.EMPTY);
                 where = where.trim();
 
+                Pattern p4 = RegexCache.getPattern(Pattern.quote(openWhere + sorce + closeWhere));
                 // 注意: 这里用quote是因为 sorce 很可能会包含有正则符号
-                if ("".equals(where))
+                if (StringUtils.EMPTY.equals(where))
                 {
-                    str = str.replaceFirst(Pattern.quote(openWhere + sorce + closeWhere), "");
+                    str = RegExUtils.replaceFirst(str,p4,StringUtils.EMPTY);
                 }
                 else
                 {
-                    str = str.replaceFirst(Pattern.quote(openWhere + sorce + closeWhere), Matcher.quoteReplacement("where " + where));
+                    str = RegExUtils.replaceFirst(str,p4,Matcher.quoteReplacement("where " + where));
                 }
             }
         }
@@ -915,7 +917,7 @@ public class TypeUtil
         }
         else
         {
-            String word = str.trim().replaceAll("\\s+", " ");
+            String word = RegExUtils.replaceAll(str.trim(), RegexCache.MOR_BLANK_PATT, StringUtils.SPACE);
             int index = word.indexOf(' ');
             if (index == -1)
             {
@@ -1019,7 +1021,7 @@ public class TypeUtil
     // 暂时让其支持 一个 SQL  Reference 以后有时间了，再说
     public static Reference statementReference(String sql)
     {
-        List<String> list = TypeUtil.matches(sql, Placeholder.ARRAY_REFERENCE);
+        List<String> list = TypeUtil.matches(sql, RegexCache.ARRAY_REF_PATT);
         List<Reference> references = new ArrayList<>();
         list.forEach(e -> {
             String reference = StringUtils.substringBefore(e, "[");
@@ -1029,15 +1031,15 @@ public class TypeUtil
             for (String s : strs)
             {
                 String ele = StringUtils.substringAfter(s, "as ");
-                if ("".equals(ele))
+                if (StringUtils.EMPTY.equals(ele))
                 {
                     ele = StringUtils.substringAfter(s, ".");
-                    if ("".equals(ele))
+                    if (StringUtils.EMPTY.equals(ele))
                     {
                         ele = s;
                     }
                 }
-                fields.add(ele.trim().replace("`", ""));
+                fields.add(ele.trim().replace("`", StringUtils.EMPTY));
             }
             references.add(new Reference(reference, fields));
         });
@@ -1053,7 +1055,7 @@ public class TypeUtil
 
     public static String unStatementReference(String sql)
     {
-        List<String> list = TypeUtil.matches(sql, Placeholder.ARRAY_REFERENCE);
+        List<String> list = TypeUtil.matches(sql, RegexCache.ARRAY_REF_PATT);
         for (String str : list)
         {
             sql = StringUtils.replace(sql, str, StringUtils.substringBetween(str, "[", "]"));
@@ -1141,7 +1143,7 @@ public class TypeUtil
             {
                 enumSet = EnumSet.copyOf(enums);
             }
-            getFieldAndSetVal(beanType,obj,k,enumSet);
+            getFieldAndSetVal(beanType, obj, k, enumSet);
         });
         // xxx end
         return obj;
@@ -1207,7 +1209,7 @@ public class TypeUtil
     {
         try
         {
-            Field field =  beanType.getDeclaredField(fieldName);
+            Field field = beanType.getDeclaredField(fieldName);
             field.setAccessible(true);
             field.set(bean, val);
         }

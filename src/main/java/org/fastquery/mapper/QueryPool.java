@@ -37,14 +37,11 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.fastquery.core.MethodInfo;
-import org.fastquery.core.Param;
-import org.fastquery.core.QueryByNamed;
-import org.fastquery.core.QueryContext;
-import org.fastquery.core.RepositoryException;
-import org.fastquery.core.Resource;
+import org.fastquery.core.*;
 import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
 import org.w3c.dom.Document;
@@ -94,7 +91,7 @@ public class QueryPool
         // 一旦找到,就不往下找了,立马返回.
 
         List<String> pers = FastQueryJSONObject.getQueries();
-        pers.add("");
+        pers.add(StringUtils.EMPTY);
         for (String per : pers)
         {
             String perxml = per + className + ".queries.xml";
@@ -129,8 +126,8 @@ public class QueryPool
         try (InputStream inputStream = resource.getResourceAsStream(xmlName))
         {
             DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
-            df.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
-            df.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
+            df.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, StringUtils.EMPTY); // Compliant
+            df.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, StringUtils.EMPTY); // compliant
             // 如下设置可禁用外部实体处理
             df.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             DocumentBuilder builder = df.newDocumentBuilder();
@@ -227,7 +224,9 @@ public class QueryPool
         for (Entry<String, String> entry : entries)
         {
             // #{#"+entry.getKey()+"}这个值包含有正则关键符号,因此用quote
-            template = template.replaceAll(Pattern.quote("#{#" + entry.getKey() + "}"), Matcher.quoteReplacement(entry.getValue()));
+            Pattern pattern = RegexCache.getPattern(Pattern.quote("#{#" + entry.getKey() + "}"));
+            template = RegExUtils.replaceAll(template,pattern,Matcher.quoteReplacement(entry.getValue()));
+
         }
         // 融合全局part End
         return template;
@@ -243,7 +242,7 @@ public class QueryPool
             {
                 Element p = (Element) ps.item(j);
                 String name = p.getAttribute("name");
-                if ("".equals(name))
+                if (StringUtils.EMPTY.equals(name))
                 {
                     throw new ExceptionInInitializerError(String.format("%s> 下面的 part 节点没有设置name属性", postion));
                 }
@@ -252,7 +251,8 @@ public class QueryPool
                     // p.getTextContent() 里面很可能包含有$ 或 \
                     // 如果不用Matcher.quoteReplacement进行处理,那么$表示反向引用,就会报错的
                     // 这个name在初始化阶段就被限定只能是字母和数字,应此不存在包含有正则符号
-                    template = template.replaceAll("#\\{#" + name + "}", Matcher.quoteReplacement(p.getTextContent()));
+                    Pattern pattern = RegexCache.getPattern("#\\{#" + name + "}");
+                    template = RegExUtils.replaceAll(template,pattern,Matcher.quoteReplacement(p.getTextContent()));
                 }
             }
         }
@@ -334,7 +334,7 @@ public class QueryPool
         Object[] args = QueryContext.getArgs();
         QueryByNamed qbn = method.getQueryByNamed();
         String id = qbn.value();
-        if ("".equals(id))
+        if (StringUtils.EMPTY.equals(id))
         {
             id = method.getName();
         }
@@ -375,7 +375,8 @@ public class QueryPool
 
         String logTag = className + '.' + id;
 
-        String str = render(tpl, logTag, map).trim().replaceAll("\\s+", " ");
+        String str = render(tpl, logTag, map).trim();
+        str = RegExUtils.replaceAll(str, RegexCache.MOR_BLANK_PATT, StringUtils.SPACE);
 
         return TypeUtil.parWhere(str);
     }
@@ -442,7 +443,7 @@ public class QueryPool
 
     private static void notNullAndEmpty(String str, String msg)
     {
-        if ("".equals(str.trim()))
+        if (StringUtils.EMPTY.equals(str.trim()))
         {
             throw new ExceptionInInitializerError(msg);
         }

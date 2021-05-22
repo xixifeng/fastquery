@@ -33,10 +33,11 @@ import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.analysis.GenerateExtends;
 import org.fastquery.core.AbstractQueryRepository;
-import org.fastquery.core.Placeholder;
 import org.fastquery.core.QueryRepository;
+import org.fastquery.core.StrConst;
 import org.fastquery.mapper.QueryValidator;
 
 /**
@@ -84,7 +85,7 @@ public class AsmRepository
                 if (parameterTypes[i].getComponentType() != null)
                 {
                     Class<?> clazz = parameterTypes[i].getComponentType();
-                    sb.append(clazz.getName().replace("[L", "").replace("[", "").replace(";", ""));
+                    sb.append(clazz.getName().replace("[L", StringUtils.EMPTY).replace("[", StringUtils.EMPTY).replace(";", StringUtils.EMPTY));
                     sb.append("[]");
                     while ((clazz = clazz.getComponentType()) != null)
                     {
@@ -104,7 +105,7 @@ public class AsmRepository
         }
         else
         {
-            return "";
+            return StringUtils.EMPTY;
         }
     }
 
@@ -185,7 +186,7 @@ public class AsmRepository
         ClassClassPath classClassPath = new ClassClassPath(repositoryClazz);
         pool.removeClassPath(classClassPath);
         pool.insertClassPath(classClassPath);
-        String className = repositoryClazz.getName() + Placeholder.DB_SUF;
+        String className = repositoryClazz.getName() + StrConst.DB_SUF;
         CtClass ctClass = pool.makeClass(className);
         try
         {

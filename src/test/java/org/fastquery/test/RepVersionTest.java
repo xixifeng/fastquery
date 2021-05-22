@@ -37,6 +37,8 @@ import java.nio.file.Files;
 import java.util.regex.Pattern;
 import javax.swing.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
 
@@ -54,7 +56,7 @@ public class RepVersionTest extends TestFastQuery
         JFrame jf = new JFrame();
         jf.setAlwaysOnTop(true);
         String s;
-        while ("".equals((s = JOptionPane.showInputDialog(jf, "请输入发布版本号: ", initialSelectionValue))) || s == null || !Pattern.matches(REG, s))
+        while (StringUtils.EMPTY.equals((s = JOptionPane.showInputDialog(jf, "请输入发布版本号: ", initialSelectionValue))) || s == null || !Pattern.matches(REG, s))
         {
             log.warn("输入的版本号是空，重新输入");
         }
@@ -87,7 +89,7 @@ public class RepVersionTest extends TestFastQuery
 
         String userDir = System.getProperty("user.dir");
 
-        String initialSelectionValue = "";
+        String initialSelectionValue = StringUtils.EMPTY;
 
         try (BufferedReader br = new BufferedReader(
                 new InputStreamReader(new FileInputStream(new File(userDir, "/pom.xml")))))
@@ -119,11 +121,12 @@ public class RepVersionTest extends TestFastQuery
                 {
                     if (lineTxt.endsWith("<!-- fastquery.version -->") || lineTxt.startsWith("compile 'org.fastquery:fastquery"))
                     {
-                        bw.write(lineTxt.replaceAll(REG, version) + "\n");
+                        String str = RegExUtils.replaceAll(lineTxt,REG_PATT,version);
+                        bw.write(str + StringUtils.LF);
                     }
                     else
                     {
-                        bw.write(lineTxt + "\n");
+                        bw.write(lineTxt + StringUtils.LF);
                     }
                 }
                 bw.flush();
@@ -131,8 +134,8 @@ public class RepVersionTest extends TestFastQuery
                 log.debug("f: {}", f.getAbsolutePath());
                 log.debug("tmp.toPath():{}", tmp.toPath());
                 assertThat(f.delete(), is(true));
-                //Files.move(tmp.toPath(), f.toPath());
                 Files.copy(tmp.toPath(), f.toPath());
+                assertThat(tmp.delete(),is(true));
             }
         }
 

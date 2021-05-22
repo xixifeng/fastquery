@@ -34,6 +34,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
 import org.w3c.dom.Document;
@@ -78,11 +79,11 @@ public class XMLParse
                     unitElement = (Element) node;
                     key = unitElement.getAttribute("name");
                     val = unitElement.getTextContent();
-                    if (val == null || "".equals(val))
+                    if (val == null || StringUtils.EMPTY.equals(val))
                     {
                         val = unitElement.getAttribute("value");
                     }
-                    if (val == null || "".equals(val))
+                    if (val == null || StringUtils.EMPTY.equals(val))
                     {
                         val = unitElement.getAttribute("class");
                     }
@@ -96,7 +97,7 @@ public class XMLParse
 
     private static void check(String resourceName, String key, String val)
     {
-        if ("".equals(key) || "".equals(val))
+        if (StringUtils.EMPTY.equals(key) || StringUtils.EMPTY.equals(val))
         {
             throw new RepositoryException(resourceName + " 配置错误,name属性和value属性或class属性必须合法");
         }
@@ -113,8 +114,8 @@ public class XMLParse
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 // 如下设置可禁用外部实体处理
                 factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, StringUtils.EMPTY);
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, StringUtils.EMPTY);
                 DocumentBuilder builder;
                 Document document;
 

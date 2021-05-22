@@ -26,6 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.hamcrest.Matchers.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.SetDBService;
@@ -62,7 +63,7 @@ public class SetDBExpectTest extends TestFastQuery
     {
         try
         {
-            db.updateCourse("", null, null, null, no);
+            db.updateCourse(StringUtils.EMPTY, null, null, null, no);
         }
         catch (Exception e){
             assertThat(e instanceof RepositoryException, is(true));

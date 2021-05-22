@@ -22,6 +22,7 @@
 
 package org.fastquery.test;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.RepositoryException;
@@ -265,7 +266,7 @@ public class QueryByNamedDBExampleTest extends TestFastQuery
     @Test(expected = RepositoryException.class)
     public void findUserInfoByFuzzyName4()
     {
-        db.findUserInfoByFuzzyName("");
+        db.findUserInfoByFuzzyName(StringUtils.EMPTY);
     }
 
     @Test(expected = RepositoryException.class)

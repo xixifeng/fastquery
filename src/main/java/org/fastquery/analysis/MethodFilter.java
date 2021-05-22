@@ -50,7 +50,7 @@ interface MethodFilter
      */
     default void abortWith(Method method, String msg)
     {
-        throw new RepositoryException(String.format("%s->: %s ", method.toString(), msg));
+        throw new RepositoryException(String.format("\n%s-> 错误信息如下: \n%s ", method.toString(), msg));
     }
 
 }

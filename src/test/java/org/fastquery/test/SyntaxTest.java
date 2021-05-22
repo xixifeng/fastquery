@@ -29,7 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.Param;
+import org.fastquery.core.StrConst;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThrows;
@@ -76,13 +78,13 @@ public class SyntaxTest extends TestFastQuery
     @Test
     public void testReg()
     {
-        log.debug(String.valueOf(Pattern.matches("", "")));
+        log.debug(String.valueOf(Pattern.matches(StringUtils.EMPTY, StringUtils.EMPTY)));
         // s.replaceAll(""+param.value()+"\\b", "?"+(i+1));
-        assertThat("abckdwgew:name&".replaceAll(":name\\b", "?"), equalTo("abckdwgew?&"));
-        assertThat("abckdwgew:name &".replaceAll("name\\b", "?"), equalTo("abckdwgew:? &"));
-        log.debug("-->: " + ("abckdwgew:name222 &".replaceAll("name\\b", "?")));
-        assertThat(":name22".replaceAll("name\\b", "?"), equalTo(":name22"));
-        assertThat(":name22 ".replaceAll("name\\b", "?"), equalTo(":name22 "));
-        assertThat(":name,".replaceAll("name\\b", "?"), equalTo(":?,"));
+        assertThat("abckdwgew:name&".replaceAll(":name\\b", StrConst.QUE), equalTo("abckdwgew?&"));
+        assertThat("abckdwgew:name &".replaceAll("name\\b", StrConst.QUE), equalTo("abckdwgew:? &"));
+        log.debug("-->: " + ("abckdwgew:name222 &".replaceAll("name\\b", StrConst.QUE)));
+        assertThat(":name22".replaceAll("name\\b", StrConst.QUE), equalTo(":name22"));
+        assertThat(":name22 ".replaceAll("name\\b", StrConst.QUE), equalTo(":name22 "));
+        assertThat(":name,".replaceAll("name\\b", StrConst.QUE), equalTo(":?,"));
     }
 }

@@ -24,6 +24,7 @@ package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryBuilder;
 import org.fastquery.util.TypeUtil;
@@ -45,7 +46,7 @@ class SQLFilter implements MethodFilter
         {
             String sql = query.value();
 
-            if ("".equals(sql) && !b)
+            if (StringUtils.EMPTY.equals(sql) && !b)
             { // 如果@Query的value为"",并且又没有传递QueryBuilder(用于构建SQL)
                 this.abortWith(method, sql + "该方法,没有标注任何SQL语句. 帮定SQL又多种方式:通过@Query;采用xml模板;用QueryBuilder,或参数传入...");
             }

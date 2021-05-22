@@ -29,6 +29,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.*;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.bean.Course;
 import org.fastquery.dao.SetDBService;
 import org.fastquery.service.FQuery;
@@ -56,7 +57,7 @@ public class SetDBServiceTest extends TestFastQuery
 
     // name, credit, semester, period, no
     @DataPoints("names")
-    public static String[] names = {"JAVA编程设计", "", null};
+    public static String[] names = {"JAVA编程设计", StringUtils.EMPTY, null};
 
     @DataPoints("credits")
     public static Integer[] credits = {6, 0, null};
@@ -75,7 +76,7 @@ public class SetDBServiceTest extends TestFastQuery
     public void testUpdateCourse1$1(@FromDataPoints("names") String name, @FromDataPoints("credits") Integer credit, @FromDataPoints("semesters") Integer semester, @FromDataPoints("periods") Integer period, @FromDataPoints("no") String no)
     {
         log.info("当前参数 name={}, credit={}, semester={}, period={}, no={} ", name, credit, semester, period, no);
-        if ((name == null || "".equals(name)) && credit == null && semester == null && period == null)
+        if ((name == null || StringUtils.EMPTY.equals(name)) && credit == null && semester == null && period == null)
         {
             // 这种情形 已在SetDBServiceTest2中测试
         }
@@ -90,7 +91,7 @@ public class SetDBServiceTest extends TestFastQuery
 
             Course courseNew = db.findCourse(no);
 
-            if (name != null && !"".equals(name))
+            if (name != null && !StringUtils.EMPTY.equals(name))
             { // name 不等于null 且 不等于 "",那么name必然会修改,则 Old name != New name
                 assertThat(courseOld.getName(), not(equalTo(courseNew.getName())));
             }

@@ -5,13 +5,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.109</version> <!-- fastquery.version -->
+    <version>1.0.110</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```
-compile 'org.fastquery:fastquery:1.0.109'
+compile 'org.fastquery:fastquery:1.0.110'
 ```
 
 # FastQuery 数据持久层框架
@@ -1506,8 +1506,7 @@ String findOneCourse();
 - 标识在方法上:表示其拦截的作用范围是当前方法
 - 一个方法的拦截器总和=它的所属类的拦截器+自己的拦截器
 
-## 支持
-### 应用在 Spring 环境
+## 应用在 Spring 环境
 
 配置扫描范围：
 
@@ -1526,97 +1525,6 @@ String findOneCourse();
 ```java
 @javax.annotation.Resource
 private UserInfoDB userInfoDB;
-```
-
-### ~~应用在 Jersey 环境~~ (自 1.0.110 版本起，放弃对 Jsersey 容器的支持)
-
-```xml
-<dependency>
-	<groupId>org.glassfish.jersey.containers</groupId>
-	<artifactId>jersey-container-servlet</artifactId>
-	<version>2.27</version>
-</dependency>
-
-<dependency>
-	<groupId>org.glassfish.jersey.inject</groupId>
-	<artifactId>jersey-hk2</artifactId>
-	<version>2.27</version>
-</dependency>
-```
-
-~~让 Jersey 容器管理 FastQuery~~: (自 1.0.110+ 不再支持)
-
-```java
-import javax.ws.rs.ApplicationPath;
-
-@ApplicationPath("rest")
-public class MyApplication extends ResourceConfig {
-	public MyApplication() {
-		// 绑定FastQuery	      
-		org.fastquery.jersey.FQueryBinder.bind(this);
-	}
-}
-```
-
-~~FastQuery 支持 JAX-RS 注解, 不需实现类, 便能构建极简的 RESTful. 不得不简单的设计, 可见一斑.~~
-
-```java
-@Path("userInfo")
-public interface UserInfoDBService extends QueryRepository {
-
-	// 查询并实现分页
-	@Path("findAll")
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Query(value = "select id,name,age from `userinfo` where 1", countField = "id")
-	Page<Map<String, Object>> findAll(@QueryParam("pageIndex") @PageIndex int pageIndex,
-			                          @QueryParam("pageSize")  @PageSize  int pageSize);
-   
-}
-```
-
-~~没错, **不用去写任何实现类**, 访问 `http://<your host>/rest/userInfo/findAll?pageIndex=1&pageSize=5`, 就可以看到效果.  
-**DB接口不仅能当做WEB Service(服务),同时也是一个DB接口**.除非逻辑是数据即服务,否则,不提倡`DAO`层跟`HTTP`服务融在一起.JAX-RS Resource的实现类,在WEB容器初始化之前就已经被`FastQuery`推导创建好了.~~
-
-### ~~配置支持HttpSign~~ (自 1.0.110+ 不再支持)
-[HttpSign](https://github.com/xixifeng/httpsign) 是一种RESTful接口签名认证的实现.  
-
-```xml
-<dependency>
-    <groupId>org.fastquery</groupId>
-    <artifactId>httpsign</artifactId>
-    <!-- 请从 https://gitee.com/xixifeng.com/httpsign 或 maven 中央仓库中查阅最新版本 -->
-    <version>1.0.3</version>
-</dependency>
-```
-
-用法很简单,在方法上标识`@Authorization`便可.
-
-```java
-@org.fastquery.httpsign.Authorization
-@Path("findById")
-@GET
-@Produces(MediaType.APPLICATION_JSON)
-@Query("select id,name,age from UserInfo where id = :id")
-JSONObject findById(@QueryParam("id") @Param("id") Integer id);
-```
-
-当然,如果不喜欢太简单,可以把DB接口注入到JAX-RS Resource类中:
-
-```java
-@Path("hi")
-public class Hi {
-
-	@javax.inject.Inject
-	private UserInfoDBService db;
-	
-	@GET
-	@Produces({"text/html"})
-	public String hi() {
-	      // use db...
-	      return "hi";
-	}
-}
 ```
 
 ## 测试FastQuery

@@ -24,6 +24,7 @@ package org.fastquery.test;
 
 import java.lang.reflect.Method;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Param;
 import org.fastquery.util.TypeUtil;
@@ -61,7 +62,7 @@ public class ParamFilterTest extends TestFastQuery
         String name = "小王子";
         int age = 6;
         Object[] args = {name, age};
-        String sql = "";
+        String sql = StringUtils.EMPTY;
         String str = paramFilter(method, args, sql);
         assertThat(str, equalTo(sql));
 
@@ -93,7 +94,7 @@ public class ParamFilterTest extends TestFastQuery
         String name = "小王子";
         int age = 6;
         Object[] args = {name, age};
-        String sql = "";
+        String sql = StringUtils.EMPTY;
         String str = paramFilter(method, args, sql);
         assertThat(str, equalTo(sql));
 

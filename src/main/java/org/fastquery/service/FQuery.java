@@ -25,9 +25,9 @@ package org.fastquery.service;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
-import org.fastquery.core.Placeholder;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
+import org.fastquery.core.StrConst;
 import org.fastquery.dsm.FQueryProperties;
 import org.fastquery.util.BeanUtil;
 
@@ -51,7 +51,7 @@ public class FQuery
     @SuppressWarnings("unchecked")
     public static <T extends Repository> T getRepository(Class<T> clazz)
     {
-        String name = clazz.getName() + Placeholder.DB_SUF;
+        String name = clazz.getName() + StrConst.DB_SUF;
         try
         {
             return (T) GenerateRepositoryImpl.getInstance().getClassLoader().loadClass(name).getMethod("g").invoke(null);

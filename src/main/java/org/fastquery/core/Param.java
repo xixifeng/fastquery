@@ -22,6 +22,8 @@
 
 package org.fastquery.core;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -48,5 +50,5 @@ public @interface Param
      *
      * @return String
      */
-    String defaultVal() default "";
+    String defaultVal() default StringUtils.EMPTY;
 }

@@ -25,8 +25,10 @@ package org.fastquery.analysis;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import org.fastquery.core.Placeholder;
+import org.apache.commons.lang3.StringUtils;
+import org.fastquery.core.RegexCache;
 import org.fastquery.core.Query;
+import org.fastquery.core.StrConst;
 import org.fastquery.util.TypeUtil;
 
 /**
@@ -45,9 +47,9 @@ class MuestionFilter implements MethodFilter
         for (Query query : queries)
         {
             String value = query.value();
-            Set<String> strs = TypeUtil.matchesNotrepeat(value, Placeholder.SP1_REG_PATT);
+            Set<String> strs = TypeUtil.matchesNotrepeat(value, RegexCache.SP1_REG_PATT);
             strs.forEach(str -> {
-                int index = Integer.parseInt(str.replace("?", ""));
+                int index = Integer.parseInt(str.replace(StrConst.QUE, StringUtils.EMPTY));
                 if (index > parameterCount)
                 {
                     this.abortWith(method,

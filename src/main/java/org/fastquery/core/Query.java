@@ -1,5 +1,7 @@
 package org.fastquery.core;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -22,14 +24,14 @@ public @interface Query
      *
      * @return String
      */
-    String value() default "";
+    String value() default StringUtils.EMPTY;
 
     /**
      * 求和语句
      *
      * @return String
      */
-    String countQuery() default "";
+    String countQuery() default StringUtils.EMPTY;
 
     /**
      * 求和字段

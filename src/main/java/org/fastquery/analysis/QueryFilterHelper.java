@@ -27,7 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import org.fastquery.core.Placeholder;
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.fastquery.core.RegexCache;
 import org.fastquery.core.Query;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.util.TypeUtil;
@@ -72,11 +74,12 @@ class QueryFilterHelper
             // 追加条件 End
 
             String where = sb.toString();
-            if (!"".equals(where) && TypeUtil.matches(query.value(), Placeholder.WHERE_REG_PATT).size() != 1)
+            if (!StringUtils.EMPTY.equals(where) && TypeUtil.matches(query.value(), RegexCache.WHERE_REG_PATT).size() != 1)
             {
                 throw new RepositoryException(method + " 如果存在@Condition(条件注解),那么@Query中的value值,必须存在#{#where},有且只能出现一次");
             }
-            sqls.add(sql.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(sb.toString())));
+            String str = RegExUtils.replaceFirst(sql,RegexCache.WHERE_REG_PATT,Matcher.quoteReplacement(sb.toString()));
+            sqls.add(str);
         }
 
         return sqls;

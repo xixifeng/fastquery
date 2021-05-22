@@ -34,10 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.bean.Ruits;
-import org.fastquery.core.Id;
-import org.fastquery.core.MethodInfo;
-import org.fastquery.core.Param;
-import org.fastquery.core.Placeholder;
+import org.fastquery.core.*;
 import org.fastquery.struct.Reference;
 import org.junit.Test;
 
@@ -54,7 +51,7 @@ public class TypeUtilTest
     public void testMatches()
     {
         String sql = "select id,name,age from #{#limit} `userinfo` #{#where}";
-        List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE_PATT);
+        List<String> strs = TypeUtil.matches(sql, RegexCache.LIMIT_RGE_PATT);
         assertThat(strs.size(), equalTo(1));
         assertThat(strs.get(0), equalTo("#{#limit}"));
     }
@@ -182,7 +179,7 @@ public class TypeUtilTest
     {
 
         assertThat(TypeUtil.getFirstWord(null), nullValue());
-        assertThat(TypeUtil.getFirstWord(""), is(""));
+        assertThat(TypeUtil.getFirstWord(StringUtils.EMPTY), is(StringUtils.EMPTY));
 
         String str = "3/3 source files have been analyzed";
         assertThat(TypeUtil.getFirstWord(str), is("3/3"));
@@ -260,13 +257,13 @@ public class TypeUtilTest
     public void overChar() throws Exception
     {
         String str = overChar(-1);
-        assertThat(str, equalTo(""));
+        assertThat(str, equalTo(StringUtils.EMPTY));
 
         str = overChar(0);
-        assertThat(str, equalTo(""));
+        assertThat(str, equalTo(StringUtils.EMPTY));
 
         str = overChar(1);
-        assertThat(str, equalTo("?"));
+        assertThat(str, equalTo(StrConst.QUE));
 
         str = overChar(2);
         assertThat(str, equalTo("?,?"));
@@ -282,30 +279,30 @@ public class TypeUtilTest
     public void replace1()
     {
         String str = TypeUtil.replace(null, 0, 1);
-        assertThat(str, is(""));
+        assertThat(str, is(StringUtils.EMPTY));
 
-        str = TypeUtil.replace("", 0, 1);
-        assertThat(str, is(""));
+        str = TypeUtil.replace(StringUtils.EMPTY, 0, 1);
+        assertThat(str, is(StringUtils.EMPTY));
 
         str = TypeUtil.replace(null, -1, 0);
-        assertThat(str, is(""));
+        assertThat(str, is(StringUtils.EMPTY));
     }
 
     @Test
     public void replace2()
     {
         String src = "kljgwkg?gwgw47478978?jioj2?87983lkjksj";
-        int count = StringUtils.countMatches(src, "?");
+        int count = StringUtils.countMatches(src, StrConst.QUE);
         int repat = 3;
         String str = TypeUtil.replace(src, 0, repat);
-        assertThat(StringUtils.countMatches(str, "?"), is(count + repat - 1));
+        assertThat(StringUtils.countMatches(str, StrConst.QUE), is(count + repat - 1));
 
         for (int i = 0; i < 10; i++)
         {
-            count = StringUtils.countMatches(src, "?");
+            count = StringUtils.countMatches(src, StrConst.QUE);
             repat = i + 1;
             str = TypeUtil.replace(src, 0, repat);
-            assertThat(StringUtils.countMatches(str, "?"), is(count + repat - 1));
+            assertThat(StringUtils.countMatches(str, StrConst.QUE), is(count + repat - 1));
         }
 
         str = TypeUtil.replace(src, 0, 3);
@@ -332,11 +329,11 @@ public class TypeUtilTest
     @Test
     public void replace4()
     {
-        String src = "";
+        String src = StringUtils.EMPTY;
         String str = TypeUtil.replace(src, 1, 5);
-        assertThat(str, equalTo(""));
+        assertThat(str, equalTo(StringUtils.EMPTY));
         str = TypeUtil.replace(src, 20, 5);
-        assertThat(str, equalTo(""));
+        assertThat(str, equalTo(StringUtils.EMPTY));
     }
 
     @Test

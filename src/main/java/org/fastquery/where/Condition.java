@@ -22,6 +22,8 @@
 
 package org.fastquery.where;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -101,5 +103,5 @@ public @interface Condition
      *
      * @return 在if条件不成立后的可选值
      */
-    String else$() default "";
+    String else$() default StringUtils.EMPTY;
 }

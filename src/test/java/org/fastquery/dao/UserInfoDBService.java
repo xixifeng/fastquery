@@ -75,6 +75,9 @@ public interface UserInfoDBService extends QueryRepository
     @Query("select * from `userinfo` where ${one} ${orderby}")
     JSONArray findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
 
+    @Query("select * from `userinfo` where ${one} ${orderby}")
+    JSONArray findUserInfo(@Param("orderby") String orderby, @Param("one") int i,  @Param("one") int y);
+
     // 通过defaultVal属性指定:若参数接受到null值,应该采用的默认值(该属性不是必须的,默认为"").
     @Query("select * from `userinfo` ${orderby}")
     // orderby 若为null, 那么 {orderby}的值,就取defaultVal的值

@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
 import org.fastquery.dsm.FastQueryJson;
@@ -75,18 +76,18 @@ class PropertiesUtil
             config = fQueryPropertie.getConfig();
             dataSourceName = fQueryPropertie.getDataSourceName();
             basePackages = fQueryPropertie.getBasePackages();
-            if (config == null || "".equals(config))
+            if (config == null || StringUtils.EMPTY.equals(config))
             {
                 throw new RepositoryException("fastquery.json 中的config属性配置错误,提示,不能是空字符且不能为null");
             }
-            if ("".equals(dataSourceName))
+            if (StringUtils.EMPTY.equals(dataSourceName))
             {
                 throw new RepositoryException("fastquery.json 中的dataSourceName配置错误,提示,不能是空字符且不能为null");
             }
 
             for (String basePackage : basePackages)
             {
-                if (basePackage == null || "".equals(basePackage))
+                if (basePackage == null || StringUtils.EMPTY.equals(basePackage))
                 {
                     continue;
                 }

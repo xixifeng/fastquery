@@ -27,10 +27,12 @@ import java.lang.reflect.Parameter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.Param;
-import org.fastquery.core.Placeholder;
+import org.fastquery.core.RegexCache;
 import org.fastquery.core.Query;
 import org.fastquery.util.TypeUtil;
 import org.fastquery.where.Condition;
@@ -55,11 +57,13 @@ class MarkFilter implements MethodFilter
             if (param != null)
             {
                 String par = param.value();
-                if ("".equals(par.trim()))
+                if (StringUtils.EMPTY.equals(par.trim()))
                 {
                     this.abortWith(method, "@Param(\"" + par + "\")这个小括号里面的值不能为空字符串");
                 }
-                if (!Pattern.matches(Placeholder.COLON_REG, ":" + par))
+
+                Matcher m = RegexCache.COLON_REG_PATT.matcher(":" + par);
+                if (!m.matches())
                 {
                     this.abortWith(method, "@Param(\"" + par + "\")这个小括号里面的值只能是字母或数字组成的字符串");
                 }
@@ -67,8 +71,8 @@ class MarkFilter implements MethodFilter
             }
         }
 
-        Pattern slreg = Placeholder.COLON_REG_PATT;
-        Pattern preg = Placeholder.EL_REG_PATT;
+        Pattern slreg = RegexCache.COLON_REG_PATT;
+        Pattern preg = RegexCache.EL_REG_PATT;
 
         // 把能与SL_REG和preg匹配的表达式收集起来
         Set<String> ps = new HashSet<>();
@@ -135,10 +139,10 @@ class MarkFilter implements MethodFilter
 
     private void checkSmile(Method method, String s)
     {
-        List<String> smiles = TypeUtil.matches(s, Placeholder.SMILE_BIG_PATT);
+        List<String> smiles = TypeUtil.matches(s, RegexCache.SMILE_BIG_PATT);
         for (String smile : smiles)
         {
-            int len = TypeUtil.matches(smile, Placeholder.EL_OR_COLON_PATT).size();
+            int len = TypeUtil.matches(smile, RegexCache.EL_OR_COLON_PATT).size();
             if (len != 1)
             {
                 this.abortWith(method, "微笑表达式中的内容必须只能包含一个$表达式或一个冒号表达式,而它包含了" + len + "个表达式");
@@ -149,7 +153,7 @@ class MarkFilter implements MethodFilter
 
     private void checkColon(Method method, Set<String> params, Pattern slreg, String p)
     {
-        String s = slreg.matcher(p).matches() ? p.replaceFirst(":", "") : p.replace("${", "").replace("}", "").replace("$", "");
+        String s = slreg.matcher(p).matches() ? p.replaceFirst(":", StringUtils.EMPTY) : p.replace("${", StringUtils.EMPTY).replace("}", StringUtils.EMPTY).replace("$", StringUtils.EMPTY);
         if (!params.contains(s) && s.indexOf(':') == -1)
         {
             this.abortWith(method, String.format("发现存在%s,而从参数中没有找到@Param(\"%s\"),这种语法是不被允许的.", p, s));

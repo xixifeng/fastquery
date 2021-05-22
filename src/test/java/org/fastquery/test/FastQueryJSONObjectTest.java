@@ -22,6 +22,7 @@
 
 package org.fastquery.test;
 
+import org.apache.commons.lang3.RegExUtils;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.service.FQuery;
 import org.fastquery.util.FastQueryJSONObject;
@@ -33,6 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.File;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.hamcrest.Matchers.*;
 
@@ -52,7 +54,11 @@ public class FastQueryJSONObjectTest extends TestFastQuery
     public void testGetBasedir()
     {
         String basedir = FastQueryJSONObject.getBasedir();
-        assertThat(basedir, equalTo(System.getProperty("user.dir").replaceAll(Matcher.quoteReplacement(String.valueOf(File.separatorChar)), "/") + "/src/test/resources/testFiles/"));
+        String usrdir = System.getProperty("user.dir");
+        String reg = Matcher.quoteReplacement(String.valueOf(File.separatorChar));
+        String str = RegExUtils.replaceAll(usrdir, Pattern.compile(reg),"/");
+        str += "/src/test/resources/testFiles/";
+        assertThat(basedir, equalTo(str));
     }
 
     @Test

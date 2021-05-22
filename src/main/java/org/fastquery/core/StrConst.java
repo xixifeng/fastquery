@@ -19,46 +19,24 @@
  * For more information, please see http://www.fastquery.org/.
  *
  */
-
-package org.fastquery.service;
-
-import lombok.extern.slf4j.Slf4j;
-import org.fastquery.core.StrConst;
-import org.springframework.beans.factory.FactoryBean;
-
-import java.lang.reflect.InvocationTargetException;
+package org.fastquery.core;
 
 /**
  * @author xixifeng (fastquery@126.com)
- **/
-@Slf4j
-public class RepositoryFactory<T> implements FactoryBean<T>
+ */
+public final class StrConst
 {
-    private Class<T> dbInterface;
+    public static final String QUE = "?";
+    /**
+     * 生成db类的后缀名称
+     */
+    public static final String DB_SUF = "a$";
+    public static final String TABLE = "#{#table}";
+    public static final String ID = "#{#id}";
+    public static final String LIMIT = "#{#limit}";
 
-    public RepositoryFactory(Class<T> dbInterface)
+    private StrConst()
     {
-        this.dbInterface = dbInterface;
-    }
-
-
-    @Override
-    public T getObject() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException
-    {
-        log.info("正在获取 {} 实例", dbInterface);
-        String name = dbInterface.getName() + StrConst.DB_SUF;
-        return (T) FqClassLoader.getInstance().loadClass(name).getMethod("g").invoke(null);
-    }
-
-    @Override
-    public Class<?> getObjectType()
-    {
-        return dbInterface;
-    }
-
-    @Override
-    public boolean isSingleton()
-    {
-        return true;
+        throw new IllegalStateException("StrConst is Utility class");
     }
 }

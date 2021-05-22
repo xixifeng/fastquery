@@ -24,6 +24,7 @@ package org.fastquery.test;
 
 import java.math.BigInteger;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.bean.Visitor;
 import org.fastquery.example.VisitorDBServcie;
 import org.fastquery.service.FQuery;
@@ -53,7 +54,7 @@ public class SaveToIdTest extends TestFastQuery
         String mobile = "\\";
         String email = "<";
         Byte gender = (byte) 0;
-        String toAddr = "";
+        String toAddr = StringUtils.EMPTY;
         String remark = "来访";
         Long lastDate = 1506233249L;
         Long createDate = 1506233208L;

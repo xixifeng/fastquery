@@ -22,6 +22,7 @@
 
 package org.fastquery.test;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.bean.Gender;
 import org.fastquery.bean.TypeFeature;
 import org.fastquery.bean.UserInfo;
@@ -183,7 +184,7 @@ public class MethodQueryTest extends TestFastQuery
     @Test
     public void executeBatch5()
     {
-        int[] ints = studentDBService.executeBatch("create2.sql", new String[]{null, "table", "demo_table", "table", "auto_increment", ""});
+        int[] ints = studentDBService.executeBatch("create2.sql", new String[]{null, "table", "demo_table", "table", "auto_increment", StringUtils.EMPTY});
         assertThat(ints.length, is(3));
     }
 
@@ -377,17 +378,17 @@ public class MethodQueryTest extends TestFastQuery
     public void find2()
     {
         UserInfo u = userInfoDBService.find(UserInfo.class, 3, false, "name");
-        assertThat(u.getName(), equalTo(""));
+        assertThat(u.getName(), equalTo(StringUtils.EMPTY));
         assertThat(u.getId(), notNullValue());
         assertThat(u.getAge(), notNullValue());
 
         u = userInfoDBService.find(UserInfo.class, 3, false, "name", "age");
-        assertThat(u.getName(), equalTo(""));
+        assertThat(u.getName(), equalTo(StringUtils.EMPTY));
         assertThat(u.getId(), notNullValue());
         assertThat(u.getAge(), nullValue());
 
         u = userInfoDBService.find(UserInfo.class, 3, false, "name", "age", "id");
-        assertThat(u.getName(), equalTo(""));
+        assertThat(u.getName(), equalTo(StringUtils.EMPTY));
         assertThat(u.getId(), nullValue());
         assertThat(u.getAge(), nullValue());
 
@@ -405,7 +406,7 @@ public class MethodQueryTest extends TestFastQuery
 
 
     @DataPoints("emptyNull")
-    public static String[] emptyNull = {"", null};
+    public static String[] emptyNull = {StringUtils.EMPTY, null};
 
     @Theory
     public void delete2(@FromDataPoints("emptyNull") String tableName, @FromDataPoints("emptyNull") String primaryKeyName)

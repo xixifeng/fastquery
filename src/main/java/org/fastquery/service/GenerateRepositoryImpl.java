@@ -28,8 +28,8 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.asm.AsmRepository;
 import org.fastquery.core.FQueryResourceImpl;
-import org.fastquery.core.Placeholder;
 import org.fastquery.core.Resource;
+import org.fastquery.core.StrConst;
 import org.fastquery.dsm.FastQueryJson;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.util.ClassUtil;
@@ -90,7 +90,7 @@ class GenerateRepositoryImpl
 
     private <T> void generate(Class<T> repositoryClazz)
     {
-        String name = repositoryClazz.getName() + Placeholder.DB_SUF;
+        String name = repositoryClazz.getName() + StrConst.DB_SUF;
 
         byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
 

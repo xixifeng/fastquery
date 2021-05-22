@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.Repository;
 import org.fastquery.filter.After;
 import org.fastquery.filter.AfterFilter;
@@ -135,9 +136,9 @@ class InterceptorFilter implements MethodFilter
     private void filterScopeError(Method method, Annotation annotation, ParameterizedType parameterizedType, Class<?> iclazz, Class<?> t)
     {
 
-        String sb = "\n" +
+        String sb = StringUtils.LF +
                 annotation +
-                "\n" +
+                StringUtils.LF +
                 parameterizedType.getRawType().getTypeName() +
                 "<" +
                 t.getSimpleName() +

@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.fastquery.core.Param;
-import org.fastquery.core.Placeholder;
+import org.fastquery.core.RegexCache;
 import org.fastquery.core.Query;
 import org.fastquery.util.TypeUtil;
 import org.fastquery.where.Condition;
@@ -91,7 +91,8 @@ class ConditionParameterFilter implements MethodFilter
         }
         else
         {
-            if (!"or".equalsIgnoreCase(word) && !"and".equalsIgnoreCase(word) && !Pattern.matches("^\\$\\S+(.|\n)*", value.trim()))
+            // 根据 sonarlint 的建议讲 (.|\n)* 换成了 (?s).*
+            if (!"or".equalsIgnoreCase(word) && !"and".equalsIgnoreCase(word) && !Pattern.matches("^\\$\\S+(?s).*", value.trim()))
             {
                 this.abortWith(method, "第" + (i + 1) + "个@Condition的值\"" + value + "\",缺少条件连接符,如果上一个条件存在,用什么跟它相连?");
             }
@@ -101,7 +102,7 @@ class ConditionParameterFilter implements MethodFilter
     private void checkConditionEL(Method method, String value)
     {
         // 获取$表达式
-        Set<String> ps = TypeUtil.matchesNotrepeat(value, Placeholder.EL_REG_PATT);
+        Set<String> ps = TypeUtil.matchesNotrepeat(value, RegexCache.EL_REG_PATT);
         Parameter[] parameters = method.getParameters();
         ps.forEach(p -> {
             for (Parameter parameter : parameters)
@@ -118,7 +119,7 @@ class ConditionParameterFilter implements MethodFilter
 
     private void checkWhereCount(Method method, Query[] queries)
     {
-        int countWhere = TypeUtil.matches(queries[0].value(), Placeholder.WHERE_REG_PATT).size();
+        int countWhere = TypeUtil.matches(queries[0].value(), RegexCache.WHERE_REG_PATT).size();
         if (countWhere > 1)
         {
             this.abortWith(method, "@Query中的value值,有且只能出现一次#{#where}");

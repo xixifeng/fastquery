@@ -26,7 +26,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.dialect.DialectScheduler;
 import org.fastquery.page.PageDialect;
 import org.fastquery.page.Pageable;
@@ -39,7 +42,7 @@ import org.fastquery.util.TypeUtil;
 public class QueryBuilder
 {
 
-    private static final String COLON_REG = ":[A-Za-z0-9]+";
+    private static final Pattern COLON_REG_PATT = Pattern.compile(":[A-Za-z0-9]+");
 
     private final String query;
     private String countQuery;
@@ -73,7 +76,7 @@ public class QueryBuilder
         if (conditions != null)
         {
             StringBuilder conditionsBuilder = conditionBuilder();
-            String querySQL = query.replaceFirst(Placeholder.WHERE_REG, conditionsBuilder.toString());
+            String querySQL = RegExUtils.replaceFirst(query,RegexCache.WHERE_REG_PATT,conditionsBuilder.toString());
             return colonProcess(querySQL);
         }
         else
@@ -112,7 +115,7 @@ public class QueryBuilder
             if (conditions != null)
             {
                 StringBuilder conditionsBuilder = conditionBuilder();
-                countQuery = countQuery.replaceFirst(Placeholder.WHERE_REG, conditionsBuilder.toString());
+                countQuery = RegExUtils.replaceFirst(countQuery,RegexCache.WHERE_REG_PATT,conditionsBuilder.toString());
             }
             SQLValue countQuerySQLValue = colonProcess(countQuery);
             list.add(countQuerySQLValue);
@@ -133,12 +136,12 @@ public class QueryBuilder
     private SQLValue colonProcess(String sqlTpl)
     {
         List<Object> indexValue = new ArrayList<>();
-        List<String> colons = TypeUtil.matches(sqlTpl, COLON_REG);
+        List<String> colons = TypeUtil.matches(sqlTpl, COLON_REG_PATT);
         for (String colon : colons)
         {
-            String key = colon.replace(":", "");
+            String key = colon.replace(":", StringUtils.EMPTY);
             Object val = parameters.get(key);
-            if (val != null && !val.toString().trim().equals(""))
+            if (val != null && !val.toString().trim().equals(StringUtils.EMPTY))
             {
                 if (val instanceof Iterable)
                 {
@@ -151,7 +154,8 @@ public class QueryBuilder
                         indexValue.add(iterator.next());
                         sb.append('?');
                     }
-                    sqlTpl = sqlTpl.replaceFirst(colon, sb.toString());
+                    Pattern p = RegexCache.getPattern(colon);
+                    sqlTpl = RegExUtils.replaceFirst(sqlTpl,p,sb.toString());
                 }
                 else if (val.getClass().isArray())
                 {
@@ -161,7 +165,8 @@ public class QueryBuilder
                         indexValue.add(v);
                         sb.append('?');
                     });
-                    sqlTpl = sqlTpl.replaceFirst(colon, sb.toString());
+                    Pattern p = RegexCache.getPattern(colon);
+                    sqlTpl = RegExUtils.replaceFirst(sqlTpl,p,sb.toString());
                 }
                 else
                 {
@@ -170,7 +175,7 @@ public class QueryBuilder
             }
         }
 
-        sqlTpl = sqlTpl.replaceAll(COLON_REG, "?");
+        sqlTpl = RegExUtils.replaceAll(sqlTpl, RegexCache.COLON_REG_PATT, StrConst.QUE);
 
         SQLValue sqlValue = new SQLValue();
         sqlValue.setSql(sqlTpl);
@@ -184,12 +189,12 @@ public class QueryBuilder
         final StringBuilder conditionsBuilder = new StringBuilder();
 
         conditions.stream().filter(condition -> { // 确定参与运算的条件
-            List<String> colons = TypeUtil.matches(condition, COLON_REG);
+            List<String> colons = TypeUtil.matches(condition, COLON_REG_PATT);
             for (String colon : colons)
             {
-                String key = colon.replace(":", "");
+                String key = colon.replace(":", StringUtils.EMPTY);
                 Object val = parameters.get(key);
-                if (val == null || val.toString().trim().equals(""))
+                if (val == null || val.toString().trim().equals(StringUtils.EMPTY))
                 {
                     return false;
                 }

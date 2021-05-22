@@ -33,10 +33,13 @@ import java.sql.Statement;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.struct.Reference;
 import org.fastquery.util.TypeUtil;
 import org.fastquery.struct.RespUpdate;
@@ -385,7 +388,7 @@ public class DB
     {
         Connection conn = null;
         PreparedStatement stat = null;
-        Object[] updateInfo = (where == null || "".equals(where)) ? BeanUtil.toUpdateSQL(bean, dbName, false)
+        Object[] updateInfo = (where == null || StringUtils.EMPTY.equals(where)) ? BeanUtil.toUpdateSQL(bean, dbName, false)
                 : BeanUtil.toUpdateSQL(bean, dbName, where);
         if (updateInfo == null || updateInfo.length == 0)
         {
@@ -531,7 +534,7 @@ public class DB
             while ((str = br.readLine()) != null)
             {
                 str = str.trim();
-                if (!"".startsWith(str) && !str.startsWith("#") && !str.startsWith("--"))
+                if (!StringUtils.EMPTY.startsWith(str) && !str.startsWith("#") && !str.startsWith("--"))
                 {
                     buff.append(str);
                     buff.append(' ');
@@ -545,7 +548,7 @@ public class DB
             }
 
             String lastStr = buff.toString().trim();
-            if (!"".equals(lastStr))
+            if (!StringUtils.EMPTY.equals(lastStr))
             {
                 builder.add(lastStr);
             }
@@ -578,9 +581,10 @@ public class DB
                         String val = quotes[i];
                         if (val == null)
                         {
-                            val = "";
+                            val = StringUtils.EMPTY;
                         }
-                        s = s.replaceAll("\\$\\[" + i + "]", val);
+                        Pattern p = RegexCache.getPattern("\\$\\[" + i + "]");
+                        s = RegExUtils.replaceAll(s,p,val);
                     }
                 }
                 consumer.accept(st, s);
@@ -691,7 +695,7 @@ public class DB
         { // 这个输出要做很多事情,在此判断一下很有必要,生产环境通常是warn级别
             StringBuilder sb = new StringBuilder("\n正在准备执行SQL:");
             sb.append(sql);
-            sb.append("\n");
+            sb.append(StringUtils.LF);
             if (objs != null && !objs.isEmpty())
             {
                 int len = objs.size();

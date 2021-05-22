@@ -31,9 +31,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Pattern;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
-import org.fastquery.core.Placeholder;
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.fastquery.core.RegexCache;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.util.TypeUtil;
@@ -67,22 +71,23 @@ public class Script2Class
      */
     private static String processParam(String script, Method method)
     {
-        List<String> names = TypeUtil.matches(script, Placeholder.COLON_REG);
+        List<String> names = TypeUtil.matches(script, RegexCache.COLON_REG_PATT);
         for (String paramName : names)
         {
-            String name = paramName.replace(":", "");
+            String name = paramName.replace(":", StringUtils.EMPTY);
             Class<?> oldC = Judge.getParamType(name, method);
             Class<?> newC = ClassUtils.primitiveToWrapper(oldC);
+            Pattern pattern = RegexCache.getPattern(paramName);
             if (oldC == newC)
             {
                 // 包装类型 如果后面跟着
-                script = script.replaceAll(paramName, "((" + newC.getName() + ")this.getParameter(\"" + name + "\"))");
+                script = RegExUtils.replaceAll(script,pattern,"((" + newC.getName() + ")this.getParameter(\"" + name + "\"))");
 
             }
             else
             { // 基本类型 -> 包装类型 那么就要解包
                 // 加上解包方法
-                script = script.replaceAll(paramName, "((" + newC.getName() + ")this.getParameter(\"" + name + "\"))." + oldC.getName() + "Value()");
+                script = RegExUtils.replaceAll(script,pattern,"((" + newC.getName() + ")this.getParameter(\"" + name + "\"))." + oldC.getName() + "Value()");
             }
         }
         return script;

@@ -23,6 +23,7 @@
 package org.fastquery.bean;
 
 import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.Id;
 import org.fastquery.core.Transient;
 
@@ -39,7 +40,7 @@ public class UserInfo
 
     @Id
     private Integer id;
-    private String name = "";
+    private String name = StringUtils.EMPTY;
     private Integer age;
     @Transient
     private String description;

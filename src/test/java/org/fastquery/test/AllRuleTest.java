@@ -39,7 +39,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         FQueryTest.class, StudentDBServiceTest.class, UserInfoDBServiceTest.class, CreateDataSourceTest.class, UserInfoDBRepositoryTest.class,
         TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class, BeanUtilTest.class, PageTest.class, FastQueryJSONObjectTest.class,
-        FQueryResourceImplTest.class, SunnyDBServiceTest.class, SaveToIdTest.class, PlaceholderTest.class, DBTest.class, ProductDBServiceTest.class,
+        FQueryResourceImplTest.class, SunnyDBServiceTest.class, SaveToIdTest.class, RegexCacheTest.class, DBTest.class, ProductDBServiceTest.class,
         QueryPoolTest.class, ParamFilterTest.class, ConditionTest.class, MySQLPageDialectTest.class, DefaultMethodTest.class,
         RepVersionTest.class, SetDBServiceTest.class, SetDBExpectTest.class, SharpExprParserTest.class,
         TransactionalTest.class, QueryByNamedDBExtendTest.class, JudgeTest.class, Script2ClassTest.class, TxTest.class, WorldDBTest.class, TypeTestDBTest.class, SelectFieldTest.class, TypeFeatureDBServiceTest.class, AsmRepositoryTest.class, SpringSupportTest.class

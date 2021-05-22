@@ -22,7 +22,9 @@
 
 package org.fastquery.dialect;
 
-import org.fastquery.core.Placeholder;
+import org.apache.commons.lang3.RegExUtils;
+import org.fastquery.core.RegexCache;
+import org.fastquery.core.StrConst;
 import org.fastquery.page.PageDialect;
 import org.fastquery.util.TypeUtil;
 
@@ -60,12 +62,12 @@ class MySQLPageDialect implements PageDialect
         // limit语句
         String limit = " limit " + offset + ',' + pageSize;
 
-        List<String> strs = TypeUtil.matches(querySQL, Placeholder.LIMIT_RGE);
+        List<String> strs = TypeUtil.matches(querySQL, RegexCache.LIMIT_RGE_PATT);
         if (strs.isEmpty())
         { // 如果没有#{#limit}, 默认在末尾增加.
-            querySQL += Placeholder.LIMIT;
+            querySQL += StrConst.LIMIT;
         }
 
-        return querySQL.replaceAll(Placeholder.LIMIT_RGE, Matcher.quoteReplacement(limit));
+        return RegExUtils.replaceAll(querySQL, RegexCache.LIMIT_RGE_PATT,Matcher.quoteReplacement(limit));
     }
 }

@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.dialect.DialectScheduler;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.PageDialect;
@@ -68,8 +70,8 @@ public class QueryParser
         for (String sql : sqls)
         {
             // 替换SQL中的占位变量符
-            sql = sql.replaceAll(Placeholder.TABLE_REG, Matcher.quoteReplacement(table));
-            sql = sql.replaceAll(Placeholder.ID_REG, Matcher.quoteReplacement(id));
+            sql = RegExUtils.replaceAll(sql, RegexCache.TABLE_REG_PATT, Matcher.quoteReplacement(table));
+            sql = RegExUtils.replaceAll(sql, RegexCache.ID_REG_PATT,Matcher.quoteReplacement(id));
             msvs.add(inParser(sql));
         }
 
@@ -114,14 +116,14 @@ public class QueryParser
             String countField = query.countField();
             String countQuery = query.countQuery();
             String countPageSQL;
-            if ("".equals(countQuery))
+            if (StringUtils.EMPTY.equals(countQuery))
             { // 表明在声明时没有指定求和语句
                 // 那么通过主体查询语句算出count语句,querySQL的where问题已经处理好
                 countPageSQL = pageDialect.countSQLInference(querySQL, countField);
             }
             else
             {
-                countPageSQL = countQuery.replaceFirst(Placeholder.WHERE_REG, Matcher.quoteReplacement(TypeUtil.getWhereSQL(method, args)));
+                countPageSQL = RegExUtils.replaceFirst(countQuery,RegexCache.WHERE_REG_PATT,Matcher.quoteReplacement(TypeUtil.getWhereSQL(method, args)));
             }
 
             sqlValues.add(inParser(countPageSQL));

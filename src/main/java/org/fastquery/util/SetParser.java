@@ -22,10 +22,9 @@
 
 package org.fastquery.util;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.asm.Script2Class;
-import org.fastquery.core.MethodInfo;
-import org.fastquery.core.QueryContext;
-import org.fastquery.core.RepositoryException;
+import org.fastquery.core.*;
 import org.fastquery.where.Set;
 import java.lang.reflect.InvocationTargetException;
 
@@ -87,7 +86,7 @@ final class SetParser
         else
         {
             String elseValue = set.else$();
-            if (!"".equals(elseValue))
+            if (!StringUtils.EMPTY.equals(elseValue))
             {
                 elseValue = TypeUtil.paramFilter(QueryContext.getMethodInfo(), QueryContext.getArgs(), elseValue);
                 sb.append(elseValue);
@@ -108,11 +107,11 @@ final class SetParser
         // 这些因子不拿出来定义是有意义的, 多个 || 第一个true,后面的方法就不执行了
         // 像||,&& 这种运算, 多长都不嫌丑
 
-        java.util.Set<String> pars = TypeUtil.matchesNotrepeat(value, "\\?\\d+");
+        java.util.Set<String> pars = TypeUtil.matchesNotrepeat(value, RegexCache.SP1_REG_PATT);
         Object[] args = QueryContext.getArgs();
         for (String par : pars)
         {
-            int index = Integer.parseInt(par.replace("?", "")); // 计数是1开始的
+            int index = Integer.parseInt(par.replace(StrConst.QUE, StringUtils.EMPTY)); // 计数是1开始的
             Object arg = args[index - 1];
             if (getFactor1(set, arg) || getFactor2(set, arg))
             {
@@ -130,7 +129,7 @@ final class SetParser
 
     private static boolean getFactor2(Set set, Object arg)
     {
-        return arg != null && "".equals(arg.toString()) && set.ignoreEmpty();
+        return arg != null && StringUtils.EMPTY.equals(arg.toString()) && set.ignoreEmpty();
     }
 
     private static boolean getFactor3(Set set, int index)

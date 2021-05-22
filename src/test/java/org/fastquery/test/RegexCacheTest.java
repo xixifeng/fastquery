@@ -25,10 +25,14 @@ package org.fastquery.test;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
-import org.fastquery.core.Placeholder;
+import org.apache.commons.lang3.StringUtils;
+import org.fastquery.core.RegexCache;
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
 
@@ -38,14 +42,14 @@ import org.junit.Test;
  * @author mei.sir@aliyun.cn
  */
 @Slf4j
-public class PlaceholderTest extends TestFastQuery
+public class RegexCacheTest extends TestFastQuery
 {
     @Test
     public void Q_MATCH()
     {
         String str = "select * from UserInfo where name like `- - ?_  --- -`   and age like `-_?-` and akjgew `-  ?_-` and sge`-  ?                     -`";
 
-        List<String> ssms = TypeUtil.matches(str, Placeholder.SMILE_PATT);
+        List<String> ssms = TypeUtil.matches(str, RegexCache.SMILE_PATT);
 
         for (String string : ssms)
         {
@@ -69,7 +73,7 @@ public class PlaceholderTest extends TestFastQuery
     public void SL_REG1()
     {
         String str = ":a[]%:b% %:c%";
-        List<String> ssms = TypeUtil.matches(str, Placeholder.COLON_REG_PATT);
+        List<String> ssms = TypeUtil.matches(str, RegexCache.COLON_REG_PATT);
         assertThat(ssms.size(), is(3));
         assertThat(ssms.get(0), equalTo(":a"));
         assertThat(ssms.get(1), equalTo(":b"));
@@ -80,7 +84,7 @@ public class PlaceholderTest extends TestFastQuery
     public void SL_REG2()
     {
         String str = "_:%aa_b  %:Ccc_d%:eeE:F_:1%%%%_jkjgwoxl:abc";
-        List<String> ssms = TypeUtil.matches(str, Placeholder.COLON_REG_PATT);
+        List<String> ssms = TypeUtil.matches(str, RegexCache.COLON_REG_PATT);
         assertThat(ssms.size(), is(5));
         assertThat(ssms.get(0), equalTo(":Ccc"));
         assertThat(ssms.get(1), equalTo(":eeE"));
@@ -93,7 +97,7 @@ public class PlaceholderTest extends TestFastQuery
     public void SL_REG3()
     {
         String str = ":id,:name,:age";
-        List<String> ssms = TypeUtil.matches(str, Placeholder.COLON_REG_PATT);
+        List<String> ssms = TypeUtil.matches(str, RegexCache.COLON_REG_PATT);
         assertThat(ssms.size(), is(3));
         assertThat(ssms.get(0), equalTo(":id"));
         assertThat(ssms.get(1), equalTo(":name"));
@@ -103,36 +107,36 @@ public class PlaceholderTest extends TestFastQuery
     @Test
     public void PERCENT()
     {
-        String str = "";
-        boolean b = Pattern.matches(Placeholder.PERCENT, str);
+        String str = StringUtils.EMPTY;
+        boolean b = RegexCache.PERCENT_PATT.matcher(str).matches();
         assertThat(b, is(false));
 
         str = "%";
-        b = Pattern.matches(Placeholder.PERCENT, str);
+        b = RegexCache.PERCENT_PATT.matcher(str).matches();
         assertThat(b, is(true));
 
         str = "a%";
-        b = Pattern.matches(Placeholder.PERCENT, str);
+        b = RegexCache.PERCENT_PATT.matcher(str).matches();
         assertThat(b, is(false));
 
         str = "%aa";
-        b = Pattern.matches(Placeholder.PERCENT, str);
+        b = RegexCache.PERCENT_PATT.matcher(str).matches();
         assertThat(b, is(false));
 
         str = "%%";
-        b = Pattern.matches(Placeholder.PERCENT, str);
+        b = RegexCache.PERCENT_PATT.matcher(str).matches();
         assertThat(b, is(true));
 
         str = "%%%";
-        b = Pattern.matches(Placeholder.PERCENT, str);
+        b = RegexCache.PERCENT_PATT.matcher(str).matches();
         assertThat(b, is(true));
 
         str = "%%%";
-        b = Pattern.matches(Placeholder.PERCENT, str);
+        b = RegexCache.PERCENT_PATT.matcher(str).matches();
         assertThat(b, is(true));
 
         str = "%%%a";
-        b = Pattern.matches(Placeholder.PERCENT, str);
+        b = RegexCache.PERCENT_PATT.matcher(str).matches();
         assertThat(b, is(false));
     }
 
@@ -140,7 +144,7 @@ public class PlaceholderTest extends TestFastQuery
     public void SEARCH_NUM()
     {
         String s = "`-%?103%?1kjgw?2?398klgw?3-`";
-        List<String> strs = TypeUtil.matches(s, Placeholder.SEARCH_NUM_PATT);
+        List<String> strs = TypeUtil.matches(s, RegexCache.SEARCH_NUM_PATT);
         for (String str : strs)
         {
             assertThat(Pattern.matches("\\d+", str), is(true));
@@ -151,7 +155,7 @@ public class PlaceholderTest extends TestFastQuery
     public void EL_OR_COLON()
     {
         String str = "jklgjw ,gwlljlgw `- :name_ :info- $name_ $ok.ax -` and ${abc_} conm ${mark} orfkljgw xg ${a} lgwiouo$_iwk$ jhlkgikw $abc}";
-        List<String> strs = TypeUtil.matches(str, Placeholder.EL_OR_COLON_PATT);
+        List<String> strs = TypeUtil.matches(str, RegexCache.EL_OR_COLON_PATT);
         assertThat(strs.size(), is(9));
         assertThat(strs.get(0), equalTo(":name"));
         assertThat(strs.get(1), equalTo(":info"));
@@ -162,6 +166,15 @@ public class PlaceholderTest extends TestFastQuery
         assertThat(strs.get(6), equalTo("${a}"));
         assertThat(strs.get(7), equalTo("$_iwk"));
         assertThat(strs.get(8), equalTo("$abc}"));
+    }
+
+    @Test
+    public void getPattern()
+    {
+        String regex = ":name";
+        Pattern p1 = Pattern.compile(regex);
+        Pattern p2 = RegexCache.getPattern(":name");
+        assertThat(p1.toString(),equalTo(p2.toString()));
     }
 
 }

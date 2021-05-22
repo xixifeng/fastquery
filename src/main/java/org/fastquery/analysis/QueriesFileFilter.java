@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.util.FastQueryJSONObject;
 
 /**
@@ -62,7 +63,7 @@ class QueriesFileFilter implements MethodFilter
         sb.append(suffix);
         sb.append("该文件可以放入claspath环境目录下");
 
-        if (fcd != null && !"".equals(fcd))
+        if (fcd != null && !StringUtils.EMPTY.equals(fcd))
         {
             sb.append(",据发现 \"fastquery.config.dir\" 指定了目录 ");
             sb.append(fcd);
@@ -75,14 +76,14 @@ class QueriesFileFilter implements MethodFilter
     {
 
         List<String> pers = FastQueryJSONObject.getQueries();
-        pers.add("");
+        pers.add(StringUtils.EMPTY);
 
         for (String per : pers)
         {
             String perxml = per + className + suffix;
             URL url = QueriesFileFilter.class.getClassLoader().getResource(perxml);
             boolean urlExits = url != null;
-            if (urlExits || (fcd != null && !"".equals(fcd) && new File(fcd, per + className + ".queries.xml").exists()))
+            if (urlExits || (fcd != null && !StringUtils.EMPTY.equals(fcd) && new File(fcd, per + className + ".queries.xml").exists()))
             {
                 return true;
             }

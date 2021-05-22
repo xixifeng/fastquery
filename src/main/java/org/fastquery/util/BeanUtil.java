@@ -28,6 +28,7 @@ import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.*;
 import org.fastquery.struct.SQLValue;
@@ -199,7 +200,7 @@ public final class BeanUtil
         Object[] objects = toWhere(fs, bean, false);
         List<Object> values = (List<Object>) objects[1];// sql语言中"?"对应的实参
         SelectField<?> selectField = new SelectField<>(cls, contain, fields);
-        String where = "";
+        String where = StringUtils.EMPTY;
         if (!values.isEmpty())
         {
             where = " where" + objects[0].toString().substring(4);
@@ -225,7 +226,7 @@ public final class BeanUtil
         String sql; // 待执行的sql
         if (key == null)
         {
-            String where = "";
+            String where = StringUtils.EMPTY;
             if (!values.isEmpty())
             {
                 where = " where" + objects[0].toString().substring(4);
@@ -472,7 +473,7 @@ public final class BeanUtil
                     Object fv = TypeUtil.getFieldVal(bean, field);
                     if (fv != null)
                     {
-                        conditions.add(field.getName() + " " + symbol + " :" + field.getName() + opration);
+                        conditions.add(field.getName() + StringUtils.SPACE + symbol + " :" + field.getName() + opration);
                         parameters.put(field.getName(), fv);// 同时把这个?号的值记下来
                     }
                 }
@@ -600,7 +601,7 @@ public final class BeanUtil
      */
     public static Object[] toUpdateSQL(Object bean, String dbName, String where)
     {
-        List<String> wps = TypeUtil.matches(where, Placeholder.COLON_REG);
+        List<String> wps = TypeUtil.matches(where, RegexCache.COLON_REG_PATT);
         List<Object> args = new ArrayList<>();
         Class<?> cls = bean.getClass();
         // 表名称
@@ -637,10 +638,10 @@ public final class BeanUtil
             else
             {
                 // where的后面部分 和 追加sql参数
-                String whef = where.replaceAll(Placeholder.COLON_REG, "?");
+                String whef = RegExUtils.replaceAll(where, RegexCache.COLON_REG_PATT, StrConst.QUE);
                 for (String wp : wps)
                 {
-                    Object val = new PropertyDescriptor(wp.replace(":", ""), cls).getReadMethod().invoke(bean);
+                    Object val = new PropertyDescriptor(wp.replace(":", StringUtils.EMPTY), cls).getReadMethod().invoke(bean);
                     if (val == null)
                     {
                         throw new RepositoryException("条件的值不能为null");

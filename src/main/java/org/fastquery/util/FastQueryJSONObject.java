@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.RepositoryException;
 
 import com.alibaba.fastjson.JSONArray;
@@ -95,7 +96,7 @@ public class FastQueryJSONObject
         List<String> strs = getQueries();
         for (String str : strs)
         {
-            if ("".equals(str))
+            if (StringUtils.EMPTY.equals(str))
             {
                 continue;
             }

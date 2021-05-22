@@ -22,6 +22,8 @@
 
 package org.fastquery.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author mei.sir@aliyun.cn
  */
@@ -51,7 +53,7 @@ public class PreventSQLInjection
      */
     public static boolean isInjectStr(String str)
     {
-        if (str != null && !"".equals(str.trim()))
+        if (str != null && !StringUtils.EMPTY.equals(str.trim()))
         {
             String s = str.toLowerCase();
             for (String key : KEYS)

@@ -22,6 +22,7 @@
 
 package org.fastquery.test;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -83,7 +84,7 @@ public class FastQueryTestRule implements TestRule
             Repository repository = FQuery.getRepository(rc);
             if (testTarget == null && !Modifier.isStatic(field.getModifiers()))
             {
-                throw new ExceptionInInitializerError(description.getTestClass().getSimpleName() + "中的变量 [" + rc.getSimpleName() + " " + field.getName() + "] 需要设置成static(静态类型)");
+                throw new ExceptionInInitializerError(description.getTestClass().getSimpleName() + "中的变量 [" + rc.getSimpleName() + StringUtils.SPACE + field.getName() + "] 需要设置成static(静态类型)");
             }
             // 代理repository这个对象
             field.set(testTarget, Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[]{rc},

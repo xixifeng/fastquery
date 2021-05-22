@@ -30,6 +30,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.RepositoryException;
 
 /**
@@ -100,7 +101,7 @@ public class FQueryProperties
 
     public static void createDataSource(String dataSourceName, Properties properties)
     {
-        if (dataSourceName == null || "".equals(dataSourceName))
+        if (dataSourceName == null || StringUtils.EMPTY.equals(dataSourceName))
         {
             throw new RepositoryException("dataSourceName 不能为\"\"或为null");
         }

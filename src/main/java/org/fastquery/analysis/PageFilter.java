@@ -25,8 +25,10 @@ package org.fastquery.analysis;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.fastquery.core.Placeholder;
+import org.apache.commons.lang3.StringUtils;
+import org.fastquery.core.RegexCache;
 import org.fastquery.core.Query;
+import org.fastquery.core.StrConst;
 import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
 import org.fastquery.util.TypeUtil;
@@ -55,7 +57,7 @@ class PageFilter implements MethodFilter
                 // 这里query不可能为null的,若为null根本就进入不了该filter
                 String countId = query.countField();
                 String countQuery = query.countQuery();
-                if (!"id".equals(countId) || !"".equals(countQuery))
+                if (!"id".equals(countId) || !StringUtils.EMPTY.equals(countQuery))
                 {
                     this.abortWith(method, "如果用@NotCount标识,不能设置@Query中的countId的值和countQuery的值.不求总行数,设置countId和countQuery的值是没有意义的.");
                 }
@@ -63,10 +65,10 @@ class PageFilter implements MethodFilter
 
             // 8). #{#limit} 禁止重复出现
             String sql = query.value();
-            List<String> strs = TypeUtil.matches(sql, Placeholder.LIMIT_RGE_PATT);
+            List<String> strs = TypeUtil.matches(sql, RegexCache.LIMIT_RGE_PATT);
             if (strs.size() > 1)
             {
-                this.abortWith(method, String.format("%s中,禁止重复出现%s", sql, Placeholder.LIMIT));
+                this.abortWith(method, String.format("%s中,禁止重复出现%s", sql, StrConst.LIMIT));
             }
 
         }
