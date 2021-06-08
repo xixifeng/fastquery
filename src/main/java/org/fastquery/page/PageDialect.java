@@ -41,15 +41,13 @@ public interface PageDialect
      */
     default String getCurrentPageSQL(String querySQL, int offset, int pageSize)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("WITH query AS (SELECT inner_query.*, ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP) as __row_index___ FROM ( ");
-        sb.append(querySQL);
-        sb.append(" ) inner_query ) SELECT * FROM query WHERE __row_index___ > ");
-        sb.append(offset);
-        sb.append(" AND __row_index___ <= ");
-        sb.append(offset + pageSize);
 
-        return sb.toString();
+        return "WITH query AS (SELECT inner_query.*, ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP) as __row_index___ FROM ( " +
+                querySQL +
+                " ) inner_query ) SELECT * FROM query WHERE __row_index___ > " +
+                offset +
+                " AND __row_index___ <= " +
+                (offset + pageSize);
     }
 
     /**
