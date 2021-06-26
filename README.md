@@ -1607,7 +1607,7 @@ assertThat(executedSQLs.get(0), not(containsString("count")));
 
 ## 开发环境
 仅仅是建议,并不局限于此         
-  IDE: eclipse          
+  IDE: IntellIJ IDEA          
 build: maven 
 
 ## 微信交流
