@@ -337,6 +337,7 @@ public class DB
             conn = QueryContext.getConn();
             QueryContext.addSqls(sql);
             QueryContext.disableAutoCommit();
+            log.info(sql);
             if (isEffect)
             {
                 stat = conn.prepareStatement(sql); // 不需要返回主键

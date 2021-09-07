@@ -146,7 +146,7 @@ public final class BeanUtil
                 }
                 else if (field.getAnnotation(Id.class) == null)
                 {
-                    sb.append("null,");
+                    sb.append("DEFAULT,");
                 }
             }
         }

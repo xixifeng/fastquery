@@ -36,6 +36,7 @@ import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.math.BigInteger;
 import java.util.*;
 
 import static org.hamcrest.Matchers.*;
@@ -349,6 +350,92 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         assertThat(t.getGender().toString(), equalTo("女"));
         assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.西瓜,Ruits.樱桃)),is(true));
         assertThat(t.getSort(),is(6));
+    }
+
+    @Test
+    public void save()
+    {
+        TypeFeature tf = new TypeFeature();
+        tf.setName("令狐一飞");
+        tf.setGender(Gender.男);
+        tf.setRuits(EnumSet.of(Ruits.芒果,Ruits.梨));
+
+        TypeFeature typeFeature = db.save(tf);
+        assertThat(typeFeature.getSort(),is(3));
+    }
+
+    @Test
+    public void saveOrUpdate()
+    {
+        TypeFeature tf = new TypeFeature();
+        tf.setId(40L);
+        tf.setName("令狐一飞");
+        tf.setGender(Gender.男);
+        tf.setRuits(EnumSet.of(Ruits.芒果,Ruits.梨));
+
+        TypeFeature typeFeature = db.saveOrUpdate(tf);
+        assertThat(typeFeature.getSort(),is(3));
+    }
+
+    @Test
+    public void saveCollection()
+    {
+        TypeFeature tf1 = new TypeFeature();
+        tf1.setName("令狐一飞");
+        tf1.setGender(Gender.男);
+        tf1.setRuits(EnumSet.of(Ruits.芒果,Ruits.梨));
+
+        TypeFeature tf2 = new TypeFeature();
+        tf2.setName("夏婵");
+        tf2.setGender(Gender.女);
+        tf2.setRuits(EnumSet.of(Ruits.苹果,Ruits.橘子));
+
+        List<TypeFeature> list = Arrays.asList(tf1,tf2);
+
+        int effect = db.save(false,list);
+        assertThat(effect,is(2));
+    }
+
+    @Test
+    public void saveArray()
+    {
+        TypeFeature tf1 = new TypeFeature();
+        tf1.setName("令狐一飞");
+        tf1.setGender(Gender.男);
+        tf1.setRuits(EnumSet.of(Ruits.芒果,Ruits.梨));
+
+        TypeFeature tf2 = new TypeFeature();
+        tf2.setName("夏婵");
+        tf2.setGender(Gender.女);
+        tf2.setRuits(EnumSet.of(Ruits.苹果,Ruits.橘子));
+
+        int effect = db.saveArray(false,tf1,tf2);
+        assertThat(effect,is(2));
+    }
+
+    @Test
+    public void insert()
+    {
+        TypeFeature tf1 = new TypeFeature();
+        tf1.setName("令狐一飞");
+        tf1.setGender(Gender.男);
+        tf1.setRuits(EnumSet.of(Ruits.芒果,Ruits.梨));
+
+
+        int effect = db.insert(tf1);
+        assertThat(effect,is(1));
+    }
+
+    @Test
+    public void saveToId()
+    {
+        TypeFeature tf1 = new TypeFeature();
+        tf1.setName("令狐一飞");
+        tf1.setGender(Gender.男);
+        tf1.setRuits(EnumSet.of(Ruits.芒果,Ruits.梨));
+
+        BigInteger id = db.saveToId(tf1);
+        assertThat(id.longValue(),greaterThan(1L));
     }
 
 }
