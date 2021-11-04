@@ -677,6 +677,18 @@ public class DB
                 // key = resultSetMetaData.getColumnName(i); // 获取列名称
                 key = resultSetMetaData.getColumnLabel(i); // 获取列别名,若没有别名那么就获取本身名称(getColumnName)
                 obj = rs.getObject(i);
+                String columnType = resultSetMetaData.getColumnTypeName(i);
+                if("JSON".equals(columnType))
+                {
+                    if(obj == null)
+                    {
+                        obj = new JSONObject();
+                    }
+                    else
+                    {
+                        obj = JSONObject.parseObject(obj.toString());
+                    }
+                }
                 keyval.put(key, obj);
             }
             keyvals.add(keyval);

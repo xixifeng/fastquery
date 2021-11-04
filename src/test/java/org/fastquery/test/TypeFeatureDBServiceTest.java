@@ -23,6 +23,7 @@
 package org.fastquery.test;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Gender;
 import org.fastquery.bean.Ruits;
@@ -436,6 +437,41 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
 
         BigInteger id = db.saveToId(tf1);
         assertThat(id.longValue(),greaterThan(1L));
+    }
+
+    @Test
+    public void findContainJSON()
+    {
+        TypeFeature tf = db.findContainJSON(1L);
+        assertThat(tf.getActionLog(),instanceOf(JSONObject.class));
+    }
+
+    @Test
+    public void findByContainJSONPage()
+    {
+        Page<TypeFeature> page = db.findByContainJSONPage(new PageableImpl(1,3));
+        List<TypeFeature> typeFeatures = page.getContent();
+        typeFeatures.forEach(typeFeature -> assertThat(typeFeature.getActionLog(),instanceOf(JSONObject.class)));
+        log.info(">>>>>>:{}", JSON.toJSONString(page,true));
+    }
+
+    @Test
+    public void findActionLogById()
+    {
+        JSONObject json = db.findActionLogById(1L);
+        Object obj = json.get("actionLog");
+        assertThat(obj, instanceOf(JSONObject.class));
+        JSONObject actionLog = (JSONObject) obj;
+        assertThat(actionLog.containsKey("mail"),is(true));
+        assertThat(actionLog.containsKey("name"),is(true));
+        assertThat(actionLog.containsKey("address"),is(true));
+    }
+
+    @Test
+    public void find()
+    {
+        TypeFeature typeFeature = db.find(TypeFeature.class,1L);
+        assertThat(typeFeature.getActionLog(), instanceOf(JSONObject.class));
     }
 
 }

@@ -375,7 +375,6 @@ class QueryProcess
         {
             bean = iargs[0];
             sql = BeanUtil.toInsertSQL(bean);
-            log.info(sql);
             Object keyObj = DB.update(sql, false);
             if (keyObj == null)
             {

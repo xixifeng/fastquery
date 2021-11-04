@@ -22,6 +22,7 @@
 
 package org.fastquery.dao;
 
+import com.alibaba.fastjson.JSONObject;
 import org.fastquery.bean.Gender;
 import org.fastquery.bean.Ruits;
 import org.fastquery.bean.TypeFeature;
@@ -78,5 +79,14 @@ public interface TypeFeatureDBService extends QueryRepository
     @Modifying
     @Query("update type_feature set gender = :gender where id = ?1")
     int updateTypeFeature(Long id, @Param("gender") Gender gender);
+
+    @Query("select actionLog from type_feature where id = ?1")
+    JSONObject findActionLogById(Long id);
+
+    @Query("select id, name, gender, actionLog from type_feature where id = ?1")
+    TypeFeature findContainJSON(Long id);
+
+    @Query("select id, name, gender, actionLog from type_feature")
+    Page<TypeFeature> findByContainJSONPage(Pageable pageable);
 
 }

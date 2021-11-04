@@ -22,6 +22,7 @@
 
 package org.fastquery.bean;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.*;
 import org.fastquery.core.Id;
 import org.fastquery.core.Table;
@@ -47,6 +48,7 @@ public class TypeFeature
     private Gender gender;
     private EnumSet<Ruits> ruits;
     private Integer sort;
+    private JSONObject actionLog;
     @Transient
     private Long ssid;
 

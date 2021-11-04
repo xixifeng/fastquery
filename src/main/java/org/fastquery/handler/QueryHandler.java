@@ -234,7 +234,10 @@ public class QueryHandler
         {
             throw new RepositoryException(QueryContext.getMethodInfo() + "不能把多条记录赋值给JSONObject");
         }
-        return new JSONObject(mapType(keyvals, Object.class));
+        else
+        {
+            return new JSONObject(mapType(keyvals, Object.class));
+        }
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
