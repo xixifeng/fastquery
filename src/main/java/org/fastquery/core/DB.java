@@ -690,7 +690,7 @@ public class DB
                     }
                     else
                     {
-                        obj = JSONObject.parseObject(obj.toString());
+                        obj = JSON.parseObject(obj.toString());
                     }
                 }
                 keyval.put(key, obj);

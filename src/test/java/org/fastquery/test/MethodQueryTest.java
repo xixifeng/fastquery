@@ -371,7 +371,7 @@ public class MethodQueryTest extends TestFastQuery
     {
         assertThat(userInfoDBService.find(UserInfo.class, 3).getId(), is(3));
         assertThat(userInfoDBService.find(UserInfo.class, 3, null).getId(), is(3)); // 测试数据源传递null
-        assertThat(userInfoDBService.find(UserInfo.class, 3, (String) null, null).getId(), is(3)); // 测试数据库名称为null
+        assertThat(userInfoDBService.find(UserInfo.class, 3, null, null).getId(), is(3)); // 测试数据库名称为null
     }
 
     @Test
