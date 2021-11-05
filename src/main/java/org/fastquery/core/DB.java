@@ -68,6 +68,10 @@ public class DB
             int index = e.ordinal() + 1; // 数据库中枚举元素对应的数字索引
             stat.setObject(parameterIndex, index);
         }
+        else if(object instanceof JSON)
+        {
+            stat.setObject(parameterIndex, object.toString());
+        }
         else
         {
             stat.setObject(parameterIndex, object);

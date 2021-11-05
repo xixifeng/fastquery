@@ -474,4 +474,24 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         assertThat(typeFeature.getActionLog(), instanceOf(JSONObject.class));
     }
 
+    @Test
+    public void update()
+    {
+        String jsonStr = "{\"mail\": \"xiaozhang@gmail.com\", \"name\": \"小张\", \"address\": \"Shanghai\"}";
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.setId(4L);
+        JSONObject jsonObject = JSON.parseObject(jsonStr);
+        typeFeature.setActionLog(jsonObject);
+        int effect = db.executeUpdate(typeFeature);
+        assertThat(effect,is(1));
+        TypeFeature tf = db.find(TypeFeature.class,4L);
+        JSONObject actionLog = tf.getActionLog();
+        assertThat(actionLog.containsKey("mail"),is(true));
+        assertThat(actionLog.containsKey("name"),is(true));
+        assertThat(actionLog.containsKey("address"),is(true));
+        assertThat(actionLog.getString("mail"),equalTo("xiaozhang@gmail.com"));
+        assertThat(actionLog.getString("name"),equalTo("小张"));
+        assertThat(actionLog.getString("address"),equalTo("Shanghai"));
+    }
+
 }
