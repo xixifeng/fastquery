@@ -37,6 +37,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
+
+import com.alibaba.fastjson.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -686,11 +688,19 @@ public class DB
                 {
                     if(obj == null)
                     {
-                        obj = new JSONObject();
+                        String columnName = resultSetMetaData.getColumnName(i);
+                        if(columnName.endsWith("Obj"))
+                        {
+                            obj = new JSONObject();
+                        }
+                        else if(columnName.endsWith("Array"))
+                        {
+                            obj = new JSONArray();
+                        }
                     }
                     else
                     {
-                        obj = JSON.parseObject(obj.toString());
+                        obj = JSON.parse(obj.toString());
                     }
                 }
                 keyval.put(key, obj);

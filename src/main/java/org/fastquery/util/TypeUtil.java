@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.alibaba.fastjson.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.RegExUtils;
@@ -939,7 +940,7 @@ public class TypeUtil
         else
         {
             return ct == String.class || ct == Byte.class || ct == Short.class || ct == Integer.class || ct == Long.class || ct == Float.class
-                    || ct == Double.class || ct == Character.class || ct == Boolean.class || Enum.class.isAssignableFrom(ct) || EnumSet.class == ct || ct == JSONObject.class;
+                    || ct == Double.class || ct == Character.class || ct == Boolean.class || Enum.class.isAssignableFrom(ct) || EnumSet.class == ct || ct == JSONObject.class || ct == JSONArray.class;
         }
     }
 

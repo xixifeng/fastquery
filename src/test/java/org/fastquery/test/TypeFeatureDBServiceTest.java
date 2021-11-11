@@ -23,6 +23,7 @@
 package org.fastquery.test;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Gender;
@@ -285,6 +286,8 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         typeFeature.setName(name);
         typeFeature.setRuits(ruits);
         TypeFeature newTypeFeature = db.save(typeFeature);
+        assertThat(newTypeFeature.getActionLogObj().isEmpty(),is(true));
+        assertThat(newTypeFeature.getContactArray().isEmpty(),is(true));
         assertThat(newTypeFeature.getGender(), equalTo(gender));
         assertThat(newTypeFeature.getName(), equalTo(name));
         assertThat(newTypeFeature.getRuits(), equalTo(ruits));
@@ -360,8 +363,9 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         tf.setName("令狐一飞");
         tf.setGender(Gender.男);
         tf.setRuits(EnumSet.of(Ruits.芒果,Ruits.梨));
-
         TypeFeature typeFeature = db.save(tf);
+        assertThat(typeFeature.getActionLogObj().isEmpty(),is(true));
+        assertThat(typeFeature.getContactArray().isEmpty(),is(true));
         assertThat(typeFeature.getSort(),is(3));
     }
 
@@ -375,6 +379,8 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         tf.setRuits(EnumSet.of(Ruits.芒果,Ruits.梨));
 
         TypeFeature typeFeature = db.saveOrUpdate(tf);
+        assertThat(typeFeature.getActionLogObj().isEmpty(),is(true));
+        assertThat(typeFeature.getContactArray().isEmpty(),is(true));
         assertThat(typeFeature.getSort(),is(3));
     }
 
@@ -443,7 +449,8 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     public void findContainJSON()
     {
         TypeFeature tf = db.findContainJSON(1L);
-        assertThat(tf.getActionLog(),instanceOf(JSONObject.class));
+        assertThat(tf.getActionLogObj(),instanceOf(JSONObject.class));
+        assertThat(tf.getContactArray(),instanceOf(JSONArray.class));
     }
 
     @Test
@@ -451,7 +458,8 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     {
         Page<TypeFeature> page = db.findByContainJSONPage(new PageableImpl(1,3));
         List<TypeFeature> typeFeatures = page.getContent();
-        typeFeatures.forEach(typeFeature -> assertThat(typeFeature.getActionLog(),instanceOf(JSONObject.class)));
+        typeFeatures.forEach(typeFeature -> assertThat(typeFeature.getActionLogObj(),instanceOf(JSONObject.class)));
+        typeFeatures.forEach(typeFeature -> assertThat(typeFeature.getContactArray(),instanceOf(JSONArray.class)));
         log.info(">>>>>>:{}", JSON.toJSONString(page,true));
     }
 
@@ -459,39 +467,50 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     public void findActionLogById()
     {
         JSONObject json = db.findActionLogById(1L);
-        Object obj = json.get("actionLog");
-        assertThat(obj, instanceOf(JSONObject.class));
-        JSONObject actionLog = (JSONObject) obj;
+        Object obj1 = json.get("actionLogObj");
+        assertThat(obj1, instanceOf(JSONObject.class));
+        JSONObject actionLog = (JSONObject) obj1;
         assertThat(actionLog.containsKey("mail"),is(true));
         assertThat(actionLog.containsKey("name"),is(true));
         assertThat(actionLog.containsKey("address"),is(true));
+
+        Object obj2 = json.get("contactArray");
+        assertThat(obj2, instanceOf(JSONArray.class));
+        JSONArray contact = (JSONArray) obj2;
+        assertThat(contact.get(0).toString(),equalTo("{\"1\":\"2903438098\"}"));
+        assertThat(contact.get(1).toString(),equalTo("{\"2\":\"example@email.com\"}"));
     }
 
     @Test
     public void find()
     {
         TypeFeature typeFeature = db.find(TypeFeature.class,1L);
-        assertThat(typeFeature.getActionLog(), instanceOf(JSONObject.class));
+        assertThat(typeFeature.getActionLogObj(), instanceOf(JSONObject.class));
+        assertThat(typeFeature.getContactArray(), instanceOf(JSONArray.class));
     }
 
     @Test
     public void update()
     {
-        String jsonStr = "{\"mail\": \"xiaozhang@gmail.com\", \"name\": \"小张\", \"address\": \"Shanghai\"}";
         TypeFeature typeFeature = new TypeFeature();
         typeFeature.setId(4L);
-        JSONObject jsonObject = JSON.parseObject(jsonStr);
-        typeFeature.setActionLog(jsonObject);
+        JSONObject jsonObject = JSON.parseObject("{\"mail\": \"xiaozhang@gmail.com\", \"name\": \"小张\", \"address\": \"Shanghai\"}");
+        JSONArray jsonArray = JSON.parseArray("[{\"7\":\"90380989648\"},{\"8\":\"axgbxc@email.com\"}]");
+        typeFeature.setActionLogObj(jsonObject);
+        typeFeature.setContactArray(jsonArray);
         int effect = db.executeUpdate(typeFeature);
         assertThat(effect,is(1));
         TypeFeature tf = db.find(TypeFeature.class,4L);
-        JSONObject actionLog = tf.getActionLog();
+        JSONObject actionLog = tf.getActionLogObj();
         assertThat(actionLog.containsKey("mail"),is(true));
         assertThat(actionLog.containsKey("name"),is(true));
         assertThat(actionLog.containsKey("address"),is(true));
         assertThat(actionLog.getString("mail"),equalTo("xiaozhang@gmail.com"));
         assertThat(actionLog.getString("name"),equalTo("小张"));
         assertThat(actionLog.getString("address"),equalTo("Shanghai"));
+        JSONArray contact = tf.getContactArray();
+        assertThat(contact.get(0).toString(),equalTo("{\"7\":\"90380989648\"}"));
+        assertThat(contact.get(1).toString(),equalTo("{\"8\":\"axgbxc@email.com\"}"));
     }
 
 }
