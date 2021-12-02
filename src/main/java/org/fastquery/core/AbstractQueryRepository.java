@@ -57,7 +57,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
 
     private static final Class<QueryRepository> c = QueryRepository.class;
 
-    private final MethodInfo[] m = new MethodInfo[40];
+    private final MethodInfo[] m = new MethodInfo[41];
 
     private void cache(int j, String name, Class<?>... parameterTypes)
     {
@@ -489,9 +489,20 @@ public abstract class AbstractQueryRepository implements QueryRepository
     }
 
     @Override
-    public boolean exists(Object entity, boolean or)
+    public <E> E findOne(E equals, boolean unequal, boolean or, boolean contain, String... fields)
     {
         int j = 37;
+        if (m[j] == null)
+        {
+            cache(j, "findOne", Object.class, boolean.class, boolean.class, boolean.class, String[].class);
+        }
+        return (E) Prepared.excute(m[j], new Object[]{equals, unequal, or, contain, fields}, this);
+    }
+
+    @Override
+    public boolean exists(Object entity, boolean or)
+    {
+        int j = 38;
         if (m[j] == null)
         {
             cache(j, "exists", Object.class, boolean.class);
@@ -502,7 +513,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public String existsEachOn(Object entity)
     {
-        int j = 38;
+        int j = 39;
         if (m[j] == null)
         {
             cache(j, "existsEachOn", Object.class);
@@ -513,7 +524,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <E, F> List<E> findByIn(Class<E> clazz, String fieldName, List<F> fieldValues, int rows, boolean contain, String... fields)
     {
-        int j = 39;
+        int j = 40;
         if (m[39] == null)
         {
             cache(j, "findByIn", Class.class, String.class, List.class, int.class, boolean.class, String[].class);

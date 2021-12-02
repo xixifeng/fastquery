@@ -188,7 +188,7 @@ public class BeanUtilTest
         String sql = sqlValue.getSql();
         List<Object> list = sqlValue.getValues();
         assertThat(list.size(), is(3));
-        assertThat(sql, equalTo("select id,name from UserInfo where id = ? and name = ? and age = ? limit 1"));
+        assertThat(sql, equalTo("select id,name from UserInfo where  id = ? and name = ? and age = ? limit 1"));
         assertThat(list.get(0), equalTo(33));
         assertThat(list.get(1), is("函数式编程"));
         assertThat(list.get(2), is(18));
@@ -198,7 +198,7 @@ public class BeanUtilTest
         sql = sqlValue.getSql();
         list = sqlValue.getValues();
         assertThat(list.size(), is(2));
-        assertThat(sql, equalTo("select id,name,age from UserInfo where id = ? and age = ? limit 1"));
+        assertThat(sql, equalTo("select id,name,age from UserInfo where  id = ? and age = ? limit 1"));
         assertThat(list.get(0), is(33));
         assertThat(list.get(1), is(18));
 
@@ -207,7 +207,7 @@ public class BeanUtilTest
         sql = sqlValue.getSql();
         list = sqlValue.getValues();
         assertThat(list.size(), is(1));
-        assertThat(sql, equalTo("select id,age from UserInfo where id = ? limit 1"));
+        assertThat(sql, equalTo("select id,age from UserInfo where  id = ? limit 1"));
         assertThat(list.get(0), is(33));
 
         userInfo = new UserInfo(null, null, null);

@@ -304,6 +304,18 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     }
 
     @Test
+    public void findOne2()
+    {
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.setName("张三");
+        typeFeature.setGender(Gender.男);
+        TypeFeature tf = db.findOne(typeFeature,true,false,true,"name","gender");
+        log.info("tf:{}",tf);
+        assertThat(tf.getGender(), not(Gender.男));
+        assertThat(tf.getName(), not("张三"));
+    }
+
+    @Test
     public void findByIn1()
     {
         List<String> fieldValues = Arrays.asList("aa", "bb", "cc");

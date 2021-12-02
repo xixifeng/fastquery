@@ -670,6 +670,21 @@ public interface QueryRepository extends Repository
     <E> E findOne(E equals, boolean contain, String... fields);
 
     /**
+     * 根据指定的条件查询一条记录，实体属性若为 null 值，则，该属性不参与运算. <br>
+     * 一个 KV 称为一个条件单元.
+     *
+     * @param entity 条件单元集
+     * @param unequal KV 之间的关系是否不相等，true: K != V , false: K = V
+     * @param or 条件单元之间的关系是否是 or， true: 表示条件单元之间的关系为 or, 例如 K1 != V1 or K2 != V2. false: 表示条件单元之间的关系为 and.
+     * @param contain true:包含 fields，反之，排除 fields
+     * @param fields 待包含或待排除的字段列表
+     * @param <E> 实体
+     * @return 满足条件约束的实体
+     */
+    @Id(MethodId.QUERY11)
+    <E> E findOne(E entity, boolean unequal, boolean or, boolean contain, String... fields);
+
+    /**
      * 根据条件判断是否存在
      *
      * @param entity 根据指定的条件判断是否存在，实体属性若为 null 值，则，该属性不参与运算

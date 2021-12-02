@@ -46,6 +46,7 @@ public final class BeanUtil
 
     private static final String WHERE = " where ";
     public static final String AND = " and ";
+    public static final String OR = " or ";
 
     private BeanUtil()
     {
@@ -156,10 +157,12 @@ public final class BeanUtil
 
     // use select one
     // [0] where 部分， [1] sql语言中"?"对应的实参
-    private static <B> Object[] toWhere(Field[] fields, B bean, boolean ignoreId)
+    private static <B> Object[] toWhere(Field[] fields, B bean, boolean unequal, boolean or, boolean ignoreId)
     {
         StringBuilder sb = new StringBuilder();
         List<Object> values = new ArrayList<>();
+        String unitRelation = or ? OR : AND; // 条件单元之间的关系
+        String kvRelation = unequal ? " != ?" : " = ?";
         for (Field field : fields)
         {
             if (allowField(field))
@@ -169,17 +172,17 @@ public final class BeanUtil
                 {
                     if (val != null && field.getAnnotation(Id.class) == null)
                     {
-                        sb.append(AND);
+                        sb.append(unitRelation);
                         sb.append(field.getName());
-                        sb.append(" = ?");
+                        sb.append(kvRelation);
                         values.add(val);
                     }
                 }
                 else if (val != null)
                 {
-                    sb.append(AND);
+                    sb.append(unitRelation);
                     sb.append(field.getName());
-                    sb.append(" = ?");
+                    sb.append(kvRelation);
                     values.add(val);
                 }
             }
@@ -190,26 +193,35 @@ public final class BeanUtil
         return objs;
     }
 
-    public static SQLValue toSelectSQL(Object bean, String dbName, boolean contain, String... fields)
+    private static <B> Object[] toWhere(Field[] fields, B bean, boolean ignoreId)
+    {
+        return toWhere(fields,bean,false,false,ignoreId);
+    }
+
+    public static SQLValue toSelectSQL(Object bean, boolean unequal, boolean or, String dbName, boolean contain, String... fields)
     {
         Class<?> cls = bean.getClass();
         Field[] fs = getFields(cls);
 
         // 表名称
         String tableName = getTableName(dbName, cls);
-        Object[] objects = toWhere(fs, bean, false);
+        Object[] objects = toWhere(fs, bean, unequal, or, false);
         List<Object> values = (List<Object>) objects[1];// sql语言中"?"对应的实参
         SelectField<?> selectField = new SelectField<>(cls, contain, fields);
         String where = StringUtils.EMPTY;
         if (!values.isEmpty())
         {
-            where = " where" + objects[0].toString().substring(4);
+            where = " where " + objects[0].toString().substring(4);
         }
         String sql = String.format("select %s from %s%s limit 1", selectField.getFields(), tableName, where); // 待执行的sql
         SQLValue sv = new SQLValue();
         sv.setSql(sql);
         sv.setValues(values);
         return sv;
+    }
+    public static SQLValue toSelectSQL(Object bean, String dbName, boolean contain, String... fields)
+    {
+        return toSelectSQL(bean, false, false, dbName, contain, fields);
     }
 
     public static SQLValue toCount(Object bean, String dbName)

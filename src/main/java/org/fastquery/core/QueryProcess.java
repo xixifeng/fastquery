@@ -651,10 +651,21 @@ class QueryProcess
     private Object q11()
     {
         Object[] iargs = QueryContext.getArgs();
+        SQLValue sv;
         Object entity = iargs[0];
-        boolean contain = (boolean) iargs[1];
-        String[] fields = (String[]) iargs[2];
-        SQLValue sv = BeanUtil.toSelectSQL(entity, null, contain, fields);
+        if(iargs.length > 3) {
+            boolean unequal = (boolean) iargs[1];
+            boolean or = (boolean) iargs[2];
+            boolean contain = (boolean) iargs[3];
+            String[] fields = (String[]) iargs[4];
+            sv = BeanUtil.toSelectSQL(entity, unequal, or, null, contain, fields);
+        }
+        else
+        {
+            boolean contain = (boolean) iargs[1];
+            String[] fields = (String[]) iargs[2];
+            sv = BeanUtil.toSelectSQL(entity, null, contain, fields);
+        }
         List<Map<String, Object>> list = DB.find(sv);
         if (list.isEmpty())
         {
