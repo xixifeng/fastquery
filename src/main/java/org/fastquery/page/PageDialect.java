@@ -63,7 +63,7 @@ public interface PageDialect
         String tmp = querySQL.toLowerCase();
         // 计算求和语句
         // 把select 与 from 之间的 内容变为 count(countField)
-        int fromIndex = tmp.lastIndexOf("from") - 1;
+        int fromIndex = tmp.lastIndexOf(" from ");
 
         // 求和语句不需要order by(排序)
         // (?i) : 表示不区分大小写
