@@ -74,7 +74,7 @@ public class QueryByNamedDBExampleMapperTest extends TestFastQuery
     public void findUserInfoAll() throws Exception
     {
         String tpl = getTemplate(className, "findUserInfoAll");
-        assertThat(tpl, equalToIgnoringWhiteSpace("select id,name,age from UserInfo"));
+        assertThat(tpl, equalToCompressingWhiteSpace("select id,name,age from UserInfo"));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class QueryByNamedDBExampleMapperTest extends TestFastQuery
         Map<String, Object> map = new HashMap<>();
         map.put("id", "1");
         tpl = render(tpl, logTag, map);
-        assertThat(tpl, equalToIgnoringWhiteSpace("select id,name,age from UserInfo where id = :id"));
+        assertThat(tpl, equalToCompressingWhiteSpace("select id,name,age from UserInfo where id = :id"));
     }
 
     @Test
@@ -98,23 +98,23 @@ public class QueryByNamedDBExampleMapperTest extends TestFastQuery
         map.put("name", null);
         map.put("age", null);
         str = render(tpl, logTag, map);
-        assertThat(str, equalToIgnoringWhiteSpace("select id,name,age from UserInfo where 1"));
+        assertThat(str, equalToCompressingWhiteSpace("select id,name,age from UserInfo where 1"));
 
         map = new HashMap<>();
         map.put("name", "zhangsan");
         map.put("age", 18);
         str = render(tpl, logTag, map);
-        assertThat(str, equalToIgnoringWhiteSpace("select id,name,age from UserInfo where 1 and name = :name and age = :age"));
+        assertThat(str, equalToCompressingWhiteSpace("select id,name,age from UserInfo where 1 and name = :name and age = :age"));
 
         map = new HashMap<>();
         map.put("age", 18);
         str = render(tpl, logTag, map);
-        assertThat(str, equalToIgnoringWhiteSpace("select id,name,age from UserInfo where 1 and age = :age"));
+        assertThat(str, equalToCompressingWhiteSpace("select id,name,age from UserInfo where 1 and age = :age"));
 
         map = new HashMap<>();
         map.put("name", "zhangsan");
         str = render(tpl, logTag, map);
-        assertThat(str, equalToIgnoringWhiteSpace("select id,name,age from UserInfo where 1 and name = :name"));
+        assertThat(str, equalToCompressingWhiteSpace("select id,name,age from UserInfo where 1 and name = :name"));
 
     }
 
@@ -128,13 +128,13 @@ public class QueryByNamedDBExampleMapperTest extends TestFastQuery
         map = new HashMap<>();
         str = render(tpl, logTag, map);
         str = TypeUtil.parWhere(str);
-        assertThat(str, equalToIgnoringWhiteSpace("select no, name, sex from Student order by age desc"));
+        assertThat(str, equalToCompressingWhiteSpace("select no, name, sex from Student order by age desc"));
 
         map = new HashMap<>();
         map.put("name", "zhangsan");
         str = render(tpl, logTag, map);
         str = TypeUtil.parWhere(str);
-        assertThat(str, equalToIgnoringWhiteSpace("select no, name, sex from Student where name like :name order by age desc"));
+        assertThat(str, equalToCompressingWhiteSpace("select no, name, sex from Student where name like :name order by age desc"));
     }
 
     @Test
@@ -143,21 +143,21 @@ public class QueryByNamedDBExampleMapperTest extends TestFastQuery
         String tpl = getTemplate(className, "updateUserInfoById");
         String str;
         str = render(tpl, logTag, new HashMap<>());
-        assertThat(str, equalToIgnoringWhiteSpace("update UserInfo set name = :name,age = :age where id= :id"));
+        assertThat(str, equalToCompressingWhiteSpace("update UserInfo set name = :name,age = :age where id= :id"));
     }
 
     @Test
     public void findUAll() throws Exception
     {
         String tpl = getTemplate(className, "findUAll");
-        assertThat(tpl, equalToIgnoringWhiteSpace("select id,name,age from UserInfo limit 3"));
+        assertThat(tpl, equalToCompressingWhiteSpace("select id,name,age from UserInfo limit 3"));
     }
 
     @Test
     public void findUserAll() throws Exception
     {
         String tpl = getTemplate(className, "findUserAll");
-        assertThat(tpl, equalToIgnoringWhiteSpace("select name from UserInfo limit 3"));
+        assertThat(tpl, equalToCompressingWhiteSpace("select name from UserInfo limit 3"));
     }
 
 }

@@ -120,15 +120,15 @@ public class QueryPoolTest extends TestFastQuery
             String template = queryMapper$getTemplate(queryMapper);
             if ("findUAll".equals(id))
             {
-                assertThat(template, equalToIgnoringWhiteSpace("select id,name,age from UserInfo limit 3"));
+                assertThat(template, equalToCompressingWhiteSpace("select id,name,age from UserInfo limit 3"));
             }
             else if ("findUserAll".equals(id))
             {
-                assertThat(template, equalToIgnoringWhiteSpace("select name from UserInfo limit 3"));
+                assertThat(template, equalToCompressingWhiteSpace("select name from UserInfo limit 3"));
             }
             else if ("findUserInfo".equals(id))
             {
-                assertThat(template, equalToIgnoringWhiteSpace("select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`"));
+                assertThat(template, equalToCompressingWhiteSpace("select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`"));
             }
         }
     }

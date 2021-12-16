@@ -174,7 +174,7 @@ public class QueryByNamedDBExampleTest extends TestFastQuery
         SQLValue sv1 = sqlValues.get(0);
 
         assertThat(sv1.getSql(),
-                equalToIgnoringWhiteSpace("select no, name, sex from Student where no like ? or age > ? order by age desc limit 0,5"));
+                equalToCompressingWhiteSpace("select no, name, sex from Student where no like ? or age > ? order by age desc limit 0,5"));
         assertThat(sv1.getSql(), equalTo("select no, name, sex from Student where no like ? or age > ? order by age desc limit 0,5"));
         List<Object> ps1 = sv1.getValues();
         assertThat(ps1.size(), is(2));
@@ -185,7 +185,7 @@ public class QueryByNamedDBExampleTest extends TestFastQuery
 
         // 分页求和语句
         SQLValue sv2 = sqlValues.get(1);
-        assertThat(sv2.getSql(), equalToIgnoringWhiteSpace("select count(no) from Student where no like ? or age > ?"));
+        assertThat(sv2.getSql(), equalToCompressingWhiteSpace("select count(no) from Student where no like ? or age > ?"));
         assertThat(sv2.getSql(), equalTo("select count(no) from Student where no like ? or age > ?"));
         List<Object> ps2 = sv1.getValues();
         assertThat(ps2.size(), is(2));
@@ -243,7 +243,7 @@ public class QueryByNamedDBExampleTest extends TestFastQuery
 
         SQLValue sqlValue = rule.getSQLValue();
         assertThat(sqlValue.getSql(), notNullValue());
-        assertThat(sqlValue.getSql(), equalToIgnoringWhiteSpace("select * from UserInfo where name like ?"));
+        assertThat(sqlValue.getSql(), equalToCompressingWhiteSpace("select * from UserInfo where name like ?"));
         assertThat(sqlValue.getSql().trim(), equalTo("select * from UserInfo where name like ?"));
 
         List<Object> values = sqlValue.getValues();
