@@ -352,33 +352,45 @@ public class UserInfoDBServiceTest extends TestFastQuery
             log.debug("totalElements:" + totalElements + " pageIndex:" + pageIndex + "  pageSize:" + pageSize + "  totalPages:" + totalPages);
 
             Page<Map<String, Object>> page = db.findSome2(age, id, pageIndex, pageSize);
-            assertThat(page, notNullValue());
-            assertThat(page.getNumber(), equalTo(pageIndex));
-            assertThat(page.getSize(), equalTo(pageSize));
-            assertThat(page.getTotalElements(), equalTo(-1L));
-            assertThat(page.getTotalPages(), equalTo(-1));
-            assertThat(page.getNumberOfElements(), lessThanOrEqualTo(pageSize));
-            // log.debug(JSON.toJSONString(page, true));
+            extracted(pageIndex, pageSize, totalPages, page);
 
-            boolean hasContent = pageIndex <= totalPages; // 是否有结果集
-            boolean isFirst = pageIndex == 1; // 是否是第一页
-            boolean isLast = pageIndex == totalPages; // 是否是最后一页
-            boolean hasNext = pageIndex < totalPages; // 是否有下一页
-            boolean hasPrevious = (pageIndex > 1) && hasContent; // 是否有上一页
-            Slice previousPageable = new Slice((!isFirst) ? (pageIndex - 1) : pageIndex, pageSize); // 上一页的Pageable对象
-            Slice nextPageable = new Slice((!isLast) ? (pageIndex + 1) : pageIndex, pageSize); // 下一页的Pageable对象
+            page = db.findSome2(age, id, pageIndex, pageSize,true);
+            extracted(pageIndex, pageSize, totalPages, page);
 
-            assertThat(page.isHasContent(), is(hasContent));
-            assertThat(page.isFirst(), is(isFirst));
-            assertThat(page.isLast(), is(isLast));
-            assertThat(page.isHasNext(), is(hasNext));
-            assertThat(page.isHasPrevious(), is(hasPrevious));
-            assertThat(page.getPreviousPageable().getNumber(), is(previousPageable.getNumber()));
-            assertThat(page.getPreviousPageable().getSize(), is(previousPageable.getSize()));
-            assertThat(page.getNextPageable().getNumber(), is(nextPageable.getNumber()));
-            assertThat(page.getNextPageable().getSize(), is(nextPageable.getSize()));
+            page = db.findSome2(age, id, pageIndex, pageSize,false);
+            assertThat(page.getTotalElements(), not(is(-1L)));
+            assertThat(page.getTotalPages(), not(is(-1L)));
 
         }
+    }
+
+    private void extracted(int pageIndex, int pageSize, int totalPages, Page<Map<String, Object>> page)
+    {
+        assertThat(page, notNullValue());
+        assertThat(page.getNumber(), equalTo(pageIndex));
+        assertThat(page.getSize(), equalTo(pageSize));
+        assertThat(page.getTotalElements(), equalTo(-1L));
+        assertThat(page.getTotalPages(), equalTo(-1));
+        assertThat(page.getNumberOfElements(), lessThanOrEqualTo(pageSize));
+        // log.debug(JSON.toJSONString(page, true));
+
+        boolean hasContent = pageIndex <= totalPages; // 是否有结果集
+        boolean isFirst = pageIndex == 1; // 是否是第一页
+        boolean isLast = pageIndex == totalPages; // 是否是最后一页
+        boolean hasNext = pageIndex < totalPages; // 是否有下一页
+        boolean hasPrevious = (pageIndex > 1) && hasContent; // 是否有上一页
+        Slice previousPageable = new Slice((!isFirst) ? (pageIndex - 1) : pageIndex, pageSize); // 上一页的Pageable对象
+        Slice nextPageable = new Slice((!isLast) ? (pageIndex + 1) : pageIndex, pageSize); // 下一页的Pageable对象
+
+        assertThat(page.isHasContent(), is(hasContent));
+        assertThat(page.isFirst(), is(isFirst));
+        assertThat(page.isLast(), is(isLast));
+        assertThat(page.isHasNext(), is(hasNext));
+        assertThat(page.isHasPrevious(), is(hasPrevious));
+        assertThat(page.getPreviousPageable().getNumber(), is(previousPageable.getNumber()));
+        assertThat(page.getPreviousPageable().getSize(), is(previousPageable.getSize()));
+        assertThat(page.getNextPageable().getNumber(), is(nextPageable.getNumber()));
+        assertThat(page.getNextPageable().getSize(), is(nextPageable.getSize()));
     }
 
     @Test

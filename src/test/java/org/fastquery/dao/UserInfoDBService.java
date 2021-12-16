@@ -166,6 +166,11 @@ public interface UserInfoDBService extends QueryRepository
     @Condition("and id < ?2")
     Page<Map<String, Object>> findSome2(Integer age, Integer id, @PageIndex int pageIndex, @PageSize int pageSize);
 
+    @Query(value = "select id,name,age from `userinfo` #{#where}")
+    @Condition("age > ?1")
+    @Condition("and id < ?2")
+    Page<Map<String, Object>> findSome2(Integer age, Integer id, @PageIndex int pageIndex, @PageSize int pageSize, @NotCount boolean notCount);
+
     @Query("select count(id) from `userinfo` where age > ?1 AND id < ?2")
     long count(Integer age, Integer id);
 
