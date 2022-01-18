@@ -775,7 +775,7 @@ public final class BeanUtil
                                 s = StringUtils.replace(s, ", ", ",");
                             }
                             sets.append('\'');
-                            sets.append(s);
+                            sets.append(s.replace("'","''"));
                             sets.append("' ");
                         }
                     }

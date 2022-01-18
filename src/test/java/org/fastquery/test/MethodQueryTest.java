@@ -305,7 +305,7 @@ public class MethodQueryTest extends TestFastQuery
         userInfoDBService.executeSaveOrUpdate(new UserInfo(99, "酸奶", 2));
 
         List<UserInfo> userInfos = new ArrayList<>();
-        userInfos.add(new UserInfo(77, "茝若", 18));
+        userInfos.add(new UserInfo(77, "茝'若", 18));
         userInfos.add(new UserInfo(88, "芸兮", null));
         userInfos.add(new UserInfo(99, "梓", 16));
 
