@@ -669,7 +669,7 @@ class QueryProcess
         List<Map<String, Object>> list = DB.find(sv);
         if (list.isEmpty())
         {
-            log.warn("findOne 实际没有查到任何记录，返回 null");
+            log.info("findOne 实际没有查到任何记录，返回 null");
             return null;
         }
         else if (list.size() > 1)

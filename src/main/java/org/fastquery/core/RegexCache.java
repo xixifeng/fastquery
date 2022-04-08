@@ -91,9 +91,10 @@ public final class RegexCache
 
     private static synchronized Pattern put(String regex)
     {
-        if (patterns.size() > 50)
+        int len = patterns.size();
+        if (len > 50)
         {
-            log.warn("正则的编译缓存已经超过 50 个了，需要优化...");
+            log.warn("正则的编译缓存已达到{}个，需要优化",len);
         }
         Pattern pattern = Pattern.compile(regex);
         // 调用 Map.put 返回是当前 put 之前，根据 key 获取的 val
