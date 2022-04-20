@@ -21,6 +21,7 @@
  */
 
 package org.fastquery.test;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.bean.Student;
@@ -166,7 +167,7 @@ public class QueryByNamedDBExampleTest extends TestFastQuery
             assertThat(pageObj.getTotalElements(), not(0L)); // 总记录数不为0l
             // 注意TotalElements是long类型,比较是最好保持类型一致!
         }
-        log.debug(JSON.toJSONString(JSON.toJSON(pageObj), true));
+        log.debug(JSON.toJSONString(JSON.toJSON(pageObj), SerializerFeature.PrettyFormat));
 
         List<SQLValue> sqlValues = rule.getListSQLValue();
         assertThat(sqlValues.size(), is(2));

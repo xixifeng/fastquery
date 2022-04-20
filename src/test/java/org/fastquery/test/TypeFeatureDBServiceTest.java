@@ -25,6 +25,7 @@ package org.fastquery.test;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Gender;
 import org.fastquery.bean.Ruits;
@@ -91,7 +92,7 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     public void findByRuits()
     {
         List<TypeFeature> tfs = db.findByRuits(Ruits.苹果, Ruits.橘子);
-        log.error("tfs:{},len:{}", tfs, tfs.size());
+        log.debug("tfs:{},len:{}", tfs, tfs.size());
         assertThat(tfs, not(empty()));
         tfs.forEach(t -> assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.苹果, Ruits.橘子)), is(true)));
     }
@@ -103,7 +104,7 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         Ruits two = Ruits.橘子;
         Page<TypeFeature> page = db.findByRuitsPage(one, two, new PageableImpl(1,3));
         List<TypeFeature> typeFeatures = page.getContent();
-        log.info(JSON.toJSONString(page,true));
+        log.info(JSON.toJSONString(page,SerializerFeature.PrettyFormat));
         typeFeatures.forEach(t -> {
             assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.苹果, Ruits.橘子)), is(true));
             assertThat(t.getRuits().containsAll(EnumSet.of(Ruits.梨)), is(false));
@@ -125,7 +126,7 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     public void findByRuitsPage2()
     {
         Page<TypeFeature> page = db.findByRuitsPage(new PageableImpl(1,3));
-        log.info(JSON.toJSONString(page,true));
+        log.info(JSON.toJSONString(page,SerializerFeature.PrettyFormat));
         assertThat(page.isFirst(),is(true));
         assertThat(page.isHasContent(),is(true));
         assertThat(page.isHasNext(), is(true));
@@ -318,8 +319,10 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     @Test
     public void findByIn1()
     {
-        List<String> fieldValues = Arrays.asList("aa", "bb", "cc");
-        List<TypeFeature> list = db.findByIn(TypeFeature.class, "name", fieldValues, 3, true, "id", "name");
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.setName("zhangsan");
+        List<String> fieldValues = new ArrayList<>(Arrays.asList("aa", "bb", "cc"));
+        List<TypeFeature> list = db.findByIn(TypeFeature.class, "name", fieldValues,typeFeature, 3, true, "id", "name");
         assertThat(list, is(empty()));
     }
 
@@ -327,9 +330,31 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     public void findByIn2()
     {
         List<Long> fieldValues = Arrays.asList(1L, 2L, 3L);
-        List<TypeFeature> list = db.findByIn(TypeFeature.class, "id", fieldValues, 3, true, "name");
+        List<TypeFeature> list = db.findByIn(TypeFeature.class, "id", fieldValues, null, 3, true, "name");
         assertThat(list.size(), is(3));
+        fieldValues = Arrays.asList();
+        list = db.findByIn(TypeFeature.class, "id", fieldValues, null, 3, true, "name");
+        assertThat(list, is(empty()));
+        list = db.findByIn(TypeFeature.class, "id", null, null, 3, true, "name");
+        assertThat(list, is(empty()));
     }
+
+    @Test
+    public void findByIn3()
+    {
+        TypeFeature typeFeature = new TypeFeature();
+        List<Long> fieldValues = new ArrayList<>(Arrays.asList(1L, 2L, 3L));
+        List<TypeFeature> list = db.findByIn(TypeFeature.class, "id", fieldValues, typeFeature, 3, true, "name");
+        assertThat(list.size(), is(3));
+        fieldValues = Arrays.asList();
+        list = db.findByIn(TypeFeature.class, "id", fieldValues, typeFeature, 3, true, "name");
+        assertThat(list, is(empty()));
+        list = db.findByIn(TypeFeature.class, "id", null, typeFeature, 3, true, "name");
+        assertThat(list, is(empty()));
+    }
+
+
+
 
     @Test
     public void updateRuits(){
@@ -472,7 +497,7 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         List<TypeFeature> typeFeatures = page.getContent();
         typeFeatures.forEach(typeFeature -> assertThat(typeFeature.getActionLogObj(),instanceOf(JSONObject.class)));
         typeFeatures.forEach(typeFeature -> assertThat(typeFeature.getContactArray(),instanceOf(JSONArray.class)));
-        log.info(">>>>>>:{}", JSON.toJSONString(page,true));
+        log.info(">>>>>>:{}", JSON.toJSONString(page,SerializerFeature.PrettyFormat));
     }
 
     @Test

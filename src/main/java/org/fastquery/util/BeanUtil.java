@@ -211,7 +211,7 @@ public final class BeanUtil
         String where = StringUtils.EMPTY;
         if (!values.isEmpty())
         {
-            where = " where " + objects[0].toString().substring(4);
+            where = WHERE + objects[0].toString().substring(4);
         }
         String sql = String.format("select %s from %s%s limit 1", selectField.getFields(), tableName, where); // 待执行的sql
         SQLValue sv = new SQLValue();
@@ -960,12 +960,13 @@ public final class BeanUtil
         return sqls;
     }
 
-    public static SQLValue getSqlValue(Class<?> clazz, String fieldName, List<Object> fieldValues, int rows, boolean contain, String[] fields)
+    public static SQLValue getSqlValue(Class<?> clazz, String fieldName, List<Object> fieldValues, Object equals, int rows, boolean contain, String[] fields)
     {
         String selectFields = new SelectField<>(clazz, contain, fields).getFields();
         log.debug("selectFields: {}", selectFields);
 
         StringBuilder sb = new StringBuilder();
+        SQLValue sqlValue = new SQLValue();
         sb.append("select ");
         sb.append(selectFields);
         sb.append(" from ");
@@ -974,19 +975,28 @@ public final class BeanUtil
         sb.append(fieldName);
         if (fieldValues == null || fieldValues.isEmpty())
         {
-            sb.append(" in (null) limit ");
+            sb.append(" in (null) ");
         }
         else
         {
+            sqlValue.setValues(fieldValues);
             sb.append(" in (");
             sb.append(TypeUtil.repeatChar(fieldValues.size(), '?'));
-            sb.append(") limit ");
+            sb.append(") ");
         }
-        sb.append(rows);
 
-        SQLValue sqlValue = new SQLValue();
+        // equal
+        if(equals != null)
+        {
+            Field[] fs = getFields(clazz);
+            Object[] objects = toWhere(fs, equals, false, false, false);
+            sb.append(objects[0]);
+            sb.append(' ');
+            sqlValue.addValues((List<Object>) objects[1]);
+        }
+        sb.append("limit ");
+        sb.append(rows);
         sqlValue.setSql(sb.toString());
-        sqlValue.setValues(fieldValues);
         return sqlValue;
     }
 

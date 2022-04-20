@@ -27,6 +27,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Student;
 import org.fastquery.core.Primarykey;
@@ -260,11 +261,11 @@ public class StudentDBServiceTest extends TestFastQuery
         JSONArray students = studentDBService.findBySex("男", 18);
         if (students.size() >= 3)
         {
-            log.debug(JSON.toJSONString(students.subList(0, 3), true));
+            log.debug(JSON.toJSONString(students.subList(0, 3), SerializerFeature.PrettyFormat));
         }
         else
         {
-            log.debug(JSON.toJSONString(students.subList(0, students.size()), true));
+            log.debug(JSON.toJSONString(students.subList(0, students.size()), SerializerFeature.PrettyFormat));
         }
         log.debug(studentDBService.toString());
 
@@ -290,7 +291,7 @@ public class StudentDBServiceTest extends TestFastQuery
     public void findColumnKey()
     {
         JSONArray jsonObject = studentDBService.findColumnKey("product", "xk");
-        log.debug(JSON.toJSONString(jsonObject, true));
+        log.debug(JSON.toJSONString(jsonObject, SerializerFeature.PrettyFormat));
         assertThat(jsonObject.size(), is(2));
         assertThat(jsonObject.getJSONObject(0).getString("COLUMN_NAME"), either(equalTo("pid")).or(equalTo("lid")));
         assertThat(jsonObject.getJSONObject(1).getString("COLUMN_NAME"), either(equalTo("pid")).or(equalTo("lid")));
@@ -328,7 +329,7 @@ public class StudentDBServiceTest extends TestFastQuery
     public void saveUserInfo2()
     {
         JSONObject jsonObject = studentDBService.saveUserInfo2("网五", 31);
-        log.debug(JSON.toJSONString(jsonObject, true));
+        log.debug(JSON.toJSONString(jsonObject, SerializerFeature.PrettyFormat));
         assertThat(jsonObject.getString("name"), equalTo("网五"));
         assertThat(jsonObject.getInteger("age"), equalTo(31));
         assertThat(jsonObject.containsKey("id"), is(false));
@@ -348,7 +349,7 @@ public class StudentDBServiceTest extends TestFastQuery
         Integer age = 16;
         JSONObject jsonObject = studentDBService.updateUserinfoById(16, 1);
         assertThat(jsonObject, notNullValue());
-        log.debug(JSON.toJSONString(jsonObject, true));
+        log.debug(JSON.toJSONString(jsonObject, SerializerFeature.PrettyFormat));
         assertThat(jsonObject.getInteger("id"), is(id));
         assertThat(jsonObject.getInteger("age"), is(age));
     }

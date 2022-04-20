@@ -291,7 +291,7 @@ class QueryProcess
         Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++)
         {
-            if (parameters[i].getParameterizedType() instanceof TypeVariable)
+            if (iargs[i] != null && parameters[i].getParameterizedType() instanceof TypeVariable)
             { // 这个类型是变量类型吗?
                 Field[] fields = BeanUtil.getFields(iargs[i].getClass());
                 for (Field field : fields)
@@ -734,12 +734,13 @@ class QueryProcess
             fieldName = "1";
         }
         List<Object> fieldValues = (List<Object>) iargs[2];
-        int rows = (int) iargs[3];
-        boolean contain = (boolean) iargs[4];
-        String[] fields = (String[]) iargs[5];
+        Object equals = iargs[3];
+        int rows = (int) iargs[4];
+        boolean contain = (boolean) iargs[5];
+        String[] fields = (String[]) iargs[6];
         log.debug("clazz:{}, fieldName:{}, fieldValues:{}, rows:{}, contain:{}, fields:{}",
                 clazz, fieldName, fieldValues, rows, contain, fields);
-        SQLValue sqlValue = BeanUtil.getSqlValue(clazz, fieldName, fieldValues, rows, contain, fields);
+        SQLValue sqlValue = BeanUtil.getSqlValue(clazz, fieldName, fieldValues, equals, rows, contain, fields);
         List<Map<String, Object>> keymaps = DB.find(sqlValue);
         List<Object> list = new ArrayList<>();
         for (Map<String, Object> map : keymaps)

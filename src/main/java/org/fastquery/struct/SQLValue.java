@@ -21,6 +21,7 @@
  */
 
 package org.fastquery.struct;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -47,7 +48,7 @@ import org.fastquery.util.TypeUtil;
 public class SQLValue
 {
     private String sql; // 待执行的sql
-    private List<Object> values;// sql语言中"?"对应的实参
+    private List<Object> values = new ArrayList<>();// sql语言中"?"对应的实参
 
     public SQLValue()
     {
@@ -75,6 +76,16 @@ public class SQLValue
 
         this.sql = RegExUtils.replaceAll(this.sql, RegexCache.SP1_REG_PATT, StrConst.QUE);
         this.values = values;
+    }
+
+    public void addValue(Object obj)
+    {
+        this.getValues().add(obj);
+    }
+
+    public void addValues(List<Object> values)
+    {
+        this.getValues().addAll(values);
     }
 
     private void antiSQLInject(String sql)

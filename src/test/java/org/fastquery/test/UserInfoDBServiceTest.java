@@ -275,7 +275,7 @@ public class UserInfoDBServiceTest extends TestFastQuery
         assertThat(page.getNumberOfElements(), lessThanOrEqualTo(size));
 
         // 打印出来看看
-        String str = JSON.toJSONString(page, true);
+        String str = JSON.toJSONString(page, SerializerFeature.PrettyFormat);
         log.debug(str);
 
     }
@@ -292,7 +292,7 @@ public class UserInfoDBServiceTest extends TestFastQuery
         }
         assertThat(page.isFirst(), is(true));
 
-        String str = JSON.toJSONString(page, true);
+        String str = JSON.toJSONString(page, SerializerFeature.PrettyFormat);
 
         log.debug(str);
     }
@@ -698,7 +698,7 @@ public class UserInfoDBServiceTest extends TestFastQuery
     public void findEmplByDid()
     {
         JSONObject json = db.findEmplByDid(1L);
-        log.info("json: {}", JSON.toJSONString(json, true));
+        log.info("json: {}", JSON.toJSONString(json, SerializerFeature.PrettyFormat));
         assertThat(json.getString("departmentName"), equalTo("研发"));
         assertThat(json.getIntValue("departmentId"), is(1));
         assertThat(json.keySet().size(), is(3));
@@ -743,7 +743,7 @@ public class UserInfoDBServiceTest extends TestFastQuery
                 assertThat(emps.size(), is(3));
             }
         });
-        log.info("{} ->", JSON.toJSONString(maps, true));
+        log.info("{} ->", JSON.toJSONString(maps, SerializerFeature.PrettyFormat));
     }
 
     @Test
@@ -751,7 +751,7 @@ public class UserInfoDBServiceTest extends TestFastQuery
     {
         List<Department> list = db.findDepartments();
         assertThat(list.size(), is(4));
-        log.info("list:{}", JSON.toJSONString(list, true));
+        log.info("list:{}", JSON.toJSONString(list, SerializerFeature.PrettyFormat));
     }
 
     @Test

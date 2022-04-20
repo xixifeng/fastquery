@@ -87,4 +87,10 @@ public class SyntaxTest extends TestFastQuery
         assertThat(":name22 ".replaceAll("name\\b", StrConst.QUE), equalTo(":name22 "));
         assertThat(":name,".replaceAll("name\\b", StrConst.QUE), equalTo(":?,"));
     }
+
+    @Test
+    public void test16()
+    {
+        log.warn("0X16:{}",(byte) 0X14);
+    }
 }

@@ -522,13 +522,13 @@ public abstract class AbstractQueryRepository implements QueryRepository
     }
 
     @Override
-    public <E, F> List<E> findByIn(Class<E> clazz, String fieldName, List<F> fieldValues, int rows, boolean contain, String... fields)
+    public <E, F> List<E> findByIn(Class<E> clazz, String fieldName, List<F> fieldValues, E equals, int rows, boolean contain, String... fields)
     {
         int j = 40;
         if (m[39] == null)
         {
-            cache(j, "findByIn", Class.class, String.class, List.class, int.class, boolean.class, String[].class);
+            cache(j, "findByIn", Class.class, String.class, List.class, Object.class, int.class, boolean.class, String[].class);
         }
-        return (List<E>) Prepared.excute(m[j], new Object[]{clazz, fieldName, fieldValues, rows, contain, fields}, this);
+        return (List<E>) Prepared.excute(m[j], new Object[]{clazz, fieldName, fieldValues, equals, rows, contain, fields}, this);
     }
 }
