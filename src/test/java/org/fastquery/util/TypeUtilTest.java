@@ -35,7 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.bean.Ruits;
 import org.fastquery.core.*;
-import org.fastquery.struct.Reference;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
@@ -456,24 +455,6 @@ public class TypeUtilTest
         assertThat(objects.get(0), equalTo(1));
         assertThat(objects.get(1), equalTo(2));
         assertThat(objects.get(2), equalTo(3));
-    }
-
-    @Test
-    public void statementReference()
-    {
-        String str = "jkge,list_$[kwjlkeg as id, gweklge.name as name, `e.jgke` , d.xo, number] kwe";
-        Reference reference = TypeUtil.statementReference(str);
-        assertThat(reference, notNullValue());
-        assertThat(reference.getName(), equalTo("list_$"));
-        List<String> feilds = reference.getFields();
-        assertThat(feilds.get(0), equalTo("id"));
-        assertThat(feilds.get(1), equalTo("name"));
-        assertThat(feilds.get(2), equalTo("jgke"));
-        assertThat(feilds.get(3), equalTo("xo"));
-        assertThat(feilds.get(4), equalTo("number"));
-
-        String newStr = TypeUtil.unStatementReference(str);
-        assertThat(newStr, equalTo("jkge,kwjlkeg as id, gweklge.name as name, `e.jgke` , d.xo, number kwe"));
     }
 
     @Test

@@ -85,8 +85,6 @@ public final class RegexCache
 
     public static final Pattern PERCENT_PATT = Pattern.compile("%+");
 
-    public static final Pattern ARRAY_REF_PATT = Pattern.compile("[$A-Za-z0-9_]+\\[[A-Za-z0-9`_.(),\\s]+]");
-
     private static final Map<String, Pattern> patterns = new HashMap<>();
 
     private static synchronized Pattern put(String regex)

@@ -78,11 +78,6 @@ public class SQLValue
         this.values = values;
     }
 
-    public void addValue(Object obj)
-    {
-        this.getValues().add(obj);
-    }
-
     public void addValues(List<Object> values)
     {
         this.getValues().addAll(values);

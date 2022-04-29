@@ -695,111 +695,42 @@ public class UserInfoDBServiceTest extends TestFastQuery
     }
 
     @Test
-    public void findEmplByDid()
-    {
-        JSONObject json = db.findEmplByDid(1L);
-        log.info("json: {}", JSON.toJSONString(json, SerializerFeature.PrettyFormat));
-        assertThat(json.getString("departmentName"), equalTo("研发"));
-        assertThat(json.getIntValue("departmentId"), is(1));
-        assertThat(json.keySet().size(), is(3));
-        JSONArray emps = json.getJSONArray("emps");
-        assertThat(emps.size(), is(3));
-        assertThat(emps.getJSONObject(0).getString("name"), equalTo("小明"));
-        assertThat(emps.getJSONObject(0).getLongValue("id"), equalTo(1L));
-        assertThat(emps.getJSONObject(1).getString("name"), equalTo("张三"));
-        assertThat(emps.getJSONObject(1).getLongValue("id"), equalTo(2L));
-        assertThat(emps.getJSONObject(2).getString("name"), equalTo("李思"));
-        assertThat(emps.getJSONObject(2).getLongValue("id"), equalTo(3L));
-    }
-
-    @Test
     public void findEmpl()
     {
         List<Map<String, Object>> maps = db.findEmpl();
-        assertThat(maps.size(), is(4));
+        assertThat(maps.size(), is(10));
         maps.forEach(map -> {
-            Integer departmentId = (Integer) map.get("departmentId");
-            List<Map<String, Object>> emps = (List<Map<String, Object>>) map.get("emps");
-            emps.forEach(m -> {
-                if (departmentId != 4)
-                {
-                    assertThat(Integer.parseInt(m.get("dId").toString()), equalTo(departmentId));
-                }
-            });
-
-            if (departmentId == 1)
+            Long departmentId = (Long) map.get("departmentId");
+            if (departmentId == 1L)
             {
                 assertThat(map.get("departmentName").toString(), equalTo("研发"));
-                assertThat(emps.size(), is(3));
             }
-            else if (departmentId == 2)
+            else if (departmentId == 2L)
             {
                 assertThat(map.get("departmentName").toString(), equalTo("人事"));
-                assertThat(emps.size(), is(3));
             }
-            else if (departmentId == 3)
+            else if (departmentId == 3L)
             {
                 assertThat(map.get("departmentName").toString(), equalTo("财务"));
-                assertThat(emps.size(), is(3));
             }
         });
-        log.info("{} ->", JSON.toJSONString(maps, SerializerFeature.PrettyFormat));
     }
 
     @Test
     public void findDepartments()
     {
         List<Department> list = db.findDepartments();
-        assertThat(list.size(), is(4));
-        log.info("list:{}", JSON.toJSONString(list, SerializerFeature.PrettyFormat));
-    }
-
-    @Test
-    public void referenceForBean()
-    {
-        Department department = db.findDepartment(1L);
-        assertThat(department.toString(), equalTo("Department(departmentId=1, departmentName=研发, emps=[Employee(id=1, departmentId=null, name=小明, ssid=null), Employee(id=2, departmentId=null, name=张三, ssid=null), Employee(id=3, departmentId=null, name=李思, ssid=null)])"));
+        assertThat(list.size(), is(10));
     }
 
     @Test
     public void findDepPage()
     {
-        Page<Department> page = db.findDepPage(new PageableImpl(1, 100), null, null);
-        assertThat(page.getNumberOfElements(), is(4));
+        Page<Department> page = db.findDepPage(new PageableImpl(1, 100));
+        assertThat(page.getNumberOfElements(), is(10));
         List<Department> departments = page.getContent();
-        assertThat(departments.size(), is(4));
-        departments.forEach(d -> {
-            Long departmentId = d.getDepartmentId();
-            if (departmentId == 1L)
-            {
-                assertThat(d.getEmps().toString(), equalTo("[Employee(id=1, departmentId=null, name=小明, ssid=null), Employee(id=2, departmentId=null, name=张三, ssid=null), Employee(id=3, departmentId=null, name=李思, ssid=null)]"));
-            }
-            else if (departmentId == 2L)
-            {
-                assertThat(d.getEmps().toString(), equalTo("[Employee(id=4, departmentId=null, name=小红, ssid=null), Employee(id=5, departmentId=null, name=小黑, ssid=null), Employee(id=6, departmentId=null, name=小贝, ssid=null)]"));
-            }
-        });
+        assertThat(departments.size(), is(10));
     }
-
-    @Test
-    public void findDepPage2()
-    {
-        Page<Department> page = db.findDepPage2(new PageableImpl(1, 100), map -> map.get("id") != null, new String[][]{{"deptId", "departmentId"}});
-        page.getContent().forEach(d -> {
-            if (d.getDepartmentId() == 4L)
-            {
-                assertThat(d.getEmps(), is(empty()));
-            }
-        });
-    }
-
-	/*
-	@Test
-	public void referenceForJsonArray() {
-		fail("需要测试");
-	}
-	*/
-
 }
 
 

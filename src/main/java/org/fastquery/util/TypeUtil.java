@@ -34,7 +34,6 @@ import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.*;
-import org.fastquery.struct.Reference;
 import org.fastquery.asm.Script2Class;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.PageIndex;
@@ -1017,51 +1016,6 @@ public class TypeUtil
             throw new RepositoryException("传递的QueryBuilder不能为null");
         }
         return queryBuilder;
-    }
-
-    // 暂时让其支持 一个 SQL  Reference 以后有时间了，再说
-    public static Reference statementReference(String sql)
-    {
-        List<String> list = TypeUtil.matches(sql, RegexCache.ARRAY_REF_PATT);
-        List<Reference> references = new ArrayList<>();
-        list.forEach(e -> {
-            String reference = StringUtils.substringBefore(e, "[");
-            List<String> fields = new ArrayList<>();
-            String sub = StringUtils.substringBetween(e, "[", "]");
-            String[] strs = StringUtils.split(sub, ',');
-            for (String s : strs)
-            {
-                String ele = StringUtils.substringAfter(s, "as ");
-                if (StringUtils.EMPTY.equals(ele))
-                {
-                    ele = StringUtils.substringAfter(s, ".");
-                    if (StringUtils.EMPTY.equals(ele))
-                    {
-                        ele = s;
-                    }
-                }
-                fields.add(ele.trim().replace("`", StringUtils.EMPTY));
-            }
-            references.add(new Reference(reference, fields));
-        });
-        if (!references.isEmpty())
-        {
-            return references.get(0);
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    public static String unStatementReference(String sql)
-    {
-        List<String> list = TypeUtil.matches(sql, RegexCache.ARRAY_REF_PATT);
-        for (String str : list)
-        {
-            sql = StringUtils.replace(sql, str, StringUtils.substringBetween(str, "[", "]"));
-        }
-        return sql;
     }
 
     public static EnumSet toEnumSet(String value, Class<Enum> clazz)

@@ -32,9 +32,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
@@ -42,7 +40,6 @@ import com.alibaba.fastjson.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.fastquery.struct.Reference;
 import org.fastquery.util.TypeUtil;
 import org.fastquery.struct.RespUpdate;
 import org.fastquery.struct.SQLValue;
@@ -82,8 +79,7 @@ public class DB
 
     public static List<Map<String, Object>> find(SQLValue sqlValue)
     {
-        Reference reference = TypeUtil.statementReference(sqlValue.getSql());
-        String sql = TypeUtil.unStatementReference(sqlValue.getSql());
+        String sql = sqlValue.getSql();
         List<Object> objs = sqlValue.getValues();
         List<Map<String, Object>> keyvals;
         Connection conn = QueryContext.getConn();
@@ -103,10 +99,6 @@ public class DB
             // 设置sql参数值 End
             rs = stat.executeQuery();
             keyvals = rs2Map(rs);
-            if (reference != null)
-            {
-                keyvals = listMapGroupingBy(keyvals, reference);
-            }
             stat.close();
         }
         catch (Exception e)
@@ -119,123 +111,6 @@ public class DB
         }
 
         return keyvals;
-    }
-
-
-    private static String fetchGroupKey(Map<String, Object> map, List<String> keys)
-    {
-        JSONObject jsonObject = new JSONObject(true);
-        for (String key : keys)
-        {
-            jsonObject.put(key, map.get(key));
-        }
-        return jsonObject.toJSONString();
-    }
-
-
-    private static List<Map<String, Object>> listMapGroupingBy(List<Map<String, Object>> keyvals, Reference reference)
-    {
-        if (keyvals.isEmpty())
-        {
-            return keyvals;
-        }
-        else
-        {
-            List<String> feilds = reference.getFields();
-            String name = reference.getName();
-
-            // 确定分组属性
-            List<String> groupFeilds = new ArrayList<>();
-            Set<String> allKeys = keyvals.get(0).keySet();
-            for (String k : allKeys)
-            {
-                if (!feilds.contains(k))
-                {
-                    groupFeilds.add(k);
-                }
-            }
-
-            Map<String, List<Map<String, Object>>> map = keyvals.stream().collect(Collectors.groupingBy(m -> fetchGroupKey(m, groupFeilds), LinkedHashMap::new, Collectors.toList()));
-            Set<String> keys = map.keySet(); // 组名列表
-
-            List<Map<String, Object>> array = new ArrayList<>();
-            for (String key : keys)
-            {
-                Map<String, Object> jsonObject = JSON.parseObject(key);
-                List<Map<String, Object>> ele = new ArrayList<>();
-                List<Map<String, Object>> list = map.get(key);
-                list.forEach(mp -> {
-                    Map<String, Object> unit = new JSONObject();
-                    Set<String> fs = mp.keySet();
-                    for (String f : fs)
-                    {
-                        if (feilds.contains(f))
-                        {
-                            unit.put(f, mp.get(f));
-                        }
-                    }
-                    // 决定当前 unit 是否添加
-                    Predicate<Map<String, Object>> predicate = getPredicate();
-                    if (predicate == null || predicate.test(unit))
-                    {
-                        // change names
-                        String[][] changeNames = getTwoDimensional();
-                        changeNames(unit, changeNames);
-                        // change names end
-                        ele.add(unit);
-                    }
-                });
-                jsonObject.put(name, ele);
-                array.add(jsonObject);
-            }
-            return array;
-        }
-    }
-
-    // 获取二维参数
-    private static String[][] getTwoDimensional()
-    {
-        Object[] args = QueryContext.getArgs();
-        for (Object obj : args)
-        {
-            if (obj instanceof String[][])
-            {
-                return (String[][]) obj;
-            }
-        }
-        return new String[0][0];
-    }
-
-    private static Predicate<Map<String, Object>> getPredicate()
-    {
-        Object[] args = QueryContext.getArgs();
-        for (Object obj : args)
-        {
-            if (obj instanceof Predicate)
-            {
-                return (Predicate<Map<String, Object>>) obj;
-            }
-        }
-        return null;
-    }
-
-    private static void changeNames(Map<String, Object> map, String[][] names)
-    {
-        if (map != null && names != null)
-        {
-            for (String[] keys : names)
-            {
-                if (keys != null && keys.length == 2)
-                {
-                    String oldKey = keys[0];
-                    if (map.containsKey(oldKey))
-                    {
-                        String newKey = keys[1];
-                        map.put(newKey, map.remove(oldKey));
-                    }
-                }
-            }
-        }
     }
 
     /**
