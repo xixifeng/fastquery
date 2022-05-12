@@ -561,7 +561,7 @@ public class DB
                 String columnType = resultSetMetaData.getColumnTypeName(i);
                 if("JSON".equals(columnType))
                 {
-                    if(obj == null)
+                    if(obj == null || "null".equals(obj))
                     {
                         String columnName = resultSetMetaData.getColumnName(i);
                         if(columnName.endsWith("Obj"))

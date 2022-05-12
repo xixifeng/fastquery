@@ -499,6 +499,16 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         typeFeatures.forEach(typeFeature -> assertThat(typeFeature.getContactArray(),instanceOf(JSONArray.class)));
         log.info(">>>>>>:{}", JSON.toJSONString(page,SerializerFeature.PrettyFormat));
     }
+    @Test
+    public void findById()
+    {
+        TypeFeature typeFeature = db.find(TypeFeature.class,5L);
+        assertThat(typeFeature.getContactArray().isEmpty(),is(true));
+        assertThat(typeFeature.getActionLogObj().isEmpty(),is(true));
+        typeFeature = db.find(TypeFeature.class,6L);
+        assertThat(typeFeature.getContactArray().isEmpty(),is(true));
+        assertThat(typeFeature.getActionLogObj().isEmpty(),is(true));
+    }
 
     @Test
     public void findActionLogById()
