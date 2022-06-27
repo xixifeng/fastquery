@@ -181,6 +181,11 @@ public class QueryHandler
                         throw new RepositoryException("不能把转换成" + returnTypeName);
                     }
                     Object obj = map.values().iterator().next();
+                    if(obj == null)
+                    {
+                        list.add(null);
+                        return;
+                    }
                     Class<?> clazz = (Class<?>) ct;
                     // 如果obj就是clazz对应实例的子类
                     if (clazz.isAssignableFrom(obj.getClass()))
