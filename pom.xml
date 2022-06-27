@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
-			<version>1.2.79</version>
+			<version>1.2.83</version>
 		</dependency>
 		
 		<dependency>
@@ -98,7 +98,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.16</version>
+			<version>8.0.29</version>
 			<scope>provided</scope>
 		</dependency>
 		

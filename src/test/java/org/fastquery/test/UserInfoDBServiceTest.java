@@ -514,6 +514,7 @@ public class UserInfoDBServiceTest extends TestFastQuery
         assertThat(ages.length, is(3));
         for (String age : ages)
         {
+            log.info("age:{}",age);
             if (age != null)
             {
                 assertThat(Pattern.matches("\\{\".+\":\".+\"}", age), is(false));
@@ -730,6 +731,14 @@ public class UserInfoDBServiceTest extends TestFastQuery
         assertThat(page.getNumberOfElements(), is(10));
         List<Department> departments = page.getContent();
         assertThat(departments.size(), is(10));
+    }
+
+    @Test
+    public void findAgesContainNull()
+    {
+        List<Integer> ages = db.findAgesContainNull();
+        assertThat(ages.size(),is(3));
+        ages.forEach( age -> assertThat(age, nullValue()));
     }
 }
 
