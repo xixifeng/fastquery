@@ -380,7 +380,7 @@ public class MethodQueryTest extends TestFastQuery
         UserInfo u = userInfoDBService.find(UserInfo.class, 3, false, "name");
         assertThat(u.getName(), equalTo(StringUtils.EMPTY));
         assertThat(u.getId(), notNullValue());
-        assertThat(u.getAge(), notNullValue());
+        assertThat(u.getAge(), nullValue());
 
         u = userInfoDBService.find(UserInfo.class, 3, false, "name", "age");
         assertThat(u.getName(), equalTo(StringUtils.EMPTY));
