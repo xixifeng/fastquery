@@ -23,7 +23,6 @@
 package org.fastquery.dao;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -63,4 +62,7 @@ public interface SQLInExample extends QueryRepository
     @Query("select * from student where sex = :sex and age > :age and name in(:names)")
     List<Student> findByIn(@Param(value = "sex") String sex, @Param("age") Integer age,
                            @Param("names") Set<String> names);
+
+    @Query("select * from UserInfo where id = ?1 and id in (?2) and id = ?1 and id in (?2)")
+    UserInfo[] findByInDouble(Integer id, List<Integer> ids);
 }

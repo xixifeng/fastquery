@@ -76,7 +76,7 @@ public class Prepared
                 return object;
             }
 
-            log.info("准备执行方法:{}", method);
+            log.debug("准备执行方法:{}", method);
             object = businessProcess();
 
             // 注入AfterFilter

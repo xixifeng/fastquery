@@ -174,7 +174,7 @@ public class Script2Class
         body.append(code);
         body.append(";");
 
-        log.info("生成源代码: {}", body);
+        log.debug("生成源代码: {}", body);
         ctMethod.setBody(body.toString());
         ctClass.addMethod(ctMethod);
 

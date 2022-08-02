@@ -180,10 +180,13 @@ public class QueryParser
         // sql 中的"?"号调整
         // sql中的"?"可能会因为方法参数是一个集合,会变成多个, 举例说明: in (?) 那么这个?的实际个数取决于传递的集合长度
         ParamMap paramMap = TypeUtil.getParamMap(ints);
-        Map<Integer, Integer> rpates = paramMap.getRps();
+        Map<Integer, Integer> rates = paramMap.getRps();
         List<Object> objs = paramMap.getObjs();
 
-        Set<Entry<Integer, Integer>> entities = rpates.entrySet();
+        // rates 是有序的，否则：会导致混乱。
+        // 假设 rates 无序， {16(k):14(v),1(k):14(v)}, 它的涵义是：将SQL中的第16个"?"替换成14个"?"；将SQL中的第1个"?"替换成14个"?"。
+        // 遍历时，第一个出现的k-v如果是 16(k):14(v)，此时，SQL 根本就不存在第16个"?"（把"?"替换成多个"?",必须遵循从左至右，下次替换的位置受前一次的影响）, 那么此次操作将失效。
+        Set<Entry<Integer, Integer>> entities = rates.entrySet();
         for (Entry<Integer, Integer> entry : entities)
         {
             sql = TypeUtil.replace(sql, entry.getKey(), entry.getValue());

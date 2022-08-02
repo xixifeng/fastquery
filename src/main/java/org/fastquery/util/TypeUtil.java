@@ -141,7 +141,7 @@ public class TypeUtil
     public static ParamMap getParamMap(int[] indexMap)
     {
         Object[] args = QueryContext.getArgs();
-        Map<Integer, Integer> rps = new HashMap<>();
+        Map<Integer, Integer> rps = new TreeMap<>();
         List<Object> objs = new ArrayList<>();
         int increment = 0;
         for (int i = 0; i < indexMap.length; i++)

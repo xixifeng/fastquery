@@ -34,6 +34,7 @@ import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.dao.SQLInExample;
 import org.fastquery.service.FQuery;
+import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -182,5 +183,20 @@ public class SQLInExampleTest extends TestFastQuery
         {
             assertThat(u.getId(), either(is(1)).or(is(2)).or(is(3)));
         }
+    }
+
+    @Test
+    public void findByInDouble()
+    {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < 14; i++) {
+            list.add(i);
+        }
+
+        db.findByInDouble(888,list);
+        SQLValue sqlValue = rule.getSQLValue();
+        List<Object> vales = sqlValue.getValues();
+        assertThat(sqlValue.getSql(), equalTo("select * from UserInfo where id = ? and id in (?,?,?,?,?,?,?,?,?,?,?,?,?,?) and id = ? and id in (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"));
+        assertThat(vales.toString(),equalTo("[888, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 888, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]"));
     }
 }

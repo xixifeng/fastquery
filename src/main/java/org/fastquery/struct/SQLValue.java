@@ -57,7 +57,7 @@ public class SQLValue
     public SQLValue(String sql, List<Object> values)
     {
 
-        log.info("SQL扩展之前:{}", sql);
+        log.debug("SQL扩展之前:{}", sql);
         Object[] args = QueryContext.getArgs();
         // 1. 处理"% ? % "问题, 对应的正则 "[_\\s*%]+\\?[_\\s*%]+"
         List<String> ssms = percent(sql, values, args);
