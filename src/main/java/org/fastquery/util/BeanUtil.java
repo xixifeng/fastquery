@@ -443,17 +443,17 @@ public final class BeanUtil
         if (andSize != conditions.size())
         {
             // 去掉末尾的 " or"
-            updateConditionListLastElement(conditions, 3);
+            //updateConditionListLastElement(conditions, 3);
             conditions.add(")");
         }
         else
         {
             conditions.remove(andSize - 1); // 去掉 "（"
             // 接下来后面的 " and"
-            if (!conditions.isEmpty())
-            {
-                updateConditionListLastElement(conditions, 4);
-            }
+            //if (!conditions.isEmpty())
+            //{
+            //    updateConditionListLastElement(conditions, 4);
+            //}
         }
 
         String query;

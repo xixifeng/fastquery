@@ -23,9 +23,7 @@
 package org.fastquery.test;
 
 import org.apache.commons.lang3.StringUtils;
-import org.fastquery.bean.Gender;
-import org.fastquery.bean.TypeFeature;
-import org.fastquery.bean.UserInfo;
+import org.fastquery.bean.*;
 import org.fastquery.core.*;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.example.StudentDBService;
@@ -527,6 +525,16 @@ public class MethodQueryTest extends TestFastQuery
         assertThat(sqlValues.size(), is(2));
         assertThat(sqlValues.get(0), equalTo("select id,name,gender,ruits,sort,actionLogObj,contactArray from type_feature where gender = ? and sort = ? and ( name like ? or sort like ? ) order by sort DESC limit 0,1"));
         assertThat(sqlValues.get(1), equalTo("select count(id) from type_feature where gender = ? and sort = ? and ( name like ? or sort like ? )"));
+    }
+
+    @Test
+    public void findPage3()
+    {
+        Area area = new Area();
+        area.setType(AreaType.二级);
+        area.setAreaEnName("");
+        Page<Area> page = userInfoDBService.findPage(area, null, "order by id desc", true, 1, 3, true,"id"," stageSid");
+        page = userInfoDBService.findPage(null, area, "order by id desc", true, 1, 3, true,"id"," stageSid");
     }
 }
 

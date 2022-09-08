@@ -75,8 +75,8 @@ public class QueryBuilder
     {
         if (conditions != null)
         {
-            StringBuilder conditionsBuilder = conditionBuilder();
-            String querySQL = RegExUtils.replaceFirst(query,RegexCache.WHERE_REG_PATT,conditionsBuilder.toString());
+            String conditionsBuilder = conditionBuilder();
+            String querySQL = RegExUtils.replaceFirst(query,RegexCache.WHERE_REG_PATT,conditionsBuilder);
             return colonProcess(querySQL);
         }
         else
@@ -114,8 +114,8 @@ public class QueryBuilder
         { // 表明需要求和
             if (conditions != null)
             {
-                StringBuilder conditionsBuilder = conditionBuilder();
-                countQuery = RegExUtils.replaceFirst(countQuery,RegexCache.WHERE_REG_PATT,conditionsBuilder.toString());
+                String conditionsBuilder = conditionBuilder();
+                countQuery = RegExUtils.replaceFirst(countQuery,RegexCache.WHERE_REG_PATT,conditionsBuilder);
             }
             SQLValue countQuerySQLValue = colonProcess(countQuery);
             list.add(countQuerySQLValue);
@@ -184,7 +184,7 @@ public class QueryBuilder
         return sqlValue;
     }
 
-    private StringBuilder conditionBuilder()
+    private String conditionBuilder()
     {
         final StringBuilder conditionsBuilder = new StringBuilder();
 
@@ -204,8 +204,17 @@ public class QueryBuilder
             conditionsBuilder.append(condition);
             conditionsBuilder.append(' ');
         });
-        int len = conditionsBuilder.length();
-        return len > 0 ? conditionsBuilder.deleteCharAt(len - 1).insert(0, "where ") : conditionsBuilder;
+
+        // 去掉首位空格，最后的 or 或 and
+        String str = conditionsBuilder.toString().trim();
+        int len = str.length();
+        if(" or )".equals(StringUtils.substring(str,-5))) {
+            str = str.substring(0,len - 5) + " )";
+        } else if(" and".equals(StringUtils.substring(str,-4))) {
+            str = str.substring(0,len - 4);
+        }
+
+        return len > 0 ? "where " + str : str;
     }
 
 }
