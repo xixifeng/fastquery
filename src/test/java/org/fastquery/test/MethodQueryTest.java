@@ -531,6 +531,7 @@ public class MethodQueryTest extends TestFastQuery
     public void findPage3()
     {
         Area area = new Area();
+        // 针对两个属性，其中一个为空这种情形测试
         area.setType(AreaType.二级);
         area.setAreaEnName("");
         Page<Area> page = userInfoDBService.findPage(area, null, "order by id desc", true, 1, 3, true,"id"," stageSid");
