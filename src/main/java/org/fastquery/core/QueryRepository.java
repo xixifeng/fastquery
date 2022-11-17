@@ -24,7 +24,7 @@ package org.fastquery.core;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -645,7 +645,7 @@ public interface QueryRepository extends Repository
      * @return fun函数体中有任何没被捕获的异常或fun函数体返回null或返回-1,就会导致fun里面的全部操作回滚,被回滚后的tx最后会返回-1,除此之外,tx的返回值等于fun的返回值.
      */
     @Id(MethodId.QUERY9)
-    int tx(IntSupplier fun);
+    long tx(LongSupplier fun);
 
     /**
      * 根据指定的条件统计总记录数，实体属性若为 null 值，则，该属性不参与运算，反之，参与 and 运算

@@ -32,7 +32,7 @@ import java.lang.reflect.TypeVariable;
 import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -614,12 +614,12 @@ class QueryProcess
         try
         {
             TxContext.start();
-            int asInt = ((IntSupplier) (QueryContext.getArgs()[0])).getAsInt();
+            long asInt = ((LongSupplier) (QueryContext.getArgs()[0])).getAsLong();
             if (asInt == -1)
             {
                 log.info("tx中的函数式返回了null或-1,导致tx中的所有操作回滚");
                 TxContext.getTxContext().rollback();
-                return -1;
+                return -1L;
             }
             else
             {
@@ -631,7 +631,7 @@ class QueryProcess
         {
             TxContext.getTxContext().rollback();
             log.warn("tx方法被迫回滚", e);
-            return -1;
+            return -1L;
         }
         finally
         {

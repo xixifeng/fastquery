@@ -41,7 +41,6 @@ import org.fastquery.db2.CC;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.DC;
-import org.fastquery.util.BeanUtil;
 import org.fastquery.util.TypeUtil;
 import org.junit.Test;
 
@@ -61,8 +60,8 @@ public class TxTest extends TestFastQuery
     @Test
     public void updateTx1()
     {
-        int effect = userInfoDBService.tx(() -> userInfoDBService.updateBatch2("小不点", 6, 2));
-        assertThat(effect, equalTo(-1));
+        long effect = userInfoDBService.tx(() -> userInfoDBService.updateBatch2("小不点", 6, 2));
+        assertThat(effect, equalTo(-1L));
     }
 
     private void u1(Integer id, String name, Integer age)
@@ -135,9 +134,9 @@ public class TxTest extends TestFastQuery
     @Test
     public void tx1()
     {
-        assertThat(aa.tx(() -> 1), is(1));
-        assertThat(bb.tx(() -> 2), is(2));
-        assertThat(cc.tx(() -> 3), is(3));
+        assertThat(aa.tx(() -> 1), is(1L));
+        assertThat(bb.tx(() -> 2), is(2L));
+        assertThat(cc.tx(() -> 3), is(3L));
     }
 
 
@@ -180,7 +179,7 @@ public class TxTest extends TestFastQuery
         Integer id = 1;
         String name = "乌龟";
         Integer num = 300;
-        int effect = aa.tx(() -> {
+        long effect = aa.tx(() -> {
 
             Fish fish = aa.update(new Fish(id, name, num));
             part1(id, name, num, fish);
@@ -227,7 +226,7 @@ public class TxTest extends TestFastQuery
             throw new RepositoryException("模拟异常");
         });
 
-        assertThat(effect, is(-1));
+        assertThat(effect, is(-1L));
     }
 
     public void part3(Integer id, String name, Integer num, Fish fish)
