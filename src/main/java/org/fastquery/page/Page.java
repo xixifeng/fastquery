@@ -130,11 +130,4 @@ public interface Page<E>
      * @return 一个新的 Page 包含 T 类型的实例
      */
     <T> Page<T> convert(Class<T> clazz);
-
-    /**
-     * 获取下一页
-     *
-     * @return
-     */
-    Page<E> getNextPage();
 }
