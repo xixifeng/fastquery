@@ -787,6 +787,7 @@ public interface QueryRepository extends Repository
      * @param <F>         参与 in 运算字段的类型
      * @return 实体 list
      */
+    @Deprecated
     @Id(MethodId.QUERY14)
     <E, F> List<E> findByIn(Class<E> entity, String fieldName, List<F> fieldValues, E equals, int rows, boolean contain, String... fields);
 
@@ -810,6 +811,7 @@ public interface QueryRepository extends Repository
      * @param <E>     实体类型
      * @return 实体 list
      */
+    @Deprecated
     default <E> List<E> findByIn(Class<E> entity, long[] ids, E equals, int rows, boolean contain, String... fields)
     {
         Objects.requireNonNull(ids, "ids must not be null");
