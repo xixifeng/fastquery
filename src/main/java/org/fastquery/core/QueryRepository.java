@@ -792,6 +792,33 @@ public interface QueryRepository extends Repository
     <E, F> List<E> findByIn(Class<E> entity, String fieldName, List<F> fieldValues, E equals, int rows, boolean contain, String... fields);
 
     /**
+     * 指定某个字段进行 in 和 equal 查询
+     *
+     * @param entity      实体 class
+     * @param fieldName   字段
+     * @param fieldValues 字段值列表，参与 in 运算
+     * @param equals    实体实例,用于作为查询条件,条件之间是 and 关系.举例说明,若传递的实体为:<br>
+     *                  Student student = new Student(); <br>
+     *                  student.setDept("计算机");<br>
+     *                  student.setName("海猫");<br>
+     *                  那么会推导出 SQL 语句的查询条件为:<br>
+     *                  where dept = ? and name = ?<br>
+     *                  占位符?问号的值通过 PreparedStatement 设置<br>
+     *                  注意: 实体的属性若为 null 该属性将不参与任何运算.
+     *                  in 条件集 与 equals 条件集 之间的关系是 and
+     * @param notCount    是否求和
+     * @param pageIndex   页吗
+     * @param pageSize    每页大小
+     * @param contain     true:包含 fields，反之，排除 fields
+     * @param fields      待包含或待排除的字段列表
+     * @param <E>         实体类型
+     * @param <F>         参与 in 运算字段的类型
+     * @return 分页结构对象
+     */
+    @Id(MethodId.QUERY15)
+    <E, F> Page<E> findPageByIn(Class<E> entity, String fieldName, List<F> fieldValues, E equals, @NotCount boolean notCount, @PageIndex int pageIndex, @PageSize int pageSize, boolean contain, String... fields);
+
+    /**
      * 指定 id 集进行 in 和 equal 查询
      *
      * @param entity  实体 class

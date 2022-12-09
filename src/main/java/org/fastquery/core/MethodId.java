@@ -100,6 +100,8 @@ class MethodId
 
     static final byte QUERY14 = 0X14;
 
+    static final byte QUERY15 = 0X15;
+
     /**
      * 默认私有构造方法
      */

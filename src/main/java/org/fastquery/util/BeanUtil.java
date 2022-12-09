@@ -960,6 +960,7 @@ public final class BeanUtil
         return sqls;
     }
 
+    @Deprecated
     public static SQLValue getSqlValue(Class<?> clazz, String fieldName, List<Object> fieldValues, Object equals, int rows, boolean contain, String[] fields)
     {
         String selectFields = new SelectField<>(clazz, contain, fields).getFields();
@@ -996,6 +997,44 @@ public final class BeanUtil
         }
         sb.append("limit ");
         sb.append(rows);
+        sqlValue.setSql(sb.toString());
+        return sqlValue;
+    }
+
+    public static SQLValue getSqlValue(Class<?> clazz, String fieldName, List<Object> fieldValues, Object equals, boolean contain, String[] fields)
+    {
+        String selectFields = new SelectField<>(clazz, contain, fields).getFields();
+        log.debug("selectFields: {}", selectFields);
+
+        StringBuilder sb = new StringBuilder();
+        SQLValue sqlValue = new SQLValue();
+        sb.append("select ");
+        sb.append(selectFields);
+        sb.append(" from ");
+        sb.append(getTableName(null, clazz));
+        sb.append(WHERE);
+        sb.append(fieldName);
+        if (fieldValues == null || fieldValues.isEmpty())
+        {
+            sb.append(" in (null) ");
+        }
+        else
+        {
+            sqlValue.setValues(fieldValues);
+            sb.append(" in (");
+            sb.append(TypeUtil.repeatChar(fieldValues.size(), '?'));
+            sb.append(") ");
+        }
+
+        // equal
+        if(equals != null)
+        {
+            Field[] fs = getFields(clazz);
+            Object[] objects = toWhere(fs, equals, false, false, false);
+            sb.append(objects[0]);
+            sb.append(' ');
+            sqlValue.addValues((List<Object>) objects[1]);
+        }
         sqlValue.setSql(sb.toString());
         return sqlValue;
     }

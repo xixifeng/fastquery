@@ -37,9 +37,11 @@ import java.util.function.LongSupplier;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.fastquery.dialect.DialectScheduler;
 import org.fastquery.handler.ModifyingHandler;
 import org.fastquery.handler.QueryHandler;
 import org.fastquery.page.Page;
+import org.fastquery.page.PageDialect;
 import org.fastquery.page.Pageable;
 import org.fastquery.page.Slice;
 import org.fastquery.struct.RespUpdate;
@@ -276,7 +278,16 @@ class QueryProcess
             if (type instanceof ParameterizedType)
             {
                 ParameterizedType parameterizedType = (ParameterizedType) method.getGenericReturnType();
-                Class<?> bean = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+                Type actualType = parameterizedType.getActualTypeArguments()[0];
+                Class<?> bean;
+                if(actualType instanceof Class)
+                {
+                    bean = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+                }
+                else
+                {
+                    bean = (Class<?>) QueryContext.getArgs()[0];
+                }
                 list = TypeUtil.listMap2ListBean(keyvals, bean);
             }
         }
@@ -340,6 +351,8 @@ class QueryProcess
                 return q13();
             case MethodId.QUERY14:
                 return q14();
+            case MethodId.QUERY15:
+                return q15();
             default:
                 break;
         }
@@ -734,6 +747,10 @@ class QueryProcess
             fieldName = "1";
         }
         List<Object> fieldValues = (List<Object>) iargs[2];
+        if(fieldValues != null)
+        {
+            fieldValues = new ArrayList<>(fieldValues);// 禁止修改外面的 fieldValues，应该是浅 copy
+        }
         Object equals = iargs[3];
         int rows = (int) iargs[4];
         boolean contain = (boolean) iargs[5];
@@ -749,6 +766,53 @@ class QueryProcess
             list.add(obj);
         }
         return list;
+    }
+
+    private Object q15()
+    {
+        MethodInfo method = QueryContext.getMethodInfo();
+        Pageable pageable = QueryContext.getPageable();
+        int offset = pageable.getOffset();
+        int pageSize = pageable.getPageSize();
+
+        Object[] iargs = QueryContext.getArgs();
+        Class<?> clazz = (Class<?>) iargs[0];
+        Objects.requireNonNull(clazz);
+        String fieldName = (String) iargs[1];
+        if (fieldName == null || StringUtils.EMPTY.equals(fieldName))
+        {
+            fieldName = "1";
+        }
+        List<Object> fieldValues = (List<Object>) iargs[2];
+        Object equals = iargs[3];
+        boolean contain = (boolean) iargs[7];
+        String[] fields = (String[]) iargs[8];
+        log.debug("clazz:{}, fieldName:{}, fieldValues:{}, contain:{}, fields:{}",
+                clazz, fieldName, fieldValues, contain, fields);
+        SQLValue sqlValue = BeanUtil.getSqlValue(clazz, fieldName, fieldValues, equals, contain, fields);
+        String querySQL = sqlValue.getSql();
+
+        PageDialect pageDialect = DialectScheduler.getCurrentPageDialect();
+        String currentPageSQL = pageDialect.getCurrentPageSQL(querySQL, offset, pageSize);
+        sqlValue.setSql(currentPageSQL);
+        List<SQLValue> sqlValues = new ArrayList<>(2);
+        sqlValues.add(sqlValue);
+
+        if (method.isCount())
+        {
+            String countPageSQL = pageDialect.countSQLInference(querySQL, "id");
+            SQLValue countSqlValue = new SQLValue(countPageSQL, sqlValue.getValues());
+            sqlValues.add(countSqlValue);
+        }
+        else
+        {
+            offset = offset + pageSize;
+            String nextRecordSQL = pageDialect.getCurrentPageSQL(querySQL, offset, 1);
+            SQLValue sv = new SQLValue(nextRecordSQL, sqlValue.getValues());
+            sqlValues.add(sv);
+        }
+
+        return QueryProcess.getInstance().queryPage(sqlValues);
     }
 
     @SuppressWarnings("rawtypes")

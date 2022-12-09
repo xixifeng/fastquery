@@ -24,14 +24,18 @@ package org.fastquery.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.dao.UserInfoDBService;
-import org.fastquery.page.Page;
-import org.fastquery.page.PageableImpl;
+import org.fastquery.page.*;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
+import org.fastquery.util.TypeUtil;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -40,6 +44,7 @@ import static org.hamcrest.Matchers.*;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Slf4j
 public class PageTest extends TestFastQuery
 {
 
@@ -93,4 +98,54 @@ public class PageTest extends TestFastQuery
         page = userInfoDBService.findSome1(age, -100, new PageableImpl(pageIndex, size));
         assertThat(page.getContent().isEmpty(), is(true));
     }
+
+    @Test
+    public void findPageByIn1()
+    {
+        Class<UserInfo> entity = UserInfo.class;
+        String fieldName = "id";
+        List<Long> fieldValues = Arrays.asList(1L,2L,3L,4L,36L,37L,38L,39L,40L,41L,42L);
+        UserInfo equals = null;
+        boolean notCount = false;
+        int pageIndex = 1;
+        int pageSize = 3;
+        boolean contain = true;
+        String[] fields = {"id","name","age"};
+
+        Page<UserInfo> page = userInfoDBService.findPageByIn(entity,fieldName,fieldValues,equals,notCount,pageIndex,pageSize,contain,fields);
+        assertThat(page.getTotalElements(), is(11L));
+        assertThat(page.getTotalPages(), is(4));
+
+        // 断言执行过的 sql
+        List<String> sqls = rule.getExecutedSQLs();
+        assertThat(sqls.get(0), equalTo("select id,name,age from UserInfo where id in (?,?,?,?,?,?,?,?,?,?,?)  limit 0,3"));
+        assertThat(sqls.get(1), equalTo("select count(id) from UserInfo where id in (?,?,?,?,?,?,?,?,?,?,?) "));
+    }
+
+
+    @Test
+    public void findPageByIn2()
+    {
+        Class<UserInfo> entity = UserInfo.class;
+        String fieldName = "id";
+        List<Long> fieldValues = Stream.of(1L,2L,3L,4L,36L,37L,38L,39L,40L,41L,42L).collect(Collectors.toList());
+        UserInfo equals = new UserInfo();
+        equals.setName("Jsxxv");
+        boolean notCount = false;
+        int pageIndex = 1;
+        int pageSize = 3;
+        boolean contain = true;
+        String[] fields = {"id","name","age"};
+
+        Page<UserInfo> page = userInfoDBService.findPageByIn(entity,fieldName,fieldValues,equals,notCount,pageIndex,pageSize,contain,fields);
+        assertThat(page.getTotalElements(), is(6L));
+        assertThat(page.getTotalPages(), is(2));
+
+        // 断言执行过的 sql
+        List<String> sqls = rule.getExecutedSQLs();
+        assertThat(sqls.get(0), equalTo("select id,name,age from UserInfo where id in (?,?,?,?,?,?,?,?,?,?,?)  and name = ?  limit 0,3"));
+        assertThat(sqls.get(1), equalTo("select count(id) from UserInfo where id in (?,?,?,?,?,?,?,?,?,?,?)  and name = ? "));
+    }
+
+
 }
