@@ -349,10 +349,11 @@ class QueryProcess
                 return q12();
             case MethodId.QUERY13:
                 return q13();
-            case MethodId.QUERY14:
-                return q14();
+            //case MethodId.QUERY14:
+            //    return q14();
             case MethodId.QUERY15:
                 return q15();
+                // 下次用 QUERY14
             default:
                 break;
         }
@@ -736,37 +737,9 @@ class QueryProcess
         return null;
     }
 
-    private Object q14()
-    {
-        Object[] iargs = QueryContext.getArgs();
-        Class<?> clazz = (Class<?>) iargs[0];
-        Objects.requireNonNull(clazz);
-        String fieldName = (String) iargs[1];
-        if (fieldName == null || StringUtils.EMPTY.equals(fieldName))
-        {
-            fieldName = "1";
-        }
-        List<Object> fieldValues = (List<Object>) iargs[2];
-        if(fieldValues != null)
-        {
-            fieldValues = new ArrayList<>(fieldValues);// 禁止修改外面的 fieldValues，应该是浅 copy
-        }
-        Object equals = iargs[3];
-        int rows = (int) iargs[4];
-        boolean contain = (boolean) iargs[5];
-        String[] fields = (String[]) iargs[6];
-        log.debug("clazz:{}, fieldName:{}, fieldValues:{}, rows:{}, contain:{}, fields:{}",
-                clazz, fieldName, fieldValues, rows, contain, fields);
-        SQLValue sqlValue = BeanUtil.getSqlValue(clazz, fieldName, fieldValues, equals, rows, contain, fields);
-        List<Map<String, Object>> keymaps = DB.find(sqlValue);
-        List<Object> list = new ArrayList<>();
-        for (Map<String, Object> map : keymaps)
-        {
-            Object obj = TypeUtil.map2Obj(clazz, map);
-            list.add(obj);
-        }
-        return list;
-    }
+    //private Object q14()
+    //{
+    //}
 
     private Object q15()
     {

@@ -98,7 +98,7 @@ class MethodId
 
     static final byte QUERY13 = 0X13;
 
-    static final byte QUERY14 = 0X14;
+    //static final byte QUERY14 = 0X14;
 
     static final byte QUERY15 = 0X15;
 

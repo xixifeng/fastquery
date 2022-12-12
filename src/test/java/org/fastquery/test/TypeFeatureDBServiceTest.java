@@ -322,7 +322,7 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         TypeFeature typeFeature = new TypeFeature();
         typeFeature.setName("zhangsan");
         List<String> fieldValues = new ArrayList<>(Arrays.asList("aa", "bb", "cc"));
-        List<TypeFeature> list = db.findByIn(TypeFeature.class, "name", fieldValues,typeFeature, 3, true, "id", "name");
+        List<TypeFeature> list = db.findPageByIn(TypeFeature.class,"name", fieldValues, typeFeature, false, 1, 3, true, "id", "name").getContent();
         assertThat(list, is(empty()));
     }
 
@@ -330,12 +330,12 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     public void findByIn2()
     {
         List<Long> fieldValues = Arrays.asList(1L, 2L, 3L);
-        List<TypeFeature> list = db.findByIn(TypeFeature.class, "id", fieldValues, null, 3, true, "name");
+        List<TypeFeature> list = db.findPageByIn(TypeFeature.class, "id", fieldValues,null,false,1,3,true,"name").getContent();
         assertThat(list.size(), is(3));
         fieldValues = Arrays.asList();
-        list = db.findByIn(TypeFeature.class, "id", fieldValues, null, 3, true, "name");
+        list = db.findPageByIn(TypeFeature.class, "id", fieldValues,null,false,1,3,true,"name").getContent();
         assertThat(list, is(empty()));
-        list = db.findByIn(TypeFeature.class, "id", null, null, 3, true, "name");
+        list = db.findPageByIn(TypeFeature.class, "id", null,null,false,1,3,true,"name").getContent();
         assertThat(list, is(empty()));
     }
 
@@ -344,12 +344,12 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     {
         TypeFeature typeFeature = new TypeFeature();
         List<Long> fieldValues = new ArrayList<>(Arrays.asList(1L, 2L, 3L));
-        List<TypeFeature> list = db.findByIn(TypeFeature.class, "id", fieldValues, typeFeature, 3, true, "name");
+        List<TypeFeature> list = db.findPageByIn(TypeFeature.class, "id", fieldValues,typeFeature,false,1,3,true,"name").getContent();
         assertThat(list.size(), is(3));
         fieldValues = Arrays.asList();
-        list = db.findByIn(TypeFeature.class, "id", fieldValues, typeFeature, 3, true, "name");
+        list = db.findPageByIn(TypeFeature.class, "id", fieldValues,typeFeature,false,1,3,true,"name").getContent();
         assertThat(list, is(empty()));
-        list = db.findByIn(TypeFeature.class, "id", null, typeFeature, 3, true, "name");
+        list = db.findPageByIn(TypeFeature.class, "id", null,typeFeature,false,1,3,true,"name").getContent();
         assertThat(list, is(empty()));
     }
 
