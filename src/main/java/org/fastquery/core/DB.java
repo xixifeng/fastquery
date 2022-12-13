@@ -555,7 +555,6 @@ public class DB
             keyval = new HashMap<>();
             for (int i = 1; i <= columnCount; i++)
             {
-                // key = resultSetMetaData.getColumnName(i); // 获取列名称
                 key = resultSetMetaData.getColumnLabel(i); // 获取列别名,若没有别名那么就获取本身名称(getColumnName)
                 obj = rs.getObject(i);
                 String columnType = resultSetMetaData.getColumnTypeName(i);

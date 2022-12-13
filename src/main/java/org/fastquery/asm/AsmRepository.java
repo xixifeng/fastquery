@@ -158,7 +158,7 @@ public class AsmRepository
                 sb.append("),");
             }
             sb.deleteCharAt(sb.length() - 1);
-            return "new Object[] { " + sb.toString() + " }";
+            return "new Object[] { " + sb + " }";
         }
         else
         {
@@ -232,19 +232,18 @@ public class AsmRepository
             for (Method method : methods)
             {
                 Class<?>[] ps = method.getParameterTypes();
-                StringBuilder bodyBuilder = new StringBuilder();
-                bodyBuilder.append('{');
-                bodyBuilder.append("int j = ").append(index++).append(';');
-                // 缓存method...
-                bodyBuilder.append("if(this.m[j]==null) {");
-                bodyBuilder.append("java.lang.reflect.Method m;");
-                bodyBuilder.append("try {m = c.getMethod(\"").append(method.getName()).append("\", $sig);} catch (Exception e) {throw new org.fastquery.core.RepositoryException(e);}");
-                bodyBuilder.append("this.m[j] = new org.fastquery.core.MethodInfo(m); ");
-                bodyBuilder.append("}");
-                // 缓存method... End
-                bodyBuilder.append("return ($r) org.fastquery.core.Prepared.excute(this.m[j],").append(getParameterNames(ps)).append(", this) ;");
-                bodyBuilder.append('}');
-                CtMethod cm = CtMethod.make(getMethodDef(method) + bodyBuilder.toString(), ctClass);
+                String bodyBuilder = '{' +
+                        "int j = " + index++ + ';' +
+                        // 缓存method...
+                        "if(this.m[j]==null) {" +
+                        "java.lang.reflect.Method m;" +
+                        "try {m = c.getMethod(\"" + method.getName() + "\", $sig);} catch (Exception e) {throw new org.fastquery.core.RepositoryException(e);}" +
+                        "this.m[j] = new org.fastquery.core.MethodInfo(m); " +
+                        "}" +
+                        // 缓存method... End
+                        "return ($r) org.fastquery.core.Prepared.excute(this.m[j]," + getParameterNames(ps) + ", this) ;" +
+                        '}';
+                CtMethod cm = CtMethod.make(getMethodDef(method) + bodyBuilder, ctClass);
                 ctClass.addMethod(cm);
             }
         }

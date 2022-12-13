@@ -777,7 +777,6 @@ public class TypeUtil
     public static <B> List<B> listMap2ListBean(List<Map<String, Object>> maps, Class<B> b)
     {
         List<B> bs = new ArrayList<>();
-        // JSON.toJavaObject(new JSONObject(map), b)
         maps.forEach(map -> bs.add((B) TypeUtil.map2Obj(b, map)));
         return bs;
     }

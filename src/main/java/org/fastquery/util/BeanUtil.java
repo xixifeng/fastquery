@@ -193,11 +193,6 @@ public final class BeanUtil
         return objs;
     }
 
-    private static <B> Object[] toWhere(Field[] fields, B bean, boolean ignoreId)
-    {
-        return toWhere(fields,bean,false,false,ignoreId);
-    }
-
     public static SQLValue toSelectSQL(Object bean, boolean unequal, boolean or, String dbName, boolean contain, String... fields)
     {
         Class<?> cls = bean.getClass();
@@ -233,7 +228,7 @@ public final class BeanUtil
         String keyFeild = objs[0].toString();
         // 表名称
         String tableName = getTableName(dbName, cls);
-        Object[] objects = toWhere(fields, bean, true);
+        Object[] objects = toWhere(fields,bean,false,false,true);
         List<Object> values = (List<Object>) objects[1];// sql语言中"?"对应的实参
         String sql; // 待执行的sql
         if (key == null)
@@ -247,7 +242,7 @@ public final class BeanUtil
         }
         else
         {
-            sql = String.format("select count(id) from %s where %s = %s%s", tableName, keyFeild, key.toString(), objects[0]);
+            sql = String.format("select count(id) from %s where %s = %s%s", tableName, keyFeild, key, objects[0]);
         }
         SQLValue sv = new SQLValue();
         sv.setSql(sql);
@@ -405,23 +400,13 @@ public final class BeanUtil
             String tableName = getTableName(dbName, cls);
             if (selectEntity)
             {
-                return String.format("select %s from %s where %s = %s", selectFields, tableName, keyFeild, key.toString());
+                return String.format("select %s from %s where %s = %s", selectFields, tableName, keyFeild, key);
             }
             else
             {
-                return String.format("select %s from %s where %s = %s", keyFeild, tableName, keyFeild, key.toString());
+                return String.format("select %s from %s where %s = %s", keyFeild, tableName, keyFeild, key);
             }
         }
-    }
-
-    // 修改指定 index 元素的值，将此元素的末尾 num 个字符删掉
-    // 注意：
-    private static void updateConditionListLastElement(ConditionList conditions, int num)
-    {
-        int lastIndex = conditions.size() - 1;
-        String lastCondition = conditions.get(lastIndex);
-        lastCondition = lastCondition.substring(0, lastCondition.length() - num);
-        conditions.set(lastIndex, lastCondition);
     }
 
     public static QueryBuilder toSelectSQL(Class<?> cls, Object bean, Object likes, String dbName, String sort, String selectFields)
@@ -442,18 +427,11 @@ public final class BeanUtil
 
         if (andSize != conditions.size())
         {
-            // 去掉末尾的 " or"
-            //updateConditionListLastElement(conditions, 3);
             conditions.add(")");
         }
         else
         {
             conditions.remove(andSize - 1); // 去掉 "（"
-            // 接下来后面的 " and"
-            //if (!conditions.isEmpty())
-            //{
-            //    updateConditionListLastElement(conditions, 4);
-            //}
         }
 
         String query;
@@ -592,7 +570,7 @@ public final class BeanUtil
                 updateinfo[1] = args;
                 if (toSQL)
                 {
-                    updateinfo[2] = String.format("select * from %s where %s = %s", tableName, keyFeild, key.toString());
+                    updateinfo[2] = String.format("select * from %s where %s = %s", tableName, keyFeild, key);
                 }
                 return updateinfo;
             }
