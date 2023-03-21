@@ -136,11 +136,11 @@ public class Prepared
     {
         MethodInfo methodInfo = QueryContext.getMethodInfo();
         Class<?> returnType = QueryContext.getReturnType();
-        Query[] querys = methodInfo.getQueries();
+        Query[] queries = methodInfo.getQueries();
         Modifying modifying = methodInfo.getModifying();
         QueryByNamed queryById = methodInfo.getQueryByNamed();
 
-        boolean hasSQLTpl = hasSQLTpl(methodInfo, querys, queryById); // 有SQL模板吗?
+        boolean hasSQLTpl = hasSQLTpl(methodInfo, queries, queryById); // 有SQL模板吗?
 
         if (hasSQLTpl)
         {
@@ -185,8 +185,8 @@ public class Prepared
         }
     }
 
-    private static boolean hasSQLTpl(MethodInfo methodInfo, Query[] querys, QueryByNamed queryById)
+    private static boolean hasSQLTpl(MethodInfo methodInfo, Query[] queries, QueryByNamed queryById)
     {
-        return querys.length > 0 || queryById != null || methodInfo.isContainQueryBuilderParam();
+        return queries.length > 0 || queryById != null || methodInfo.isContainQueryBuilderParam();
     }
 }

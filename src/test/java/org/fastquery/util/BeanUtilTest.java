@@ -419,7 +419,7 @@ public class BeanUtilTest
         String sql = BeanUtil.toUpdateSQL(userInfos, null);
 
         assertThat(sql, equalTo(
-                "update UserInfo set name = case id when 77 then '茝若' when 88 then '芸兮' when 99 then '梓' else name end,age = case id when 77 then '18' when 88 then age when 99 then '16' else age end where id in(77,88,99)"));
+                "update UserInfo set name = case id when 77 then '茝若' when 88 then '芸兮' when 99 then '梓' else name end,age = case id when 77 then '18' when 99 then '16' else age end where id in(77,88,99)"));
     }
 
     @Test
@@ -432,7 +432,7 @@ public class BeanUtilTest
 
         String sql = BeanUtil.toUpdateSQL(userInfos, null);
         assertThat(sql, equalTo(
-                "update UserInfo set name = case id when 77 then '茝若' when 88 then name when 99 then '梓' else name end,age = case id when 77 then '18' when 88 then age when 99 then '16' else age end where id in(77,88,99)"));
+                "update UserInfo set name = case id when 77 then '茝若' when 99 then '梓' else name end,age = case id when 77 then '18' when 99 then '16' else age end where id in(77,88,99)"));
     }
 
     @Test
@@ -446,7 +446,7 @@ public class BeanUtilTest
         String sql = BeanUtil.toUpdateSQL(userInfos, null);
 
         assertThat(sql, equalTo(
-                "update UserInfo set name = case id when 77 then '茝若' when 88 then name when 99 then '梓' else name end,age = case id when 77 then age when 88 then age when 99 then age else age end where id in(77,88,99)"));
+                "update UserInfo set name = case id when 77 then '茝若' when 99 then '梓' else name end where id in(77,88,99)"));
     }
 
     @Test
@@ -459,11 +459,24 @@ public class BeanUtilTest
 
         String sql = BeanUtil.toUpdateSQL(userInfos, null);
         assertThat(sql, equalTo(
-                "update UserInfo set name = case id when 77 then name when 88 then name when 99 then name else name end,age = case id when 77 then age when 88 then age when 99 then '16' else age end where id in(77,88,99)"));
+                "update UserInfo set age = case id when 99 then '16' else age end where id in(77,88,99)"));
     }
 
     @Test
     public void toUpdateSQL5()
+    {
+        List<UserInfo> userInfos = new ArrayList<>();
+        userInfos.add(new UserInfo(77, null, null));
+        userInfos.add(new UserInfo(88, null, null));
+        userInfos.add(new UserInfo(99, null, null));
+
+        String sql = BeanUtil.toUpdateSQL(userInfos, null);
+        assertThat(sql, equalTo(
+                "update UserInfo set id=id where id in(77,88,99)"));
+    }
+
+    @Test
+    public void toUpdateSQL6()
     {
         BoolType tt1 = new BoolType(1L, true, false, true, "男");
         BoolType tt2 = new BoolType(3L, false, true, false, "女");

@@ -726,19 +726,26 @@ public final class BeanUtil
             if (field != key && allowField(field))
             {
                 String fieldName = field.getName();
+                int caseStartIndex = sets.length();
                 sets.append(fieldName);
                 sets.append(" = case ");
                 sets.append(key.getName());
                 sets.append(' ');
+                boolean exists = false; // 判断当前 field 的值，是否全部为 null，如果全部为 null, 那么要移除这个字段的 case sql 语句
                 for (B b : beans)
                 {
                     Object keyVal = TypeUtil.getFieldVal(b, key);
                     Object fieldVal = TypeUtil.getFieldVal(b, field);
-                    sets.append("when ");
-                    sets.append(keyVal);
-                    sets.append(" then ");
-                    if (fieldVal != null)
+                    int currentLen = sets.length();
+                    sets.append("when "); // ➀
+                    sets.append(keyVal); // ➁
+                    sets.append(" then "); // ➂
+                    if (fieldVal == null) // 满足，则销毁 ➀ -> ➂ 这三行
                     {
+                        sets.delete(currentLen - 1, sets.length() - 1);
+                    }
+                    else
+                    {   exists = true;
                         if (fieldVal instanceof Boolean)
                         {
                             sets.append(fieldVal);
@@ -757,19 +764,25 @@ public final class BeanUtil
                             sets.append("' ");
                         }
                     }
-                    else
-                    {
-                        sets.append(fieldName);
-                        sets.append(' ');
-                    }
                 }
                 sets.append("else ");
                 sets.append(fieldName);
                 sets.append(" end,");
+                if(!exists)
+                {
+                    sets.delete(caseStartIndex, sets.length());
+                }
             }
         }
-        sets.deleteCharAt(sets.length() - 1);
-        return sets.toString();
+        if(sets.length() != 0)
+        {
+            sets.deleteCharAt(sets.length() - 1);
+            return sets.toString();
+        }
+        else
+        {
+            return "id=id";
+        }
     }
 
     private static <B> StringBuilder getIds(Iterable<B> beans, Field key)
