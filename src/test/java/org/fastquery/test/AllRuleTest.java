@@ -43,7 +43,7 @@ import org.junit.runners.Suite.SuiteClasses;
         QueryPoolTest.class, ParamFilterTest.class, ConditionTest.class, MySQLPageDialectTest.class, DefaultMethodTest.class,
         RepVersionTest.class, SetDBServiceTest.class, SetDBExpectTest.class, SharpExprParserTest.class,
         TransactionalTest.class, QueryByNamedDBExtendTest.class, JudgeTest.class, Script2ClassTest.class, TxTest.class, WorldDBTest.class, TypeTestDBTest.class, SelectFieldTest.class, TypeFeatureDBServiceTest.class, AsmRepositoryTest.class, SpringSupportTest.class
-        , FQueryPropertiesTest.class
+        , FQueryPropertiesTest.class, BanditTest.class
 })
 public class AllRuleTest
 {

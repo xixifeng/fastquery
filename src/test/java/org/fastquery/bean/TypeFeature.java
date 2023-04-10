@@ -28,6 +28,8 @@ import lombok.*;
 import org.fastquery.core.Id;
 import org.fastquery.core.Table;
 import org.fastquery.core.Transient;
+import org.fastquery.struct.Chip;
+import org.fastquery.struct.Predicate;
 
 import java.util.EnumSet;
 
@@ -40,7 +42,7 @@ import java.util.EnumSet;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class TypeFeature
+public class TypeFeature extends Predicate<TypeFeature>
 {
 
     @Id
@@ -53,6 +55,26 @@ public class TypeFeature
     private JSONArray contactArray;
     @Transient
     private Long ssid;
+
+    public Chip<Long> id()
+    {
+        return new Chip<>("id", this.id);
+    }
+
+    public Chip<String> name()
+    {
+        return new Chip<>("name", this.name);
+    }
+
+    public Chip<Gender> gender()
+    {
+        return new Chip<>("gender", this.gender);
+    }
+
+    public Chip<EnumSet<Ruits>> ruits()
+    {
+        return new Chip<>("ruits", this.ruits);
+    }
 
     public TypeFeature(Long id, String name, Gender gender, EnumSet<Ruits> ruits, Integer sort)
     {

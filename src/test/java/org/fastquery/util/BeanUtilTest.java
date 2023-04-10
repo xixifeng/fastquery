@@ -257,7 +257,7 @@ public class BeanUtilTest
         sql = sqlValue.getSql();
         list = sqlValue.getValues();
         assertThat(list.size(), is(2));
-        assertThat(sql, equalTo("select count(id) from UserInfo where name = ? and age = ?"));
+        assertThat(sql, equalTo("select count(id) from UserInfo where  name = ? and age = ?"));
         assertThat(list.get(0), equalTo("小燕子"));
         assertThat(list.get(1), is(18));
 
@@ -266,7 +266,7 @@ public class BeanUtilTest
         sql = sqlValue.getSql();
         list = sqlValue.getValues();
         assertThat(list.size(), is(1));
-        assertThat(sql, equalTo("select count(id) from UserInfo where name = ?"));
+        assertThat(sql, equalTo("select count(id) from UserInfo where  name = ?"));
         assertThat(list.get(0), equalTo("小燕子"));
 
         userInfo = new UserInfo(null, null, 13);
@@ -274,7 +274,7 @@ public class BeanUtilTest
         sql = sqlValue.getSql();
         list = sqlValue.getValues();
         assertThat(list.size(), is(1));
-        assertThat(sql, equalTo("select count(id) from UserInfo where age = ?"));
+        assertThat(sql, equalTo("select count(id) from UserInfo where  age = ?"));
         assertThat(list.get(0), is(13));
     }
 

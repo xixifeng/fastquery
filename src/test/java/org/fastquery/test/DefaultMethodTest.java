@@ -24,20 +24,25 @@ package org.fastquery.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+
 import static org.hamcrest.Matchers.*;
+
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao2.DefaultDBService;
 import org.fastquery.service.FQuery;
+import org.fastquery.struct.BooleanOperator;
+import org.fastquery.struct.SQLOperator;
+import org.fastquery.struct.SQLValue;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * 测试QueryRepository中的默认方法
+ * 连接是  xk3 数据库
  *
  * @author mei.sir@aliyun.cn
  */
@@ -46,6 +51,9 @@ public class DefaultMethodTest extends TestFastQuery
 {
 
     private final DefaultDBService db = FQuery.getRepository(DefaultDBService.class);
+
+    @Rule
+    public FastQueryTestRule rule = new FastQueryTestRule();
 
     @Test
     public void dbNoneNull()
@@ -138,6 +146,32 @@ public class DefaultMethodTest extends TestFastQuery
     }
 
     @Test
+    public void count2()
+    {
+        UserInfo u = new UserInfo(78, "Smith", 18);
+        u.condition(BooleanOperator.AND, u::name, SQLOperator.EQ);
+        u.condition(BooleanOperator.AND, u::age, SQLOperator.EQ);
+        u.finish();
+        db.count(u);
+        List<String> executedSQLs = rule.getExecutedSQLs();
+        String sql = executedSQLs.get(0);
+        assertThat(sql, equalTo("select count(id) from UserInfo where id = 78 and name = ? and age = ?"));
+    }
+
+    @Test
+    public void count3()
+    {
+        UserInfo u = new UserInfo(null, "Smith", 18);
+        u.condition(BooleanOperator.OR, u::name, SQLOperator.EQ);
+        u.condition(BooleanOperator.OR, u::age, SQLOperator.EQ);
+        u.finish();
+        db.count(u);
+        List<String> executedSQLs = rule.getExecutedSQLs();
+        String sql = executedSQLs.get(0);
+        assertThat(sql, equalTo("select count(id) from UserInfo where name = ? or age = ?"));
+    }
+
+    @Test
     public void findOne()
     {
         UserInfo userInfo = new UserInfo();
@@ -152,6 +186,20 @@ public class DefaultMethodTest extends TestFastQuery
         assertThat(u.getName(), equalTo(name));
         assertThat(u.getAge(), nullValue());
 
+    }
+
+    @Test
+    public void findOne2()
+    {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setName("婤姶");
+        userInfo.condition(BooleanOperator.EMPTY, userInfo::name, SQLOperator.EQ);
+        userInfo.finish();
+        UserInfo u = db.findOne(userInfo, true, "id", "name");
+        assertThat(u.toString(), equalTo("UserInfo(id=4, name=婤姶, age=null, description=null, ssid=null)"));
+        List<String> executedSQLs = rule.getExecutedSQLs();
+        String sql = executedSQLs.get(0);
+        assertThat(sql, equalTo("select id,name from UserInfo where  name = ? limit 1"));
     }
 
     @Test
@@ -245,7 +293,7 @@ public class DefaultMethodTest extends TestFastQuery
         }
         catch (RepositoryException e)
         {
-            assertThat(e.getMessage(), containsString("Unknown column 'cc' in 'where clause'"));
+            assertThat(e.getCause().getCause().getMessage(), containsString("Unknown column 'cc' in 'where clause'"));
         }
     }
 
@@ -272,7 +320,7 @@ public class DefaultMethodTest extends TestFastQuery
         }
         catch (RepositoryException e)
         {
-            assertThat(e.getMessage(), containsString("有注入风险"));
+            assertThat(e.getCause().getCause().getMessage(), containsString("有注入风险"));
         }
     }
 

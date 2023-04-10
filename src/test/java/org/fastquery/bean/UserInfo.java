@@ -26,6 +26,8 @@ import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.Id;
 import org.fastquery.core.Transient;
+import org.fastquery.struct.Chip;
+import org.fastquery.struct.Predicate;
 
 /**
  * @author xixifeng (fastquery@126.com)
@@ -35,7 +37,7 @@ import org.fastquery.core.Transient;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UserInfo
+public class UserInfo extends Predicate<UserInfo>
 {
 
     @Id
@@ -46,6 +48,21 @@ public class UserInfo
     private String description;
     @Transient
     private Long ssid;
+
+    public Chip<Integer> id()
+    {
+        return new Chip<>("id", this.id);
+    }
+
+    public Chip<Integer> age()
+    {
+        return new Chip<>("age", this.age);
+    }
+
+    public Chip<String> name()
+    {
+        return new Chip<>("name", this.name);
+    }
 
     public UserInfo(String name, Integer age)
     {

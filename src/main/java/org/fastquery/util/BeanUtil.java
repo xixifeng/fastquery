@@ -31,6 +31,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.*;
+import org.fastquery.struct.Predicate;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.core.SelectField;
 import com.alibaba.fastjson.JSON;
@@ -47,6 +48,8 @@ public final class BeanUtil
     private static final String WHERE = " where ";
     public static final String AND = " and ";
     public static final String OR = " or ";
+
+    private static final String BLANK_1 = " ";
 
     private BeanUtil()
     {
@@ -157,8 +160,18 @@ public final class BeanUtil
 
     // use select one
     // [0] where 部分， [1] sql语言中"?"对应的实参
-    private static <B> Object[] toWhere(Field[] fields, B bean, boolean unequal, boolean or, boolean ignoreId)
+    private static <B> SQLValue toWhere(Field[] fields, B bean, boolean unequal, boolean or, boolean ignoreId)
     {
+        if( bean instanceof Predicate)
+        {
+            Predicate p = (Predicate) bean;
+            SQLValue sqlValue = p.getSqlValue();
+            if(sqlValue != null)
+            {
+                return sqlValue;
+            }
+        }
+
         StringBuilder sb = new StringBuilder();
         List<Object> values = new ArrayList<>();
         String unitRelation = or ? OR : AND; // 条件单元之间的关系
@@ -187,10 +200,11 @@ public final class BeanUtil
                 }
             }
         }
-        Object[] objs = new Object[2];
-        objs[0] = sb.toString();
-        objs[1] = values;
-        return objs;
+
+        SQLValue sqlValue = new SQLValue();
+        sqlValue.setSql(sb.toString());
+        sqlValue.setValues(values);
+        return sqlValue;
     }
 
     public static SQLValue toSelectSQL(Object bean, boolean unequal, boolean or, String dbName, boolean contain, String... fields)
@@ -200,13 +214,13 @@ public final class BeanUtil
 
         // 表名称
         String tableName = getTableName(dbName, cls);
-        Object[] objects = toWhere(fs, bean, unequal, or, false);
-        List<Object> values = (List<Object>) objects[1];// sql语言中"?"对应的实参
+        SQLValue objects = toWhere(fs, bean, unequal, or, false);
+        List<Object> values = objects.getValues();// sql语言中"?"对应的实参
         SelectField<?> selectField = new SelectField<>(cls, contain, fields);
-        String where = StringUtils.EMPTY;
+        String where = objects.getSql();
         if (!values.isEmpty())
         {
-            where = WHERE + objects[0].toString().substring(4);
+            where = WHERE + delOperator(where);
         }
         String sql = String.format("select %s from %s%s limit 1", selectField.getFields(), tableName, where); // 待执行的sql
         SQLValue sv = new SQLValue();
@@ -228,21 +242,21 @@ public final class BeanUtil
         String keyFeild = objs[0].toString();
         // 表名称
         String tableName = getTableName(dbName, cls);
-        Object[] objects = toWhere(fields,bean,false,false,true);
-        List<Object> values = (List<Object>) objects[1];// sql语言中"?"对应的实参
+        SQLValue objects = toWhere(fields,bean,false,false,true);
+        List<Object> values = objects.getValues();// sql语言中"?"对应的实参
         String sql; // 待执行的sql
         if (key == null)
         {
             String where = StringUtils.EMPTY;
             if (!values.isEmpty())
             {
-                where = " where" + objects[0].toString().substring(4);
+                where = " where " + delOperator(objects.getSql());
             }
             sql = String.format("select count(id) from %s%s", tableName, where);
         }
         else
         {
-            sql = String.format("select count(id) from %s where %s = %s%s", tableName, keyFeild, key, objects[0]);
+            sql = String.format("select count(id) from %s where %s = %s%s", tableName, keyFeild, key, objects.getSql());
         }
         SQLValue sv = new SQLValue();
         sv.setSql(sql);
@@ -951,6 +965,53 @@ public final class BeanUtil
         return sqls;
     }
 
+    public static SQLValue getSqlValue14(Class<?> clazz, Object equals, boolean contain, String[] fields)
+    {
+        String selectFields = new SelectField<>(clazz, contain, fields).getFields();
+        log.debug("selectFields: {}", selectFields);
+
+        StringBuilder sb = new StringBuilder();
+        SQLValue sqlValue = new SQLValue();
+        sb.append("select ");
+        sb.append(selectFields);
+        sb.append(" from ");
+        sb.append(getTableName(null, clazz));
+
+            Field[] fs = getFields(clazz);
+            SQLValue objects = toWhere(fs, equals, false, false, false);
+            List<Object> values = objects.getValues();
+            if(!values.isEmpty())
+            {
+                sb.append(WHERE);
+            }
+            else
+            {
+                sb.append(BLANK_1);
+            }
+
+            String wh = delOperator(objects.getSql());
+            sb.append(wh);
+            sb.append(BLANK_1);
+            sqlValue.addValues(values);
+
+        sqlValue.setSql(sb.toString());
+        return sqlValue;
+    }
+
+    // 删除为首的 and 或 or
+    private static String delOperator(String sql)
+    {
+        String wh = BLANK_1 + sql.trim();
+        if(wh.startsWith(AND) || wh.startsWith(OR))
+        {
+            return wh.substring(4);
+        }
+        else
+        {
+            return wh;
+        }
+    }
+
     public static SQLValue getSqlValue(Class<?> clazz, String fieldName, List<Object> fieldValues, Object equals, boolean contain, String[] fields)
     {
         String selectFields = new SelectField<>(clazz, contain, fields).getFields();
@@ -980,10 +1041,10 @@ public final class BeanUtil
         if(equals != null)
         {
             Field[] fs = getFields(clazz);
-            Object[] objects = toWhere(fs, equals, false, false, false);
-            sb.append(objects[0]);
+            SQLValue objects = toWhere(fs, equals, false, false, false);
+            sb.append(objects.getSql());
             sb.append(' ');
-            sqlValue.addValues((List<Object>) objects[1]);
+            sqlValue.addValues(objects.getValues());
         }
         sqlValue.setSql(sb.toString());
         return sqlValue;

@@ -35,6 +35,8 @@ import org.fastquery.page.Page;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.page.Slice;
 import org.fastquery.service.FQuery;
+import org.fastquery.struct.BooleanOperator;
+import org.fastquery.struct.SQLOperator;
 import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
 import org.junit.Test;
@@ -317,6 +319,16 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     }
 
     @Test
+    public void findOne3()
+    {
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.orderBy();
+        typeFeature.finish();
+        db.findOne(typeFeature,true,false,true,"name","gender");
+        assertThat(rule.getExecutedSQLs().get(0), equalTo("select name,gender from type_feature order by id desc limit 1"));
+    }
+
+    @Test
     public void findByIn1()
     {
         TypeFeature typeFeature = new TypeFeature();
@@ -353,7 +365,52 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         assertThat(list, is(empty()));
     }
 
+    @Test
+    public void findPageByPredicate1()
+    {
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.setGender(Gender.男);
+        // 根据 id 集合查
+        List<Long> ids = new ArrayList<>();
+        ids.add(1L);
+        ids.add(2L);
+        ids.add(3L);
 
+        typeFeature.condition(BooleanOperator.AND, typeFeature::id, SQLOperator.IN, ids);
+        typeFeature.condition(BooleanOperator.AND, typeFeature::gender, SQLOperator.EQ);
+        typeFeature.orderBy("id desc");
+        typeFeature.finish();
+
+        List<TypeFeature> list = db.findPageByPredicate(typeFeature, false, 1, 100, true, "id", "name").getContent();
+        assertThat(list.size(), is(3));
+        List<Long> allId = list.stream().collect(ArrayList::new, (collection, e) -> collection.add(e.getId()), ArrayList::addAll);
+        assertThat(allId.toString(),equalTo("[3, 2, 1]"));
+    }
+
+    @Test
+    public void findPageByPredicate2()
+    {
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.orderBy();
+        typeFeature.finish();
+        List<TypeFeature> list = db.findPageByPredicate(typeFeature, false, 1, 3, true, "id", "name").getContent();
+        List<String> sqls = rule.getExecutedSQLs();
+        assertThat(sqls.get(0), equalTo("select id,name from type_feature  order by id desc  limit 0,3"));
+        assertThat(sqls.get(1), equalTo("select count(id) from type_feature  order by id desc "));
+    }
+
+    @Test
+    public void findPageByPredicate3()
+    {
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.setGender(Gender.女);
+        typeFeature.setName("Lily");
+        typeFeature.setSort(0);
+        List<TypeFeature> list = db.findPageByPredicate(typeFeature, false, 1, 3, true, "id", "name").getContent();
+        List<String> sqls = rule.getExecutedSQLs();
+        assertThat(sqls.get(0), equalTo("select id,name from type_feature where  name = ? and gender = ? and sort = ?  limit 0,3"));
+        assertThat(sqls.get(1), equalTo("select count(id) from type_feature where  name = ? and gender = ? and sort = ? "));
+    }
 
 
     @Test

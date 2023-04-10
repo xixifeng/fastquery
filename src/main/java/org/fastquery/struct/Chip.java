@@ -19,49 +19,18 @@
  * For more information, please see http://www.fastquery.org/.
  *
  */
+package org.fastquery.struct;
 
-package org.fastquery.core;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
-class MethodId
+@AllArgsConstructor
+@Getter
+public class Chip<T>
 {
-    static final byte QUERY = -1;
-
-    static final byte QUERY0 = 0X00;
-
-    static final byte QUERY1 = 0X01;
-
-    static final byte QUERY2 = 0X02;
-
-    static final byte QUERY3 = 0X03;
-
-    static final byte QUERY4 = 0X04;
-
-    static final byte QUERY5 = 0X05;
-
-    static final byte QUERY6 = 0X06;
-
-    static final byte QUERY7 = 0X07;
-
-    static final byte QUERY8 = 0X08;
-
-    static final byte QUERY9 = 0X09;
-
-    static final byte QUERY10 = 0X10;
-
-    static final byte QUERY11 = 0X11;
-
-    static final byte QUERY12 = 0X12;
-
-    static final byte QUERY13 = 0X13;
-
-    static final byte QUERY14 = 0X14;
-
-    static final byte QUERY15 = 0X15;
-
-    private MethodId()
-    {
-    }
+    private String name;
+    private T t;
 }

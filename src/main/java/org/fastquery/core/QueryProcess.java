@@ -286,7 +286,14 @@ class QueryProcess
                 }
                 else
                 {
-                    bean = (Class<?>) QueryContext.getArgs()[0];
+                    if(method.getId().value() != MethodId.QUERY14)
+                    {
+                        bean = (Class<?>) QueryContext.getArgs()[0];
+                    }
+                    else
+                    {
+                        bean = QueryContext.getArgs()[0].getClass();
+                    }
                 }
                 list = TypeUtil.listMap2ListBean(keyvals, bean);
             }
@@ -349,8 +356,8 @@ class QueryProcess
                 return q12();
             case MethodId.QUERY13:
                 return q13();
-            //case MethodId.QUERY14:
-            //    return q14();
+            case MethodId.QUERY14:
+                return q14();
             case MethodId.QUERY15:
                 return q15();
                 // 下次用 QUERY14
@@ -737,9 +744,46 @@ class QueryProcess
         return null;
     }
 
-    //private Object q14()
-    //{
-    //}
+    private Object q14()
+    {
+        MethodInfo method = QueryContext.getMethodInfo();
+        Pageable pageable = QueryContext.getPageable();
+        int offset = pageable.getOffset();
+        int pageSize = pageable.getPageSize();
+
+        Object[] iargs = QueryContext.getArgs();
+        Object equals = iargs[0];
+        Objects.requireNonNull(equals);
+        Class<?> clazz = equals.getClass();
+        boolean contain = (boolean) iargs[4];
+        String[] fields = (String[]) iargs[5];
+        log.debug("clazz:{}, contain:{}, fields:{}",
+                clazz, contain, fields);
+        SQLValue sqlValue = BeanUtil.getSqlValue14(clazz, equals, contain, fields);
+        String querySQL = sqlValue.getSql();
+
+        PageDialect pageDialect = DialectScheduler.getCurrentPageDialect();
+        String currentPageSQL = pageDialect.getCurrentPageSQL(querySQL, offset, pageSize);
+        sqlValue.setSql(currentPageSQL);
+        List<SQLValue> sqlValues = new ArrayList<>(2);
+        sqlValues.add(sqlValue);
+
+        if (method.isCount())
+        {
+            String countPageSQL = pageDialect.countSQLInference(querySQL, "id");
+            SQLValue countSqlValue = new SQLValue(countPageSQL, sqlValue.getValues());
+            sqlValues.add(countSqlValue);
+        }
+        else
+        {
+            offset = offset + pageSize;
+            String nextRecordSQL = pageDialect.getCurrentPageSQL(querySQL, offset, 1);
+            SQLValue sv = new SQLValue(nextRecordSQL, sqlValue.getValues());
+            sqlValues.add(sv);
+        }
+
+        return QueryProcess.getInstance().queryPage(sqlValues);
+    }
 
     private Object q15()
     {

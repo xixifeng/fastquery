@@ -57,7 +57,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
 
     private static final Class<QueryRepository> c = QueryRepository.class;
 
-    private final MethodInfo[] m = new MethodInfo[41];
+    private final MethodInfo[] m = new MethodInfo[42];
 
     private void cache(int j, String name, Class<?>... parameterTypes)
     {
@@ -522,9 +522,20 @@ public abstract class AbstractQueryRepository implements QueryRepository
     }
 
     @Override
-    public <E, F> Page<E> findPageByIn(Class<E> clazz, String fieldName, List<F> fieldValues, E equals, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields)
+    public <E> Page<E> findPageByPredicate(E equals, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields)
     {
         int j = 40;
+        if (m[j] == null)
+        {
+            cache(j, "findPageByPredicate", Object.class, boolean.class, int.class, int.class, boolean.class, String[].class);
+        }
+        return (Page<E>) Prepared.excute(m[j], new Object[]{equals, notCount, pageIndex, pageSize, contain, fields}, this);
+    }
+
+    @Override
+    public <E, F> Page<E> findPageByIn(Class<E> clazz, String fieldName, List<F> fieldValues, E equals, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields)
+    {
+        int j = 41;
         if (m[j] == null)
         {
             cache(j, "findPageByIn", Class.class, String.class, List.class, Object.class, boolean.class, int.class, int.class, boolean.class, String[].class);
