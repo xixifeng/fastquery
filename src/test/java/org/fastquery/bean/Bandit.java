@@ -42,22 +42,22 @@ public class Bandit extends Predicate<Bandit>
 
     public Chip<Long> id()
     {
-        return new Chip<>("id", this.id);
+        return new Chip<>("id");
     }
 
     public Chip<String> name()
     {
-        return new Chip<>("name", this.name);
+        return new Chip<>("name");
     }
 
     public Chip<Long> createDateTime()
     {
-        return new Chip<>("createDateTime", this.createDateTime);
+        return new Chip<>("createDateTime");
     }
 
     public Chip<Long> lastUpdateDateTime()
     {
-        return new Chip<>("lastUpdateDateTime", this.lastUpdateDateTime);
+        return new Chip<>("lastUpdateDateTime");
     }
 }
 

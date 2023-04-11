@@ -376,8 +376,8 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         ids.add(2L);
         ids.add(3L);
 
-        typeFeature.condition(BooleanOperator.AND, typeFeature::id, SQLOperator.IN, ids);
-        typeFeature.condition(BooleanOperator.AND, typeFeature::gender, SQLOperator.EQ);
+        typeFeature.and(typeFeature::id, SQLOperator.IN, ids);
+        typeFeature.and(typeFeature::gender, SQLOperator.EQ, typeFeature.getGender());
         typeFeature.orderBy("id desc");
         typeFeature.finish();
 
@@ -410,6 +410,17 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         List<String> sqls = rule.getExecutedSQLs();
         assertThat(sqls.get(0), equalTo("select id,name from type_feature where  name = ? and gender = ? and sort = ?  limit 0,3"));
         assertThat(sqls.get(1), equalTo("select count(id) from type_feature where  name = ? and gender = ? and sort = ? "));
+    }
+
+    @Test
+    public void findPageByPredicate4()
+    {
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.setGender(Gender.女);
+        typeFeature.setName("Lilyx#$");
+        typeFeature.setSort(0);
+        Page<TypeFeature> page = db.findPageByPredicate(typeFeature, true, 1, 3, true, "id", "name");
+        assertThat(page.isLast(),is(true));
     }
 
 

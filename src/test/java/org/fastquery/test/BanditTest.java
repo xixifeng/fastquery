@@ -133,7 +133,7 @@ public class BanditTest
         Bandit bandit = new Bandit();
         bandit.setId(18L);
 
-        bandit.condition(BooleanOperator.AND, bandit::id, SQLOperator.EQ);
+        bandit.and(bandit::id, SQLOperator.EQ, bandit.getId());
         bandit.orderBy();
         bandit.finish();
 
@@ -148,12 +148,12 @@ public class BanditTest
     {
         bandit
                 .groupStart(BooleanOperator.AND)
-                .condition(BooleanOperator.EMPTY, bandit::id, SQLOperator.EQ, bandit.getId())
-                .condition(BooleanOperator.AND, bandit::createDateTime, SQLOperator.GE)
-                .condition(BooleanOperator.AND, bandit::lastUpdateDateTime, SQLOperator.LE)
-                .condition(BooleanOperator.AND, bandit::name, SQLOperator.IN, names)
+                .and(bandit::id, SQLOperator.EQ, bandit.getId())
+                .and(bandit::createDateTime, SQLOperator.GE, bandit.getCreateDateTime())
+                .and(bandit::lastUpdateDateTime, SQLOperator.LE, bandit.getLastUpdateDateTime())
+                .and(bandit::name, SQLOperator.IN, names)
                 .groupEnd()
-                .condition(BooleanOperator.AND, bandit::name, SQLOperator.LIKE)
+                .and(bandit::name, SQLOperator.LIKE, bandit.getName())
                 .finish();
     }
 

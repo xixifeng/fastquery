@@ -149,8 +149,8 @@ public class DefaultMethodTest extends TestFastQuery
     public void count2()
     {
         UserInfo u = new UserInfo(78, "Smith", 18);
-        u.condition(BooleanOperator.AND, u::name, SQLOperator.EQ);
-        u.condition(BooleanOperator.AND, u::age, SQLOperator.EQ);
+        u.and(u::name, SQLOperator.EQ, u.getName());
+        u.and(u::age, SQLOperator.EQ, u.getAge());
         u.finish();
         db.count(u);
         List<String> executedSQLs = rule.getExecutedSQLs();
@@ -162,8 +162,8 @@ public class DefaultMethodTest extends TestFastQuery
     public void count3()
     {
         UserInfo u = new UserInfo(null, "Smith", 18);
-        u.condition(BooleanOperator.OR, u::name, SQLOperator.EQ);
-        u.condition(BooleanOperator.OR, u::age, SQLOperator.EQ);
+        u.or(u::name, SQLOperator.EQ, u.getName());
+        u.or(u::age, SQLOperator.EQ, u.getAge());
         u.finish();
         db.count(u);
         List<String> executedSQLs = rule.getExecutedSQLs();
@@ -193,7 +193,7 @@ public class DefaultMethodTest extends TestFastQuery
     {
         UserInfo userInfo = new UserInfo();
         userInfo.setName("婤姶");
-        userInfo.condition(BooleanOperator.EMPTY, userInfo::name, SQLOperator.EQ);
+        userInfo.and(userInfo::name, SQLOperator.EQ,userInfo.getName());
         userInfo.finish();
         UserInfo u = db.findOne(userInfo, true, "id", "name");
         assertThat(u.toString(), equalTo("UserInfo(id=4, name=婤姶, age=null, description=null, ssid=null)"));

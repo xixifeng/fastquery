@@ -97,7 +97,7 @@ public class WorldDBTest extends TestFastQuery
         assertThat(page.isHasContent(), is(false));
         assertThat(page.isHasNext(), is(false));
         assertThat(page.isFirst(), is(false)); // 不是地一页
-        assertThat(page.isLast(), is(false)); // 不是最后一页
+        assertThat(page.isLast(), is(true)); // 没有内容，就视为最后一页
 
     }
 

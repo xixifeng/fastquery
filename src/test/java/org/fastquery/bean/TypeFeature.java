@@ -58,22 +58,22 @@ public class TypeFeature extends Predicate<TypeFeature>
 
     public Chip<Long> id()
     {
-        return new Chip<>("id", this.id);
+        return new Chip<>("id");
     }
 
     public Chip<String> name()
     {
-        return new Chip<>("name", this.name);
+        return new Chip<>("name");
     }
 
     public Chip<Gender> gender()
     {
-        return new Chip<>("gender", this.gender);
+        return new Chip<>("gender");
     }
 
     public Chip<EnumSet<Ruits>> ruits()
     {
-        return new Chip<>("ruits", this.ruits);
+        return new Chip<>("ruits");
     }
 
     public TypeFeature(Long id, String name, Gender gender, EnumSet<Ruits> ruits, Integer sort)

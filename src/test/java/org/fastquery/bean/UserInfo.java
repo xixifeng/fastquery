@@ -51,17 +51,17 @@ public class UserInfo extends Predicate<UserInfo>
 
     public Chip<Integer> id()
     {
-        return new Chip<>("id", this.id);
+        return new Chip<>("id");
     }
 
     public Chip<Integer> age()
     {
-        return new Chip<>("age", this.age);
+        return new Chip<>("age");
     }
 
     public Chip<String> name()
     {
-        return new Chip<>("name", this.name);
+        return new Chip<>("name");
     }
 
     public UserInfo(String name, Integer age)

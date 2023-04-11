@@ -258,7 +258,7 @@ class QueryProcess
             totalElements = 0;
             totalPages = 0;
             hasNext = false;
-            isLast = false;
+            isLast = true;
         }
 
         List<?> list = convertContent(keyvals, method);

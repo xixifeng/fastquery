@@ -22,13 +22,17 @@ public abstract class Predicate<E>
     @Transient
     private Integer groupStart = -1;
 
-    public <T> E condition(BooleanOperator booleanOperator, Supplier<Chip<T>> left, SQLOperator operator)
+    public <T> E and(Supplier<Chip<T>> left, SQLOperator operator, T right)
     {
-        condition(booleanOperator, left, operator, left.get().getT());
-        return (E) this;
+        return this.condition(BooleanOperator.AND,left,operator,right);
     }
 
-    public <T> E condition(BooleanOperator booleanOperator, Supplier<Chip<T>> left, SQLOperator operator, T right)
+    public <T> E or(Supplier<Chip<T>> left, SQLOperator operator, T right)
+    {
+        return this.condition(BooleanOperator.OR,left,operator,right);
+    }
+
+    private <T> E condition(BooleanOperator booleanOperator, Supplier<Chip<T>> left, SQLOperator operator, T right)
     {
         if (right != null && !right.toString().equals(""))
         {
@@ -45,7 +49,17 @@ public abstract class Predicate<E>
         return (E) this;
     }
 
-    public <T> E condition(BooleanOperator booleanOperator, Supplier<Chip<T>> left, SQLOperator operator, Collection<T> collection)
+    public <T> E and(Supplier<Chip<T>> left, SQLOperator operator, Collection<T> collection)
+    {
+        return this.condition(BooleanOperator.AND, left,operator,collection);
+    }
+
+    public <T> E or(Supplier<Chip<T>> left, SQLOperator operator, Collection<T> collection)
+    {
+        return this.condition(BooleanOperator.OR, left,operator,collection);
+    }
+
+    private  <T> E condition(BooleanOperator booleanOperator, Supplier<Chip<T>> left, SQLOperator operator, Collection<T> collection)
     {
         if (collection != null && !collection.isEmpty())
         {

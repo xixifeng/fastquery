@@ -32,5 +32,4 @@ import lombok.Getter;
 public class Chip<T>
 {
     private String name;
-    private T t;
 }
