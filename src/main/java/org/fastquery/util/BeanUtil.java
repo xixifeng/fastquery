@@ -24,6 +24,7 @@ package org.fastquery.util;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
@@ -84,7 +85,7 @@ public final class BeanUtil
     // 忽略条件: 如果不是包装类型或者字段上标识有Transient
     private static boolean allowField(Field field)
     {
-        return TypeUtil.isWarrp(field.getType()) && field.getDeclaredAnnotation(Transient.class) == null;
+        return TypeUtil.isWarrp(field.getType()) && !Modifier.isStatic(field.getModifiers()) && field.getDeclaredAnnotation(Transient.class) == null;
     }
 
     private static <B> String toFields(Field[] fields, B bean)
@@ -867,8 +868,11 @@ public final class BeanUtil
             }
             for (Field field : fields)
             {
-                field.setAccessible(true);
-                field.set(bean, null);
+                if(!Modifier.isStatic(field.getModifiers()))
+                {
+                    field.setAccessible(true);
+                    field.set(bean, null);
+                }
             }
         }
         catch (Exception e)

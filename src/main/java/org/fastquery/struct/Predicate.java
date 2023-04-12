@@ -1,12 +1,13 @@
 package org.fastquery.struct;
 
-import org.fastquery.core.Transient;
+import org.fastquery.util.BeanUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 /**
@@ -19,26 +20,26 @@ public abstract class Predicate<E>
     private final StringBuilder builder = new StringBuilder();
     private final List<Object> values = new ArrayList<>();
 
-    @Transient
-    private Integer groupStart = -1;
+    private static final String AND = " and ";
+    private static final String OR = " or ";
 
     public <T> E and(Supplier<Chip<T>> left, SQLOperator operator, T right)
     {
-        return this.condition(BooleanOperator.AND,left,operator,right);
+        return this.condition(AND,left,operator,right);
     }
 
     public <T> E or(Supplier<Chip<T>> left, SQLOperator operator, T right)
     {
-        return this.condition(BooleanOperator.OR,left,operator,right);
+        return this.condition(OR,left,operator,right);
     }
 
-    private <T> E condition(BooleanOperator booleanOperator, Supplier<Chip<T>> left, SQLOperator operator, T right)
+    private <T> E condition(String booleanOperator, Supplier<Chip<T>> left, SQLOperator operator, T right)
     {
         if (right != null && !right.toString().equals(""))
         {
             if (!builder.toString().endsWith("( "))
             {
-                builder.append(booleanOperator != BooleanOperator.EMPTY ? booleanOperator.getName() : "");
+                builder.append(booleanOperator);
             }
             builder.append(left.get().getName());
             builder.append(operator.getOperator());
@@ -51,15 +52,15 @@ public abstract class Predicate<E>
 
     public <T> E and(Supplier<Chip<T>> left, SQLOperator operator, Collection<T> collection)
     {
-        return this.condition(BooleanOperator.AND, left,operator,collection);
+        return this.condition(AND, left,operator,collection);
     }
 
     public <T> E or(Supplier<Chip<T>> left, SQLOperator operator, Collection<T> collection)
     {
-        return this.condition(BooleanOperator.OR, left,operator,collection);
+        return this.condition(OR, left,operator,collection);
     }
 
-    private  <T> E condition(BooleanOperator booleanOperator, Supplier<Chip<T>> left, SQLOperator operator, Collection<T> collection)
+    private  <T> E condition(String booleanOperator, Supplier<Chip<T>> left, SQLOperator operator, Collection<T> collection)
     {
         if (collection != null && !collection.isEmpty())
         {
@@ -68,7 +69,7 @@ public abstract class Predicate<E>
             {
                 if (!builder.toString().endsWith("( "))
                 {
-                    builder.append(booleanOperator != BooleanOperator.EMPTY ? booleanOperator.getName() : "");
+                    builder.append(booleanOperator);
                 }
                 builder.append(left.get().getName());
 
@@ -109,37 +110,36 @@ public abstract class Predicate<E>
         return (E) this;
     }
 
-    public E groupStart(BooleanOperator booleanOperator)
+    public E and(UnaryOperator<E> function)
     {
-        groupStart = builder.length();
-        if (booleanOperator == BooleanOperator.EMPTY)
-        {
-            throw new IllegalArgumentException("booleanOperator cannot be EMPTY!");
-        }
-        else
-        {
-            builder.append(booleanOperator.getName());
-            builder.append(" ( ");
-            return (E) this;
-        }
+        return group(function,AND);
     }
 
-    public E groupEnd()
+    public E or(UnaryOperator<E> function)
     {
-        if (groupStart == -1)
-        {
-            throw new IllegalArgumentException("groupEnd can't find the '(' from the front");
-        }
+        return group(function,OR);
+    }
 
-        if (builder.substring(groupStart).trim().endsWith("("))
+    private E group(UnaryOperator<E> function, String booleanOperator)
+    {
+        int groupStart = builder.length();
+
+        builder.append(booleanOperator);
+        builder.append(" ( ");
+
+        function.apply((E) this);
+
+        int len = builder.length();
+
+        if (len - groupStart <= 8) // 表明 function 没有内容
         {
-            builder.delete(groupStart, builder.length() - 1);
+            builder.delete(groupStart, len - 1);
         }
         else
         {
             builder.append(" )");
-            groupStart = -1; // 标识（）一对已经结束
         }
+
         return (E) this;
     }
 

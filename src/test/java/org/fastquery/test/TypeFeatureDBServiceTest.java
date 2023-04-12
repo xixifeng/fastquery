@@ -35,7 +35,6 @@ import org.fastquery.page.Page;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.page.Slice;
 import org.fastquery.service.FQuery;
-import org.fastquery.struct.BooleanOperator;
 import org.fastquery.struct.SQLOperator;
 import org.fastquery.struct.SQLValue;
 import org.junit.Rule;

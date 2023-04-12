@@ -34,7 +34,6 @@ import org.fastquery.bean.UserInfo;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao2.DefaultDBService;
 import org.fastquery.service.FQuery;
-import org.fastquery.struct.BooleanOperator;
 import org.fastquery.struct.SQLOperator;
 import org.fastquery.struct.SQLValue;
 import org.junit.Rule;

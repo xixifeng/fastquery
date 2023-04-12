@@ -1,7 +1,6 @@
 package org.fastquery.test;
 
 import org.fastquery.bean.Bandit;
-import org.fastquery.struct.BooleanOperator;
 import org.fastquery.struct.SQLOperator;
 import org.fastquery.struct.SQLValue;
 import org.junit.Test;
@@ -147,12 +146,13 @@ public class BanditTest
     private void builder(List<String> names, Bandit bandit)
     {
         bandit
-                .groupStart(BooleanOperator.AND)
-                .and(bandit::id, SQLOperator.EQ, bandit.getId())
-                .and(bandit::createDateTime, SQLOperator.GE, bandit.getCreateDateTime())
-                .and(bandit::lastUpdateDateTime, SQLOperator.LE, bandit.getLastUpdateDateTime())
-                .and(bandit::name, SQLOperator.IN, names)
-                .groupEnd()
+                .and(e -> e
+                        .and(bandit::id, SQLOperator.EQ, bandit.getId())
+                        .and(bandit::createDateTime, SQLOperator.GE, bandit.getCreateDateTime())
+                        .and(bandit::lastUpdateDateTime, SQLOperator.LE, bandit.getLastUpdateDateTime())
+                        .and(bandit::name, SQLOperator.IN, names)
+                )
+
                 .and(bandit::name, SQLOperator.LIKE, bandit.getName())
                 .finish();
     }
