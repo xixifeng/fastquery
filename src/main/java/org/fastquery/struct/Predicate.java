@@ -1,6 +1,6 @@
 package org.fastquery.struct;
 
-import org.fastquery.util.BeanUtil;
+import com.alibaba.fastjson.JSON;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,10 +44,22 @@ public abstract class Predicate<E>
             builder.append(left.get().getName());
             builder.append(operator.getOperator());
 
-            values.add(right);
+            addValue(right);
         }
 
         return (E) this;
+    }
+
+    private void addValue(Object value)
+    {
+        if(value instanceof Enum || value instanceof JSON)
+        {
+            values.add(value.toString());
+        }
+        else
+        {
+            values.add(value);
+        }
     }
 
     public <T> E and(Supplier<Chip<T>> left, SQLOperator operator, Collection<T> collection)
@@ -79,7 +91,7 @@ public abstract class Predicate<E>
 
                 for (T t : collection)
                 {
-                    values.add(t.toString());
+                    addValue(t);
                 }
             }
         }
