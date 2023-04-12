@@ -86,12 +86,21 @@ public abstract class Predicate<E>
         return (E) this;
     }
 
+    /**
+     * 默认根据 id 降序排序
+     * @return 当前实例
+     */
     public E orderBy()
     {
         builder.append(" order by id desc");
         return (E) this;
     }
 
+    /**
+     * 自定义排序， order by 可以省略
+     * @param sql 排序规则
+     * @return 当前实例
+     */
     public E orderBy(String sql)
     {
         Objects.requireNonNull(sql, "sql must not be null");
