@@ -34,6 +34,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
@@ -48,13 +50,9 @@ import org.xml.sax.SAXException;
  *
  * @author mei.sir@aliyun.cn
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class XMLParse
 {
-
-    private XMLParse()
-    {
-    }
-
     public static boolean exists(Resource resource, String resourceName, String dataSourceName, String tagName)
     {
         return toWho(resource, resourceName, dataSourceName, tagName, Objects::nonNull); // ele -> ele != null

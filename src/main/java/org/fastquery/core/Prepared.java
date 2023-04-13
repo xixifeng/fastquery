@@ -25,6 +25,9 @@ package org.fastquery.core;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.List;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.Page;
@@ -32,16 +35,14 @@ import org.fastquery.struct.SQLValue;
 import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
 
+import static org.fastquery.core.QueryProcess.*;
 /**
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Prepared
 { // NO_UCD
-    private Prepared()
-    {
-    }
-
     /**
      * 执行方法
      *
@@ -135,11 +136,11 @@ public class Prepared
             }
             else if (modifying != null)
             { // 改
-                return QueryProcess.getInstance().modifying();
+                return modifying();
             }
             else
             { // 查
-                return QueryProcess.getInstance().query();
+                return query();
             }
         }
         else
@@ -147,11 +148,11 @@ public class Prepared
             Id id = methodInfo.getId();
             if (id != null)
             { // 有@id
-                return QueryProcess.getInstance().methodQuery(id);
+                return methodQuery(id);
             }
             else
             { // 无@id
-                return QueryProcess.getInstance().methodQuery();
+                return methodQuery();
             }
         }
     }
@@ -161,12 +162,12 @@ public class Prepared
         if (methodInfo.isContainQueryBuilderParam())
         {
             QueryBuilder queryBuilder = TypeUtil.getQueryBuilder();
-            return QueryProcess.getInstance().queryPage(queryBuilder.getPageQuerySQLValue());
+            return queryPage(queryBuilder.getPageQuerySQLValue());
         }
         else
         {
             List<SQLValue> sqlValues = queryById == null ? QueryParser.pageParser() : QueryParser.pageParserByNamed();
-            return QueryProcess.getInstance().queryPage(sqlValues);
+            return queryPage(sqlValues);
         }
     }
 

@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.RepositoryException;
 
@@ -35,16 +37,13 @@ import com.alibaba.fastjson.JSONObject;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FastQueryJSONObject
 {
 
     private static final String DEBUG = "debug";
 
     private static JSONObject jo;
-
-    private FastQueryJSONObject()
-    {
-    }
 
     static synchronized void setJsonObject(JSONObject o)
     {

@@ -22,11 +22,13 @@
 
 package org.fastquery.util;
 
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author mei.sir@aliyun.cn
  */
+@UtilityClass
 public class PreventSQLInjection
 {
 
@@ -40,10 +42,6 @@ public class PreventSQLInjection
                     "*", "+", "union", "chr", "net user", ",", "execute", "-", "master", "/",
                     "group_concat", "char", "table_schema", ";", "grant", "exec"
             };
-
-    private PreventSQLInjection()
-    {
-    }
 
     /**
      * 判断是否是注入SQL

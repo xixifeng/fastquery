@@ -34,12 +34,13 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.function.LongSupplier;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.dialect.DialectScheduler;
-import org.fastquery.handler.ModifyingHandler;
-import org.fastquery.handler.QueryHandler;
 import org.fastquery.page.Page;
 import org.fastquery.page.PageDialect;
 import org.fastquery.page.Pageable;
@@ -53,38 +54,18 @@ import org.fastquery.util.TypeUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import static org.fastquery.handler.ModifyingHandler.*;
+import static org.fastquery.handler.QueryHandler.*;
+
 /**
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 class QueryProcess
 {
-
-    private static class LazyHolder
-    {
-        private static final QueryProcess INSTANCE = new QueryProcess();
-
-        private LazyHolder()
-        {
-        }
-    }
-
-    private QueryProcess()
-    {
-    }
-
-    /**
-     * 获取QueryProcess实例
-     *
-     * @return QueryProcess
-     */
-    static QueryProcess getInstance()
-    {
-        return LazyHolder.INSTANCE;
-    }
-
     // 改操作
-    Object modifying()
+    static Object modifying()
     {
         MethodInfo method = QueryContext.getMethodInfo();
         Class<?> returnType = QueryContext.getReturnType();
@@ -106,14 +87,13 @@ class QueryProcess
 
         Long autoIncKey = respUpdates.get(0).getPk();
 
-        ModifyingHandler mh = ModifyingHandler.getInstance();
         if (returnType == void.class)
         {
-            return mh.voidType();
+            return voidType();
         }
         else if (returnType == int.class)
         {
-            return mh.intType(respUpdates);
+            return intType(respUpdates);
         }
         else if (returnType == int[].class)
         {
@@ -127,29 +107,29 @@ class QueryProcess
         }
         else if (returnType == Map.class)
         { // 如果然会值是Map,那么一定是insert或update,在生成实现的时候已经做安全检测
-            return mh.mapType(autoIncKey, TypeUtil.mapValueTyep(method));
+            return mapType(autoIncKey, TypeUtil.mapValueTyep(method));
         }
         else if (returnType == JSONObject.class)
         {
-            return mh.jsonObjectType(autoIncKey);
+            return jsonObjectType(autoIncKey);
         }
         else if (returnType == Primarykey.class)
         {
-            return mh.primarykeyType(autoIncKey);
+            return primarykeyType(autoIncKey);
         }
         else if (returnType == boolean.class)
         {
-            return mh.booleanType(respUpdates);
+            return booleanType(respUpdates);
         }
         else
         { // 把值强制转换成 returnType
-            return mh.beanType(autoIncKey);
+            return beanType(autoIncKey);
         }
 
     }
 
     // 查操作
-    Object query()
+    static Object query()
     {
 
         MethodInfo method = QueryContext.getMethodInfo();
@@ -167,56 +147,55 @@ class QueryProcess
         List<Map<String, Object>> keyvals = DB.find(sqlValue);
 
         // 上面的try发生异常了,才会导致keyvals为null, 不过异常一旦捕获到就throw了,因此,程序执行到这里keyvals不可能为null.
-        QueryHandler qh = QueryHandler.getInstance();
         if (returnType == long.class)
         {
-            return qh.longType(keyvals);
+            return longType(keyvals);
         }
         else if (returnType == int.class)
         {
-            return qh.intType(keyvals);
+            return intType(keyvals);
         }
         else if (returnType == boolean.class)
         {
-            return qh.booleanType(keyvals);
+            return booleanType(keyvals);
         }
         else if (returnType == Map.class)
         {
-            return qh.mapType(keyvals, TypeUtil.mapValueTyep(method));
+            return mapType(keyvals, TypeUtil.mapValueTyep(method));
         }
         else if (TypeUtil.isListMapSO(method.getGenericReturnType()))
         {
-            return qh.listType(keyvals, TypeUtil.listMapValueTyep(method));
+            return listType(keyvals, TypeUtil.listMapValueTyep(method));
         }
         else if (returnType == List.class)
         {
-            return qh.list(keyvals);
+            return list(keyvals);
         }
         else if (returnType == JSONObject.class)
         {
-            return qh.jsonObjeType(keyvals);
+            return jsonObjeType(keyvals);
         }
         else if (returnType == JSONArray.class)
         {
-            return qh.jsonArrayType(keyvals);
+            return jsonArrayType(keyvals);
         }
         else if (TypeUtil.isWarrp(returnType))
         {
-            return qh.wrapperType(method, returnType, keyvals);
+            return wrapperType(method, returnType, keyvals);
         }
         else if (TypeUtil.isWarrp(returnType.getComponentType()) || TypeUtil.hasDefaultConstructor(returnType.getComponentType()))
         {
             // 基本类型数组, bean数组
-            return qh.wrapperAarryType(returnType, keyvals);
+            return wrapperAarryType(returnType, keyvals);
         }
         else
         {
-            return qh.beanType(keyvals);
+            return beanType(keyvals);
         }
     }
 
     // 分页查询
-    Object queryPage(List<SQLValue> sqlValues)
+    static Object queryPage(List<SQLValue> sqlValues)
     {
         List<Map<String, Object>> keyvals = DB.find(sqlValues.get(0));
         Pageable pageable = QueryContext.getPageable();
@@ -266,7 +245,7 @@ class QueryProcess
         return new PageImpl(size, number, list, totalElements, totalPages, hasNext, isLast);
     }
 
-    private List<?> convertContent(List<Map<String, Object>> keyvals, MethodInfo method)
+    private static List<?> convertContent(List<Map<String, Object>> keyvals, MethodInfo method)
     {
         List<?> list = keyvals;
         // Page<T> 中的 T如果是一个实体,那么需要把 HashMap 转换成实体
@@ -301,7 +280,7 @@ class QueryProcess
         return list;
     }
 
-    Object methodQuery(Id id)
+    static Object methodQuery(Id id)
     {
         MethodInfo method = QueryContext.getMethodInfo();
         Object[] iargs = QueryContext.getArgs();
@@ -367,12 +346,12 @@ class QueryProcess
         return null;
     }
 
-    Object methodQuery()
+    static Object methodQuery()
     {
         return null;
     }
 
-    private Object q()
+    private static Object q()
     {
         Object bean;
         String sql;
@@ -408,7 +387,7 @@ class QueryProcess
         }
     }
 
-    private Object q0()
+    private static Object q0()
     {
         Object bean;
         String sql;
@@ -427,7 +406,7 @@ class QueryProcess
         return DB.update(sql, true);
     }
 
-    private Object q1()
+    private static Object q1()
     {
         Object bean;
         String dbName = null;
@@ -448,7 +427,7 @@ class QueryProcess
         return DB.update(bean, dbName, null);
     }
 
-    private Object q2()
+    private static Object q2()
     {
         Object bean;
         String sql;
@@ -480,7 +459,7 @@ class QueryProcess
         }
     }
 
-    private Object q3()
+    private static Object q3()
     {
         Object b;
         String dname = null;
@@ -501,7 +480,7 @@ class QueryProcess
         return DB.update(b, dname, (String) iargs[iargs.length - 1]);
     }
 
-    private Object q4()
+    private static Object q4()
     {
         String sql;
         String dbName = null;
@@ -540,7 +519,7 @@ class QueryProcess
         return DB.update(sql, true);
     }
 
-    private Object q5()
+    private static Object q5()
     {
         String sql;
         String dbName = null;
@@ -561,7 +540,7 @@ class QueryProcess
         return DB.update(sql, true);
     }
 
-    private Object q6()
+    private static Object q6()
     {
         String sqlFile;
         Object[] iargs = QueryContext.getArgs();
@@ -591,7 +570,7 @@ class QueryProcess
         }
     }
 
-    private Object q7()
+    private static Object q7()
     {
         String dbName = null;
         Object[] iargs = QueryContext.getArgs();
@@ -608,7 +587,7 @@ class QueryProcess
         return DB.select(BeanUtil.toSelectSQL(clazz, i, dbName, true, selectFields), clazz);
     }
 
-    private Object q8()
+    private static Object q8()
     {
         String dbName = null;
         Object[] iargs = QueryContext.getArgs();
@@ -630,7 +609,7 @@ class QueryProcess
         }
     }
 
-    private Object q9()
+    private static Object q9()
     {
         try
         {
@@ -660,7 +639,7 @@ class QueryProcess
         }
     }
 
-    private Object q10()
+    private static Object q10()
     {
         Object[] iargs = QueryContext.getArgs();
         Object entity = iargs[0];
@@ -669,7 +648,7 @@ class QueryProcess
         return list.get(0).values().iterator().next();
     }
 
-    private Object q11()
+    private static Object q11()
     {
         Object[] iargs = QueryContext.getArgs();
         SQLValue sv;
@@ -703,7 +682,7 @@ class QueryProcess
         }
     }
 
-    private Object q12()
+    private static Object q12()
     {
         Object[] iargs = QueryContext.getArgs();
         Object entity = iargs[0];
@@ -718,7 +697,7 @@ class QueryProcess
         return DB.exists(sv);
     }
 
-    private Object q13()
+    private static Object q13()
     {
         Object[] iargs = QueryContext.getArgs();
         Object entity = iargs[0];
@@ -744,7 +723,7 @@ class QueryProcess
         return null;
     }
 
-    private Object q14()
+    private static Object q14()
     {
         MethodInfo method = QueryContext.getMethodInfo();
         Pageable pageable = QueryContext.getPageable();
@@ -782,10 +761,10 @@ class QueryProcess
             sqlValues.add(sv);
         }
 
-        return QueryProcess.getInstance().queryPage(sqlValues);
+        return queryPage(sqlValues);
     }
 
-    private Object q15()
+    private static Object q15()
     {
         MethodInfo method = QueryContext.getMethodInfo();
         Pageable pageable = QueryContext.getPageable();
@@ -829,10 +808,12 @@ class QueryProcess
             sqlValues.add(sv);
         }
 
-        return QueryProcess.getInstance().queryPage(sqlValues);
+        return queryPage(sqlValues);
     }
 
     @SuppressWarnings("rawtypes")
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static class PageImpl implements Page
     {
 
@@ -854,10 +835,6 @@ class QueryProcess
         private Slice nextPageable; // 下一页的Pageable对象
         private Slice previousPageable; // 上一页的Pageable对象
 
-        private PageImpl()
-        {
-        }
-
         private PageImpl(int size, int number, List<?> content, long totalElements, int totalPages, boolean hasNext, boolean isLast)
         {
             this.size = size;
@@ -873,84 +850,6 @@ class QueryProcess
             this.isLast = isLast;
             this.nextPageable = new Slice((!isLast) ? (number + 1) : number, size);
             this.previousPageable = new Slice((!isFirst) ? (number - 1) : number, size);
-        }
-
-        @Override
-        public int getSize()
-        {
-            return size;
-        }
-
-        @Override
-        public int getNumberOfElements()
-        {
-            return numberOfElements;
-        }
-
-        @Override
-        public int getNumber()
-        {
-            return number;
-        }
-
-        @Override
-        public List<?> getContent()
-        {
-            return content;
-        }
-
-        @Override
-        public long getTotalElements()
-        {
-            return totalElements;
-        }
-
-        @Override
-        public int getTotalPages()
-        {
-            return totalPages;
-        }
-
-        @Override
-        public boolean isHasContent()
-        {
-            return hasContent;
-        }
-
-        @Override
-        public boolean isHasNext()
-        {
-            return hasNext;
-        }
-
-        @Override
-        public boolean isHasPrevious()
-        {
-            return hasPrevious;
-        }
-
-        @Override
-        public boolean isFirst()
-        {
-            return isFirst;
-        }
-
-        @Override
-        public boolean isLast()
-        {
-            return isLast;
-        }
-
-        @Override
-        public Slice getNextPageable()
-        {
-            return nextPageable;
-        }
-
-        @Override
-        public Slice getPreviousPageable()
-        {
-            return previousPageable;
         }
 
         @SuppressWarnings("unchecked")

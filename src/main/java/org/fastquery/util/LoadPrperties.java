@@ -25,6 +25,8 @@ package org.fastquery.util;
 import java.util.Map;
 import java.util.Set;
 import javax.sql.DataSource;
+
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.core.ConnectionPoolProvider;
 import org.fastquery.core.Resource;
@@ -35,12 +37,9 @@ import org.fastquery.dsm.FQueryProperties;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
+@UtilityClass
 public class LoadPrperties
 {
-    private LoadPrperties()
-    {
-    }
-
     /**
      * 装载配置并且初始化数据源,该方法消耗大,只能被调用一次
      *

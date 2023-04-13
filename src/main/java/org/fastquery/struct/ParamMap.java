@@ -35,8 +35,6 @@ import java.util.Map;
 @Getter
 public class ParamMap
 {
-
     private final Map<Integer, Integer> rps;
     private final List<Object> objs;
-
 }

@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RegExUtils;
@@ -41,6 +42,7 @@ import com.alibaba.fastjson.JSON;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
+@UtilityClass
 public final class BeanUtil
 {
     private static final String UPDATE = "update ";
@@ -51,10 +53,6 @@ public final class BeanUtil
     public static final String OR = " or ";
 
     private static final String BLANK_1 = " ";
-
-    private BeanUtil()
-    {
-    }
 
     private static String escapeSql(String str)
     {

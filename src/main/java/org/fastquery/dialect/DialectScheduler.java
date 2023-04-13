@@ -26,6 +26,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.page.PageDialect;
@@ -33,13 +35,9 @@ import org.fastquery.page.PageDialect;
 /**
  * @author mei.sir@aliyun.cn
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DialectScheduler
 {
-
-    private DialectScheduler()
-    {
-    }
-
     public static PageDialect getCurrentPageDialect()
     {
         Connection conn = QueryContext.getConn();

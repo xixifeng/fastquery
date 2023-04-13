@@ -25,7 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
@@ -45,14 +47,11 @@ import org.fastquery.util.TypeUtil;
 @Slf4j
 @Setter
 @Getter
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class SQLValue
 {
     private String sql; // 待执行的sql
     private List<Object> values = new ArrayList<>();// sql语言中"?"对应的实参
-
-    public SQLValue()
-    {
-    }
 
     public SQLValue(String sql, List<Object> values)
     {

@@ -30,6 +30,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.RepositoryException;
 
@@ -38,6 +39,7 @@ import org.fastquery.core.RepositoryException;
  *
  * @author xixifeng (fastquery@126.com)
  */
+@UtilityClass
 public class FQueryProperties
 {
 
@@ -46,10 +48,6 @@ public class FQueryProperties
 
     // 第一个参数是dataSourceName,在此用Map,是为了查寻方便, 放在这里我们最终是为了查寻.
     private static final Map<String, DataSource> dataSources = new HashMap<>();
-
-    private FQueryProperties()
-    {
-    }
 
     public static void putDataSourceIndex(String basePackage, String dataSourceName)
     {

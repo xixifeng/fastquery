@@ -41,8 +41,6 @@ public class BeanDefinitionRegistry implements BeanDefinitionRegistryPostProcess
     @Override
     public void postProcessBeanDefinitionRegistry(org.springframework.beans.factory.support.BeanDefinitionRegistry registry)
     {
-        log.info("FQ BeanDefinitionRegistry");
-
         List<Class<?>> classes = GenerateRepositoryImpl.getInstance().getClasses();
         classes.forEach(beanClass -> {
             BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition();
@@ -52,7 +50,6 @@ public class BeanDefinitionRegistry implements BeanDefinitionRegistryPostProcess
             registry.registerBeanDefinition(beanClass.getSimpleName(), definition);
         });
         GenerateRepositoryImpl.getInstance().cleanClasses();
-        log.info("FQ BeanDefinitionRegistry end");
     }
 
     @Override

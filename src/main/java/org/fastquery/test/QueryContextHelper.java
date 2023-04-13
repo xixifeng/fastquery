@@ -24,6 +24,7 @@ package org.fastquery.test;
 
 import java.lang.reflect.Method;
 
+import lombok.experimental.UtilityClass;
 import org.fastquery.core.QueryContext;
 
 import static org.junit.Assert.fail;
@@ -31,13 +32,9 @@ import static org.junit.Assert.fail;
 /**
  * @author mei.sir@aliyun.cn
  */
+@UtilityClass
 public class QueryContextHelper
 {
-
-    private QueryContextHelper()
-    {
-    }
-
     public static QueryContext getQueryContext()
     {
         try

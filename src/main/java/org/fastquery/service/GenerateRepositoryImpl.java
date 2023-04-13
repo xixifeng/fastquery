@@ -41,15 +41,11 @@ import org.fastquery.util.LoadPrperties;
 @Slf4j
 class GenerateRepositoryImpl
 {
-    private final FqClassLoader classLoader = FqClassLoader.getInstance();
+    private final static FqClassLoader classLoader = FqClassLoader.getInstance();
 
     private static class LazyHolder
     {
         private static final GenerateRepositoryImpl INSTANCE = new GenerateRepositoryImpl();
-
-        private LazyHolder()
-        {
-        }
     }
 
     static GenerateRepositoryImpl getInstance()

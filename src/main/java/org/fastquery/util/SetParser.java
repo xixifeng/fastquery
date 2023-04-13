@@ -21,6 +21,8 @@
  */
 
 package org.fastquery.util;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.asm.Script2Class;
@@ -32,12 +34,9 @@ import java.lang.reflect.InvocationTargetException;
  * @author mei.sir@aliyun.cn
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class SetParser
 {
-    private SetParser()
-    {
-    }
-
     static String process()
     {
         MethodInfo method = QueryContext.getMethodInfo();

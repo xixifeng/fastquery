@@ -37,6 +37,8 @@ import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
 import com.alibaba.fastjson.JSONArray;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,12 +55,9 @@ import com.alibaba.fastjson.JSONObject;
  * @author mei.sir@aliyun.cn
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DB
 {
-    private DB()
-    {
-    }
-
     private static void statSetObject(PreparedStatement stat, int parameterIndex, Object object) throws SQLException
     {
         if (object instanceof Enum)

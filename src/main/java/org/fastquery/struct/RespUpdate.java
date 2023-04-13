@@ -32,7 +32,6 @@ import lombok.Setter;
 @Getter
 public class RespUpdate
 {
-
     private int effect; // 影响行数
     private Long pk; // 主健
 }

@@ -22,6 +22,7 @@
 
 package org.fastquery.mapper;
 
+import lombok.experimental.UtilityClass;
 import org.fastquery.mapper.filter.FilterChain;
 import org.fastquery.mapper.filter.part.PartSyntaxFilter;
 import org.fastquery.mapper.filter.query.StructureFilter;
@@ -34,13 +35,9 @@ import org.w3c.dom.NodeList;
  *
  * @author xixifeng (fastquery@126.com)
  */
+@UtilityClass
 class Allocation
 {
-
-    private Allocation()
-    {
-    }
-
     // 校验SQL模板, 该校验仅仅作用于初始化阶段(因此不用考虑性能问题)
     // 该校验可以减少运行期错误
     private static void doCountQuery(String xmlName, Element element)

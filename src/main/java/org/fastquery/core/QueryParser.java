@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.dialect.DialectScheduler;
@@ -42,13 +44,9 @@ import org.fastquery.util.TypeUtil;
 /**
  * @author mei.sir@aliyun.cn
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QueryParser
 {
-
-    private QueryParser()
-    {
-    }
-
     /**
      * 改操作分析
      *

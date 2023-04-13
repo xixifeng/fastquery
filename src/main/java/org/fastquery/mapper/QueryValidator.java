@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.RegexCache;
 import org.fastquery.core.QueryByNamed;
@@ -44,12 +45,9 @@ import java.util.regex.Pattern;
  *
  * @author xixifeng (fastquery@126.com)
  */
+@UtilityClass
 public class QueryValidator
 {
-    private QueryValidator()
-    {
-    }
-
     public static void check(List<Class<?>> classes)
     {
         List<String> queries = new ArrayList<>();

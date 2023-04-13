@@ -31,6 +31,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
@@ -42,13 +44,9 @@ import com.alibaba.fastjson.JSONObject;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 class PropertiesUtil
 {
-
-    private PropertiesUtil()
-    {
-    }
-
     /**
      * 配置转换
      *

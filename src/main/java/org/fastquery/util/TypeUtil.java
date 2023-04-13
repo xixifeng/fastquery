@@ -29,6 +29,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSONArray;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.RegExUtils;
@@ -47,12 +49,9 @@ import com.alibaba.fastjson.JSONObject;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TypeUtil
 {
-    private TypeUtil()
-    {
-    }
-
     // 给定一个"正则匹配"匹配在另一个字符串,把匹配上的字符串存入一个数组里. 这样一来即可以用,又可以统计出现次数!
     public static List<String> matches(String str, Pattern regex)
     {

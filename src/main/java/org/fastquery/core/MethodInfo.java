@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 
+import lombok.Getter;
 import org.fastquery.page.NotCount;
 import org.fastquery.util.TypeUtil;
 import org.fastquery.where.Condition;
@@ -35,9 +36,9 @@ import org.fastquery.where.Set;
 /**
  * @author mei.sir@aliyun.cn
  */
+@Getter
 public class MethodInfo
 {
-
     private final Method method;
     private final Modifying modifying;
     private final Query[] queries;
@@ -54,11 +55,6 @@ public class MethodInfo
     private final String name;
     private final Query query;
     private final Set[] sets;
-
-    public Transactional getT()
-    {
-        return t;
-    }
 
     public MethodInfo(Method method)
     { // NO_UCD
@@ -80,46 +76,6 @@ public class MethodInfo
         this.containQueryBuilderParam = TypeUtil.hasType(QueryBuilder.class, this.parameters);
     }
 
-    Method getMethod()
-    {
-        return method;
-    }
-
-    public Modifying getModifying()
-    {
-        return modifying;
-    }
-
-    public Query[] getQueries()
-    {
-        return queries;
-    }
-
-    public Parameter[] getParameters()
-    {
-        return parameters;
-    }
-
-    public boolean isContainQueryBuilderParam()
-    {
-        return containQueryBuilderParam;
-    }
-
-    public Class<?> getReturnType()
-    {
-        return returnType;
-    }
-
-    public Id getId()
-    {
-        return id;
-    }
-
-    public QueryByNamed getQueryByNamed()
-    {
-        return queryByNamed;
-    }
-
     public boolean isCount()
     { // 检测到需要分页了，才会执行这个方法
         if (notCount != null)
@@ -138,42 +94,6 @@ public class MethodInfo
                 return true;
             }
         }
-    }
-
-    public Condition[] getConditions()
-    {
-        return conditions;
-    }
-
-    public Annotation[][] getParameterAnnotations()
-    {
-        return parameterAnnotations;
-    }
-
-    public Type getGenericReturnType()
-    {
-        return genericReturnType;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public Query getQuery()
-    {
-        return query;
-    }
-
-    public Set[] getSets()
-    {
-        return sets;
-    }
-
-    @Override
-    public String toString()
-    {
-        return this.method.toString();
     }
 
     public String toGenericString()

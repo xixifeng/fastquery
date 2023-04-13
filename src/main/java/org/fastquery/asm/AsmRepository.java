@@ -32,6 +32,8 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.analysis.GenerateExtends;
@@ -44,12 +46,9 @@ import org.fastquery.mapper.QueryValidator;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AsmRepository
 {
-    private AsmRepository()
-    {
-    }
-
     private static String getReturnTypeName(Method method)
     {
         Class<?> returnType = method.getReturnType();

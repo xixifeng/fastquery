@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 import org.fastquery.core.DB;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Primarykey;
@@ -42,27 +45,9 @@ import com.alibaba.fastjson.JSONObject;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@UtilityClass
 public final class ModifyingHandler
 {
-
-    private ModifyingHandler()
-    {
-    }
-
-    private static class LazyHolder
-    {
-        private static final ModifyingHandler INSTANCE = new ModifyingHandler();
-
-        private LazyHolder()
-        {
-        }
-    }
-
-    public static ModifyingHandler getInstance()
-    {
-        return LazyHolder.INSTANCE;
-    }
-
     // 对于改操作可根据其返回值分类如下(也就是说只允许这这些类型,在生成类之前已经做预处理,越界类型是进来不了的)
     // 1). 返回值是void
     // 2). 返回值是int,int[]
@@ -74,12 +59,12 @@ public final class ModifyingHandler
     // 为什么要分类?
     // 如果全部集中处理的话,代码堆积会很多,可读性差,不利于扩展.
     // 对于复杂的事情,一定要找适合的模式,尽可能地分化成的小的模块
-    public Object voidType()
+    public static Object voidType()
     {
         return null;
     }
 
-    public Map<String, Object> mapType(Long autoIncKey, Class<?> convertType)
+    public static Map<String, Object> mapType(Long autoIncKey, Class<?> convertType)
     {
         Modifying modifying = QueryContext.getMethodInfo().getModifying();
         String keyFieldName = modifying.id(); // 不可能为null
@@ -127,14 +112,14 @@ public final class ModifyingHandler
         return keyval;
     }
 
-    public JSONObject jsonObjectType(Long autoIncKey)
+    public static JSONObject jsonObjectType(Long autoIncKey)
     {
         Map<String, Object> map = mapType(autoIncKey, Object.class);
         return new JSONObject(map);
     }
 
     // 如果不存在主键直接返回null
-    public Primarykey primarykeyType(Long autoIncKey)
+    public static Primarykey primarykeyType(Long autoIncKey)
     {
         Object pkey = getId();
         if ((autoIncKey == null) && (pkey == null))
@@ -144,18 +129,18 @@ public final class ModifyingHandler
         return new Primarykey(autoIncKey);
     }
 
-    public boolean booleanType(List<RespUpdate> respUpdates)
+    public static boolean booleanType(List<RespUpdate> respUpdates)
     {
         return intType(respUpdates) >= 0;
     }
 
-    public Object beanType(Long autoIncKey)
+    public static Object beanType(Long autoIncKey)
     {
         Map<String, Object> map = mapType(autoIncKey, Object.class);
         return JSON.toJavaObject(new JSONObject(map), QueryContext.getReturnType());
     }
 
-    public int intType(List<RespUpdate> respUpdates)
+    public static int intType(List<RespUpdate> respUpdates)
     {
         int sum = 0;
         for (RespUpdate respUpdate : respUpdates)
@@ -165,7 +150,7 @@ public final class ModifyingHandler
         return sum;
     }
 
-    private Object getId()
+    private static Object getId()
     { // 获取指定的主健,没有找到返回null
         Object[] args = QueryContext.getArgs();
         int index = TypeUtil.findId(QueryContext.getMethodInfo().getParameters());

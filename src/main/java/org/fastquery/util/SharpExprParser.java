@@ -22,6 +22,9 @@
 
 package org.fastquery.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -31,13 +34,9 @@ import java.util.Set;
  *
  * @author mei.sir@aliyun.cn
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SharpExprParser
 {
-
-    private SharpExprParser()
-    {
-    }
-
     public static Set<String> matchesNotrepeat(String str)
     {
         Objects.requireNonNull(str);

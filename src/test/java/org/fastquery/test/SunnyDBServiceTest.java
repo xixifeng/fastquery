@@ -26,6 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.math.BigInteger;
 import static org.hamcrest.Matchers.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
 import org.fastquery.bean.sunny.Card;
 import org.fastquery.bean.sunny.Tenant;
 import org.fastquery.dao.SunnyDBService;
@@ -80,12 +81,12 @@ public class SunnyDBServiceTest extends TestFastQuery
     @Test
     public void saveTenant()
     {
-        log.debug(String.valueOf(Integer.MAX_VALUE));
-        long id = (long) Integer.MAX_VALUE + 10;
+        long id = RandomUtils.nextLong(2147484647L, 4294967295L);
         while (sunnyDBService.existsTenant(id))
         {
-            id = id + 1;
+            id = RandomUtils.nextLong(2147484647L, 4294967295L);
         }
+
         Tenant tenant = new Tenant(id, "测试用户" + id);
         BigInteger bigInteger = sunnyDBService.saveToId(tenant);
         assertThat(bigInteger.longValue(), is(id));

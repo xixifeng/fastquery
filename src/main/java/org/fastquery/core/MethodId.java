@@ -22,9 +22,13 @@
 
 package org.fastquery.core;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 class MethodId
 {
     static final byte QUERY = -1;
@@ -60,8 +64,4 @@ class MethodId
     static final byte QUERY14 = 0X14;
 
     static final byte QUERY15 = 0X15;
-
-    private MethodId()
-    {
-    }
 }

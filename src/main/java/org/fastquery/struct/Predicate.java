@@ -1,6 +1,7 @@
 package org.fastquery.struct;
 
 import com.alibaba.fastjson.JSON;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public abstract class Predicate<E>
 {
+    @Getter
     private SQLValue sqlValue;
     private final StringBuilder builder = new StringBuilder();
     private final List<Object> values = new ArrayList<>();
@@ -163,11 +165,6 @@ public abstract class Predicate<E>
         sv.setSql(' ' + sql);
         sv.setValues(values);
         this.sqlValue = sv;
-    }
-
-    public SQLValue getSqlValue()
-    {
-        return sqlValue;
     }
 
     private static String mark(int size)

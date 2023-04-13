@@ -22,25 +22,19 @@
 
 package org.fastquery.dialect;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.fastquery.page.PageDialect;
 
 /**
  * @author mei.sir@aliyun.cn
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 class DefaultPageDialect implements PageDialect
 {
-
-    private DefaultPageDialect()
-    {
-    }
-
     private static class LazyHolder
     {
         private static final DefaultPageDialect INSTANCE = new DefaultPageDialect();
-
-        private LazyHolder()
-        {
-        }
     }
 
     static PageDialect getInstance()

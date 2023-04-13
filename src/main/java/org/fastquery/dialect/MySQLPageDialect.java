@@ -22,6 +22,8 @@
 
 package org.fastquery.dialect;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.RegExUtils;
 import org.fastquery.core.RegexCache;
 import org.fastquery.core.StrConst;
@@ -34,20 +36,12 @@ import java.util.regex.Matcher;
 /**
  * @author mei.sir@aliyun.cn
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 class MySQLPageDialect implements PageDialect
 {
-
-    private MySQLPageDialect()
-    {
-    }
-
     private static class LazyHolder
     {
         private static final MySQLPageDialect INSTANCE = new MySQLPageDialect();
-
-        private LazyHolder()
-        {
-        }
     }
 
     static PageDialect getInstance()

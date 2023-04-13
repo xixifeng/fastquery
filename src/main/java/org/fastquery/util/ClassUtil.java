@@ -34,19 +34,16 @@ import java.util.Objects;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import lombok.experimental.UtilityClass;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@UtilityClass
 public class ClassUtil
 {
-
-    private ClassUtil()
-    {
-    }
-
     /**
      * 从包package中获取所有的Class
      *

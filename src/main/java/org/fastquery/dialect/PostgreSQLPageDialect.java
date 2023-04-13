@@ -22,25 +22,19 @@
 
 package org.fastquery.dialect;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.fastquery.page.PageDialect;
 
 /**
  * @author mei.sir@aliyun.cn
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 class PostgreSQLPageDialect implements PageDialect
 {
-
-    private PostgreSQLPageDialect()
-    {
-    }
-
     private static class LazyHolder
     {
         private static final PostgreSQLPageDialect INSTANCE = new PostgreSQLPageDialect();
-
-        private LazyHolder()
-        {
-        }
     }
 
     static PageDialect getInstance()

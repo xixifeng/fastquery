@@ -27,13 +27,8 @@ package org.fastquery.service;
  */
 class FqClassLoader extends ClassLoader
 {
-
     private static class LazyHolder
     {
-        private LazyHolder()
-        {
-        }
-
         private static final FqClassLoader INSTANCE = new FqClassLoader();
     }
 

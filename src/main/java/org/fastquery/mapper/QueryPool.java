@@ -36,6 +36,8 @@ import java.util.regex.Pattern;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +55,7 @@ import org.w3c.dom.NodeList;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
+@UtilityClass
 public class QueryPool
 {
     private static Resource resource;
@@ -60,10 +63,6 @@ public class QueryPool
     private static final Map<String, Set<QueryMapper>> mapQueryMapper = new HashMap<>();
 
     private static final Map<String, String> countQueryMap = new HashMap<>();
-
-    private QueryPool()
-    {
-    }
 
     private static void putCountQuery(String key, String value)
     {

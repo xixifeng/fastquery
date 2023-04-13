@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.RegExUtils;
@@ -54,13 +56,10 @@ import javassist.NotFoundException;
  * @author mei.sir@aliyun.cn
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Script2Class
 {
     private static final Map<String, Judge> judges = new HashMap<>();
-
-    private Script2Class()
-    {
-    }
 
     /**
      * 处理脚本中的冒号表达式

@@ -21,9 +21,12 @@
  */
 package org.fastquery.core;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@UtilityClass
 public final class StrConst
 {
     public static final String QUE = "?";
@@ -34,9 +37,4 @@ public final class StrConst
     public static final String TABLE = "#{#table}";
     public static final String ID = "#{#id}";
     public static final String LIMIT = "#{#limit}";
-
-    private StrConst()
-    {
-        throw new IllegalStateException("StrConst is Utility class");
-    }
 }

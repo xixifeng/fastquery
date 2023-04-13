@@ -39,11 +39,4 @@ public @interface Query
      * @return String
      */
     String countField() default "id";
-
-    /**
-     * 是否采用本地查询
-     *
-     * @return 布尔 boolean
-     */
-    boolean nativeQuery() default true; // NO_UCD
 }

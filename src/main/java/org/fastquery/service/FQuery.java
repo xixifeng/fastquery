@@ -25,6 +25,7 @@ package org.fastquery.service;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
+import lombok.experimental.UtilityClass;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.StrConst;
@@ -34,13 +35,9 @@ import org.fastquery.util.BeanUtil;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@UtilityClass
 public class FQuery
 { // NO_UCD
-
-    private FQuery()
-    {
-    }
-
     /**
      * 获取 Repository
      *

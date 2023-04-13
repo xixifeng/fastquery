@@ -26,6 +26,8 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.EnumUtils;
 import org.fastquery.core.MethodInfo;
 import org.fastquery.core.QueryContext;
@@ -39,27 +41,9 @@ import com.alibaba.fastjson.JSONObject;
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@UtilityClass
 public class QueryHandler
 {
-
-    private static class LazyHolder
-    {
-        private static final QueryHandler INSTANCE = new QueryHandler();
-
-        private LazyHolder()
-        {
-        }
-    }
-
-    private QueryHandler()
-    {
-    }
-
-    public static QueryHandler getInstance()
-    {
-        return LazyHolder.INSTANCE;
-    }
-
     // 对于查操作可根据其返回值分类如下(也就是说只允许这这些类型,在生成类之前已经做预处理,越界类型是进来不了的)
     // 1). long/int 用于统计总行数
     // 2). boolean 判断是否存在
@@ -77,7 +61,7 @@ public class QueryHandler
     // 如果全部集中处理的话,代码堆积会很多,可读性差,不利于扩展.
     // 对于复杂的事情,一定要找适合的模式,尽可能地分化成的小的模块
 
-    public long longType(List<Map<String, Object>> keyvals)
+    public static long longType(List<Map<String, Object>> keyvals)
     {
         MethodInfo method = QueryContext.getMethodInfo();
         if (keyvals.isEmpty())
@@ -105,20 +89,20 @@ public class QueryHandler
         return Long.parseLong(iterator.next().getValue().toString());
     }
 
-    public int intType(List<Map<String, Object>> keyvals)
+    public static int intType(List<Map<String, Object>> keyvals)
     {
         // 求和的返回值如果是int类型,那么需要把long强制转换成int,可能会越界!
         // 建议:求和返回值用long
         return (int) longType(keyvals);
     }
 
-    public boolean booleanType(List<Map<String, Object>> keyvals)
+    public static boolean booleanType(List<Map<String, Object>> keyvals)
     {
         return !keyvals.isEmpty();
     }
 
     // convertType 表示map种的value需要转换的目标类型
-    public Map<String, Object> mapType(List<Map<String, Object>> keyvals, Class<?> convertType)
+    public static Map<String, Object> mapType(List<Map<String, Object>> keyvals, Class<?> convertType)
     {
         if (keyvals.isEmpty())
         {
@@ -140,7 +124,7 @@ public class QueryHandler
     }
 
     // convertType 表示map种的value需要转换的目标类型
-    public List<Map<String, Object>> listType(List<Map<String, Object>> keyvals, Class<?> convertType)
+    public static List<Map<String, Object>> listType(List<Map<String, Object>> keyvals, Class<?> convertType)
     {
         if (convertType == String.class)
         {
@@ -157,7 +141,7 @@ public class QueryHandler
         return keyvals;
     }
 
-    public Object list(List<Map<String, Object>> keyvals)
+    public static Object list(List<Map<String, Object>> keyvals)
     { // list bean
 
         List<Object> list = new ArrayList<>();
@@ -233,7 +217,7 @@ public class QueryHandler
         return list;
     }
 
-    public JSONObject jsonObjeType(List<Map<String, Object>> keyvals)
+    public static JSONObject jsonObjeType(List<Map<String, Object>> keyvals)
     {
         if (keyvals.size() > 1)
         {
@@ -246,13 +230,13 @@ public class QueryHandler
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public JSONArray jsonArrayType(List<Map<String, Object>> keyvals)
+    public static JSONArray jsonArrayType(List<Map<String, Object>> keyvals)
     {
         return new JSONArray((List) keyvals);
     }
 
     // 基本包装类型
-    public Object wrapperType(MethodInfo method, Class<?> returnType, List<Map<String, Object>> keyvals)
+    public static Object wrapperType(MethodInfo method, Class<?> returnType, List<Map<String, Object>> keyvals)
     {
 
         if (keyvals.isEmpty())
@@ -301,7 +285,7 @@ public class QueryHandler
     }
 
     // 包装类型,数组格式
-    public Object wrapperAarryType(Class<?> returnType, List<Map<String, Object>> keyvals)
+    public static Object wrapperAarryType(Class<?> returnType, List<Map<String, Object>> keyvals)
     {
 
         // 该数组元素的类型
@@ -343,7 +327,7 @@ public class QueryHandler
         return array;
     }
 
-    public Object beanType(List<Map<String, Object>> keyvals)
+    public static Object beanType(List<Map<String, Object>> keyvals)
     {
         if (keyvals.isEmpty())
         {

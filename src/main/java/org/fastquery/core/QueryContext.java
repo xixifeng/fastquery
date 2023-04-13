@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.util.PreventSQLInjection;
 import com.alibaba.fastjson.JSONObject;
@@ -20,6 +23,7 @@ import org.fastquery.util.TypeUtil;
  * @author mei.sir@aliyun.cn
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class QueryContext
 {
     private static final ThreadLocal<QueryContext> threadLocal = new ThreadLocal<>();
@@ -37,10 +41,6 @@ public final class QueryContext
 
     // 作用于调式
     private static boolean debug;
-
-    private QueryContext()
-    {
-    }
 
     private static QueryContext getQueryContext()
     {
