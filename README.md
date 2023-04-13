@@ -5,13 +5,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.129</version> <!-- fastquery.version -->
+    <version>1.0.130</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```
-compile 'org.fastquery:fastquery:1.0.129'
+compile 'org.fastquery:fastquery:1.0.130'
 ```
 
 # FastQuery 数据持久层框架
@@ -513,8 +513,8 @@ Map<String, Object> addUserInfo(String name,Integer age);
 |`@PageSize`|标识页行数|
 |`@Condition`|标识条件单元|
 |`@Set`|标识设置字段单元|
-|`@Before`|标识函数执行前|
-|`@After`|标识函数执行后|
+|~~`@Before`~~|~~标识函数执行前~~ 已废弃|
+|~~ `@After` ~~|~~标识函数执行后~~ 已废弃|
 |`@SkipFilter`|标识跳过拦截器|
 
 ## QueryRepository的内置方法
@@ -1377,7 +1377,7 @@ public class MyPoolProvider implements ConnectionPoolProvider {
 }
 ```
 
-## @Before拦截器
+## ~~@Before拦截器~~ 已废弃
 在执行方法之前拦截  
 - 准备一个BeforeFilter
 
@@ -1413,7 +1413,7 @@ public interface StudentDBService extends QueryRepository {
 }
 ```
 
-## @After拦截器
+## ~~@After拦截器~~ 已废弃
 在执行方法之后,即将返回执行结果之前拦截  
 ```java
 /**

@@ -35,7 +35,6 @@ import java.util.List;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
-import org.fastquery.filter.SkipFilter;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.util.BeanUtil;
@@ -55,7 +54,6 @@ public class FastQueryTestRule implements TestRule
     private void proxy(Statement base, Description description) throws IllegalAccessException
     {
         Object testTarget = getTestTarget(base);
-        log.debug("SkipFilter:{}", description.getAnnotation(SkipFilter.class));
         Class<?> clazz = description.getTestClass();
         List<Field> fList = new ArrayList<>();
         Field[] fields = BeanUtil.getFields(clazz);

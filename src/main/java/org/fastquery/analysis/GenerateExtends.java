@@ -62,7 +62,6 @@ public class GenerateExtends
             // 拦截全局
             filterChain = new MethodFilterChain();
             filterChain.addFilter(new ReturnTypeFilter());
-            filterChain.addFilter(new InterceptorFilter()); // @Before,@After拦截器安全校验
             filterChain.addFilter(new PageableFilter());
             filterChain.addFilter(new SharpFilter()); // #{#表达式} 合法检测
             filterChain.addFilter(new ModifyingDependencyFilter());

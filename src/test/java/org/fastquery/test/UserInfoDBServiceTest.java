@@ -31,7 +31,6 @@ import org.fastquery.core.ConditionList;
 import org.fastquery.core.QueryBuilder;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
-import org.fastquery.filter.SkipFilter;
 import org.fastquery.page.Page;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.page.Slice;
@@ -281,7 +280,6 @@ public class UserInfoDBServiceTest extends TestFastQuery
     }
 
     @Test
-    @SkipFilter
     public void find()
     {
         Page<UserInfo> page = db.find(100, 50, new PageableImpl(1, 3));

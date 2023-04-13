@@ -38,7 +38,6 @@ import org.fastquery.core.QueryContext;
 import org.fastquery.core.QueryParser;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
-import org.fastquery.filter.SkipFilter;
 import org.fastquery.page.Page;
 import org.fastquery.util.TypeUtil;
 import org.junit.runner.Description;
@@ -62,10 +61,6 @@ public class RepositoryInvocationHandler implements InvocationHandler
 
     private void before() throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException
     {
-        if (description.getAnnotation(SkipFilter.class) != null)
-        {
-            return;
-        }
         Class<QueryContext> qcclazz = QueryContext.class;
         Method getQueryContextMethod = qcclazz.getDeclaredMethod("getQueryContext");
         getQueryContextMethod.setAccessible(true);
@@ -76,10 +71,6 @@ public class RepositoryInvocationHandler implements InvocationHandler
 
     private void after() throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException, InvocationTargetException
     {
-        if (description.getAnnotation(SkipFilter.class) != null)
-        {
-            return;
-        }
         Class<QueryParser> clazz = QueryParser.class;
         log.debug("RepositoryInvocationHandler:当前线程:{}", Thread.currentThread());
         MethodInfo currentMethod = QueryContext.getMethodInfo();

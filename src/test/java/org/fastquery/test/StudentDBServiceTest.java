@@ -33,7 +33,6 @@ import org.fastquery.bean.Student;
 import org.fastquery.core.Primarykey;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.example.StudentDBService;
-import org.fastquery.filter.SkipFilter;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
 
@@ -123,7 +122,6 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(student.getString("dept"), is("化学系"));
     }
 
-    @SkipFilter
     @Test
     public void findOne2()
     {

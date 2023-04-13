@@ -26,7 +26,6 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.fastquery.filter.FilterChainHandler;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.Page;
 import org.fastquery.struct.SQLValue;
@@ -68,22 +67,8 @@ public class Prepared
             // QueryContext 生命开始
             QueryContext.start(iclazz, methodInfo, args);
 
-            // 在businessProcess的先后加拦截器 ==================
-            // 注入BeforeFilter
-            Object object = FilterChainHandler.bindBeforeFilterChain(iclazz, target, method, args);
-            if (object != void.class)
-            {
-                return object;
-            }
-
             log.debug("准备执行方法:{}", method);
-            object = businessProcess();
-
-            // 注入AfterFilter
-            object = FilterChainHandler.bindAfterFilterChain(iclazz, target, method, args, object); // 注意,这个方法的method,必须是原始的!!!
-            // 在businessProcess的先后加拦截器 ================== End
-
-            return object;
+            return businessProcess();
         }
         catch (Exception e)
         {

@@ -33,13 +33,6 @@ import org.fastquery.core.Primarykey;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
-import org.fastquery.filter.After;
-import org.fastquery.filter.Before;
-import org.fastquery.filter.MyAfterFilter;
-import org.fastquery.filter.MyAfterFilter1;
-import org.fastquery.filter.MyBeforeFilter1;
-import org.fastquery.filter.MyBeforeFilter2;
-import org.fastquery.filter.SkipFilter;
 import org.fastquery.where.Condition;
 
 import com.alibaba.fastjson.JSONArray;
@@ -48,11 +41,6 @@ import com.alibaba.fastjson.JSONObject;
 /**
  * @author xixifeng (fastquery@126.com)
  */
-@Before(MyBeforeFilter1.class)
-@Before(MyBeforeFilter2.class)
-// @Before(MyBeforeFilter3.class)
-@After(MyAfterFilter.class)
-// @After(MyAfterFilter2.class)
 public interface StudentDBService extends QueryRepository
 {
 
@@ -69,10 +57,6 @@ public interface StudentDBService extends QueryRepository
     @Modifying
     int update(String no, int age);
 
-    @Before(MyBeforeFilter1.class)
-    @Before(MyBeforeFilter2.class)
-    @After(MyAfterFilter1.class)
-    // @After(MyAfterFilter2.class)
     @Query("select * from student")
     JSONArray findAll();
 
@@ -186,7 +170,6 @@ public interface StudentDBService extends QueryRepository
     @Query("select age from Student limit 1")
     Integer findAgeByStudent();
 
-    @SkipFilter
     @Query("select * from Student #{#where} order by age desc")
     // 增加一些条件
     @Condition("no like ?1") // ?1的值,如果是null, 该行条件将不参与运算
