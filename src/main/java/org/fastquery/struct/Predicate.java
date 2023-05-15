@@ -2,6 +2,7 @@ package org.fastquery.struct;
 
 import com.alibaba.fastjson.JSON;
 import lombok.Getter;
+import org.fastquery.core.Transient;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,8 @@ public abstract class Predicate<E>
 
     private static final String AND = " and ";
     private static final String OR = " or ";
+    @Transient
+    private Boolean existsNulOpt = false;
 
     public <T> E and(Supplier<Chip<T>> left, SQLOperator operator, T right)
     {
@@ -100,6 +103,34 @@ public abstract class Predicate<E>
 
         return (E) this;
     }
+
+    public <T> E and(Supplier<Chip<T>> left, NulOperator operator)
+    {
+        return this.condition(AND,left,operator);
+    }
+
+    public <T> E or(Supplier<Chip<T>> left, NulOperator operator)
+    {
+        return this.condition(OR,left,operator);
+    }
+
+    private <T> E condition(String booleanOperator, Supplier<Chip<T>> left, NulOperator operator)
+    {
+        if (!builder.toString().endsWith("( "))
+        {
+            builder.append(booleanOperator);
+        }
+        if(values.isEmpty() && !Boolean.TRUE.equals(existsNulOpt))
+        {
+            builder.append("where ");
+            existsNulOpt = true;
+        }
+        builder.append(left.get().getName());
+        builder.append(operator.getOperator());
+
+        return (E) this;
+    }
+
 
     /**
      * 默认根据 id 降序排序
