@@ -35,6 +35,7 @@ import org.fastquery.page.Page;
 import org.fastquery.page.PageableImpl;
 import org.fastquery.page.Slice;
 import org.fastquery.service.FQuery;
+import org.fastquery.struct.NulOperator;
 import org.fastquery.struct.SQLOperator;
 import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
@@ -365,7 +366,7 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     }
 
     @Test
-    public void findPageByPredicate1()
+    public void findPageByPredicate0()
     {
         TypeFeature typeFeature = new TypeFeature();
         typeFeature.setGender(Gender.男);
@@ -384,6 +385,22 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         assertThat(list.size(), is(3));
         List<Long> allId = list.stream().collect(ArrayList::new, (collection, e) -> collection.add(e.getId()), ArrayList::addAll);
         assertThat(allId.toString(),equalTo("[3, 2, 1]"));
+    }
+
+    @Test
+    public void findPageByPredicate1()
+    {
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.setGender(Gender.男);
+        // 根据 id 集合查
+        typeFeature.and(typeFeature::gender, NulOperator.ISNULL);
+        typeFeature.and(typeFeature::name, NulOperator.ISNOTNULL);
+        typeFeature.orderBy("id desc");
+        typeFeature.finish();
+
+        List<TypeFeature> list = db.findPageByPredicate(typeFeature, false, 1, 37, true, "id", "name").getContent();
+        List<String> sqls = rule.getExecutedSQLs();
+        assertThat(sqls.get(0), equalTo("select id,name from type_feature  where gender is null and name is not null order by id desc  limit 0,37"));
     }
 
     @Test
