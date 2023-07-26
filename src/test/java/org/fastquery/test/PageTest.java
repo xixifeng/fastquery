@@ -147,5 +147,27 @@ public class PageTest extends TestFastQuery
         assertThat(sqls.get(1), equalTo("select count(id) from UserInfo where id in (?,?,?,?,?,?,?,?,?,?,?)  and name = ? "));
     }
 
+    @Test
+    public void findPageByIn3()
+    {
+        Class<UserInfo> entity = UserInfo.class;
+        String fieldName = "id";
+        List<Long> fieldValues = Stream.of(1L,2L,3L).collect(Collectors.toList());
+        UserInfo equals = new UserInfo();
+        equals.setName("Jsxxv");
+        boolean notCount = false;
+        int pageIndex = 1;
+        int pageSize = 3;
+        boolean contain = true;
+        String[] fields = {"id","name","age"};
+
+        Page<UserInfo> page = userInfoDBService.findPageByIn(entity,fieldName,fieldValues,equals,notCount,pageIndex,pageSize,contain,fields);
+        assertThat(fieldValues.size(),is(3));
+        page = userInfoDBService.findPageByIn(entity,fieldName,fieldValues,equals,notCount,pageIndex,pageSize,contain,fields);
+        assertThat(fieldValues.size(),is(3));
+        page = userInfoDBService.findPageByIn(entity,fieldName,fieldValues,equals,notCount,pageIndex,pageSize,contain,fields);
+        assertThat(fieldValues.size(),is(3));
+    }
+
 
 }

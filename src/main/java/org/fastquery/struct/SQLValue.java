@@ -126,4 +126,10 @@ public class SQLValue
         }
         return ssms;
     }
+
+    public void setValues(List<Object> values)
+    {
+        this.values = new ArrayList<>(values);
+        // this.values 中途会修改它，为了不破坏入参的源头，因此需要做浅 copy
+    }
 }
