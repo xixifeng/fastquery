@@ -444,7 +444,7 @@ public class MethodQueryTest extends TestFastQuery
         List<String> executedSQLs = rule.getExecutedSQLs();
         assertThat("断言：执行过的sql有两条", executedSQLs.size(), is(2));
         assertThat(executedSQLs.get(0), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 0,3"));
-        assertThat(executedSQLs.get(1), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 3,1"));
+        assertThat(executedSQLs.get(1), equalTo("select 1 from userinfo where age > ? and id < ? limit 3,1"));
 
         page = userInfoDBService.findPage(queryBuilder, false, 1, 3);
         content = page.getContent();
@@ -472,10 +472,11 @@ public class MethodQueryTest extends TestFastQuery
         Page<UserInfo> page = userInfoDBService.findPage(userInfo, null, "order by id desc", true, 1, 3, false);
         assertThat(page.getNumber(), is(1));
         assertThat(page.getSize(), is(3));
+        assertThat(page.getNumberOfElements(),is(2));
         assertThat(page.getTotalElements(), is(-1L));
         assertThat(page.getTotalPages(), is(-1));
         List<String> sqlValues = rule.getExecutedSQLs();
-        assertThat(sqlValues.size(), is(2));
+        assertThat(sqlValues.size(), is(1));
         assertThat(sqlValues.get(0), equalTo("select id,name,age from UserInfo where age = ? order by id desc limit 0,3"));
 
         userInfo.setAge(null);

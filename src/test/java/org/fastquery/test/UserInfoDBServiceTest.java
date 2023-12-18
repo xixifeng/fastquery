@@ -679,7 +679,7 @@ public class UserInfoDBServiceTest extends TestFastQuery
         List<String> executedSQLs = rule.getExecutedSQLs();
         assertThat("断言：执行过的sql有两条", executedSQLs.size(), is(2));
         assertThat(executedSQLs.get(0), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 0,3"));
-        assertThat(executedSQLs.get(1), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 3,1"));
+        assertThat(executedSQLs.get(1), equalTo("select 1 from userinfo where age > ? and id < ? limit 3,1"));
     }
 
     @Test

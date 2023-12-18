@@ -194,6 +194,36 @@ class QueryProcess
         }
     }
 
+    private static final String ORDER_BLANK = "#{?0}";
+
+    private static String proNextSQL(String sql)
+    {
+        int start = sql.indexOf('(');
+        String replacement = null;
+        if(start != -1)
+        {
+            int end = sql.lastIndexOf(')');
+            replacement = sql.substring(start, end + 1);
+            sql = sql.replace(replacement, ORDER_BLANK);
+        }
+        sql = sql.toLowerCase();
+        int firstFrom = sql.indexOf(" from ");
+        sql = sql.substring(firstFrom);
+
+        int orderIndex = sql.lastIndexOf(" order ");
+        if(orderIndex != -1)
+        {
+            int limitIndex = sql.lastIndexOf(" limit ");
+            sql = sql.replace(sql.substring(orderIndex,limitIndex), "");
+        }
+        if(replacement != null)
+        {
+            sql = sql.replace(ORDER_BLANK, replacement);
+        }
+        sql = "select 1" + sql;
+        return sql;
+    }
+
     // 分页查询
     static Object queryPage(List<SQLValue> sqlValues)
     {
@@ -224,12 +254,19 @@ class QueryProcess
                 hasNext = number < totalPages;
                 isLast = number == totalPages;
             }
-            else
+            else if(keyvals.size() == size) // 实际查出的数据(keyvals)永远 <= size, 如果等于 size 不能表明是否有下一页
             {
-                List<Map<String, Object>> nextvalues = DB.find(sqlValues.get(1));
+                SQLValue sqlValue = sqlValues.get(1);
+                sqlValue.setSql(proNextSQL(sqlValue.getSql()));
+                List<Map<String, Object>> nextvalues = DB.find(sqlValue);
                 boolean next = nextvalues.isEmpty();
                 hasNext = !next; // 下一页有数据
                 isLast = next; // 下一页没有数据了,表明这是最后一页了.
+            }
+            else // 实际查出的数据永远 < size
+            {
+                hasNext = false;
+                isLast = true;
             }
         }
         else
