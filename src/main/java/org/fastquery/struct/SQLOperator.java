@@ -62,6 +62,12 @@ public enum SQLOperator
      * in (?)
      */
     IN(" in (?)"),
+
+    /**
+     * not in (?)
+     */
+    NOTIN(" not in (?)"),
+
     /**
      * like ?
      */
