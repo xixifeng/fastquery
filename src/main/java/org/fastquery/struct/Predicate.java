@@ -100,6 +100,18 @@ public abstract class Predicate<E>
                 }
             }
         }
+        else
+        {
+            if (!builder.toString().endsWith("( "))
+            {
+                builder.append(booleanOperator);
+            }
+            builder.append(left.get().getName());
+
+            String op = operator.getOperator();
+            builder.append(op);
+            addValue(null);
+        }
 
         return (E) this;
     }
@@ -139,6 +151,7 @@ public abstract class Predicate<E>
     public E orderBy()
     {
         builder.append(" order by id desc");
+        finish();
         return (E) this;
     }
 
@@ -152,6 +165,7 @@ public abstract class Predicate<E>
         Objects.requireNonNull(sql, "sql must not be null");
         builder.append(" order by ");
         builder.append(sql);
+        finish();
         return (E) this;
     }
 
