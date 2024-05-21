@@ -1272,11 +1272,6 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 ### 扩展分页实现
 目前该框架默认支持分页的数据库有`MySQL`,`Microsoft SQL Server`,`PostgreSQL`,因此,扩展的空间非常大,并且非常容易.实现`org.fastquery.page.PageDialect`类,有针对性地重写相关方法,解决`SQL`中的差异.欲了解更多细节请参考`org.fastquery.dialect.MySQLPageDialect`,`org.fastquery.dialect.PostgreSQLPageDialect`.
 
-## JavaScript分页插件
-[PJAXPage](https://gitee.com/xixifeng.com/pjaxpage)分页插件,完美支持`Page`数据结构.        
-项目地址: https://gitee.com/xixifeng.com/pjaxpage      
-使用例子: http://xixifeng.com.oschina.io/pjaxpage/example/   
-
 ## 执行SQL文件
 ```java
 String sqlName = "update.sql";
@@ -1570,8 +1565,8 @@ assertThat(executedSQLs.get(0), not(containsString("count")));
 
 ## 源码
 
-- https://gitee.com/xixifeng.com/fastquery
-- https://github.com/xixifeng/fastquery
+- https://gitee.com/fastquery2016/fastquery
+- https://github.com/fastquery2016/fastquery
 
 ## 开发环境
 仅仅是建议,并不局限于此         
@@ -1583,6 +1578,6 @@ build: maven
 与作者一起探讨FastQuery(加入时请标注java,谢谢).
 
 ## 反馈问题
-https://gitee.com/xixifeng.com/fastquery/issues  
-FastQuery秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://gitee.com/xixifeng.com/fastquery/issues)来向我们反馈.  
+https://gitee.com/fastquery2016/fastquery/issues  
+FastQuery秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://gitee.com/fastquery2016/fastquery/issues)来向我们反馈.  
 
