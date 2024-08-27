@@ -652,23 +652,13 @@ class QueryProcess
         {
             TxContext.start();
             long asInt = ((LongSupplier) (QueryContext.getArgs()[0])).getAsLong();
-            if (asInt == -1)
-            {
-                log.info("tx中的函数式返回了null或-1,导致tx中的所有操作回滚");
-                TxContext.getTxContext().rollback();
-                return -1L;
-            }
-            else
-            {
-                TxContext.getTxContext().commit();
-                return asInt;
-            }
+            TxContext.getTxContext().commit();
+            return asInt;
         }
         catch (Exception e)
         {
             TxContext.getTxContext().rollback();
-            log.warn("tx方法被迫回滚", e);
-            return -1L;
+            throw new RepositoryException(e);
         }
         finally
         {

@@ -23,23 +23,23 @@
 package org.fastquery.core;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import javax.sql.DataSource;
-import lombok.extern.slf4j.Slf4j;
-import org.fastquery.struct.DC;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * tx 上下文
  *
  * @author mei.sir@aliyun.cn
  */
-@Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 class TxContext
 {
     private static final ThreadLocal<TxContext> threadLocal = new ThreadLocal<>();
 
-    private final List<DC> dclist = new ArrayList<>();
+    private Connection connection;
+    private DataSource dataSource;
 
     static void start()
     {
@@ -56,67 +56,55 @@ class TxContext
         return getTxContext() != null;
     }
 
-    // 如果在列中已经存在了,就不添加
-    Connection addConn(DataSource ds) throws SQLException
+    Connection setConn(DataSource ds) throws SQLException
     {
-        for (DC dc : dclist)
+        if (connection == null)
         {
-            if (dc.getDs() == ds)
-            {
-                return dc.getConn();
-            }
+            connection = ds.getConnection();
+            connection.setAutoCommit(false);
+            dataSource = ds;
         }
-
-        DC dc = new DC(ds, ds.getConnection());
-        dc.getConn().setAutoCommit(false);
-        dclist.add(dc);
-
-        return dc.getConn();
+        else if(ds != dataSource) { // connection 有值的情况下，外界出入不同数据源，应该拒绝掉
+            throw new RepositoryException("tx 不支持多数据源");
+        }
+        return connection;
     }
 
     void commit() throws SQLException
     {
-        int len = dclist.size();
-        for (int i = len - 1; i >= 0; i--)
-        {
-            dclist.get(i).getConn().commit();
+        if(connection != null) {
+            connection.commit();
         }
     }
 
     void rollback()
     {
-        int len = dclist.size();
-        for (int i = len - 1; i >= 0; i--)
-        {
+        if(connection != null) {
             try
             {
-                dclist.get(i).getConn().rollback();
+                connection.rollback();
             }
             catch (SQLException e)
             {
-                log.error("conn rollback败", e);
+                throw new RepositoryException("回滚异常", e);
             }
         }
     }
 
     private void clear()
     {
-        // 先关闭所有连接
-        int len = dclist.size();
-        for (int i = len - 1; i >= 0; i--)
+
+        if(connection != null)
         {
             try
             {
-                dclist.get(i).getConn().close();
+                connection.close();
             }
             catch (SQLException e)
             {
-                log.error("conn 关闭失败", e);
+                throw new RepositoryException("conn 关闭异常", e);
             }
         }
-
-        // 清空集合
-        dclist.clear();
 
         // 移出范围
         threadLocal.remove();

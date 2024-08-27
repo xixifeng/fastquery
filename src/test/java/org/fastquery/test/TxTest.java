@@ -25,13 +25,9 @@ package org.fastquery.test;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.List;
-
-import javax.sql.DataSource;
-
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.bean.Fish;
+import org.fastquery.bean.Student;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
@@ -40,13 +36,7 @@ import org.fastquery.db2.BB;
 import org.fastquery.db2.CC;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
-import org.fastquery.struct.DC;
-import org.fastquery.util.TypeUtil;
 import org.junit.Test;
-
-import com.alibaba.druid.pool.DruidDataSource;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mysql.cj.jdbc.MysqlDataSource;
 
 /**
  * @author mei.sir@aliyun.cn
@@ -60,8 +50,14 @@ public class TxTest extends TestFastQuery
     @Test
     public void updateTx1()
     {
-        long effect = userInfoDBService.tx(() -> userInfoDBService.updateBatch2("小不点", 6, 2));
-        assertThat(effect, equalTo(-1L));
+        try
+        {
+            userInfoDBService.tx(() -> userInfoDBService.updateBatch2("小不点", 6, 2));
+        } catch (Exception e)
+        {
+            String[] rootCauseStackTrace = ExceptionUtils.getRootCauseStackTrace(e);
+            assertThat(rootCauseStackTrace[0], equalTo("java.sql.SQLIntegrityConstraintViolationException: Duplicate entry '1' for key 'PRIMARY'"));
+        }
     }
 
     private void u1(Integer id, String name, Integer age)
@@ -88,8 +84,29 @@ public class TxTest extends TestFastQuery
                 u1(id, name, age);
                 u1(id, name, age);
                 u1(id, name, age);
+
+                UserInfo u1 = userInfoDBService.findById(id);
+                assertThat(u1.getId(), equalTo(id));
+                assertThat(u1.getName(), equalTo(name));
+                assertThat(u1.getAge(), equalTo(age));
+
+                Student student = new Student();
+                student.setNo("0018480");
+                student.setName("迈克狐");
+                student.setAge(19);
+
+                int effect = studentDBService.update(student.getNo(),student.getName(),student.getAge().intValue());
+                assertThat(effect, equalTo(1));
+                Student student2 = studentDBService.findByNo(student.getNo());
+                assertThat(student2.getNo(), equalTo(student.getNo()));
+                assertThat(student2.getName(), equalTo(student.getName()));
+                assertThat(student2.getAge(), equalTo(student.getAge()));
+
                 throw new RepositoryException("Do...Do...");
             });
+        }
+        catch (RepositoryException e) {
+            assertThat(e.getCause().getCause().getMessage(), equalTo("Do...Do..."));
         }
         finally
         {
@@ -97,6 +114,11 @@ public class TxTest extends TestFastQuery
             assertThat(u1.getId(), equalTo(id));
             assertThat(u1.getName(), not(equalTo(name)));
             assertThat(u1.getAge(), not(equalTo(age)));
+
+            Student student2 = studentDBService.findByNo("0018480");
+            assertThat(student2.getNo(), equalTo("0018480"));
+            assertThat(student2.getName(), not(equalTo("迈克狐")));
+            assertThat(student2.getAge(), not(equalTo(19)));
         }
     }
 
@@ -139,94 +161,41 @@ public class TxTest extends TestFastQuery
         assertThat(cc.tx(() -> 3), is(3L));
     }
 
-
-    @SuppressWarnings("unchecked")
-    private static List<DC> getDclist()
-    {
-        try
-        {
-            Class<?> tc = Class.forName("org.fastquery.core.TxContext");
-            Method ldc = tc.getDeclaredMethod("getTxContext");
-            ldc.setAccessible(true);
-            Object obj = ldc.invoke(null);
-            Field field = tc.getDeclaredField("dclist");
-            return (List<DC>) TypeUtil.getFieldVal(obj,field);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends DataSource> T getDataSource(Class<T> cls)
-    {
-        int len = getDclist().size();
-        for (int i = 0; i < len; i++)
-        {
-            DataSource ds = getDclist().get(i).getDs();
-            if (ds.getClass() == cls)
-            {
-                return (T) ds;
-            }
-        }
-        return null;
-    }
-
     @Test
     public void tx2()
     {
         Integer id = 1;
         String name = "乌龟";
         Integer num = 300;
-        long effect = aa.tx(() -> {
+        try
+        {
+                aa.tx(() -> {
 
-            Fish fish = aa.update(new Fish(id, name, num));
-            part1(id, name, num, fish);
+                Fish fish = aa.update(new Fish(id, name, num));
+                part1(id, name, num, fish);
 
-            fish = bb.update(new Fish(id, name, num));
-            part2(id, name, num, fish);
+                fish = bb.update(new Fish(id, name, num));
+                part2(id, name, num, fish);
 
-            aa.save(new Fish(name, num));
-            bb.save(new Fish(name, num));
-            cc.save(new Fish(name, num));
+                aa.save(new Fish(name, num));
+                bb.save(new Fish(name, num));
+                cc.save(new Fish(name, num));
 
-            fish = cc.update(new Fish(id, name, num));
-            part3(id, name, num, fish);
+                fish = cc.update(new Fish(id, name, num));
+                part3(id, name, num, fish);
 
-            int i = aa.delete("Fish", "id", 1);
-            assertThat(i, is(1));
-            i = bb.delete("Fish", "id", 1);
-            assertThat(i, is(1));
-            i = cc.delete("Fish", "id", 1);
-            assertThat(i, is(1));
+                int i = aa.delete("Fish", "id", 1);
+                assertThat(i, is(1));
+                i = bb.delete("Fish", "id", 1);
+                assertThat(i, is(1));
+                i = cc.delete("Fish", "id", 1);
+                assertThat(i, is(1));
 
-            // 断言目前的连接数
-            assertThat(getDclist().size(), is(3));
-
-            // 断言数据源信息
-            DruidDataSource dds = getDataSource(DruidDataSource.class);
-            assertThat(dds, notNullValue());
-            assertThat(dds.getUsername(), equalTo("aa"));
-            assertThat(dds.getPassword(), equalTo("aa123456"));
-
-            ComboPooledDataSource cpds = getDataSource(ComboPooledDataSource.class);
-            assertThat(cpds, notNullValue());
-            assertThat(cpds.getDataSourceName(), equalTo("bb"));
-            assertThat(cpds.getUser(), equalTo("bb"));
-            assertThat(cpds.getPassword(), equalTo("bb123456"));
-
-
-            MysqlDataSource mds = getDataSource(MysqlDataSource.class);
-            assertThat(mds, notNullValue());
-            assertThat(mds.getUser(), equalTo("cc"));
-            assertThat(mds.getDatabaseName(), equalTo("cc"));
-            assertThat(mds.getPassword(), equalTo("cc123456"));
-
-            throw new RepositoryException("模拟异常");
-        });
-
-        assertThat(effect, is(-1L));
+                throw new RepositoryException("模拟异常");
+            });
+        } catch (Exception e)   {
+            assertThat(e.getCause().getCause().getCause().getMessage(), equalTo("tx 不支持多数据源"));
+        }
     }
 
     public void part3(Integer id, String name, Integer num, Fish fish)

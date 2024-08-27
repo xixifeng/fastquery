@@ -42,7 +42,7 @@ public final class QueryContext
     // 作用于调式
     private static boolean debug;
 
-    private static QueryContext getQueryContext()
+    static QueryContext getQueryContext()
     {
         return threadLocal.get();
     }
@@ -94,7 +94,7 @@ public final class QueryContext
             DataSource ds = getDataSource(context.sourceName, iclass.getName());
             if (TxContext.enabled())
             {
-                context.connection = TxContext.getTxContext().addConn(ds);
+                context.connection = TxContext.getTxContext().setConn(ds);
             }
             else if (id == null || id.value() != MethodId.QUERY9)
             { // 非tx(),注意:并代表tx函数体里的方法
@@ -206,10 +206,6 @@ public final class QueryContext
                 {
                     context.connection.close();
                 }
-            }
-            catch (Exception e)
-            {
-                throw new SQLException(e);
             }
             finally
             {

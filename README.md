@@ -5,13 +5,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.135</version> <!-- fastquery.version -->
+    <version>1.0.136</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```
-compile 'org.fastquery:fastquery:1.0.135'
+compile 'org.fastquery:fastquery:1.0.136'
 ```
 
 # FastQuery 数据持久层框架
@@ -536,7 +536,7 @@ Map<String, Object> addUserInfo(String name,Integer age);
 | `<E> int update(Collection<E> entities)` | 更新集合实体,成员属性如果是null,那么该属性将不会参与改运算,每个实体必须包含主键 |
 | `int delete(String tableName,String primaryKeyName,long id)` | 根据主键删除实体,返回影响行数 |
 | `int[] executeBatch(String sqlName)` | 根据指定的SQL文件名称或绝对路径,执行批量操作SQL语句,返回int[],数组中的每个数对应一条SQL语句执行后所影响的行数 |
-| `int tx(Supplier<Integer> fun)` | 事务函数.fun的返回值等于tx的返回值.fun返回null,-1或向上抛异常,tx会被回滚,并返回-1 |
+| `int tx(Supplier<Integer> fun)` | 事务函数. |
 | `<E> long count(E entity)` | 根据指定的条件统计总记录数，实体属性若为 null 值，则，该属性不参与运算，反之，参与 and 运算 |
 
 举例说明:  
@@ -748,7 +748,7 @@ int effect = userInfoDBService.tx(() -> {
 });
 ```
 
-以上`Lambda`表达式,`()->{}`中的`{}`里的所有操作是原子性的,要么统统成功,要么全部失败回滚.在`{}`里抛出异常或`return null`或返回-1,都会导致`{}`全体回滚并返回-1.`Lambda`表达式对**值**封闭,对**变量**开放(Lambda expressions close over values,not variables),正因为这个特性,不能在`{}`中修改外界的值,但是可以给外界的对象设置值. 
+以上`Lambda`表达式,`()->{}`中的`{}`里的所有操作是原子性的,要么统统成功,要么全部失败回滚.`Lambda`表达式对**值**封闭,对**变量**开放(Lambda expressions close over values,not variables),正因为这个特性,不能在`{}`中修改外界的值,但是可以给外界的对象设置值. 
 
 ```java
 ... ...
@@ -759,7 +759,7 @@ tx(() -> {
      map.put(K, V); // 这是允许的(Legal, open over variables)
 });
 ```
-因此,要想把`{}`中处理的数据拿出来使用,将其设置给一个外界的对象就行了. `tx`方法被回滚后会返回-1.
+因此,要想把`{}`中处理的数据拿出来使用,将其设置给一个外界的对象就行了.
 
 ## @Param参数
 

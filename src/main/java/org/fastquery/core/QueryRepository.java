@@ -639,10 +639,10 @@ public interface QueryRepository extends Repository
     }
 
     /**
-     * 事务函数
+     * 事务函数，tx 范围内不支持多数据源
      *
      * @param fun 函数式子
-     * @return fun函数体中有任何没被捕获的异常或fun函数体返回null或返回-1,就会导致fun里面的全部操作回滚,被回滚后的tx最后会返回-1,除此之外,tx的返回值等于fun的返回值.
+     * @return 返回值等于 fun 的返回值.
      */
     @Id(MethodId.QUERY9)
     long tx(LongSupplier fun);

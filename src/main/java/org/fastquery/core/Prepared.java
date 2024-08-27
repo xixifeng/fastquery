@@ -73,25 +73,32 @@ public class Prepared
         }
         catch (Exception e)
         {
-            StringBuilder sb = new StringBuilder();
-            String msg = e.getMessage();
-            if (msg != null)
+            if(QueryContext.getQueryContext() == null)
             {
-                sb.append(msg);
+                throw new RepositoryException(e);
             }
-
-            sb.append("\n发生方法:").append(QueryContext.getMethodInfo());
-            sb.append("\n执行过的sql:");
-
-            List<String> sqls = QueryContext.getSqls();
-            if (sqls != null)
+            else
             {
-                sqls.forEach(sql -> {
-                    sb.append(sql);
-                    sb.append('\n');
-                });
+                StringBuilder sb = new StringBuilder();
+                String msg = e.getMessage();
+                if (msg != null)
+                {
+                    sb.append(msg);
+                }
+
+                sb.append("\n发生方法:").append(QueryContext.getMethodInfo().toGenericString());
+                sb.append("\n执行过的sql:");
+
+                List<String> sqls = QueryContext.getSqls();
+                if (sqls != null)
+                {
+                    sqls.forEach(sql -> {
+                        sb.append(sql);
+                        sb.append('\n');
+                    });
+                }
+                throw new RepositoryException(sb.toString(), e);
             }
-            throw new RepositoryException(sb.toString(), e);
         }
         finally
         {
@@ -102,7 +109,7 @@ public class Prepared
             }
             catch (SQLException e)
             {
-                log.error("数据库连接无法释放", e);
+                throw new RepositoryException("数据库连接无法释放", e);
             }
 
             long slowQueryTime = FastQueryJSONObject.getSlowQueryTime();
