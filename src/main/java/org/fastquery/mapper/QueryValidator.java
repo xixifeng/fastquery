@@ -68,9 +68,6 @@ public class QueryValidator
             // 1).
             checkQuery(query);
 
-            // 2). 校验微笑表达式中的内容
-            checkSmile(query);
-
             // 3). query装载后,就不能再出现 #{#name} 表达式了
             checkSharp(query);
 
@@ -152,20 +149,6 @@ public class QueryValidator
         {
             error(String.format("没有找到name=\"%s\"的part", mts.get(0).replace("{", StringUtils.EMPTY).replace("}", StringUtils.EMPTY).replace("#", StringUtils.EMPTY)), query);
         }
-    }
-
-    private static void checkSmile(String query)
-    {
-        List<String> smiles = TypeUtil.matches(query, RegexCache.SMILE_BIG_PATT);
-        for (String smile : smiles)
-        {
-            int len = TypeUtil.matches(smile, RegexCache.EL_OR_COLON_PATT).size();
-            if (len != 1)
-            {
-                error("微笑表达式中的内容必须只能包含一个$表达式或一个冒号表达式,而它包含了" + len + "个表达式", query);
-            }
-        }
-        smiles.clear();
     }
 
     private static void checkQuery(String query)

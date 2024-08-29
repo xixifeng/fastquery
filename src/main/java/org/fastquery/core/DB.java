@@ -523,7 +523,7 @@ public class DB
             }
             catch (SQLException e)
             {
-                log.error(e.getMessage(), e);
+                throw new RepositoryException("stat 关闭异常", e);
             }
         }
     }

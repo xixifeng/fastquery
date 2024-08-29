@@ -84,9 +84,6 @@ class MarkFilter implements MethodFilter
             // 表达式语法规范校验
             expressionSpec(method, s);
 
-            // 2). 校验微笑表达式中的内容
-            checkSmile(method, s);
-
             ps.addAll(TypeUtil.matchesNotrepeat(query.value(), slreg));
             ps.addAll(TypeUtil.matchesNotrepeat(query.countField(), slreg));
             ps.addAll(TypeUtil.matchesNotrepeat(query.countQuery(), slreg));
@@ -136,21 +133,7 @@ class MarkFilter implements MethodFilter
             this.abortWith(method, "表达式不符合规范:\"{\"前必须连接\"$\"或\"#\"");
         }
     }
-
-    private void checkSmile(Method method, String s)
-    {
-        List<String> smiles = TypeUtil.matches(s, RegexCache.SMILE_BIG_PATT);
-        for (String smile : smiles)
-        {
-            int len = TypeUtil.matches(smile, RegexCache.EL_OR_COLON_PATT).size();
-            if (len != 1)
-            {
-                this.abortWith(method, "微笑表达式中的内容必须只能包含一个$表达式或一个冒号表达式,而它包含了" + len + "个表达式");
-            }
-        }
-        smiles.clear();
-    }
-
+    
     private void checkColon(Method method, Set<String> params, Pattern slreg, String p)
     {
         String s = slreg.matcher(p).matches() ? p.replaceFirst(":", StringUtils.EMPTY) : p.replace("${", StringUtils.EMPTY).replace("}", StringUtils.EMPTY).replace("$", StringUtils.EMPTY);

@@ -237,10 +237,10 @@ public class QueryByNamedDBExampleTest extends TestFastQuery
     @Test
     public void findUserInfoByFuzzyName()
     {
-        String name = "三";
+        String name = "%三%";
         List<UserInfo> uis = db.findUserInfoByFuzzyName(name);
         assertThat(uis.size(), greaterThanOrEqualTo(2));
-        uis.forEach(u -> assertThat(u.getName(), containsString(name)));
+        uis.forEach(u -> assertThat(u.getName(), containsString("三")));
 
         SQLValue sqlValue = rule.getSQLValue();
         assertThat(sqlValue.getSql(), notNullValue());
@@ -249,38 +249,14 @@ public class QueryByNamedDBExampleTest extends TestFastQuery
 
         List<Object> values = sqlValue.getValues();
         assertThat(values, notNullValue());
-        assertThat(values.get(0), equalTo("%" + name + "%"));
-    }
-
-    @Test(expected = RepositoryException.class)
-    public void findUserInfoByFuzzyName2()
-    {
-        db.findUserInfoByFuzzyName(null);
-    }
-
-    @Test(expected = RepositoryException.class)
-    public void findUserInfoByFuzzyName3()
-    {
-        db.findUserInfoByFuzzyName("%");
-    }
-
-    @Test(expected = RepositoryException.class)
-    public void findUserInfoByFuzzyName4()
-    {
-        db.findUserInfoByFuzzyName(StringUtils.EMPTY);
-    }
-
-    @Test(expected = RepositoryException.class)
-    public void findUserInfoByFuzzyName5()
-    {
-        db.findUserInfoByFuzzyName("%%");
+        assertThat(values.get(0), equalTo(name));
     }
 
     @Test
     public void findUserInfo()
     {
         Integer id = null;
-        String name = "J";
+        String name = "'%J%'";
         Integer age = null;
         Integer num = 1;
         db.findUserInfo(id, name, age, num);
@@ -289,7 +265,7 @@ public class QueryByNamedDBExampleTest extends TestFastQuery
         List<Object> vals = sqlValue.getValues();
         assertThat(vals.size(), is(2));
         assertThat(vals.get(0), nullValue());
-        assertThat(vals.get(1), equalTo("'%" + name + "%'"));
+        assertThat(vals.get(1), equalTo("'%J%'"));
     }
 
     @Test

@@ -45,31 +45,6 @@ import org.junit.Test;
 public class RegexCacheTest extends TestFastQuery
 {
     @Test
-    public void Q_MATCH()
-    {
-        String str = "select * from UserInfo where name like `- - ?_  --- -`   and age like `-_?-` and akjgew `-  ?_-` and sge`-  ?                     -`";
-
-        List<String> ssms = TypeUtil.matches(str, RegexCache.SMILE_PATT);
-
-        for (String string : ssms)
-        {
-            log.debug(string);
-        }
-
-        assertThat(ssms.size(), is(4));
-
-        assertThat(ssms.get(0), equalTo("`- - ?_  --- -`"));
-
-        assertThat(ssms.get(1), equalTo("`-_?-`"));
-
-        assertThat(ssms.get(2), equalTo("`-  ?_-`"));
-
-        assertThat(ssms.get(3), equalTo("`-  ?                     -`"));
-
-        ssms.forEach(log::debug);
-    }
-
-    @Test
     public void SL_REG1()
     {
         String str = ":a[]%:b% %:c%";
@@ -102,42 +77,6 @@ public class RegexCacheTest extends TestFastQuery
         assertThat(ssms.get(0), equalTo(":id"));
         assertThat(ssms.get(1), equalTo(":name"));
         assertThat(ssms.get(2), equalTo(":age"));
-    }
-
-    @Test
-    public void PERCENT()
-    {
-        String str = StringUtils.EMPTY;
-        boolean b = RegexCache.PERCENT_PATT.matcher(str).matches();
-        assertThat(b, is(false));
-
-        str = "%";
-        b = RegexCache.PERCENT_PATT.matcher(str).matches();
-        assertThat(b, is(true));
-
-        str = "a%";
-        b = RegexCache.PERCENT_PATT.matcher(str).matches();
-        assertThat(b, is(false));
-
-        str = "%aa";
-        b = RegexCache.PERCENT_PATT.matcher(str).matches();
-        assertThat(b, is(false));
-
-        str = "%%";
-        b = RegexCache.PERCENT_PATT.matcher(str).matches();
-        assertThat(b, is(true));
-
-        str = "%%%";
-        b = RegexCache.PERCENT_PATT.matcher(str).matches();
-        assertThat(b, is(true));
-
-        str = "%%%";
-        b = RegexCache.PERCENT_PATT.matcher(str).matches();
-        assertThat(b, is(true));
-
-        str = "%%%a";
-        b = RegexCache.PERCENT_PATT.matcher(str).matches();
-        assertThat(b, is(false));
     }
 
     @Test

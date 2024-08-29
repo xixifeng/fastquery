@@ -160,7 +160,7 @@ class PropertiesUtil
         }
         catch (IOException e)
         {
-            throw new RepositoryException(e.getMessage(), e);
+            throw new RepositoryException(e);
         }
     }
 }

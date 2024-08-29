@@ -128,7 +128,7 @@ public class QueryPoolTest extends TestFastQuery
             }
             else if ("findUserInfo".equals(id))
             {
-                assertThat(template, equalToCompressingWhiteSpace("select * from UserInfo where id > :id and age > 18 or name like `-'%:name%'-`"));
+                assertThat(template, equalToCompressingWhiteSpace("select * from UserInfo where id > :id and age > 18 or name like :name"));
             }
         }
     }

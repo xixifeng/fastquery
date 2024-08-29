@@ -19,18 +19,17 @@ FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
 提供少许`Annotation`,消费者只用关心注解的含义,这就使得框架的核心便于重构,便于持续良性发展.<br />
 
 ## FastQuery 主要特性如下:
-1. 遵循非侵入式原则,设计优雅或简单,极易上手
-2. 在项目初始化阶段采用ASM生成好字节码,因此支持编译前预处理,可最大限度减少运行期的错误,显著提升程序的强壮性
-3. 支持安全查询,防止SQL注入
-4. 支持与主流数据库连接池框架集成
-5. 支持 `@Query` 查询,使用 `@Condition`,可实现动态 `where` 条件查询
-6. 支持查询结果集以JSON类型返回
-7. 拥有非常优雅的`Page`(分页)设计
-8. 支持`AOP`,注入拦截器只需要标识几个简单的注解,如: `@Before` , `@After`
-9. 使用`@Source`可实现动态适配数据源.这个特性特别适合多租户系统中要求数据库彼此隔离其结构相同的场景里
-10. 支持`@QueryByNamed`命名式查询,SQL动态模板
-11. 支持存储过程
-12. 支持批量更新集合实体(根据主键,批量更新不同字段,不同内容).
+- 遵循非侵入式原则,设计优雅或简单,极易上手
+- 在项目初始化阶段采用ASM生成好字节码,因此支持编译前预处理,可最大限度减少运行期的错误,显著提升程序的强壮性
+- 支持安全查询,防止SQL注入
+- 支持与主流数据库连接池框架集成
+- 支持 `@Query` 查询,使用 `@Condition`,可实现动态 `where` 条件查询
+- 支持查询结果集以JSON类型返回
+- 拥有非常优雅的`Page`(分页)设计
+- 使用`@Source`可实现动态适配数据源.这个特性特别适合多租户系统中要求数据库彼此隔离其结构相同的场景里
+- 支持`@QueryByNamed`命名式查询,SQL动态模板
+- 支持存储过程
+- 支持批量更新集合实体(根据主键,批量更新不同字段,不同内容).
 
 ## 运行环境要求
 JRE 8+
@@ -513,9 +512,6 @@ Map<String, Object> addUserInfo(String name,Integer age);
 |`@PageSize`|标识页行数|
 |`@Condition`|标识条件单元|
 |`@Set`|标识设置字段单元|
-|~~`@Before`~~|~~标识函数执行前~~ 已废弃|
-|~~ `@After` ~~|~~标识函数执行后~~ 已废弃|
-|`@SkipFilter`|标识跳过拦截器|
 
 ## QueryRepository的内置方法
 凡是继承`QueryRepository`的接口,都可以使用它的方法,并且不用写实现类.
@@ -736,7 +732,7 @@ int updateBatch(String name,Integer age,Integer id);
 ```
 
 ### 事务函数式接口
-在`QueryRepository`中提供了一个内置事务函数`tx`.支持多个数据源加入到同一个事务里.
+在`QueryRepository`中提供了一个内置事务函数`tx`.
 
 ```java
 int effect = userInfoDBService.tx(() -> {
@@ -811,37 +807,6 @@ JSONArray findUserInfo(@Param(value="orderby") @Safe String orderby);
 ```
 
 那么，框架会严格检测 `orderby`的实参是否有注入风险，一旦存在注入嫌疑，拒绝请求。
-
-## 微笑表达式
-
-定义: **以<code>\`-</code> 作为开始,以<code>-\`</code>作为结尾,包裹着若干字符,因为<code>\`- -\`</code>酷似微笑表情,因此将这样的表达式称之为`微笑表达式`.** <br>例如: <code> \`-%${name}%-\` </code>. **\`** 反撇号的位置如下图所示:<br>
-![反撇号示意图](file/fanpie.png "反撇号示意图")    
-作用:  
-1.可以作为实参的模板,举例: 查询出姓"张"的用户.没有`微笑表达式`时的写法:
-
-```java
-db.findLikeName(name + "%");
-```
-这种写法不好,实参和模糊关键字`%`被融在一起了.实参是程序语言特性,而`%`是`SQL`特性,把`%`放在`@Query`里或`SQL`模板里更为适合.  
-现在有`微笑表达式`了,在模板中,可以配置name实参的模板.假设模板中通过<code>\`-:name%-\`</code>引用这个实参,那么<code>\`-:name%-\`</code>将会作为这个实参的模板. name的值为"张",实际上传递的是"张%".   
-举例:
-
-```java
-@Query("select * from UserInfo where id > :id and age > 18 or name like `-%:name%-`")
-```
-
-或
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<queries>
-	<query id="findUserInfo">
-		select * from UserInfo where id > :id and age > 18 or name like `-%:name%-`
-	</query>
-</queries>
-```
-
-2.采用`微笑表达式`的片段,会过滤敏感关键字,严格防止SQL注入. 建议将其用在`$表达式`/`${表达式}`上,因为 **$表达式的存在仅仅是为了开发者方便构建SQL**,使用不当很危险,加上`微笑表达式`可以防止由于开发者的疏忽而引发的SQL注入问题.**注意**: 冒号表达式,如`:name`最终会解释成SQL占位符`?`号,因此不存在注入问题,不必使用`微笑表达式`来预防.
 
 ##  SQL IN
 
@@ -1371,103 +1336,6 @@ public class MyPoolProvider implements ConnectionPoolProvider {
     ]
 }
 ```
-
-## ~~@Before拦截器~~ 已废弃
-在执行方法之前拦截  
-- 准备一个BeforeFilter
-
-```java
- /**
-  * @author xixifeng (fastquery@126.com)
-  */
- public class MyBeforeFilter1 extends BeforeFilter<QueryRepository> {
-
- 	@Override
- 	public void doFilter(QueryRepository repository, Method method, Object[] args) {
- 	
- 		// repository: 当前拦截到的实例
- 		// method: 当前拦截到的方法
- 		// args: 当前传递进来的参数值,args[N]表示第N个参数,从第0开始计数.
- 		
- 		// this.abortWith(returnVal); // 中断拦截器,并指定返回值
- 		// 中断后立马返回,针对当前方法后面的所有Filter将不会执行
-		
- 	}
- }
-```
-
-- 注入Filter
-
-```java
-// 可以同时标识多个@Before
-@Before(MyBeforeFilter1.class)
-@Before(MyBeforeFilter2.class)
-@Before(MyBeforeFilter3.class)
-public interface StudentDBService extends QueryRepository {
-   // some code ... ...
-}
-```
-
-## ~~@After拦截器~~ 已废弃
-在执行方法之后,即将返回执行结果之前拦截  
-```java
-/**
- * @author xixifeng (fastquery@126.com)
- */
-public class MyAfterFilter extends AfterFilter<QueryRepository> {
-
-	@Override
-	public Object doFilter(QueryRepository repository, Method method, Object[] args, Object returnVal) {
-		
-		// repository: 当前拦截到的实例
-		// method: 当前拦截到的method
-		// args: 当前传递进来的参数值,args[N]表示第N个参数,从第0开始计数.
-		// returnVal 即将返回的值
-		
-		// 在这里可以中途修改 returnVal
-		
-		return returnVal;
-	}
-}
-```
-
-
-```java
-// 可以同时标识多个@After
-@After(MyAfterFilter.class)
-@After(MyAfterFilter2.class)
-public interface StudentDBService extends QueryRepository {
-	// some code ... ...
-}
-```
-
-## 控制拦截器的作用域
-若: 一个拦截器继承自`F<T>`,那么:这个拦截器的作用范围只能在`T`类或`T`的子类里.<br />
-举例:
-```java
-// 这个拦截器的作用范围在 DataAcquireDbService里或在DataAcquireDbService子类里.
-// 换言之: MyBeforeFilter3这个拦截器只能标注在DataAcquireDbService里或标注在DataAcquireDbService的子类里.
-// 否则,程序不能顺利通过初始化阶段.
-public class MyBeforeFilter3 extends BeforeFilter<DataAcquireDbService> { 
-     // some code ... ...
-}
-```
-
-### @SkipFilter
-跳过当前接口绑定的所有非默认的Filter(系统默认的Filter不会跳过).<br />
-举例:
-
-```java
-@SkipFilter // 标识该方法将不受"自定义Filter"的约束
-@Query("select no from `course` limit 1")
-String findOneCourse();
-```
-
-### 注意:
-- `@Before`和`@After`不仅可以标注在接口类上,也可以标注在方法上
-- 标识在类的上方:表示其拦截的作用范围是整个类的方法
-- 标识在方法上:表示其拦截的作用范围是当前方法
-- 一个方法的拦截器总和=它的所属类的拦截器+自己的拦截器
 
 ## 应用在 Spring 环境
 

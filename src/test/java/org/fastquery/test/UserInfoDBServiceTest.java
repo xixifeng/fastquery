@@ -550,13 +550,13 @@ public class UserInfoDBServiceTest extends TestFastQuery
     @Test
     public void findNamesToSmile()
     {
-        String name = "Smile";
+        String name = "%Nicky%";
         db.findNamesToSmile(name);
         SQLValue sqlValue = rule.getSQLValue();
         assertThat(sqlValue.getSql(), equalTo("select name from UserInfo where name = ? limit 1"));
         List<Object> vals = sqlValue.getValues();
         assertThat(vals.size(), is(1));
-        assertThat(vals.get(0).toString(), equalTo(" %Smile% "));
+        assertThat(vals.get(0).toString(), equalTo("%Nicky%"));
     }
 
     @Test

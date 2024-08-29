@@ -76,15 +76,6 @@ public final class RegexCache
      */
     public static final Pattern EL_OR_COLON_PATT = Pattern.compile("\\$\\{?[A-Za-z0-9_.()]+}?|:+[A-Za-z0-9]+");
 
-    /**
-     * 匹配微笑表达式
-     */
-    public static final Pattern SMILE_PATT = Pattern.compile("`-[^`]*\\?[^`]*-`");
-
-    public static final Pattern SMILE_BIG_PATT = Pattern.compile("`-[^`]*[^`]*-`");
-
-    public static final Pattern PERCENT_PATT = Pattern.compile("%+");
-
     private static final Map<String, Pattern> patterns = new HashMap<>();
 
     private static synchronized Pattern put(String regex)
