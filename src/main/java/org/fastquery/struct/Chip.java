@@ -29,7 +29,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public class Chip<T>
+public class Chip<T,E>
 {
     private String name;
 }

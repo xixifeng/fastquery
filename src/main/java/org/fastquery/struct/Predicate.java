@@ -28,17 +28,17 @@ public abstract class Predicate<E>
     @Transient
     private Boolean existsNulOpt = false;
 
-    public <T> E and(Supplier<Chip<T>> left, SQLOperator operator, T right)
+    public <T> E and(Supplier<Chip<T,E>> left, SQLOperator operator, T right)
     {
         return this.condition(AND,left,operator,right);
     }
 
-    public <T> E or(Supplier<Chip<T>> left, SQLOperator operator, T right)
+    public <T> E or(Supplier<Chip<T,E>> left, SQLOperator operator, T right)
     {
         return this.condition(OR,left,operator,right);
     }
 
-    private <T> E condition(String booleanOperator, Supplier<Chip<T>> left, SQLOperator operator, T right)
+    private <T> E condition(String booleanOperator, Supplier<Chip<T,E>> left, SQLOperator operator, T right)
     {
         if (right != null && !right.toString().equals(""))
         {
@@ -67,17 +67,17 @@ public abstract class Predicate<E>
         }
     }
 
-    public <T> E and(Supplier<Chip<T>> left, SQLOperator operator, Collection<T> collection)
+    public <T> E and(Supplier<Chip<T,E>> left, SQLOperator operator, Collection<T> collection)
     {
         return this.condition(AND, left,operator,collection);
     }
 
-    public <T> E or(Supplier<Chip<T>> left, SQLOperator operator, Collection<T> collection)
+    public <T> E or(Supplier<Chip<T,E>> left, SQLOperator operator, Collection<T> collection)
     {
         return this.condition(OR, left,operator,collection);
     }
 
-    private  <T> E condition(String booleanOperator, Supplier<Chip<T>> left, SQLOperator operator, Collection<T> collection)
+    private  <T> E condition(String booleanOperator, Supplier<Chip<T,E>> left, SQLOperator operator, Collection<T> collection)
     {
         if (collection != null && !collection.isEmpty())
         {
@@ -116,17 +116,17 @@ public abstract class Predicate<E>
         return (E) this;
     }
 
-    public <T> E and(Supplier<Chip<T>> left, NulOperator operator)
+    public <T> E and(Supplier<Chip<T,E>> left, NulOperator operator)
     {
         return this.condition(AND,left,operator);
     }
 
-    public <T> E or(Supplier<Chip<T>> left, NulOperator operator)
+    public <T> E or(Supplier<Chip<T,E>> left, NulOperator operator)
     {
         return this.condition(OR,left,operator);
     }
 
-    private <T> E condition(String booleanOperator, Supplier<Chip<T>> left, NulOperator operator)
+    private <T> E condition(String booleanOperator, Supplier<Chip<T,E>> left, NulOperator operator)
     {
         if (!builder.toString().endsWith("( "))
         {

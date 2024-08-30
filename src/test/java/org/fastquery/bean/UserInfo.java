@@ -49,17 +49,17 @@ public class UserInfo extends Predicate<UserInfo>
     @Transient
     private Long ssid;
 
-    public Chip<Integer> id()
+    public Chip<Integer,UserInfo> id()
     {
         return new Chip<>("id");
     }
 
-    public Chip<Integer> age()
+    public Chip<Integer,UserInfo> age()
     {
         return new Chip<>("age");
     }
 
-    public Chip<String> name()
+    public Chip<String,UserInfo> name()
     {
         return new Chip<>("name");
     }

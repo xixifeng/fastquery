@@ -27,12 +27,7 @@ import lombok.experimental.Accessors;
 import lombok.ToString;
 import org.fastquery.core.Id;
 import org.fastquery.core.Table;
-/**
- * 地区表
- *
- * @author ips-generate-code
- * @version 2022/09/08 12:07:49
- */
+
 @Getter
 @Setter
 @Accessors(chain = true)

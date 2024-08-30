@@ -40,22 +40,22 @@ public class Bandit extends Predicate<Bandit>
     private Long createDateTime;
     private Long lastUpdateDateTime;
 
-    public Chip<Long> id()
+    public Chip<Long,Bandit> id()
     {
         return new Chip<>("id");
     }
 
-    public Chip<String> name()
+    public Chip<String,Bandit> name()
     {
         return new Chip<>("name");
     }
 
-    public Chip<Long> createDateTime()
+    public Chip<Long,Bandit> createDateTime()
     {
         return new Chip<>("createDateTime");
     }
 
-    public Chip<Long> lastUpdateDateTime()
+    public Chip<Long,Bandit> lastUpdateDateTime()
     {
         return new Chip<>("lastUpdateDateTime");
     }

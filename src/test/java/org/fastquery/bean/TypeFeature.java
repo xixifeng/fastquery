@@ -56,22 +56,22 @@ public class TypeFeature extends Predicate<TypeFeature>
     @Transient
     private Long ssid;
 
-    public Chip<Long> id()
+    public Chip<Long,TypeFeature> id()
     {
         return new Chip<>("id");
     }
 
-    public Chip<String> name()
+    public Chip<String,TypeFeature> name()
     {
         return new Chip<>("name");
     }
 
-    public Chip<Gender> gender()
+    public Chip<Gender,TypeFeature> gender()
     {
         return new Chip<>("gender");
     }
 
-    public Chip<EnumSet<Ruits>> ruits()
+    public Chip<EnumSet<Ruits>,TypeFeature> ruits()
     {
         return new Chip<>("ruits");
     }
