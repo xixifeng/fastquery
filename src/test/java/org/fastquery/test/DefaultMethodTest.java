@@ -150,11 +150,11 @@ public class DefaultMethodTest extends TestFastQuery
         UserInfo u = new UserInfo(78, "Smith", 18);
         u.and(u::name, SQLOperator.EQ, u.getName());
         u.and(u::age, SQLOperator.EQ, u.getAge());
-        u.finish();
+        u.orderBy();
         db.count(u);
         List<String> executedSQLs = rule.getExecutedSQLs();
         String sql = executedSQLs.get(0);
-        assertThat(sql, equalTo("select count(id) from UserInfo where id = 78 and name = ? and age = ?"));
+        assertThat(sql, equalTo("select count(id) from UserInfo where id = 78 and name = ? and age = ? order by id desc"));
     }
 
     @Test
@@ -163,11 +163,11 @@ public class DefaultMethodTest extends TestFastQuery
         UserInfo u = new UserInfo(null, "Smith", 18);
         u.or(u::name, SQLOperator.EQ, u.getName());
         u.or(u::age, SQLOperator.EQ, u.getAge());
-        u.finish();
+        u.orderBy();
         db.count(u);
         List<String> executedSQLs = rule.getExecutedSQLs();
         String sql = executedSQLs.get(0);
-        assertThat(sql, equalTo("select count(id) from UserInfo where name = ? or age = ?"));
+        assertThat(sql, equalTo("select count(id) from UserInfo where name = ? or age = ? order by id desc"));
     }
 
     @Test
@@ -193,12 +193,12 @@ public class DefaultMethodTest extends TestFastQuery
         UserInfo userInfo = new UserInfo();
         userInfo.setName("婤姶");
         userInfo.and(userInfo::name, SQLOperator.EQ,userInfo.getName());
-        userInfo.finish();
+        userInfo.orderBy();
         UserInfo u = db.findOne(userInfo, true, "id", "name");
         assertThat(u.toString(), equalTo("UserInfo(id=4, name=婤姶, age=null, description=null, ssid=null)"));
         List<String> executedSQLs = rule.getExecutedSQLs();
         String sql = executedSQLs.get(0);
-        assertThat(sql, equalTo("select id,name from UserInfo where  name = ? limit 1"));
+        assertThat(sql, equalTo("select id,name from UserInfo where  name = ? order by id desc limit 1"));
     }
 
     @Test

@@ -323,7 +323,6 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     {
         TypeFeature typeFeature = new TypeFeature();
         typeFeature.orderBy();
-        typeFeature.finish();
         db.findOne(typeFeature,true,false,true,"name","gender");
         assertThat(rule.getExecutedSQLs().get(0), equalTo("select name,gender from type_feature order by id desc limit 1"));
     }
@@ -379,7 +378,6 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         typeFeature.and(typeFeature::id, SQLOperator.IN, ids);
         typeFeature.and(typeFeature::gender, SQLOperator.EQ, typeFeature.getGender());
         typeFeature.orderBy("id desc");
-        typeFeature.finish();
 
         List<TypeFeature> list = db.findPageByPredicate(typeFeature, false, 1, 100, true, "id", "name").getContent();
         assertThat(list.size(), is(3));
@@ -396,7 +394,6 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         typeFeature.and(typeFeature::gender, NulOperator.ISNULL);
         typeFeature.and(typeFeature::name, NulOperator.ISNOTNULL);
         typeFeature.orderBy("id desc");
-        typeFeature.finish();
 
         List<TypeFeature> list = db.findPageByPredicate(typeFeature, false, 1, 37, true, "id", "name").getContent();
         List<String> sqls = rule.getExecutedSQLs();
@@ -408,7 +405,6 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     {
         TypeFeature typeFeature = new TypeFeature();
         typeFeature.orderBy();
-        typeFeature.finish();
         List<TypeFeature> list = db.findPageByPredicate(typeFeature, false, 1, 3, true, "id", "name").getContent();
         List<String> sqls = rule.getExecutedSQLs();
         assertThat(sqls.get(0), equalTo("select id,name from type_feature  order by id desc  limit 0,3"));

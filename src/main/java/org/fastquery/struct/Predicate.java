@@ -40,7 +40,7 @@ public abstract class Predicate<E>
 
     private <T> E condition(String booleanOperator, Supplier<Chip<T,E>> left, SQLOperator operator, T right)
     {
-        if (right != null && !right.toString().equals(""))
+        if (right != null && !right.toString().isEmpty())
         {
             if (!builder.toString().endsWith("( "))
             {
@@ -146,27 +146,23 @@ public abstract class Predicate<E>
 
     /**
      * 默认根据 id 降序排序
-     * @return 当前实例
      */
-    public E orderBy()
+    public void orderBy()
     {
         builder.append(" order by id desc");
         finish();
-        return (E) this;
     }
 
     /**
      * 自定义排序， order by 可以省略
      * @param sql 排序规则
-     * @return 当前实例
      */
-    public E orderBy(String sql)
+    public void orderBy(String sql)
     {
         Objects.requireNonNull(sql, "sql must not be null");
         builder.append(" order by ");
         builder.append(sql);
         finish();
-        return (E) this;
     }
 
     public E and(UnaryOperator<E> function)
@@ -202,7 +198,7 @@ public abstract class Predicate<E>
         return (E) this;
     }
 
-    public void finish()
+    private void finish()
     {
         SQLValue sv = new SQLValue();
         String sql = builder.toString().trim();

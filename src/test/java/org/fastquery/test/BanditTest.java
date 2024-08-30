@@ -39,7 +39,7 @@ public class BanditTest
         SQLValue sqlValue = bandit.getSqlValue();
         String sql = sqlValue.getSql();
         List<Object> params = sqlValue.getValues();
-        assertThat(sql, equalTo(" and  ( id = ? and createDateTime >= ? and lastUpdateDateTime <= ? and name in (?,?,?) ) and name like ?"));
+        assertThat(sql, equalTo(" and  ( id = ? and createDateTime >= ? and lastUpdateDateTime <= ? and name in (?,?,?) ) and name like ? order by id desc"));
         assertThat(params.toString(), equalTo("[7, 1234, 6789, xx, yy, zz, 张三]"));
     }
 
@@ -61,7 +61,7 @@ public class BanditTest
         SQLValue sqlValue = bandit.getSqlValue();
         String sql = sqlValue.getSql();
         List<Object> params = sqlValue.getValues();
-        assertThat(sql, equalTo(" and  ( id = ? and lastUpdateDateTime <= ? ) and name like ?"));
+        assertThat(sql, equalTo(" and  ( id = ? and lastUpdateDateTime <= ? ) and name like ? order by id desc"));
         assertThat(params.toString(), equalTo("[7, 6789, 张三]"));
     }
 
@@ -79,7 +79,7 @@ public class BanditTest
         SQLValue sqlValue = bandit.getSqlValue();
         String sql = sqlValue.getSql();
         List<Object> params = sqlValue.getValues();
-        assertThat(sql, equalTo(" and  ( id = ? and name in (?) ) and name like ?"));
+        assertThat(sql, equalTo(" and  ( id = ? and name in (?) ) and name like ? order by id desc"));
         assertThat(params.toString(), equalTo("[7, null, 张三]"));
     }
 
@@ -94,7 +94,7 @@ public class BanditTest
         SQLValue sqlValue = bandit.getSqlValue();
         String sql = sqlValue.getSql();
         List<Object> params = sqlValue.getValues();
-        assertThat(sql, equalTo(" and  ( name in (?) ) and name like ?"));
+        assertThat(sql, equalTo(" and  ( name in (?) ) and name like ? order by id desc"));
         assertThat(params.toString(), equalTo("[null, 张三]"));
     }
 
@@ -108,7 +108,7 @@ public class BanditTest
         SQLValue sqlValue = bandit.getSqlValue();
         String sql = sqlValue.getSql();
         List<Object> params = sqlValue.getValues();
-        assertThat(sql, equalTo(" and  ( name in (?) )"));
+        assertThat(sql, equalTo(" and  ( name in (?) ) order by id desc"));
         assertThat(params.toString(), equalTo("[null]"));
     }
 
@@ -117,7 +117,7 @@ public class BanditTest
     {
         Bandit bandit = new Bandit();
 
-        bandit.orderBy().finish();
+        bandit.orderBy();
 
         SQLValue sqlValue = bandit.getSqlValue();
         String sql = sqlValue.getSql();
@@ -134,7 +134,6 @@ public class BanditTest
 
         bandit.and(bandit::id, SQLOperator.EQ, bandit.getId());
         bandit.orderBy();
-        bandit.finish();
 
         SQLValue sqlValue = bandit.getSqlValue();
         String sql = sqlValue.getSql();
@@ -154,7 +153,7 @@ public class BanditTest
                 )
 
                 .and(bandit::name, SQLOperator.LIKE, bandit.getName())
-                .finish();
+                .orderBy();
     }
 
 }
