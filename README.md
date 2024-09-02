@@ -15,12 +15,12 @@ compile 'org.fastquery:fastquery:1.0.137'
 ```
 
 # FastQuery 数据持久层框架
-FastQuery 基于Java语言.他的使命是:简化Java操作数据层.<br />
+FastQuery 基于Java语言.简化Java操作数据层.<br />
 提供少许`Annotation`,消费者只用关心注解的含义,这就使得框架的核心便于重构,便于持续良性发展.<br />
 
 ## FastQuery 主要特性如下:
 - 遵循非侵入式原则,设计优雅或简单,极易上手
-- 在项目初始化阶段采用ASM生成好字节码,因此支持编译前预处理,可最大限度减少运行期的错误,显著提升程序的强壮性
+- 在项目初始化阶段采用生成好字节码,因此支持编译前预处理,可最大限度减少运行期的错误,显著提升程序的强壮性
 - 支持安全查询,防止SQL注入
 - 支持与主流数据库连接池框架集成
 - 支持 `@Query` 查询,使用 `@Condition`,可实现动态 `where` 条件查询
@@ -514,7 +514,7 @@ Map<String, Object> addUserInfo(String name,Integer age);
 |`@Set`|标识设置字段单元|
 
 ## QueryRepository的内置方法
-凡是继承`QueryRepository`的接口,都可以使用它的方法,并且不用写实现类.
+凡是继承`QueryRepository`的接口,都可以使用它的方法,并且不用写实现类. 部分内置方法如下:
 
 | 方法 | 描述 |
 |:---|:---|

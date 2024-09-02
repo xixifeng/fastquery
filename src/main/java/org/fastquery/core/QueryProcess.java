@@ -390,104 +390,45 @@ class QueryProcess
 
     private static Object q()
     {
-        Object bean;
-        String sql;
         Object[] iargs = QueryContext.getArgs();
-        if (iargs.length == 3)
+        Object bean = iargs[0];
+        String sql = BeanUtil.toInsertSQL(null, bean);
+        Object keyObj = DB.update(sql, false);
+        if (keyObj == null)
         {
-            bean = iargs[2];
-            sql = BeanUtil.toInsertSQL((String) iargs[1], bean);
-            log.info(sql);
-            Object keyObj = DB.update(sql, false);
-            if (keyObj == null)
-            {
-                return BigInteger.valueOf(-1);
-            }
-            else
-            {
-                return new BigInteger(keyObj.toString());
-            }
+            return BigInteger.valueOf(-1);
         }
         else
         {
-            bean = iargs[0];
-            sql = BeanUtil.toInsertSQL(bean);
-            Object keyObj = DB.update(sql, false);
-            if (keyObj == null)
-            {
-                return BigInteger.valueOf(-1);
-            }
-            else
-            {
-                return new BigInteger(keyObj.toString());
-            }
+            return new BigInteger(keyObj.toString());
         }
     }
 
     private static Object q0()
     {
-        Object bean;
-        String sql;
         Object[] iargs = QueryContext.getArgs();
-        if (iargs.length == 3)
-        {
-            bean = iargs[2];
-            sql = BeanUtil.toInsertSQL((String) iargs[1], bean);
-        }
-        else
-        {
-            bean = iargs[0];
-            sql = BeanUtil.toInsertSQL(bean);
-        }
+        Object bean = iargs[0];
+        String sql = BeanUtil.toInsertSQL(null, bean);
         log.info(sql);
         return DB.update(sql, true);
     }
 
     private static Object q1()
     {
-        Object bean;
-        String dbName = null;
         Object[] iargs = QueryContext.getArgs();
-        if (iargs.length == 1)
-        {
-            bean = iargs[0];
-        }
-        else if (iargs.length == 2)
-        {
-            bean = iargs[1];
-        }
-        else
-        {
-            dbName = (String) iargs[1];
-            bean = iargs[2];
-        }
-        return DB.update(bean, dbName, null);
+        Object bean = iargs[0];
+        return DB.update(bean, null, null);
     }
 
     private static Object q2()
     {
-        Object bean;
-        String sql;
-        String dbName = null;
         Object[] iargs = QueryContext.getArgs();
-        if (iargs.length == 1)
-        {
-            bean = iargs[0];
-        }
-        else if (iargs.length == 2)
-        {
-            bean = iargs[1];
-        }
-        else
-        {
-            dbName = (String) iargs[1];
-            bean = iargs[2];
-        }
-        sql = BeanUtil.toSelectSQL(bean, null, dbName, false, null);
+        Object bean = iargs[0];
+        String sql = BeanUtil.toSelectSQL(bean, null, null, false, null);
         if (sql != null && DB.exists(sql))
         {
             // 更新
-            return DB.update(bean, dbName, null);
+            return DB.update(bean, null, null);
         }
         else
         {
@@ -498,29 +439,14 @@ class QueryProcess
 
     private static Object q3()
     {
-        Object b;
-        String dname = null;
         Object[] iargs = QueryContext.getArgs();
-        if (iargs.length == 2)
-        {
-            b = iargs[0];
-        }
-        else if (iargs.length == 3)
-        {
-            b = iargs[1];
-        }
-        else
-        {
-            dname = (String) iargs[1];
-            b = iargs[2];
-        }
-        return DB.update(b, dname, (String) iargs[iargs.length - 1]);
+        Object b = iargs[0];
+        return DB.update(b, null, (String) iargs[iargs.length - 1]);
     }
 
     private static Object q4()
     {
         String sql;
-        String dbName = null;
         boolean ignoreRepeat;
         Object[] iargs = QueryContext.getArgs();
         ignoreRepeat = (boolean) iargs[0];
@@ -529,10 +455,7 @@ class QueryProcess
         {
             return 0;
         }
-        if (iargs.length == 4)
-        {
-            dbName = (String) iargs[2];
-        }
+
         if (entitiesObj.getClass().isArray())
         {
             Object[] arryObj = (Object[]) entitiesObj;
@@ -540,7 +463,7 @@ class QueryProcess
             {
                 return 0;
             }
-            sql = BeanUtil.arr2InsertSQL(arryObj, dbName, ignoreRepeat);
+            sql = BeanUtil.arr2InsertSQL(arryObj, null, ignoreRepeat);
         }
         else
         {
@@ -550,7 +473,7 @@ class QueryProcess
             {
                 return 0;
             }
-            sql = BeanUtil.toInsertSQL(coll, dbName, ignoreRepeat);
+            sql = BeanUtil.toInsertSQL(coll, null, ignoreRepeat);
         }
         log.info(sql);
         return DB.update(sql, true);
@@ -558,8 +481,6 @@ class QueryProcess
 
     private static Object q5()
     {
-        String sql;
-        String dbName = null;
         Object[] iargs = QueryContext.getArgs();
         @SuppressWarnings("unchecked")
         Collection<Object> entities = (Collection<Object>) iargs[iargs.length - 1];
@@ -568,11 +489,7 @@ class QueryProcess
             return 0;
         }
 
-        if (iargs.length == 3)
-        {
-            dbName = (String) iargs[1];
-        }
-        sql = BeanUtil.toUpdateSQL(entities, dbName);
+        String sql = BeanUtil.toUpdateSQL(entities, null);
         log.info(sql);
         return DB.update(sql, true);
     }
@@ -585,9 +502,9 @@ class QueryProcess
         if (f != null)
         {
             String[] quotes = null;
-            if (iargs.length == 3)
+            if (iargs.length == 2)
             {
-                quotes = (String[]) iargs[2];
+                quotes = (String[]) iargs[1];
             }
             sqlFile = new File(f).isFile() ? f : FastQueryJSONObject.getBasedir() + iargs[0];
             return DB.executeBatch(sqlFile, quotes, (stat, s) -> {
@@ -609,24 +526,18 @@ class QueryProcess
 
     private static Object q7()
     {
-        String dbName = null;
         Object[] iargs = QueryContext.getArgs();
         Class<?> clazz = (Class<?>) iargs[0];
         boolean contain = (boolean) iargs[iargs.length - 2];
         String[] fields = (String[]) iargs[iargs.length - 1];
         String selectFields = new SelectField<>(clazz, contain, fields).getFields();
         long i = (Long) iargs[1]; // 主键
-        if (iargs.length == 6)
-        {
-            dbName = (String) iargs[3]; // 数据库名称
-        }
 
-        return DB.select(BeanUtil.toSelectSQL(clazz, i, dbName, true, selectFields), clazz);
+        return DB.select(BeanUtil.toSelectSQL(clazz, i, null, true, selectFields), clazz);
     }
 
     private static Object q8()
     {
-        String dbName = null;
         Object[] iargs = QueryContext.getArgs();
         String tableName = (String) iargs[0]; // 表名称
         String name = (String) iargs[1]; // 主键名
@@ -638,11 +549,7 @@ class QueryProcess
         else
         {
             long key = (Long) iargs[2]; // 主键值
-            if (iargs.length == 5)
-            {
-                dbName = (String) iargs[4]; // 数据库名称
-            }
-            return DB.update(BeanUtil.toDelete(tableName, name, key, dbName), true);
+            return DB.update(BeanUtil.toDelete(tableName, name, key, null), true);
         }
     }
 

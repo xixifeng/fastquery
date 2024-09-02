@@ -64,9 +64,9 @@ public class MethodQueryTest extends TestFastQuery
     {
         assertThat(QueryRepository.class.isAssignableFrom(studentDBService.getClass()), is(true));
         // 断言是否继承了QueryRepository中的方法
-        assertThat(studentDBService.getClass().getMethod("executeBatch", String.class, String.class), notNullValue());
+        assertThat(studentDBService.getClass().getMethod("executeBatch", String.class), notNullValue());
         assertThat(QueryRepository.class.isAssignableFrom(userInfoDBService.getClass()), is(true));
-        assertThat(userInfoDBService.getClass().getMethod("executeBatch", String.class, String.class), notNullValue());
+        assertThat(userInfoDBService.getClass().getMethod("executeBatch", String.class), notNullValue());
     }
 
     @Test
@@ -85,17 +85,6 @@ public class MethodQueryTest extends TestFastQuery
 
         u.setId(id);
         int effect = studentDBService.insert(u);
-        assertThat(effect, is(1));
-    }
-
-    @Test
-    public void testSave2()
-    {
-        Integer id = null;
-        String name = "凤侯";
-        Integer age = 32;
-        UserInfo u = new UserInfo(id, name, age);
-        int effect = studentDBService.insert("xk-c3p0", "xk", u);
         assertThat(effect, is(1));
     }
 
@@ -195,16 +184,6 @@ public class MethodQueryTest extends TestFastQuery
         UserInfo entity = new UserInfo(userInfo.getId(), userInfo.getName(), userInfo.getAge());
         int i = userInfoDBService.update(entity, null);
         assertThat(i, is(1));
-    }
-
-    @Test
-    public void update3()
-    {
-        String dataSourceName = "xk-c3p0";
-        String dbName = "xk";
-        UserInfo entity = new UserInfo(1, "好哇瓦", 3);
-        int effect = studentDBService.executeUpdate(dataSourceName, dbName, entity);
-        assertThat(effect, is(1));
     }
 
     @Test
@@ -368,8 +347,6 @@ public class MethodQueryTest extends TestFastQuery
     public void find()
     {
         assertThat(userInfoDBService.find(UserInfo.class, 3).getId(), is(3));
-        assertThat(userInfoDBService.find(UserInfo.class, 3, null).getId(), is(3)); // 测试数据源传递null
-        assertThat(userInfoDBService.find(UserInfo.class, 3, null, null).getId(), is(3)); // 测试数据库名称为null
     }
 
     @Test
@@ -410,13 +387,6 @@ public class MethodQueryTest extends TestFastQuery
     public void delete2(@FromDataPoints("emptyNull") String tableName, @FromDataPoints("emptyNull") String primaryKeyName)
     {
         int effect = userInfoDBService.delete(tableName, primaryKeyName, 1);
-        assertThat(effect, is(0));
-    }
-
-    @Theory
-    public void delete3(@FromDataPoints("emptyNull") String tableName, @FromDataPoints("emptyNull") String primaryKeyName, @FromDataPoints("emptyNull") String dataSourceName)
-    {
-        int effect = userInfoDBService.delete(tableName, primaryKeyName, 1, dataSourceName);
         assertThat(effect, is(0));
     }
 

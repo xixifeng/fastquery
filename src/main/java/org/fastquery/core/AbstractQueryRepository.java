@@ -75,17 +75,6 @@ public abstract class AbstractQueryRepository implements QueryRepository
     }
 
     @Override
-    public int[] executeBatch(String paramString1, String paramString2)
-    {
-        int j = 0;
-        if (m[j] == null)
-        {
-            cache(j, EXECUTE_BATCH, String.class, String.class);
-        }
-        return (int[]) Prepared.excute(m[j], new Object[]{paramString1, paramString2}, this);
-    }
-
-    @Override
     public int[] executeBatch(String paramString)
     {
         int j = 1;
@@ -97,14 +86,14 @@ public abstract class AbstractQueryRepository implements QueryRepository
     }
 
     @Override
-    public int[] executeBatch(String paramString1, String paramString2, String[] paramArrayOfString)
+    public int[] executeBatch(String paramString1, String[] paramArrayOfString)
     {
         int j = 2;
         if (m[j] == null)
         {
-            cache(j, EXECUTE_BATCH, String.class, String.class, String[].class);
+            cache(j, EXECUTE_BATCH, String.class, String[].class);
         }
-        return (int[]) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramArrayOfString}, this);
+        return (int[]) Prepared.excute(m[j], new Object[]{paramString1, paramArrayOfString}, this);
     }
 
     @Override
@@ -130,51 +119,6 @@ public abstract class AbstractQueryRepository implements QueryRepository
     }
 
     @Override
-    public BigInteger saveToId(String paramString1, String paramString2, Object paramObject)
-    {
-        int j = 5;
-        if (m[j] == null)
-        {
-            cache(j, SAVE_TO_ID, String.class, String.class, Object.class);
-        }
-        return (BigInteger) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramObject}, this);
-    }
-
-    @Override
-    public BigInteger saveToId(Object paramObject, String paramString)
-    {
-        int j = 6;
-        if (m[j] == null)
-        {
-            cache(j, SAVE_TO_ID, Object.class, String.class);
-        }
-        return (BigInteger) Prepared.excute(m[j], new Object[]{paramObject, paramString}, this);
-    }
-
-    @Override
-    public int saveArray(boolean paramBoolean, String paramString1, String paramString2, Object... paramArrayOfObject)
-    {
-        int j = 7;
-        if (m[j] == null)
-        {
-            cache(j, SAVE_ARRAY, boolean.class, String.class, String.class, Object[].class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramBoolean, paramString1, paramString2, paramArrayOfObject},
-                this);
-    }
-
-    @Override
-    public int saveArray(boolean paramBoolean, String paramString, Object... paramArrayOfObject)
-    {
-        int j = 8;
-        if (m[j] == null)
-        {
-            cache(j, SAVE_ARRAY, boolean.class, String.class, Object[].class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramBoolean, paramString, paramArrayOfObject}, this);
-    }
-
-    @Override
     public int saveArray(boolean paramBoolean, Object... paramArrayOfObject)
     {
         int j = 9;
@@ -183,17 +127,6 @@ public abstract class AbstractQueryRepository implements QueryRepository
             cache(j, SAVE_ARRAY, boolean.class, Object[].class);
         }
         return (Integer) Prepared.excute(m[j], new Object[]{paramBoolean, paramArrayOfObject}, this);
-    }
-
-    @Override
-    public int executeUpdate(String paramString, Object paramObject)
-    {
-        int j = 10;
-        if (m[j] == null)
-        {
-            cache(j, EXECUTE_UPDATE, String.class, Object.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramString, paramObject}, this);
     }
 
     @Override
@@ -208,39 +141,6 @@ public abstract class AbstractQueryRepository implements QueryRepository
     }
 
     @Override
-    public int executeUpdate(String paramString1, String paramString2, Object paramObject)
-    {
-        int j = 12;
-        if (m[j] == null)
-        {
-            cache(j, EXECUTE_UPDATE, String.class, String.class, Object.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramObject}, this);
-    }
-
-    @Override
-    public int executeSaveOrUpdate(String paramString1, String paramString2, Object paramObject)
-    {
-        int j = 13;
-        if (m[j] == null)
-        {
-            cache(j, EXECUTE_SAVE_OR_UPDATE, String.class, String.class, Object.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramObject}, this);
-    }
-
-    @Override
-    public int executeSaveOrUpdate(String paramString, Object paramObject)
-    {
-        int j = 14;
-        if (m[j] == null)
-        {
-            cache(j, EXECUTE_SAVE_OR_UPDATE, String.class, Object.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramString, paramObject}, this);
-    }
-
-    @Override
     public int executeSaveOrUpdate(Object paramObject)
     {
         int j = 15;
@@ -252,39 +152,6 @@ public abstract class AbstractQueryRepository implements QueryRepository
     }
 
     @Override
-    public int update(String paramString1, String paramString2, Object paramObject, String paramString3)
-    {
-        int j = 16;
-        if (m[j] == null)
-        {
-            cache(j, UPDATE, String.class, String.class, Object.class, String.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramObject, paramString3}, this);
-    }
-
-    @Override
-    public <E> int update(String paramString, Collection<E> paramCollection)
-    {
-        int j = 17;
-        if (m[j] == null)
-        {
-            cache(j, UPDATE, String.class, Collection.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramString, paramCollection}, this);
-    }
-
-    @Override
-    public int update(String paramString1, Object paramObject, String paramString2)
-    {
-        int j = 18;
-        if (m[j] == null)
-        {
-            cache(j, UPDATE, String.class, Object.class, String.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramObject, paramString2}, this);
-    }
-
-    @Override
     public int update(Object paramObject, String paramString)
     {
         int j = 19;
@@ -293,17 +160,6 @@ public abstract class AbstractQueryRepository implements QueryRepository
             cache(j, UPDATE, Object.class, String.class);
         }
         return (Integer) Prepared.excute(m[j], new Object[]{paramObject, paramString}, this);
-    }
-
-    @Override
-    public <E> int update(String paramString1, String paramString2, Collection<E> paramCollection)
-    {
-        int j = 20;
-        if (m[j] == null)
-        {
-            cache(j, UPDATE, String.class, String.class, Collection.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramCollection}, this);
     }
 
     @Override
@@ -319,18 +175,6 @@ public abstract class AbstractQueryRepository implements QueryRepository
 
     @SuppressWarnings("unchecked")
     @Override
-    public <E> E find(Class<E> clazz, long paramLong, String paramString1, String paramString2, boolean contain, String... fields)
-    {
-        int j = 22;
-        if (m[j] == null)
-        {
-            cache(j, "find", Class.class, long.class, String.class, String.class, boolean.class, String[].class);
-        }
-        return (E) Prepared.excute(m[j], new Object[]{clazz, paramLong, paramString1, paramString2, contain, fields}, this);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
     public <E> E find(Class<E> clazz, long paramLong, boolean contain, String... fields)
     {
         int j = 23;
@@ -339,41 +183,6 @@ public abstract class AbstractQueryRepository implements QueryRepository
             cache(j, "find", Class.class, long.class, boolean.class, String[].class);
         }
         return (E) Prepared.excute(m[j], new Object[]{clazz, paramLong, contain, fields}, this);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <E> E find(Class<E> clazz, long paramLong, String paramString, boolean contain, String... fields)
-    {
-        int j = 24;
-        if (m[j] == null)
-        {
-            cache(j, "find", Class.class, long.class, String.class, boolean.class, String[].class);
-        }
-        return (E) Prepared.excute(m[j], new Object[]{clazz, paramLong, paramString, contain, fields}, this);
-    }
-
-    @Override
-    public int delete(String paramString1, String paramString2, long paramLong, String paramString3)
-    {
-        int j = 25;
-        if (m[j] == null)
-        {
-            cache(j, DELETE, String.class, String.class, long.class, String.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramLong, paramString3}, this);
-    }
-
-    @Override
-    public int delete(String paramString1, String paramString2, long paramLong, String paramString3, String paramString4)
-    {
-        int j = 26;
-        if (m[j] == null)
-        {
-            cache(j, DELETE, String.class, String.class, long.class, String.class, String.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramLong, paramString3, paramString4},
-                this);
     }
 
     @Override
@@ -396,51 +205,6 @@ public abstract class AbstractQueryRepository implements QueryRepository
             cache(j, SAVE, boolean.class, Collection.class);
         }
         return (Integer) Prepared.excute(m[j], new Object[]{paramBoolean, paramCollection}, this);
-    }
-
-    @Override
-    public <B> int save(boolean paramBoolean, String paramString1, String paramString2, Collection<B> paramCollection)
-    {
-        int j = 29;
-        if (m[j] == null)
-        {
-            cache(j, SAVE, boolean.class, String.class, String.class, Collection.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramBoolean, paramString1, paramString2, paramCollection},
-                this);
-    }
-
-    @Override
-    public <B> int save(boolean paramBoolean, String paramString, Collection<B> paramCollection)
-    {
-        int j = 30;
-        if (m[j] == null)
-        {
-            cache(j, SAVE, boolean.class, String.class, Collection.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramBoolean, paramString, paramCollection}, this);
-    }
-
-    @Override
-    public int insert(String paramString1, String paramString2, Object paramObject)
-    {
-        int j = 31;
-        if (m[j] == null)
-        {
-            cache(j, INSERT, String.class, String.class, Object.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramString1, paramString2, paramObject}, this);
-    }
-
-    @Override
-    public int insert(Object paramObject, String paramString)
-    {
-        int j = 32;
-        if (m[j] == null)
-        {
-            cache(j, INSERT, Object.class, String.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramObject, paramString}, this);
     }
 
     @Override
