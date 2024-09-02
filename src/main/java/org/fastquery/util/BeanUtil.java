@@ -249,7 +249,7 @@ public final class BeanUtil
             String where = StringUtils.EMPTY;
             if (!values.isEmpty())
             {
-                where = " where " + delOperator(objects.getSql());
+                where = WHERE + delOperator(objects.getSql());
             }
             sql = String.format("select count(id) from %s%s", tableName, where);
         }

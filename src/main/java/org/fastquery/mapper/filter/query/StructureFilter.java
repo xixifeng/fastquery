@@ -63,22 +63,22 @@ public class StructureFilter implements Filter
         // 统计value节点的个数
         if (Collections.frequency(elementNames, "value") > 1)
         {
-            this.abortWith(sb.toString() + " 该节点下面所包裹的value节点最多只能出现一次");
+            this.abortWith(sb + " 该节点下面所包裹的value节点最多只能出现一次");
         }
 
         if (Collections.frequency(elementNames, "countQuery") > 1)
         {
-            this.abortWith(sb.toString() + " 该节点下面所包裹的countQuery节点最多只能出现一次");
+            this.abortWith(sb + " 该节点下面所包裹的countQuery节点最多只能出现一次");
         }
 
         if (Collections.frequency(elementNames, "parts") > 1)
         {
-            this.abortWith(sb.toString() + " 该节点下面所包裹的parts节点最多只能出现一次");
+            this.abortWith(sb + " 该节点下面所包裹的parts节点最多只能出现一次");
         }
 
         if (!elementNames.isEmpty() && !elementNames.contains("value"))
         { // 如果不为空,且不包含value
-            this.abortWith(sb.toString() + " 该节点下面所包裹的要么全部是文本内容,要么就必须存在value节点");
+            this.abortWith(sb + " 该节点下面所包裹的要么全部是文本内容,要么就必须存在value节点");
         }
         return element;
     }

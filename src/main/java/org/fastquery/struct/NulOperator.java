@@ -41,5 +41,5 @@ public enum NulOperator
      */
     ISNOTNULL(" is not null");
 
-    private String operator;
+    private final String operator;
 }

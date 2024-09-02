@@ -34,7 +34,7 @@ import java.lang.reflect.InvocationTargetException;
 @Slf4j
 public class RepositoryFactory<T> implements FactoryBean<T>
 {
-    private Class<T> dbInterface;
+    private final Class<T> dbInterface;
 
     public RepositoryFactory(Class<T> dbInterface)
     {
@@ -56,9 +56,4 @@ public class RepositoryFactory<T> implements FactoryBean<T>
         return dbInterface;
     }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return true;
-    }
 }

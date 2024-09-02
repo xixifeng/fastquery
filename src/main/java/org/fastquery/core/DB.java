@@ -514,16 +514,16 @@ public class DB
         }
         finally
         {
-            try
+            if(stat != null)
             {
-                if (stat != null)
+                try
                 {
                     stat.close();
                 }
-            }
-            catch (SQLException e)
-            {
-                throw new RepositoryException("stat 关闭异常", e);
+                catch (SQLException e)
+                {
+                    throw new RepositoryException("stat 关闭异常", e);
+                }
             }
         }
     }

@@ -26,7 +26,6 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.Entry;
 
-import lombok.NoArgsConstructor;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.EnumUtils;
 import org.fastquery.core.MethodInfo;

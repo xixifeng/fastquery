@@ -72,5 +72,5 @@ public enum SQLOperator
      * like ?
      */
     LIKE(" like ?");
-    private String operator;
+    private final String operator;
 }

@@ -22,6 +22,7 @@
 
 package org.fastquery.core;
 
+import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.fastquery.util.BeanUtil;
 
@@ -35,8 +36,9 @@ import java.util.Objects;
 public class SelectField<T>
 {
 
-    private Class<T> clazz;
-    private boolean contain;
+    @Getter
+    private final Class<T> clazz;
+    private final boolean contain;
     private String[] fields = {};
 
     public SelectField(Class<T> clazz, boolean contain, String... fields)
@@ -84,10 +86,5 @@ public class SelectField<T>
         }
 
         return sb.toString();
-    }
-
-    public Class<T> getClazz()
-    {
-        return clazz;
     }
 }

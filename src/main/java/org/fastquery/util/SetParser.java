@@ -62,7 +62,7 @@ final class SetParser
                 }
             }
 
-            if ("set ".equals(sb.toString()))
+            if ("set ".contentEquals(sb))
             {
                 throw new RepositoryException("@Set 修改选项全部被忽略了,这是不允许的");
             }

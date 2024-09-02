@@ -28,14 +28,12 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 
-import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao2.DefaultDBService;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLOperator;
-import org.fastquery.struct.SQLValue;
 import org.junit.Rule;
 import org.junit.Test;
 

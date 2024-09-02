@@ -143,7 +143,7 @@ public class QueryValidator
 
     private static void checkSharp(String query)
     {
-        List<String> mts = TypeUtil.matches(query, Pattern.compile("#\\{#\\S+\\}"));
+        List<String> mts = TypeUtil.matches(query, Pattern.compile("#\\{#\\S+}"));
         mts.remove(StrConst.LIMIT); // 内置标签不参与校验
         if (!mts.isEmpty())
         {
@@ -168,12 +168,12 @@ public class QueryValidator
             error("表达式不符合规范:不能出现\"{ \"", query);
         }
 
-        if (!TypeUtil.matches(query, Pattern.compile("\\s+\\}")).isEmpty())
+        if (!TypeUtil.matches(query, Pattern.compile("\\s+}")).isEmpty())
         {
             error("表达式不符合规范:不能出现\" }\"", query);
         }
 
-        if (!TypeUtil.matches(query, Pattern.compile("[^\\$#]\\{")).isEmpty())
+        if (!TypeUtil.matches(query, Pattern.compile("[^$#]\\{")).isEmpty())
         {
             error("表达式不符合规范:\"{\"前必须连接\"$\"或\"#\"", query);
         }
@@ -181,7 +181,7 @@ public class QueryValidator
         for (String mp : mps)
         {
             int c1 = TypeUtil.matches(mp, Pattern.compile("\\{")).size();
-            int c2 = TypeUtil.matches(mp, Pattern.compile("\\}")).size();
+            int c2 = TypeUtil.matches(mp, Pattern.compile("}")).size();
             if (c1 != c2 || c1 > 1)
             { // "{" 和 "}" 必须成比出现一次
                 error(String.format("\"%s\"中的\"{\"和\"}\"分别只能出现一次或都不出现,据分析\"{\"出现%d次,而\"}\"出现%d次", mp, c1, c2), query);
