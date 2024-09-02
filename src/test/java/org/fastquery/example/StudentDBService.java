@@ -48,7 +48,6 @@ public interface StudentDBService extends QueryRepository
     // 八中基本类型
     // 形参: int a,double b,long c,short d,byte e,boolean f,char g,float h
     // 实参: int a=1; double b=2;long c=3;short d=4;byte e=5;boolean f=true;char
-    // g=7;float h=8;
     @Query("update student s set s.age=?3,s.name=?2 where  s.no=?1")
     @Modifying
     int update(String no, String name, int age);
@@ -87,7 +86,7 @@ public interface StudentDBService extends QueryRepository
     int count2();
 
     @Query("select count(no) as count from student")
-    JSONObject rows(); // --> {"count":8}
+    JSONObject rows();
 
     // 增
     @Query("insert into student (no, name, sex, age, dept) values (?1, ?2, ?3, ?4, ?5)")
@@ -132,7 +131,7 @@ public interface StudentDBService extends QueryRepository
      * @param table_schema 所属数据库
      */
     @Query("select * from information_schema.columns where table_name = ?1 and table_schema = ?2 and column_key='PRI'")
-    JSONArray findColumnKey(String table_name, String table_schema);
+    JSONArray findColumnKey(String tableName, String tableSchema);
 
     @Modifying(table = "userinfo")
     @Query("insert into #{#table} (name,age) values (?1, ?2)")

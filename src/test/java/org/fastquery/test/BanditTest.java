@@ -1,6 +1,7 @@
 package org.fastquery.test;
 
 import org.fastquery.bean.Bandit;
+import org.fastquery.struct.NulOperator;
 import org.fastquery.struct.SQLOperator;
 import org.fastquery.struct.SQLValue;
 import org.junit.Test;
@@ -140,6 +141,24 @@ public class BanditTest
         List<Object> params = sqlValue.getValues();
         assertThat(sql, equalTo(" and id = ? order by id desc"));
         assertThat(params.toString(), equalTo("[18]"));
+    }
+
+    @Test
+    public void conditions8()
+    {
+        Bandit bandit = new Bandit();
+        bandit.setId(18L);
+
+        bandit.and(bandit::name, NulOperator.ISNULL);
+        bandit.and(Bandit::age, SQLOperator.IN, 3);
+        bandit.and(bandit::id, SQLOperator.EQ, bandit.getId());
+        bandit.orderBy();
+
+        SQLValue sqlValue = bandit.getSqlValue();
+        String sql = sqlValue.getSql();
+        List<Object> params = sqlValue.getValues();
+        assertThat(params.toString(), equalTo("[3, 18]"));
+        assertThat(sql, equalTo(" and name is null and age in (?) and id = ? order by id desc"));
     }
 
     private void builder(List<String> names, Bandit bandit)

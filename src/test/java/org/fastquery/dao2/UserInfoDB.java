@@ -44,9 +44,6 @@ public interface UserInfoDB extends QueryRepository
     @Query("select id,name,age from `userinfo` as u where u.age>?1")
     Map<String, Object> findOne(Integer age, @Source String dataSource);
 
-    // @Query("select id,name,age from `userinfo` as u where u.id>?1")
-    // List<UserInfo> findSome(Integer id);
-
     @Transactional
     @Modifying
     @Query("update `userinfo` set `name`=?1 where id=?3")

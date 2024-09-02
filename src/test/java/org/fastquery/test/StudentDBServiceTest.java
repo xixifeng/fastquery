@@ -87,8 +87,6 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(values.get(2).getClass() == String.class && values.get(2).equals(no), is(true));
     }
 
-    // @Query("update student s set s.age=?2 where s.no=?1")
-    // int update(String no,int age);
     @Test
     public void update2()
     {
@@ -98,8 +96,6 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(i, is(0));
     }
 
-    // @Query("select no, name, sex from student")
-    // JSONArray findAll();
     @Test
     public void findAll()
     {
@@ -214,8 +210,8 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(effect, is(1));
 
         // 测试删除
-        // effect = studentDBService.deleteByNo(no);
-        // assertThat(effect, is(1));
+        effect = studentDBService.deleteByNo(no);
+        assertThat(effect, is(1));
     }
 
     @Test

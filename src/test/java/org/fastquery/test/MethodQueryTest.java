@@ -505,8 +505,8 @@ public class MethodQueryTest extends TestFastQuery
         // 针对两个属性，其中一个为空这种情形测试
         area.setType(AreaType.二级);
         area.setAreaEnName("");
-        Page<Area> page = userInfoDBService.findPage(area, null, "order by id desc", true, 1, 3, true,"id"," stageSid");
-        page = userInfoDBService.findPage(null, area, "order by id desc", true, 1, 3, true,"id"," stageSid");
+        userInfoDBService.findPage(area, null, "order by id desc", true, 1, 3, true,"id"," stageSid");
+        userInfoDBService.findPage(null, area, "order by id desc", true, 1, 3, true,"id"," stageSid");
     }
 }
 

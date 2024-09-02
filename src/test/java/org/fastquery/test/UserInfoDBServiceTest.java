@@ -240,7 +240,7 @@ public class UserInfoDBServiceTest extends TestFastQuery
 
     // 断言: 它会抛出RepositoryException异常
     @Test(expected = RepositoryException.class)
-    public void testUpdateBatch2_a()
+    public void testUpdateBatch2a()
     {
         int effect = db.updateBatch2("小不点", 6, 2);
         // updateBatch2 中途会报错,因此修改影响的行数为0
@@ -248,7 +248,7 @@ public class UserInfoDBServiceTest extends TestFastQuery
     }
 
     @Test(expected = RepositoryException.class)
-    public void testUpdateBatch2_b()
+    public void testUpdateBatch2b()
     {
         int effect = db.updateBatch2("小不点", 6, 2);
         assertThat(effect, equalTo(0));
@@ -347,7 +347,7 @@ public class UserInfoDBServiceTest extends TestFastQuery
             {
                 pageIndex += 1;
             }
-            log.debug("totalElements:" + totalElements + " pageIndex:" + pageIndex + "  pageSize:" + pageSize + "  totalPages:" + totalPages);
+            log.debug("totalElements:{} pageIndex:{}  pageSize:{}  totalPages:{}", totalElements, pageIndex, pageSize, totalPages);
 
             Page<Map<String, Object>> page = db.findSome2(age, id, pageIndex, pageSize);
             extracted(pageIndex, pageSize, totalPages, page);
@@ -370,7 +370,6 @@ public class UserInfoDBServiceTest extends TestFastQuery
         assertThat(page.getTotalElements(), equalTo(-1L));
         assertThat(page.getTotalPages(), equalTo(-1));
         assertThat(page.getNumberOfElements(), lessThanOrEqualTo(pageSize));
-        // log.debug(JSON.toJSONString(page, true));
 
         boolean hasContent = pageIndex <= totalPages; // 是否有结果集
         boolean isFirst = pageIndex == 1; // 是否是第一页
@@ -534,8 +533,7 @@ public class UserInfoDBServiceTest extends TestFastQuery
     @Test
     public void findUserSome2()
     {
-        Integer age = null;
-        List<Map<String, Object>> maps = db.findUserSome2(age, null);
+        List<Map<String, Object>> maps = db.findUserSome2(null, null);
         maps.forEach(m -> m.forEach((k, v) -> {
             if ("age".equals(k))
                 assertThat(v, nullValue());

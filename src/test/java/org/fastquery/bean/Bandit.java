@@ -50,6 +50,11 @@ public class Bandit extends Predicate<Bandit>
         return new Chip<>("name");
     }
 
+    public static Chip<Integer,Bandit> age()
+    {
+        return new Chip<>("age");
+    }
+
     public Chip<Long,Bandit> createDateTime()
     {
         return new Chip<>("createDateTime");

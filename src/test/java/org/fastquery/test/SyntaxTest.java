@@ -79,7 +79,6 @@ public class SyntaxTest extends TestFastQuery
     public void testReg()
     {
         log.debug(String.valueOf(Pattern.matches(StringUtils.EMPTY, StringUtils.EMPTY)));
-        // s.replaceAll(""+param.value()+"\\b", "?"+(i+1));
         assertThat("abckdwgew:name&".replaceAll(":name\\b", StrConst.QUE), equalTo("abckdwgew?&"));
         assertThat("abckdwgew:name &".replaceAll("name\\b", StrConst.QUE), equalTo("abckdwgew:? &"));
         log.debug("-->: " + ("abckdwgew:name222 &".replaceAll("name\\b", StrConst.QUE)));

@@ -35,7 +35,6 @@ import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.page.*;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLValue;
-import org.fastquery.util.TypeUtil;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -161,11 +160,11 @@ public class PageTest extends TestFastQuery
         boolean contain = true;
         String[] fields = {"id","name","age"};
 
-        Page<UserInfo> page = userInfoDBService.findPageByIn(entity,fieldName,fieldValues,equals,notCount,pageIndex,pageSize,contain,fields);
+        userInfoDBService.findPageByIn(entity, fieldName, fieldValues, equals, notCount, pageIndex, pageSize, contain, fields);
         assertThat(fieldValues.size(),is(3));
-        page = userInfoDBService.findPageByIn(entity,fieldName,fieldValues,equals,notCount,pageIndex,pageSize,contain,fields);
+        userInfoDBService.findPageByIn(entity, fieldName, fieldValues, equals, notCount, pageIndex, pageSize, contain, fields);
         assertThat(fieldValues.size(),is(3));
-        page = userInfoDBService.findPageByIn(entity,fieldName,fieldValues,equals,notCount,pageIndex,pageSize,contain,fields);
+        userInfoDBService.findPageByIn(entity, fieldName, fieldValues, equals, notCount, pageIndex, pageSize, contain, fields);
         assertThat(fieldValues.size(),is(3));
     }
 

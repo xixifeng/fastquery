@@ -395,9 +395,13 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         typeFeature.and(typeFeature::name, NulOperator.ISNOTNULL);
         typeFeature.orderBy("id desc");
 
-        List<TypeFeature> list = db.findPageByPredicate(typeFeature, false, 1, 37, true, "id", "name").getContent();
+        SQLValue sqlValue = typeFeature.getSqlValue();
+        String sql = sqlValue.getSql();
+        assertThat(sql, equalTo(" and gender is null and name is not null order by id desc"));
+
+        db.findPageByPredicate(typeFeature, false, 1, 37, true, "id", "name").getContent();
         List<String> sqls = rule.getExecutedSQLs();
-        assertThat(sqls.get(0), equalTo("select id,name from type_feature  where gender is null and name is not null order by id desc  limit 0,37"));
+        assertThat(sqls.get(0), equalTo("select id,name from type_feature where gender is null and name is not null order by id desc  limit 0,37"));
     }
 
     @Test
@@ -405,10 +409,10 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
     {
         TypeFeature typeFeature = new TypeFeature();
         typeFeature.orderBy();
-        List<TypeFeature> list = db.findPageByPredicate(typeFeature, false, 1, 3, true, "id", "name").getContent();
+        db.findPageByPredicate(typeFeature, false, 1, 3, true, "id", "name").getContent();
         List<String> sqls = rule.getExecutedSQLs();
-        assertThat(sqls.get(0), equalTo("select id,name from type_feature  order by id desc  limit 0,3"));
-        assertThat(sqls.get(1), equalTo("select count(id) from type_feature  order by id desc "));
+        assertThat(sqls.get(0), equalTo("select id,name from type_feature order by id desc  limit 0,3"));
+        assertThat(sqls.get(1), equalTo("select count(id) from type_feature order by id desc "));
     }
 
     @Test
@@ -418,10 +422,10 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         typeFeature.setGender(Gender.女);
         typeFeature.setName("Lily");
         typeFeature.setSort(0);
-        List<TypeFeature> list = db.findPageByPredicate(typeFeature, false, 1, 3, true, "id", "name").getContent();
+        db.findPageByPredicate(typeFeature, false, 1, 3, true, "id", "name").getContent();
         List<String> sqls = rule.getExecutedSQLs();
-        assertThat(sqls.get(0), equalTo("select id,name from type_feature where  name = ? and gender = ? and sort = ?  limit 0,3"));
-        assertThat(sqls.get(1), equalTo("select count(id) from type_feature where  name = ? and gender = ? and sort = ? "));
+        assertThat(sqls.get(0), equalTo("select id,name from type_feature where name = ? and gender = ? and sort = ?  limit 0,3"));
+        assertThat(sqls.get(1), equalTo("select count(id) from type_feature where name = ? and gender = ? and sort = ? "));
     }
 
     @Test
@@ -433,6 +437,22 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         typeFeature.setSort(0);
         Page<TypeFeature> page = db.findPageByPredicate(typeFeature, true, 1, 3, true, "id", "name");
         assertThat(page.isLast(),is(true));
+    }
+
+    @Test
+    public void findPageByPredicate5()
+    {
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.and(typeFeature::ruits,NulOperator.ISNULL);
+        typeFeature.and(typeFeature::gender,SQLOperator.EQ, Gender.男);
+        typeFeature.orderBy();
+
+        SQLValue sqlValue = typeFeature.getSqlValue();
+        String sql = sqlValue.getSql();
+        assertThat(sql, equalTo(" and ruits is null and gender = ? order by id desc"));
+        db.findPageByPredicate(typeFeature, false, 1, 3, true, "id", "name");
+
+        assertThat(rule.getExecutedSQLs().get(0), equalTo("select id,name from type_feature where ruits is null and gender = ? order by id desc  limit 0,3"));
     }
 
 

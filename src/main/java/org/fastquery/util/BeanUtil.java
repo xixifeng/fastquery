@@ -52,6 +52,7 @@ public final class BeanUtil
     public static final String AND = " and ";
     public static final String OR = " or ";
 
+    private static final String ORDER_BY = "order by";
     private static final String BLANK_1 = " ";
 
     private static String escapeSql(String str)
@@ -982,7 +983,10 @@ public final class BeanUtil
             Field[] fs = getFields(clazz);
             SQLValue objects = toWhere(fs, equals, false, false, false);
             List<Object> values = objects.getValues();
-            if(!values.isEmpty())
+
+            String wh = delOperator(objects.getSql());
+            wh = wh.trim();
+            if(!wh.startsWith(ORDER_BY))
             {
                 sb.append(WHERE);
             }
@@ -990,8 +994,6 @@ public final class BeanUtil
             {
                 sb.append(BLANK_1);
             }
-
-            String wh = delOperator(objects.getSql());
             sb.append(wh);
             sb.append(BLANK_1);
             sqlValue.addValues(values);

@@ -2,7 +2,6 @@ package org.fastquery.struct;
 
 import com.alibaba.fastjson.JSON;
 import lombok.Getter;
-import org.fastquery.core.Transient;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,8 +24,6 @@ public abstract class Predicate<E>
 
     private static final String AND = " and ";
     private static final String OR = " or ";
-    @Transient
-    private Boolean existsNulOpt = false;
 
     public <T> E and(Supplier<Chip<T,E>> left, SQLOperator operator, T right)
     {
@@ -132,11 +129,7 @@ public abstract class Predicate<E>
         {
             builder.append(booleanOperator);
         }
-        if(values.isEmpty() && !Boolean.TRUE.equals(existsNulOpt))
-        {
-            builder.append("where ");
-            existsNulOpt = true;
-        }
+
         builder.append(left.get().getName());
         builder.append(operator.getOperator());
 
