@@ -57,7 +57,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
 
     private static final Class<QueryRepository> c = QueryRepository.class;
 
-    private final MethodInfo[] m = new MethodInfo[42];
+    private final MethodInfo[] m = new MethodInfo[21];
 
     private void cache(int j, String name, Class<?>... parameterTypes)
     {
@@ -77,7 +77,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public int[] executeBatch(String paramString)
     {
-        int j = 1;
+        int j = 0;
         if (m[j] == null)
         {
             cache(j, EXECUTE_BATCH, String.class);
@@ -88,7 +88,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public int[] executeBatch(String paramString1, String[] paramArrayOfString)
     {
-        int j = 2;
+        int j = 1;
         if (m[j] == null)
         {
             cache(j, EXECUTE_BATCH, String.class, String[].class);
@@ -99,7 +99,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public long tx(LongSupplier paramSupplier)
     {
-        int j = 3;
+        int j = 2;
         if (m[j] == null)
         {
             cache(j, "tx", LongSupplier.class);
@@ -110,7 +110,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public BigInteger saveToId(Object paramObject)
     {
-        int j = 4;
+        int j = 3;
         if (m[j] == null)
         {
             cache(j, SAVE_TO_ID, Object.class);
@@ -121,7 +121,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public int saveArray(boolean paramBoolean, Object... paramArrayOfObject)
     {
-        int j = 9;
+        int j = 4;
         if (m[j] == null)
         {
             cache(j, SAVE_ARRAY, boolean.class, Object[].class);
@@ -132,7 +132,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public int executeUpdate(Object paramObject)
     {
-        int j = 11;
+        int j = 5;
         if (m[j] == null)
         {
             cache(j, EXECUTE_UPDATE, Object.class);
@@ -143,7 +143,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public int executeSaveOrUpdate(Object paramObject)
     {
-        int j = 15;
+        int j = 6;
         if (m[j] == null)
         {
             cache(j, EXECUTE_SAVE_OR_UPDATE, Object.class);
@@ -154,7 +154,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public int update(Object paramObject, String paramString)
     {
-        int j = 19;
+        int j = 7;
         if (m[j] == null)
         {
             cache(j, UPDATE, Object.class, String.class);
@@ -165,7 +165,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <E> int update(Collection<E> paramCollection)
     {
-        int j = 21;
+        int j = 8;
         if (m[j] == null)
         {
             cache(j, UPDATE, Collection.class);
@@ -177,7 +177,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <E> E find(Class<E> clazz, long paramLong, boolean contain, String... fields)
     {
-        int j = 23;
+        int j = 9;
         if (m[j] == null)
         {
             cache(j, "find", Class.class, long.class, boolean.class, String[].class);
@@ -188,7 +188,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public int delete(String paramString1, String paramString2, long paramLong)
     {
-        int j = 27;
+        int j = 10;
         if (m[j] == null)
         {
             cache(j, DELETE, String.class, String.class, long.class);
@@ -199,7 +199,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <B> int save(boolean paramBoolean, Collection<B> paramCollection)
     {
-        int j = 28;
+        int j = 11;
         if (m[j] == null)
         {
             cache(j, SAVE, boolean.class, Collection.class);
@@ -210,7 +210,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public int insert(Object paramObject)
     {
-        int j = 33;
+        int j = 12;
         if (m[j] == null)
         {
             cache(j, INSERT, Object.class);
@@ -222,7 +222,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public Page<Map<String, Object>> findPage(QueryBuilder builder, boolean count, int pageIndex, int pageSize)
     {
-        int j = 34;
+        int j = 13;
         if (m[j] == null)
         {
             cache(j, "findPage", QueryBuilder.class, boolean.class, int.class, int.class);
@@ -233,7 +233,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public long count(Object entity)
     {
-        int j = 35;
+        int j = 14;
         if (m[j] == null)
         {
             cache(j, "count", Object.class);
@@ -244,7 +244,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <E> E findOne(E equals, boolean contain, String... fields)
     {
-        int j = 36;
+        int j = 15;
         if (m[j] == null)
         {
             cache(j, "findOne", Object.class, boolean.class, String[].class);
@@ -255,7 +255,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <E> E findOne(E equals, boolean unequal, boolean or, boolean contain, String... fields)
     {
-        int j = 37;
+        int j = 16;
         if (m[j] == null)
         {
             cache(j, "findOne", Object.class, boolean.class, boolean.class, boolean.class, String[].class);
@@ -266,7 +266,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public boolean exists(Object entity, boolean or)
     {
-        int j = 38;
+        int j = 17;
         if (m[j] == null)
         {
             cache(j, "exists", Object.class, boolean.class);
@@ -277,7 +277,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public String existsEachOn(Object entity)
     {
-        int j = 39;
+        int j = 18;
         if (m[j] == null)
         {
             cache(j, "existsEachOn", Object.class);
@@ -288,7 +288,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <E> Page<E> findPageByPredicate(E equals, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields)
     {
-        int j = 40;
+        int j = 19;
         if (m[j] == null)
         {
             cache(j, "findPageByPredicate", Object.class, boolean.class, int.class, int.class, boolean.class, String[].class);
@@ -299,7 +299,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <E, F> Page<E> findPageByIn(Class<E> clazz, String fieldName, List<F> fieldValues, E equals, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields)
     {
-        int j = 41;
+        int j = 20;
         if (m[j] == null)
         {
             cache(j, "findPageByIn", Class.class, String.class, List.class, Object.class, boolean.class, int.class, int.class, boolean.class, String[].class);
