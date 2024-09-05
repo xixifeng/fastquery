@@ -23,18 +23,10 @@
 package org.fastquery.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-
 import static org.hamcrest.Matchers.*;
 
-import org.fastquery.bean.PManager;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
-import org.fastquery.util.TypeUtil;
 import org.junit.Test;
 
 /**
@@ -48,27 +40,4 @@ public class FQueryTest extends TestFastQuery
     {
         assertThat(FQuery.getRepository(StudentDBService.class), notNullValue());
     }
-
-    @SuppressWarnings("unchecked")
-    @Test
-    public void testReset()
-            throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IntrospectionException
-    {
-        Class<PManager> clazz = PManager.class;
-        PManager tempPmanager = FQuery.reset(clazz);
-        clazz = (Class<PManager>) tempPmanager.getClass();
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields)
-        {
-            if (!TypeUtil.isWarrp(field.getType()))
-            {
-                continue;
-            }
-
-            Object readValue = new PropertyDescriptor(field.getName(), clazz).getReadMethod().invoke(tempPmanager);
-            assertThat(readValue, nullValue());
-        }
-
-    }
-
 }

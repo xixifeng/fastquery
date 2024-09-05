@@ -152,17 +152,6 @@ public abstract class AbstractQueryRepository implements QueryRepository
     }
 
     @Override
-    public int update(Object paramObject, String paramString)
-    {
-        int j = 7;
-        if (m[j] == null)
-        {
-            cache(j, UPDATE, Object.class, String.class);
-        }
-        return (Integer) Prepared.excute(m[j], new Object[]{paramObject, paramString}, this);
-    }
-
-    @Override
     public <E> int update(Collection<E> paramCollection)
     {
         int j = 8;

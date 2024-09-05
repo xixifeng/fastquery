@@ -45,6 +45,7 @@ import org.fastquery.page.Page;
 import org.fastquery.page.PageDialect;
 import org.fastquery.page.Pageable;
 import org.fastquery.page.Slice;
+import org.fastquery.struct.Predicate;
 import org.fastquery.struct.RespUpdate;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.util.BeanUtil;
@@ -417,6 +418,19 @@ class QueryProcess
     {
         Object[] iargs = QueryContext.getArgs();
         Object bean = iargs[0];
+
+        if( bean instanceof Predicate)
+        {
+            Predicate p = (Predicate) bean;
+            SQLValue sqlValue = p.getSqlValue();
+            if(sqlValue != null)
+            {
+                String tableName = BeanUtil.getTableName(null, bean.getClass());
+                sqlValue.setSql("update " + tableName + sqlValue.getSql());
+                return DB.modify(Collections.singletonList(sqlValue),false).get(0).getEffect();
+            }
+        }
+
         return DB.update(bean, null, null);
     }
 

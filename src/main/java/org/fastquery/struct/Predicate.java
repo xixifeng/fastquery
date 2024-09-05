@@ -3,10 +3,7 @@ package org.fastquery.struct;
 import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -14,7 +11,6 @@ import java.util.stream.Collectors;
 /**
  * @author xixifeng (fastquery@126.com)
  */
-@SuppressWarnings("unchecked")
 public abstract class Predicate<E>
 {
     @Getter
@@ -24,18 +20,36 @@ public abstract class Predicate<E>
 
     private static final String AND = " and ";
     private static final String OR = " or ";
+    private static final String WHERE = " where ";
+    private static final String SET = " set ";
 
-    public <T> E and(Supplier<Chip<T,E>> left, SQLOperator operator, T right)
+    /**
+     * 用于构建 sql 查询条件单元。例如，构建 fieldName != ? 这类表达式。与上一个条件单元的关系是 and
+     * @param left 表达式左边的字段名称
+     * @param operator 运算符
+     * @param right 右边的值
+     * @return 当前对象，便于链式操作
+     * @param <T> 字段值的类型
+     */
+    public <T> Predicate<E> and(Supplier<Chip<T,E>> left, SQLOperator operator, T right)
     {
         return this.condition(AND,left,operator,right);
     }
 
-    public <T> E or(Supplier<Chip<T,E>> left, SQLOperator operator, T right)
+    /**
+     * 用于构建 sql 查询条件单元。例如，构建 fieldName != ? 这类表达式。与上一个条件单元的关系是 or
+     * @param left 表达式左边的字段名称
+     * @param operator 运算符
+     * @param right 右边的值
+     * @return 当前对象，便于链式操作
+     * @param <T>  字段值的类型
+     */
+    public <T> Predicate<E> or(Supplier<Chip<T,E>> left, SQLOperator operator, T right)
     {
         return this.condition(OR,left,operator,right);
     }
 
-    private <T> E condition(String booleanOperator, Supplier<Chip<T,E>> left, SQLOperator operator, T right)
+    private <T> Predicate<E> condition(String booleanOperator, Supplier<Chip<T,E>> left, SQLOperator operator, T right)
     {
         if (right != null && !right.toString().isEmpty())
         {
@@ -49,7 +63,7 @@ public abstract class Predicate<E>
             addValue(right);
         }
 
-        return (E) this;
+        return this;
     }
 
     private void addValue(Object value)
@@ -58,23 +72,48 @@ public abstract class Predicate<E>
         {
             values.add(value.toString());
         }
+        else if(value instanceof EnumSet)
+        {
+            values.add(toEnumSetString(value));
+        }
         else
         {
             values.add(value);
         }
     }
 
-    public <T> E and(Supplier<Chip<T,E>> left, SQLOperator operator, Collection<T> collection)
+    private static String toEnumSetString(Object enumSet)
+    {
+        return enumSet.toString().replace("[","").replace("]", "").replace(" ", "");
+    }
+
+    /**
+     * 用于构建 sql 查询条件单元。例如，构建 fieldName != ? 这类表达式。与上一个条件单元的关系是 and
+     * @param left 表达式左边的字段名称
+     * @param operator 运算符
+     * @param collection 右边的值
+     * @return 当前对象，便于链式操作
+     * @param <T> 字段值的类型
+     */
+    public <T> Predicate<E> and(Supplier<Chip<T,E>> left, SQLOperator operator, Collection<T> collection)
     {
         return this.condition(AND, left,operator,collection);
     }
 
-    public <T> E or(Supplier<Chip<T,E>> left, SQLOperator operator, Collection<T> collection)
+    /**
+     * 用于构建 sql 查询条件单元。例如，构建 fieldName != ? 这类表达式。与上一个条件单元的关系是 or
+     * @param left 表达式左边的字段名称
+     * @param operator 运算符
+     * @param collection 右边的值
+     * @return 当前对象，便于链式操作
+     * @param <T> 字段值的类型
+     */
+    public <T> Predicate<E> or(Supplier<Chip<T,E>> left, SQLOperator operator, Collection<T> collection)
     {
         return this.condition(OR, left,operator,collection);
     }
 
-    private  <T> E condition(String booleanOperator, Supplier<Chip<T,E>> left, SQLOperator operator, Collection<T> collection)
+    private  <T> Predicate<E> condition(String booleanOperator, Supplier<Chip<T,E>> left, SQLOperator operator, Collection<T> collection)
     {
         if (collection != null && !collection.isEmpty())
         {
@@ -110,20 +149,34 @@ public abstract class Predicate<E>
             addValue(null);
         }
 
-        return (E) this;
+        return this;
     }
 
-    public <T> E and(Supplier<Chip<T,E>> left, NulOperator operator)
+    /**
+     * 用于构建 sql 查询条件单元。例如，构建 fieldName is not null 这类表达式。与上一个条件单元的关系是 and
+     * @param left 表达式左边的字段名称
+     * @param operator 运算符, 可选项 is not null, is null
+     * @return 当前对象，便于链式操作
+     * @param <T> 字段值的类型
+     */
+    public <T> Predicate<E> and(Supplier<Chip<T,E>> left, NulOperator operator)
     {
         return this.condition(AND,left,operator);
     }
 
-    public <T> E or(Supplier<Chip<T,E>> left, NulOperator operator)
+    /**
+     * 用于构建 sql 查询条件单元。例如，构建 fieldName is not null 这类表达式。与上一个条件单元的关系是 and
+     * @param left 表达式左边的字段名称
+     * @param operator 运算符, 可选项 is not null, is null
+     * @return 当前对象，便于链式操作
+     * @param <T> 字段值的类型
+     */
+    public <T> Predicate<E> or(Supplier<Chip<T,E>> left, NulOperator operator)
     {
         return this.condition(OR,left,operator);
     }
 
-    private <T> E condition(String booleanOperator, Supplier<Chip<T,E>> left, NulOperator operator)
+    private <T> Predicate<E> condition(String booleanOperator, Supplier<Chip<T,E>> left, NulOperator operator)
     {
         if (!builder.toString().endsWith("( "))
         {
@@ -133,7 +186,7 @@ public abstract class Predicate<E>
         builder.append(left.get().getName());
         builder.append(operator.getOperator());
 
-        return (E) this;
+        return this;
     }
 
 
@@ -158,24 +211,34 @@ public abstract class Predicate<E>
         finish();
     }
 
-    public E and(UnaryOperator<E> function)
+    /**
+     * 将多个条件单元包装在小括号()里. ()与前面条件的关系是 and
+     * @param function 条件单元集
+     * @return 当前对象，便于链式操作
+     */
+    public Predicate<E> and(UnaryOperator<Predicate<E>> function)
     {
         return group(function,AND);
     }
 
-    public E or(UnaryOperator<E> function)
+    /**
+     * 将多个条件单元包装在小括号()里. ()与前面条件的关系是 or
+     * @param function 条件单元集
+     * @return 当前对象，便于链式操作
+     */
+    public Predicate<E> or(UnaryOperator<Predicate<E>> function)
     {
         return group(function,OR);
     }
 
-    private E group(UnaryOperator<E> function, String booleanOperator)
+    private Predicate<E> group(UnaryOperator<Predicate<E>> function, String booleanOperator)
     {
         int groupStart = builder.length();
 
         builder.append(booleanOperator);
         builder.append(" ( ");
 
-        function.apply((E) this);
+        function.apply(this);
 
         int len = builder.length();
 
@@ -188,17 +251,22 @@ public abstract class Predicate<E>
             builder.append(" )");
         }
 
-        return (E) this;
+        return this;
     }
 
-    private void finish()
+    public void finish()
     {
         SQLValue sv = new SQLValue();
         String sql = builder.toString().trim();
 
+        sql = sql.replace(", and ",WHERE).replace(", or ",WHERE);
+
         sv.setSql(' ' + sql);
         sv.setValues(values);
         this.sqlValue = sv;
+
+        builder.setLength(0);
+        values.clear();
     }
 
     private static String mark(int size)
@@ -210,5 +278,46 @@ public abstract class Predicate<E>
         }
         sb.deleteCharAt(sb.length()-1);
         return sb.toString();
+    }
+
+    /**
+     * 将指定字段自增 Z (Z 表示整数集)
+     * @param fieldName 字段名称
+     * @param t 自增的量（正整数或负整数）
+     * @return 当前对象，便于链式操作
+     * @param <T> 增量值的类型
+     */
+    public <T extends Number> Predicate<E> increment(Supplier<Chip<T,E>> fieldName,T t)
+    {
+        Objects.requireNonNull(fieldName, "fieldName cannot be null");
+        Objects.requireNonNull(t, "t cannot be null");
+        if(builder.indexOf(SET) == -1)
+        {
+            builder.append(SET);
+        }
+        String name = fieldName.get().getName();
+        builder.append(name).append('=').append(name).append('+').append(t).append(',');
+        return this;
+    }
+
+    /**
+     * 修改指定字段的值
+     * @param fieldName 字段名称
+     * @param t 设置的值
+     * @return  当前对象，便于链式操作
+     * @param <T> 设置值的类型
+     */
+    public <T> Predicate<E> set(Supplier<Chip<T,E>> fieldName,T t)
+    {
+        Objects.requireNonNull(fieldName, "fieldName cannot be null");
+        Objects.requireNonNull(t, "t cannot be null");
+        if(builder.indexOf(SET) == -1)
+        {
+            builder.append(SET);
+        }
+        String name = fieldName.get().getName();
+        builder.append(name).append('=').append("?,");
+        addValue(t);
+        return this;
     }
 }

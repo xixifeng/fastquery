@@ -29,6 +29,7 @@ import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.page.Page;
 import org.fastquery.service.FQuery;
+import org.fastquery.struct.SQLOperator;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
@@ -182,7 +183,7 @@ public class MethodQueryTest extends TestFastQuery
         UserInfo userInfo = userInfoDBService.findById(id);
         assertThat(userInfo.getId(), equalTo(id));
         UserInfo entity = new UserInfo(userInfo.getId(), userInfo.getName(), userInfo.getAge());
-        int i = userInfoDBService.update(entity, null);
+        int i = userInfoDBService.executeUpdate(entity);
         assertThat(i, is(1));
     }
 
@@ -224,26 +225,19 @@ public class MethodQueryTest extends TestFastQuery
         Integer id = 1;
         String name = "框架测试!";
         Integer age = 3;
-        UserInfo entity = new UserInfo(id, name, age);
+        UserInfo userInfo = new UserInfo(id, name, age);
 
-        int e = studentDBService.executeUpdate(entity);
+        int e = studentDBService.executeUpdate(userInfo);
         assertThat(e, is(1));
 
         // 会解析成:update `UserInfo` set `id`=?, `age`=? where name = ?
-        int effect = studentDBService.update(entity, "name = :name");
+        userInfo.set(userInfo::id, userInfo.getId());
+        userInfo.set(userInfo::age, userInfo.getAge());
+        userInfo.and(userInfo::name, SQLOperator.EQ, userInfo.getName());
+        userInfo.finish();
+        int effect = studentDBService.executeUpdate(userInfo);
         // 断言: 影响的行数大于0行
         assertThat(effect, greaterThan(0));
-
-        // 不想让id字段参与改运算
-        entity.setId(null);
-        // 会解析成:update `UserInfo` set `age`=? where name = ?
-        effect = studentDBService.update(entity, "name = :name");
-        assertThat(effect, greaterThan(0));
-
-        // 不想让age字段参与改运算
-        entity.setAge(null);
-        effect = studentDBService.update(entity, "name = :name");
-        assertThat(effect, is(0));
     }
 
     @Test
@@ -252,25 +246,19 @@ public class MethodQueryTest extends TestFastQuery
         Integer id = 1;
         String name = "框架测试!";
         Integer age = 23;
-        UserInfo ui = FQuery.reset(UserInfo.class);
-        ui.setName(name);
-        ui.setAge(age);
-        ui.setId(id);
-        int i = userInfoDBService.update(ui, "id in (:id,:id)");
-        assertThat(i, equalTo(1));
-        UserInfo userInfo = userInfoDBService.findById(ui.getId());
-        assertThat(userInfo.getId(), equalTo(id));
-        assertThat(userInfo.getName(), equalTo(name));
-        assertThat(userInfo.getAge(), equalTo(age));
-    }
+        UserInfo userInfo = new UserInfo(id, name, age);
 
-    @Test
-    public void update6()
-    {
-        UserInfo ui = FQuery.reset(UserInfo.class);
-        ui.setId(1);
-        int i = userInfoDBService.update(ui, "id = :id");
-        assertThat(i, lessThan(1));
+        userInfo.set(userInfo::name, userInfo.getName());
+        userInfo.set(userInfo::age, userInfo.getAge());
+        userInfo.and(userInfo::id, SQLOperator.EQ, userInfo.getId());
+        userInfo.finish();
+
+        int i = userInfoDBService.executeUpdate(userInfo);
+        assertThat(i, equalTo(1));
+        UserInfo u = userInfoDBService.findById(userInfo.getId());
+        assertThat(u.getId(), equalTo(id));
+        assertThat(u.getName(), equalTo(name));
+        assertThat(u.getAge(), equalTo(age));
     }
 
     // 测试批量更新集合

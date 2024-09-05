@@ -24,6 +24,7 @@ package org.fastquery.bean;
 
 import lombok.*;
 import org.fastquery.core.Transient;
+import org.fastquery.struct.Chip;
 
 /**
  * @author xixifeng (fastquery@126.com)
@@ -45,6 +46,31 @@ public class Student
     private String description;
     @Transient
     private Long ssid;
+
+    public static Chip<String,Bandit> no()
+    {
+        return new Chip<>("no");
+    }
+
+    public static Chip<String,Bandit> name()
+    {
+        return new Chip<>("name");
+    }
+
+    public static Chip<String,Bandit> sex()
+    {
+        return new Chip<>("sex");
+    }
+
+    public static Chip<Integer,Bandit> age()
+    {
+        return new Chip<>("age");
+    }
+
+    public static Chip<String,Bandit> dept()
+    {
+        return new Chip<>("dept");
+    }
 
     public Student(String no, String name, String sex, Integer age, String dept)
     {

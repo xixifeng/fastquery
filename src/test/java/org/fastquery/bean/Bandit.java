@@ -50,6 +50,11 @@ public class Bandit extends Predicate<Bandit>
         return new Chip<>("name");
     }
 
+    public Chip<Integer,Bandit> sort()
+    {
+        return new Chip<>("sort");
+    }
+
     public static Chip<Integer,Bandit> age()
     {
         return new Chip<>("age");

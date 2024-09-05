@@ -660,4 +660,56 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         assertThat(contact.get(1).toString(),equalTo("{\"8\":\"axgbxc@email.com\"}"));
     }
 
+    @Test
+    public void predicate1()
+    {
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.setGender(Gender.女);
+
+        long count = db.count(typeFeature);
+        typeFeature.increment(TypeFeature::sort, -1);
+        typeFeature.and(typeFeature::gender, SQLOperator.EQ, typeFeature.getGender());
+        typeFeature.finish();
+
+        int effect = db.executeUpdate(typeFeature);
+        assertThat(count==effect,is(true));
+
+        SQLValue sqlValue = typeFeature.getSqlValue();
+        String sql = sqlValue.getSql();
+        List<Object> values = sqlValue.getValues();
+        assertThat(sql, equalTo("update type_feature set sort=sort+-1 where gender = ?"));
+        assertThat(values, notNullValue());
+        assertThat(values.size(), equalTo(1));
+        assertThat(values.get(0), equalTo(typeFeature.getGender().toString()));
+    }
+
+    @Test
+    public void predicate2()
+    {
+        long id = 19;
+        String name = "Nicky";
+        EnumSet<Ruits> ruits = EnumSet.of(Ruits.梨,Ruits.芒果, Ruits.苹果);
+        TypeFeature typeFeature = new TypeFeature();
+        typeFeature.set(typeFeature::ruits, ruits);
+        typeFeature.set(typeFeature::name, name);
+        typeFeature.and(typeFeature::id, SQLOperator.EQ, id);
+        typeFeature.finish();
+
+        int effect = db.executeUpdate(typeFeature);
+        assertThat(effect,is(1));
+
+        SQLValue sqlValue = typeFeature.getSqlValue();
+        String sql = sqlValue.getSql();
+        List<Object> values = sqlValue.getValues();
+        assertThat(sql, equalTo("update type_feature set ruits=?,name=? where id = ?"));
+        assertThat(values, notNullValue());
+        assertThat(values.size(), equalTo(3));
+        assertThat(values.get(0), equalTo("苹果,芒果,梨"));
+        assertThat(values.get(1), equalTo(name));
+        assertThat(values.get(2), equalTo(id));
+
+        TypeFeature oneById = db.findOneById(id);
+        assertThat(oneById.getName(),equalTo(name));
+        assertThat(oneById.getRuits(),equalTo(ruits));
+    }
 }

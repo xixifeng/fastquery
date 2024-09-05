@@ -499,15 +499,6 @@ public class BeanUtilTest
         assertThat(sql, equalTo("delete from Pe.Student where uuid=18"));
     }
 
-    @Test
-    public void testReset()
-    {
-        UserInfo u2 = BeanUtil.newBeanVarNull(UserInfo.class);
-        assertThat(u2.getId(), nullValue());
-        assertThat(u2.getName(), nullValue());
-        assertThat(u2.getAge(), nullValue());
-    }
-
     private static Field getField(String name)
     {
         Field[] fields = BeanUtil.getFields(Fish.class);

@@ -499,7 +499,7 @@ public final class BeanUtil
         return nf;
     }
 
-    private static String getTableName(String dbName, Class<?> cls)
+    public static String getTableName(String dbName, Class<?> cls)
     {
         String tableName = getEntitySimpleName(cls);
         if (dbName != null)
@@ -853,50 +853,6 @@ public final class BeanUtil
             }
         }
         return obj;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <S> S newBeanVarNull(Class<S> clazz, Object bean)
-    {
-        Field[] fields = getFields(clazz);
-        try
-        {
-            if (bean == null)
-            {
-                bean = clazz.getDeclaredConstructor().newInstance();
-            }
-            for (Field field : fields)
-            {
-                if(!Modifier.isStatic(field.getModifiers()))
-                {
-                    field.setAccessible(true);
-                    field.set(bean, null);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            throw new RepositoryException(e);
-        }
-        return (S) bean;
-    }
-
-    /**
-     * 创建一个bean实例,成员变量的值全部都为null <br>
-     * 注意:这个bean的成员变量必须都是包装类型
-     *
-     * @param <S>       实体
-     * @param beanClass 实体class
-     * @return 实体
-     */
-    public static <S> S newBeanVarNull(Class<S> beanClass)
-    {
-        return newBeanVarNull(beanClass, null);
-    }
-
-    public static void newBeanVarNull(Object bean)
-    {
-        newBeanVarNull(bean.getClass(), bean);
     }
 
     public static long toId(Object entity)

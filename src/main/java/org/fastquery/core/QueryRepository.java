@@ -91,16 +91,6 @@ public interface QueryRepository extends Repository
     <E> int executeUpdate(E entity);
 
     /**
-     * 更新实体
-     *
-     * @param entity          实体
-     * @param attachCondition 附加条件,若传递null或"",默认将主健作为条件进行修改
-     * @return 影响行数
-     */
-    @Id(MethodId.QUERY3)
-    int update(Object entity, String attachCondition);
-
-    /**
      * 保存或者更新实体,实体需要包含主键值否则报错 (如果不存在就存储,存在就更新)
      *
      * @param <E>    实体

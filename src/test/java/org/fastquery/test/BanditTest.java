@@ -1,5 +1,6 @@
 package org.fastquery.test;
 
+import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Bandit;
 import org.fastquery.struct.NulOperator;
 import org.fastquery.struct.SQLOperator;
@@ -17,6 +18,7 @@ import static org.hamcrest.Matchers.*;
  * @author xixifeng (fastquery@126.com)
  */
 
+@Slf4j
 public class BanditTest
 {
 
@@ -159,6 +161,27 @@ public class BanditTest
         List<Object> params = sqlValue.getValues();
         assertThat(params.toString(), equalTo("[3, 18]"));
         assertThat(sql, equalTo(" and name is null and age in (?) and id = ? order by id desc"));
+    }
+
+    @Test
+    public void conditions9()
+    {
+        Bandit bandit = new Bandit();
+
+        bandit.increment(Bandit::age, -3).increment(bandit::id, 16L);
+        bandit.set(bandit::sort, 7).set(bandit::createDateTime, 123456L);
+        bandit.and(bandit::name, NulOperator.ISNULL);
+        bandit.and(bandit::id, SQLOperator.EQ, 30L);
+        bandit.finish();
+
+        SQLValue sqlValue = bandit.getSqlValue();
+        String sql = sqlValue.getSql();
+        assertThat(sql,equalTo(" set age=age+-3,id=id+16,sort=?,createDateTime=? where name is null and id = ?"));
+        List<Object> values = sqlValue.getValues();
+        assertThat(values.size(),is(3));
+        assertThat(values.get(0),is(7));
+        assertThat(values.get(1),is(123456L));
+        assertThat(values.get(2),is(30L));
     }
 
     private void builder(List<String> names, Bandit bandit)

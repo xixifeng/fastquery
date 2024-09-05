@@ -30,7 +30,6 @@ import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.StrConst;
 import org.fastquery.dsm.FQueryProperties;
-import org.fastquery.util.BeanUtil;
 
 /**
  * @author xixifeng (fastquery@126.com)
@@ -69,28 +68,5 @@ public class FQuery
     public static void createDataSource(String dataSourceName, Properties properties)
     { // NO_UCD
         FQueryProperties.createDataSource(dataSourceName, properties);
-    }
-
-    /**
-     * 创建一个bean实例,成员变量的值全部重至为null <br>
-     * 注意:这个bean的成员变量必须都是包装类型
-     *
-     * @param <S>       实体
-     * @param beanClass 实体
-     * @return 成员变量重至为null后的实体
-     */
-    public static <S> S reset(Class<S> beanClass)
-    {
-        return BeanUtil.newBeanVarNull(beanClass);
-    }
-
-    /**
-     * 将传递的对象中的成员变量设置为null
-     *
-     * @param bean 待修改的对象
-     */
-    public static void reset(Object bean)
-    {
-        BeanUtil.newBeanVarNull(bean);
     }
 }

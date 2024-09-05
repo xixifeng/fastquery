@@ -71,6 +71,11 @@ public class TypeFeature extends Predicate<TypeFeature>
         return new Chip<>("gender");
     }
 
+    public static Chip<Integer,TypeFeature> sort()
+    {
+        return new Chip<>("sort");
+    }
+
     public Chip<EnumSet<Ruits>,TypeFeature> ruits()
     {
         return new Chip<>("ruits");
