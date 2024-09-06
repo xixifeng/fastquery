@@ -27,8 +27,6 @@ import org.fastquery.bean.Department;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInformation;
-import org.fastquery.core.ConditionList;
-import org.fastquery.core.QueryBuilder;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.page.Page;
@@ -423,29 +421,6 @@ public class UserInfoDBServiceTest extends TestFastQuery
     }
 
     @Test
-    public void insertByQueryBuilder()
-    {
-        int id;
-        String name = "香月儿";
-        Integer age = 23;
-
-        id = db.findByMaxId() + 1;
-
-        String query = "insert into UserInfo(id,name,age) values(:id,:name,:age)";
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("id", id);
-        parameters.put("name", name);
-        parameters.put("age", age);
-        QueryBuilder queryBuilder = new QueryBuilder(query, parameters);
-
-        UserInfo u = db.insert(queryBuilder);
-        assertThat(u.getId(), equalTo(id));
-        assertThat(u.getName(), equalTo(name));
-        assertThat(u.getAge(), equalTo(age));
-
-    }
-
-    @Test
     public void updateNameById()
     {
         int id = 2;
@@ -625,70 +600,6 @@ public class UserInfoDBServiceTest extends TestFastQuery
     {
         List<String> list = db.findLogic5(true);
         list.forEach(m -> assertThat(m, endsWith("三")));
-    }
-
-    @Test
-    public void pageByQueryBuilder()
-    {
-        String query = "select id,name,age from userinfo #{#where}";
-        String countQuery = "select count(name) from userinfo #{#where}";
-        ConditionList conditions = ConditionList.of("age > :age", "and id < :id");
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("age", 18);
-        parameters.put("id", 50);
-
-        QueryBuilder queryBuilder = new QueryBuilder(query, countQuery, conditions, parameters);
-        Page<Map<String, Object>> page = db.pageByQueryBuilder(queryBuilder, new PageableImpl(1, 3));
-        List<Map<String, Object>> content = page.getContent();
-        content.forEach(map -> {
-            Integer age = (Integer) map.get("age");
-            Integer id = (Integer) map.get("id");
-            assertThat(age, greaterThan(18));
-            assertThat(id, lessThan(50));
-        });
-
-        List<String> executedSQLs = rule.getExecutedSQLs();
-        assertThat("断言：执行过的sql有两条", executedSQLs.size(), is(2));
-        assertThat(executedSQLs.get(0), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 0,3"));
-        assertThat(executedSQLs.get(1), equalTo("select count(name) from userinfo where age > ? and id < ?"));
-    }
-
-    @Test
-    public void pageByQueryBuilderNotCount()
-    {
-        String query = "select id,name,age from userinfo #{#where}";
-        String countQuery = "select count(name) from userinfo #{#where}";
-        ConditionList conditions = ConditionList.of("age > :age", "and id < :id");
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("age", 18);
-        parameters.put("id", 50);
-
-        QueryBuilder queryBuilder = new QueryBuilder(query, countQuery, conditions, parameters);
-        Page<Map<String, Object>> page = db.pageByQueryBuilderNotCount(queryBuilder, new PageableImpl(1, 3));
-        List<Map<String, Object>> content = page.getContent();
-        content.forEach(map -> {
-            Integer age = (Integer) map.get("age");
-            Integer id = (Integer) map.get("id");
-            assertThat(age, greaterThan(18));
-            assertThat(id, lessThan(50));
-        });
-        assertThat(page.getTotalElements(), is(-1L));
-        assertThat(page.getTotalPages(), is(-1));
-        List<String> executedSQLs = rule.getExecutedSQLs();
-        assertThat("断言：执行过的sql有两条", executedSQLs.size(), is(2));
-        assertThat(executedSQLs.get(0), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 0,3"));
-        assertThat(executedSQLs.get(1), equalTo("select 1 from userinfo where age > ? and id < ? limit 3,1"));
-    }
-
-    @Test
-    public void findByIdWithQueryBuilder()
-    {
-        String query = "select id,name,age from UserInfo where id = :id";
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("id", 3);
-        QueryBuilder queryBuilder = new QueryBuilder(query, parameters);
-        UserInfo userInfo = db.findByIdWithQueryBuilder(queryBuilder);
-        assertThat(userInfo.getId(), is(3));
     }
 
     @Test

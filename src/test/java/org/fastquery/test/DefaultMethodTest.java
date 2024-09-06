@@ -200,58 +200,32 @@ public class DefaultMethodTest extends TestFastQuery
     }
 
     @Test
-    public void exists()
-    { // xk3
-        UserInfo userInfo = new UserInfo();
-        userInfo.setName(null);
-        boolean b = db.exists(userInfo, true);
-        assertThat(b, is(true));
-
-        userInfo.setName("婤姶");
-        b = db.exists(userInfo, true);
-        assertThat(b, is(true));
-
-        userInfo.setName("凤雏");
-        b = db.exists(userInfo, true);
-        assertThat(b, is(false));
-
-        userInfo.setName("王五");
-        userInfo.setAge(36);
-        b = db.exists(userInfo, true);
-        assertThat(b, is(true));
-
-        userInfo.setId(2);
-        b = db.exists(userInfo, true);
-        assertThat(b, is(true));
-    }
-
-    @Test
     public void exists1()
     { // xk3
         UserInfo userInfo = new UserInfo();
         userInfo.setName(null);
-        boolean b = db.exists(userInfo, false);
+        boolean b = db.exists(userInfo);
         assertThat(b, is(true));
 
         userInfo.setName("婤姶");
-        b = db.exists(userInfo, false);
+        b = db.exists(userInfo);
         assertThat(b, is(true));
 
         userInfo.setName("凤雏");
-        b = db.exists(userInfo, false);
+        b = db.exists(userInfo);
         assertThat(b, is(false));
 
         userInfo.setName("王五");
         userInfo.setAge(36);
-        b = db.exists(userInfo, false);
+        b = db.exists(userInfo);
         assertThat(b, is(true));
 
         userInfo.setId(2);
-        b = db.exists(userInfo, false);
+        b = db.exists(userInfo);
         assertThat(b, is(true));
 
         userInfo.setName("瘌蛤蟆");
-        b = db.exists(userInfo, false);
+        b = db.exists(userInfo);
         assertThat(b, is(false));
     }
 

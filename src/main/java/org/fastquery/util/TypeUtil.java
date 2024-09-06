@@ -991,31 +991,6 @@ public class TypeUtil
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T> T findCurrentMethodParameter()
-    {
-        Object[] args = QueryContext.getArgs();
-        for (Object arg : args)
-        {
-            if (arg != null && arg.getClass() == QueryBuilder.class)
-            {
-                return (T) arg;
-            }
-        }
-        return null;
-    }
-
-    public static QueryBuilder getQueryBuilder()
-    {
-        MethodInfo methodInfo = QueryContext.getMethodInfo();
-        QueryBuilder queryBuilder = findCurrentMethodParameter();
-        if (methodInfo.isContainQueryBuilderParam() && queryBuilder == null)
-        {
-            throw new RepositoryException("传递的QueryBuilder不能为null");
-        }
-        return queryBuilder;
-    }
-
     public static EnumSet toEnumSet(String value, Class<Enum> clazz)
     {
         if (value == null)

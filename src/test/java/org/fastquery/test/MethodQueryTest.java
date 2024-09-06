@@ -27,7 +27,6 @@ import org.fastquery.bean.*;
 import org.fastquery.core.*;
 import org.fastquery.dao.UserInfoDBService;
 import org.fastquery.example.StudentDBService;
-import org.fastquery.page.Page;
 import org.fastquery.service.FQuery;
 import org.fastquery.struct.SQLOperator;
 import org.junit.Rule;
@@ -43,9 +42,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author xixifeng (fastquery@126.com)
@@ -105,13 +102,6 @@ public class MethodQueryTest extends TestFastQuery
         UserInfo u1 = new UserInfo(1, "equ", 10);
         UserInfo u2 = new UserInfo(2, "Ecl", 3);
         UserInfo u3 = new UserInfo(3, "ement", 2);
-        // 断言: 在执行studentDBService.save(false, u1,u2,u3)之后,将会抛出
-        // RepositoryException 异常!
-        // thrown.expect(RepositoryException.class);
-        // 断言: 在执行studentDBService.save(false, u1,u2,u3)之后,抛出的异常信息中包含有"Duplicate
-        // entry '1' for key 'PRIMARY'"字符串
-        // thrown.expectMessage(containsString("Duplicate entry '1' for key
-        // 'PRIMARY'"));
         int effect = studentDBService.saveArray(false, u1, u2, u3);
         assertThat(effect, is(0));
     }
@@ -376,125 +366,6 @@ public class MethodQueryTest extends TestFastQuery
     {
         int effect = userInfoDBService.delete(tableName, primaryKeyName, 1);
         assertThat(effect, is(0));
-    }
-
-    @Test
-    public void findPage1()
-    {
-        String query = "select id,name,age from userinfo #{#where}";
-        String countQuery = "select count(name) from userinfo #{#where}";
-        ConditionList conditions = ConditionList.of("age > :age", "and id < :id");
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("age", 18);
-        parameters.put("id", 50);
-
-        QueryBuilder queryBuilder = new QueryBuilder(query, countQuery, conditions, parameters);
-        Page<Map<String, Object>> page = userInfoDBService.findPage(queryBuilder, true, 1, 3);
-        List<Map<String, Object>> content = page.getContent();
-        content.forEach(map -> {
-            Integer age = (Integer) map.get("age");
-            Integer id = (Integer) map.get("id");
-            assertThat(age, greaterThan(18));
-            assertThat(id, lessThan(50));
-        });
-        assertThat(page.getTotalElements(), is(-1L));
-        assertThat(page.getTotalPages(), is(-1));
-        List<String> executedSQLs = rule.getExecutedSQLs();
-        assertThat("断言：执行过的sql有两条", executedSQLs.size(), is(2));
-        assertThat(executedSQLs.get(0), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 0,3"));
-        assertThat(executedSQLs.get(1), equalTo("select 1 from userinfo where age > ? and id < ? limit 3,1"));
-
-        page = userInfoDBService.findPage(queryBuilder, false, 1, 3);
-        content = page.getContent();
-        content.forEach(map -> {
-            Integer age = (Integer) map.get("age");
-            Integer id = (Integer) map.get("id");
-            assertThat(age, greaterThan(18));
-            assertThat(id, lessThan(50));
-        });
-        assertThat(page.getTotalElements(), greaterThan(1L));
-        assertThat(page.getTotalPages(), greaterThan(1));
-        assertThat(page.getSize(), is(3));
-        executedSQLs = rule.getExecutedSQLs();
-        assertThat("断言：执行过的sql有两条", executedSQLs.size(), is(2));
-        assertThat(executedSQLs.get(0), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 0,3"));
-        assertThat(executedSQLs.get(1), equalTo("select count(name) from userinfo where age > ? and id < ?"));
-    }
-
-    @Test
-    public void findPage()
-    {
-        UserInfo userInfo = new UserInfo();
-        userInfo.setDescription("小说");
-        userInfo.setAge(18);
-        Page<UserInfo> page = userInfoDBService.findPage(userInfo, null, "order by id desc", true, 1, 3, false);
-        assertThat(page.getNumber(), is(1));
-        assertThat(page.getSize(), is(3));
-        assertThat(page.getNumberOfElements(),is(2));
-        assertThat(page.getTotalElements(), is(-1L));
-        assertThat(page.getTotalPages(), is(-1));
-        List<String> sqlValues = rule.getExecutedSQLs();
-        assertThat(sqlValues.size(), is(1));
-        assertThat(sqlValues.get(0), equalTo("select id,name,age from UserInfo where age = ? order by id desc limit 0,3"));
-
-        userInfo.setAge(null);
-        userInfo.setName("张三");
-        page = userInfoDBService.findPage(userInfo, null, "order by id desc", false, 1, 3, false, "id");
-        assertThat(page.getTotalElements(), not(-1L));
-        assertThat(page.getTotalPages(), not(-1));
-        sqlValues = rule.getExecutedSQLs();
-        assertThat(sqlValues.size(), is(2));
-        assertThat(sqlValues.get(0), equalTo("select name,age from UserInfo where name = ? order by id desc limit 0,3"));
-
-        userInfo.setAge(18);
-        userInfo.setName("张三gewgewkljgklwjgxx"); // 没有这条数据
-        page = userInfoDBService.findPage(userInfo, null, "order by id desc", false, 1, 3, false, "id", "age");
-        assertThat(page.getTotalElements(), is(0L));
-        assertThat(page.getTotalPages(), is(0));
-        sqlValues = rule.getExecutedSQLs();
-        assertThat(sqlValues.size(), is(1));
-        assertThat(sqlValues.get(0), equalTo("select name from UserInfo where name = ? and age = ? order by id desc limit 0,3"));
-
-        userInfo.setAge(null);
-        userInfo.setName(null); // 没有这条数据
-        userInfoDBService.findPage(userInfo, null, "order by id desc", false, 1, 3, true, "age");
-        sqlValues = rule.getExecutedSQLs();
-        assertThat(sqlValues.size(), is(2));
-        assertThat(sqlValues.get(0), equalTo("select age from UserInfo order by id desc limit 0,3"));
-        assertThat(sqlValues.get(1), equalTo("select count(id) from UserInfo"));
-
-        userInfoDBService.findPage(userInfo, null, null, false, 1, 3, true, "age", "id");
-        sqlValues = rule.getExecutedSQLs();
-        assertThat(sqlValues.size(), is(2));
-        assertThat(sqlValues.get(0), equalTo("select id,age from UserInfo  limit 0,3"));
-        assertThat(sqlValues.get(1), equalTo("select count(id) from UserInfo"));
-    }
-
-    @Test
-    public void findPage2()
-    {
-        TypeFeature typeFeature = new TypeFeature();
-        typeFeature.setGender(Gender.女);
-        typeFeature.setSort(0);
-        TypeFeature likes = new TypeFeature();
-        likes.setName("Ru%");
-        likes.setSort(0);
-        userInfoDBService.findPage(typeFeature, likes, "order by sort DESC", false, 1, 1, true);
-        List<String> sqlValues = rule.getExecutedSQLs();
-        assertThat(sqlValues.size(), is(2));
-        assertThat(sqlValues.get(0), equalTo("select id,name,gender,ruits,sort,actionLogObj,contactArray from type_feature where gender = ? and sort = ? and ( name like ? or sort like ? ) order by sort DESC limit 0,1"));
-        assertThat(sqlValues.get(1), equalTo("select count(id) from type_feature where gender = ? and sort = ? and ( name like ? or sort like ? )"));
-    }
-
-    @Test
-    public void findPage3()
-    {
-        Area area = new Area();
-        // 针对两个属性，其中一个为空这种情形测试
-        area.setType(AreaType.二级);
-        area.setAreaEnName("");
-        userInfoDBService.findPage(area, null, "order by id desc", true, 1, 3, true,"id"," stageSid");
-        userInfoDBService.findPage(null, area, "order by id desc", true, 1, 3, true,"id"," stageSid");
     }
 }
 

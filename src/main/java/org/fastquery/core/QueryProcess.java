@@ -72,16 +72,7 @@ class QueryProcess
         Class<?> returnType = QueryContext.getReturnType();
 
         // 获取待执行的sql
-        List<SQLValue> sqlValues;
-        if (method.isContainQueryBuilderParam())
-        {
-            QueryBuilder queryBuilder = TypeUtil.getQueryBuilder();
-            sqlValues = queryBuilder.getQuerySQLValues();
-        }
-        else
-        {
-            sqlValues = QueryParser.modifyParser();
-        }
+        List<SQLValue> sqlValues= QueryParser.modifyParser();
 
         // 执行
         List<RespUpdate> respUpdates = DB.modify(sqlValues, QueryContext.isRequirePk());
@@ -135,16 +126,7 @@ class QueryProcess
 
         MethodInfo method = QueryContext.getMethodInfo();
         Class<?> returnType = QueryContext.getReturnType();
-        SQLValue sqlValue;
-        if (method.isContainQueryBuilderParam())
-        {
-            QueryBuilder queryBuilder = TypeUtil.getQueryBuilder();
-            sqlValue = queryBuilder.getQuerySQLValue();
-        }
-        else
-        {
-            sqlValue = QueryParser.queryParser();
-        }
+        SQLValue sqlValue = QueryParser.queryParser();
         List<Map<String, Object>> keyvals = DB.find(sqlValue);
 
         // 上面的try发生异常了,才会导致keyvals为null, 不过异常一旦捕获到就throw了,因此,程序执行到这里keyvals不可能为null.
@@ -351,8 +333,6 @@ class QueryProcess
                 return q1();
             case MethodId.QUERY2:
                 return q2();
-            case MethodId.QUERY3:
-                return q3();
             case MethodId.QUERY4:
                 return q4();
             case MethodId.QUERY5:
@@ -375,9 +355,6 @@ class QueryProcess
                 return q13();
             case MethodId.QUERY14:
                 return q14();
-            case MethodId.QUERY15:
-                return q15();
-                // 下次用 QUERY14
             default:
                 break;
         }
@@ -449,13 +426,6 @@ class QueryProcess
             // 保存
             return DB.update((iargs.length == 3) ? BeanUtil.toInsertSQL(iargs[1].toString(), bean) : BeanUtil.toInsertSQL(bean), true);
         }
-    }
-
-    private static Object q3()
-    {
-        Object[] iargs = QueryContext.getArgs();
-        Object b = iargs[0];
-        return DB.update(b, null, (String) iargs[iargs.length - 1]);
     }
 
     private static Object q4()
@@ -601,19 +571,11 @@ class QueryProcess
         Object[] iargs = QueryContext.getArgs();
         SQLValue sv;
         Object entity = iargs[0];
-        if(iargs.length > 3) {
-            boolean unequal = (boolean) iargs[1];
-            boolean or = (boolean) iargs[2];
-            boolean contain = (boolean) iargs[3];
-            String[] fields = (String[]) iargs[4];
-            sv = BeanUtil.toSelectSQL(entity, unequal, or, null, contain, fields);
-        }
-        else
-        {
-            boolean contain = (boolean) iargs[1];
-            String[] fields = (String[]) iargs[2];
-            sv = BeanUtil.toSelectSQL(entity, null, contain, fields);
-        }
+
+        boolean contain = (boolean) iargs[1];
+        String[] fields = (String[]) iargs[2];
+        sv = BeanUtil.toSelectSQL(entity, null, contain, fields);
+
         List<Map<String, Object>> list = DB.find(sv);
         if (list.isEmpty())
         {
@@ -634,14 +596,7 @@ class QueryProcess
     {
         Object[] iargs = QueryContext.getArgs();
         Object entity = iargs[0];
-        boolean or = (boolean) iargs[1];
         SQLValue sv = BeanUtil.toSelectSQL(entity, null, true, "1");
-        if (or)
-        {
-            String sql = sv.getSql();
-            sql = sql.replace(" and ", " or ");
-            sv.setSql(sql);
-        }
         return DB.exists(sv);
     }
 
@@ -687,53 +642,6 @@ class QueryProcess
         log.debug("clazz:{}, contain:{}, fields:{}",
                 clazz, contain, fields);
         SQLValue sqlValue = BeanUtil.getSqlValue14(clazz, equals, contain, fields);
-        String querySQL = sqlValue.getSql();
-
-        PageDialect pageDialect = DialectScheduler.getCurrentPageDialect();
-        String currentPageSQL = pageDialect.getCurrentPageSQL(querySQL, offset, pageSize);
-        sqlValue.setSql(currentPageSQL);
-        List<SQLValue> sqlValues = new ArrayList<>(2);
-        sqlValues.add(sqlValue);
-
-        if (method.isCount())
-        {
-            String countPageSQL = pageDialect.countSQLInference(querySQL, "id");
-            SQLValue countSqlValue = new SQLValue(countPageSQL, sqlValue.getValues());
-            sqlValues.add(countSqlValue);
-        }
-        else
-        {
-            offset = offset + pageSize;
-            String nextRecordSQL = pageDialect.getCurrentPageSQL(querySQL, offset, 1);
-            SQLValue sv = new SQLValue(nextRecordSQL, sqlValue.getValues());
-            sqlValues.add(sv);
-        }
-
-        return queryPage(sqlValues);
-    }
-
-    private static Object q15()
-    {
-        MethodInfo method = QueryContext.getMethodInfo();
-        Pageable pageable = QueryContext.getPageable();
-        int offset = pageable.getOffset();
-        int pageSize = pageable.getPageSize();
-
-        Object[] iargs = QueryContext.getArgs();
-        Class<?> clazz = (Class<?>) iargs[0];
-        Objects.requireNonNull(clazz);
-        String fieldName = (String) iargs[1];
-        if (fieldName == null || StringUtils.EMPTY.equals(fieldName))
-        {
-            fieldName = "1";
-        }
-        List<Object> fieldValues = (List<Object>) iargs[2];
-        Object equals = iargs[3];
-        boolean contain = (boolean) iargs[7];
-        String[] fields = (String[]) iargs[8];
-        log.debug("clazz:{}, fieldName:{}, fieldValues:{}, contain:{}, fields:{}",
-                clazz, fieldName, fieldValues, contain, fields);
-        SQLValue sqlValue = BeanUtil.getSqlValue(clazz, fieldName, fieldValues, equals, contain, fields);
         String querySQL = sqlValue.getSql();
 
         PageDialect pageDialect = DialectScheduler.getCurrentPageDialect();

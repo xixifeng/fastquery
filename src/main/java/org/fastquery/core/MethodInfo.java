@@ -43,7 +43,6 @@ public class MethodInfo
     private final Modifying modifying;
     private final Query[] queries;
     private final Parameter[] parameters;
-    private final boolean containQueryBuilderParam;
     private final Class<?> returnType;
     private final Id id;
     private final Transactional t;
@@ -73,7 +72,6 @@ public class MethodInfo
         this.name = method.getName();
         this.query = method.getAnnotation(Query.class);
         this.sets = method.getAnnotationsByType(Set.class);
-        this.containQueryBuilderParam = TypeUtil.hasType(QueryBuilder.class, this.parameters);
     }
 
     public boolean isCount()

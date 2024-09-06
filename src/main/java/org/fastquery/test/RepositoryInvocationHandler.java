@@ -32,14 +32,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.fastquery.core.MethodInfo;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Query;
-import org.fastquery.core.QueryBuilder;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.QueryParser;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.page.Page;
-import org.fastquery.util.TypeUtil;
 import org.junit.runner.Description;
 
 /**
@@ -90,18 +88,17 @@ public class RepositoryInvocationHandler implements InvocationHandler
         Field sqlValuesField = qcclazz.getDeclaredField("sqlValues");
         sqlValueField.setAccessible(true);
         sqlValuesField.setAccessible(true);
-        QueryBuilder queryBuilder = TypeUtil.getQueryBuilder();
         if (modifying != null)
         {
-            modifyingRule(currentMethod, modifyParserMethod, sqlValuesField, queryBuilder);
+            modifyingRule(modifyParserMethod, sqlValuesField);
         }
         else if (returnType == Page.class)
         {
-            pageRule(currentMethod, queryById, query, sqlValuesField, queryBuilder);
+            pageRule(queryById, query, sqlValuesField);
         }
         else if (queryById != null || query != null)
         {
-            queryAndByIdRule(currentMethod, queryParserMethod, sqlValueField, queryBuilder);
+            queryAndByIdRule(queryParserMethod, sqlValueField);
         }
         else
         {
@@ -121,20 +118,13 @@ public class RepositoryInvocationHandler implements InvocationHandler
         executedSQLsField.set(rule, list);
     }
 
-    private void queryAndByIdRule(MethodInfo currentMethod, Method queryParserMethod, Field sqlValueField, QueryBuilder queryBuilder)
+    private void queryAndByIdRule(Method queryParserMethod, Field sqlValueField)
             throws IllegalAccessException, InvocationTargetException
     {
-        if (currentMethod.isContainQueryBuilderParam())
-        {
-            sqlValueField.set(rule, queryBuilder.getQuerySQLValue());
-        }
-        else
-        {
             sqlValueField.set(rule, queryParserMethod.invoke(null));
-        }
     }
 
-    private void pageRule(MethodInfo currentMethod, QueryByNamed queryById, Query query, Field sqlValuesField, QueryBuilder queryBuilder)
+    private void pageRule(QueryByNamed queryById, Query query, Field sqlValuesField)
             throws IllegalAccessException
     {
         if (queryById != null)
@@ -143,29 +133,15 @@ public class RepositoryInvocationHandler implements InvocationHandler
         }
         else if (query != null)
         {
-            if (currentMethod.isContainQueryBuilderParam())
-            {
-                sqlValuesField.set(rule, queryBuilder.getPageQuerySQLValue());
-            }
-            else
-            {
-                sqlValuesField.set(rule, QueryParser.pageParser());
-            }
+            sqlValuesField.set(rule, QueryParser.pageParser());
         }
     }
 
-    private void modifyingRule(MethodInfo currentMethod, Method modifyParserMethod, Field sqlValuesField, QueryBuilder queryBuilder)
+    private void modifyingRule(Method modifyParserMethod, Field sqlValuesField)
             throws IllegalAccessException, InvocationTargetException
     {
         // 改操作涉及多条sql语句
-        if (currentMethod.isContainQueryBuilderParam())
-        {
-            sqlValuesField.set(rule, queryBuilder.getQuerySQLValues());
-        }
-        else
-        {
-            sqlValuesField.set(rule, modifyParserMethod.invoke(null));
-        }
+        sqlValuesField.set(rule, modifyParserMethod.invoke(null));
     }
 
     @Override

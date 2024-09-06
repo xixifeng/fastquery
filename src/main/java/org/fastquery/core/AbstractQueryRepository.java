@@ -25,8 +25,6 @@ package org.fastquery.core;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.function.LongSupplier;
 
 import org.fastquery.page.Page;
@@ -57,7 +55,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
 
     private static final Class<QueryRepository> c = QueryRepository.class;
 
-    private final MethodInfo[] m = new MethodInfo[21];
+    private final MethodInfo[] m = new MethodInfo[17];
 
     private void cache(int j, String name, Class<?>... parameterTypes)
     {
@@ -154,7 +152,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <E> int update(Collection<E> paramCollection)
     {
-        int j = 8;
+        int j = 7;
         if (m[j] == null)
         {
             cache(j, UPDATE, Collection.class);
@@ -166,7 +164,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <E> E find(Class<E> clazz, long paramLong, boolean contain, String... fields)
     {
-        int j = 9;
+        int j = 8;
         if (m[j] == null)
         {
             cache(j, "find", Class.class, long.class, boolean.class, String[].class);
@@ -177,7 +175,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public int delete(String paramString1, String paramString2, long paramLong)
     {
-        int j = 10;
+        int j = 9;
         if (m[j] == null)
         {
             cache(j, DELETE, String.class, String.class, long.class);
@@ -188,7 +186,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <B> int save(boolean paramBoolean, Collection<B> paramCollection)
     {
-        int j = 11;
+        int j = 10;
         if (m[j] == null)
         {
             cache(j, SAVE, boolean.class, Collection.class);
@@ -199,7 +197,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public int insert(Object paramObject)
     {
-        int j = 12;
+        int j = 11;
         if (m[j] == null)
         {
             cache(j, INSERT, Object.class);
@@ -207,22 +205,11 @@ public abstract class AbstractQueryRepository implements QueryRepository
         return (Integer) Prepared.excute(m[j], new Object[]{paramObject}, this);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public Page<Map<String, Object>> findPage(QueryBuilder builder, boolean count, int pageIndex, int pageSize)
-    {
-        int j = 13;
-        if (m[j] == null)
-        {
-            cache(j, "findPage", QueryBuilder.class, boolean.class, int.class, int.class);
-        }
-        return (Page<Map<String, Object>>) Prepared.excute(m[j], new Object[]{builder, count, pageIndex, pageSize}, this);
-    }
 
     @Override
     public long count(Object entity)
     {
-        int j = 14;
+        int j = 12;
         if (m[j] == null)
         {
             cache(j, "count", Object.class);
@@ -233,7 +220,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <E> E findOne(E equals, boolean contain, String... fields)
     {
-        int j = 15;
+        int j = 13;
         if (m[j] == null)
         {
             cache(j, "findOne", Object.class, boolean.class, String[].class);
@@ -242,31 +229,20 @@ public abstract class AbstractQueryRepository implements QueryRepository
     }
 
     @Override
-    public <E> E findOne(E equals, boolean unequal, boolean or, boolean contain, String... fields)
+    public boolean exists(Object entity)
     {
-        int j = 16;
+        int j = 14;
         if (m[j] == null)
         {
-            cache(j, "findOne", Object.class, boolean.class, boolean.class, boolean.class, String[].class);
+            cache(j, "exists", Object.class);
         }
-        return (E) Prepared.excute(m[j], new Object[]{equals, unequal, or, contain, fields}, this);
-    }
-
-    @Override
-    public boolean exists(Object entity, boolean or)
-    {
-        int j = 17;
-        if (m[j] == null)
-        {
-            cache(j, "exists", Object.class, boolean.class);
-        }
-        return (boolean) Prepared.excute(m[j], new Object[]{entity, or}, this);
+        return (boolean) Prepared.excute(m[j], new Object[]{entity}, this);
     }
 
     @Override
     public String existsEachOn(Object entity)
     {
-        int j = 18;
+        int j = 15;
         if (m[j] == null)
         {
             cache(j, "existsEachOn", Object.class);
@@ -277,7 +253,7 @@ public abstract class AbstractQueryRepository implements QueryRepository
     @Override
     public <E> Page<E> findPageByPredicate(E equals, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields)
     {
-        int j = 19;
+        int j = 16;
         if (m[j] == null)
         {
             cache(j, "findPageByPredicate", Object.class, boolean.class, int.class, int.class, boolean.class, String[].class);
@@ -285,14 +261,4 @@ public abstract class AbstractQueryRepository implements QueryRepository
         return (Page<E>) Prepared.excute(m[j], new Object[]{equals, notCount, pageIndex, pageSize, contain, fields}, this);
     }
 
-    @Override
-    public <E, F> Page<E> findPageByIn(Class<E> clazz, String fieldName, List<F> fieldValues, E equals, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields)
-    {
-        int j = 20;
-        if (m[j] == null)
-        {
-            cache(j, "findPageByIn", Class.class, String.class, List.class, Object.class, boolean.class, int.class, int.class, boolean.class, String[].class);
-        }
-        return (Page<E>) Prepared.excute(m[j], new Object[]{clazz, fieldName, fieldValues, equals, notCount, pageIndex, pageSize, contain, fields}, this);
-    }
 }

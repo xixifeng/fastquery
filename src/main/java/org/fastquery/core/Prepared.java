@@ -33,7 +33,6 @@ import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.Page;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.util.FastQueryJSONObject;
-import org.fastquery.util.TypeUtil;
 
 import static org.fastquery.core.QueryProcess.*;
 /**
@@ -133,13 +132,13 @@ public class Prepared
         Modifying modifying = methodInfo.getModifying();
         QueryByNamed queryById = methodInfo.getQueryByNamed();
 
-        boolean hasSQLTpl = hasSQLTpl(methodInfo, queries, queryById); // 有SQL模板吗?
+        boolean hasSQLTpl = hasSQLTpl(queries, queryById); // 有SQL模板吗?
 
         if (hasSQLTpl)
         {
             if (returnType == Page.class)
             { // 分页
-                return pagePro(methodInfo, queryById);
+                return pagePro(queryById);
             }
             else if (modifying != null)
             { // 改
@@ -164,22 +163,14 @@ public class Prepared
         }
     }
 
-    private static Object pagePro(MethodInfo methodInfo, QueryByNamed queryById)
+    private static Object pagePro(QueryByNamed queryById)
     {
-        if (methodInfo.isContainQueryBuilderParam())
-        {
-            QueryBuilder queryBuilder = TypeUtil.getQueryBuilder();
-            return queryPage(queryBuilder.getPageQuerySQLValue());
-        }
-        else
-        {
             List<SQLValue> sqlValues = queryById == null ? QueryParser.pageParser() : QueryParser.pageParserByNamed();
             return queryPage(sqlValues);
-        }
     }
 
-    private static boolean hasSQLTpl(MethodInfo methodInfo, Query[] queries, QueryByNamed queryById)
+    private static boolean hasSQLTpl(Query[] queries, QueryByNamed queryById)
     {
-        return queries.length > 0 || queryById != null || methodInfo.isContainQueryBuilderParam();
+        return queries.length > 0 || queryById != null;
     }
 }

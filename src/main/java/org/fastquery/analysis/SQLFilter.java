@@ -26,8 +26,6 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.Query;
-import org.fastquery.core.QueryBuilder;
-import org.fastquery.util.TypeUtil;
 
 /**
  * SQL 安全检测
@@ -41,16 +39,15 @@ class SQLFilter implements MethodFilter
     public void doFilter(Method method)
     {
         Query[] queries = method.getAnnotationsByType(Query.class);
-        boolean b = TypeUtil.hasType(QueryBuilder.class, method.getParameters());
         for (Query query : queries)
         {
             String sql = query.value();
 
-            if (StringUtils.EMPTY.equals(sql) && !b)
+            if (StringUtils.EMPTY.equals(sql))
             { // 如果@Query的value为"",并且又没有传递QueryBuilder(用于构建SQL)
                 this.abortWith(method, sql + "该方法,没有标注任何SQL语句. 帮定SQL又多种方式:通过@Query;采用xml模板;用QueryBuilder,或参数传入...");
             }
-            else if (sql.length() < 2 && !b)
+            else if (sql.length() < 2)
             {
                 this.abortWith(method, sql + "SQL语法错误");
             }

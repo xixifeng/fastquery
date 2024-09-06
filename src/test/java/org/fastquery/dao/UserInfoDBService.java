@@ -32,7 +32,6 @@ import org.fastquery.core.Id;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;
-import org.fastquery.core.QueryBuilder;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.core.Transactional;
@@ -181,9 +180,6 @@ public interface UserInfoDBService extends QueryRepository
     @Query("insert into UserInfo(id,name,age) values(:id,:name,:age)")
     UserInfo insert(@Param("id") Integer id, @Param("name") String name, @Param("age") Integer age);
 
-    @Modifying(table = "UserInfo")
-    UserInfo insert(QueryBuilder queryBuilder);
-
     // 这行SQL参数完全可以用?或:name表达式,在此仅用来测试语法特性
     @Modifying
     @Query("update UserInfo set name = ${name} where id = ${id}")
@@ -241,16 +237,6 @@ public interface UserInfoDBService extends QueryRepository
 
     @Query("select name from UserInfo where if(:predicate,name like '%三',1)")
     List<String> findLogic5(@Param("predicate") boolean predicate);
-
-    @Query
-    Page<Map<String, Object>> pageByQueryBuilder(QueryBuilder queryBuilder, Pageable pageable);
-
-    @Query
-    @NotCount
-    Page<Map<String, Object>> pageByQueryBuilderNotCount(QueryBuilder queryBuilder, Pageable pageable);
-
-    @Query
-    UserInfo findByIdWithQueryBuilder(QueryBuilder queryBuilder);
 
     @Query("select d.id as departmentId, d.name as departmentName from `department` d left join employee e on d.id = e.departmentId")
     List<Map<String, Object>> findEmpl();

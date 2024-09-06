@@ -127,8 +127,8 @@ public interface StudentDBService extends QueryRepository
     /**
      * 查询某个表的主键字段信息, 注意: 一个表中有可能是联合主键,因此返回的是数组
      *
-     * @param table_name   表名称
-     * @param table_schema 所属数据库
+     * @param tableName   表名称
+     * @param tableSchema 所属数据库
      */
     @Query("select * from information_schema.columns where table_name = ?1 and table_schema = ?2 and column_key='PRI'")
     JSONArray findColumnKey(String tableName, String tableSchema);

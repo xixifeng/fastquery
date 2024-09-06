@@ -26,7 +26,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.function.LongSupplier;
 
-import org.apache.commons.lang3.StringUtils;
 import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
 import org.fastquery.page.PageIndex;
@@ -242,39 +241,23 @@ public interface QueryRepository extends Repository
     /**
      * 根据指定的条件查询一条记录，实体属性若为 null 值，则，该属性不参与运算，反之，参与 equal 运算，条件与条件之间的关系是 and
      *
-     * @param equals  实体对象
+     * @param entity  实体对象
      * @param contain true:包含 fields，反之，排除 fields
      * @param fields  待包含或待排除的字段列表
      * @param <E>     实体
      * @return 实体
      */
     @Id(MethodId.QUERY11)
-    <E> E findOne(E equals, boolean contain, String... fields);
-
-    /**
-     * 根据指定的条件查询一条记录，实体属性若为 null 值，则，该属性不参与运算. <br>
-     * 一个 KV 称为一个条件单元.
-     *
-     * @param entity 条件单元集
-     * @param unequal KV 之间的关系是否不相等，true: K != V , false: K = V
-     * @param or 条件单元之间的关系是否是 or， true: 表示条件单元之间的关系为 or, 例如 K1 != V1 or K2 != V2. false: 表示条件单元之间的关系为 and.
-     * @param contain true:包含 fields，反之，排除 fields
-     * @param fields 待包含或待排除的字段列表
-     * @param <E> 实体
-     * @return 满足条件约束的实体
-     */
-    @Id(MethodId.QUERY11)
-    <E> E findOne(E entity, boolean unequal, boolean or, boolean contain, String... fields);
+    <E> E findOne(E entity, boolean contain, String... fields);
 
     /**
      * 根据条件判断是否存在
      *
      * @param entity 根据指定的条件判断是否存在，实体属性若为 null 值，则，该属性不参与运算
-     * @param or     true 表示条件与条件之间参与 or 运算，反之，参与 and 运算。实体的属性参与 equal 运算
      * @return 存在返回 true，反之，返回 false
      */
     @Id(MethodId.QUERY12)
-    boolean exists(Object entity, boolean or);
+    boolean exists(Object entity);
 
     /**
      * 逐一遍历指定对象的成员属性并查询该属性值是否在，若存在，立马返回当前属性的名称，反之，继续搜寻下一个属性。实体的  null 属性值不参与运算
@@ -284,68 +267,6 @@ public interface QueryRepository extends Repository
      */
     @Id(MethodId.QUERY13)
     String existsEachOn(Object entity);
-
-    /**
-     * 查询分页
-     *
-     * @param builder   查询构造器
-     * @param notCount  true:表示分页时不执行 count 语句.反之,执行 count 语句.
-     * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
-     * @param pageSize  用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
-     * @return 分页结构对象
-     */
-    Page<Map<String, Object>> findPage(QueryBuilder builder, @NotCount boolean notCount, @PageIndex int pageIndex, @PageSize int pageSize);
-
-    /**
-     * 查找存储的实体集并进行分页
-     *
-     * @param <E>       实体类型
-     * @param equals    实体实例,用于作为查询条件,条件之间是 and 关系.举例说明,若传递的实体为:<br>
-     *                  Student student = new Student(); <br>
-     *                  student.setDept("计算机");<br>
-     *                  student.setName("海猫");<br>
-     *                  那么会推导出 SQL 语句的查询条件为:<br>
-     *                  where dept = ? and name = ?<br>
-     *                  占位符?问号的值通过 PreparedStatement 设置<br>
-     *                  注意: 实体的属性若为 null 该属性将不参与任何运算.
-     * @param likes     实体对象实例 用于指定 like 运算集
-     * @param sort      排序语句，如,设置"order by id desc". 传递null,则采取默认排序
-     * @param notCount  true:表示分页时不执行 count 语句.反之,执行 count 语句.
-     * @param pageIndex 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1
-     * @param pageSize  用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1
-     * @param contain   true:包含 fields，反之，排除 fields
-     * @param fields    待包含或待排除的字段列表
-     * @return 分页结构对象
-     * @see #findPage(QueryBuilder, boolean, int, int)
-     */
-    @SuppressWarnings("unchecked")
-    default <E> Page<E> findPage(E equals, E likes, String sort, boolean notCount, int pageIndex, int pageSize, boolean contain, String... fields)
-    {
-
-        Class<E> type;
-        if (equals != null)
-        {
-            type = (Class<E>) equals.getClass();
-        }
-        else if (likes != null)
-        {
-            type = (Class<E>) likes.getClass();
-        }
-        else
-        {
-            throw new IllegalArgumentException("entity，likes 其中一个实体必须不为 null");
-        }
-
-        if (sort == null)
-        {
-            sort = StringUtils.EMPTY;
-        }
-
-        SelectField<E> selectField = new SelectField<>(type, contain, fields);
-        QueryBuilder builder = BeanUtil.toSelectSQL(type, equals, likes, null, sort, selectField.getFields());
-        Page<Map<String, Object>> page = this.findPage(builder, notCount, pageIndex, pageSize);
-        return page.convert(type);
-    }
 
     /**
      * 根据实体条件分页查询
@@ -361,33 +282,4 @@ public interface QueryRepository extends Repository
      */
     @Id(MethodId.QUERY14)
     <E> Page<E> findPageByPredicate(E entity, @NotCount boolean notCount, @PageIndex int pageIndex, @PageSize int pageSize, boolean contain, String... fields);
-
-    /**
-     * 指定某个字段进行 in 和 equal 查询
-     *
-     * @param entity      实体 class
-     * @param fieldName   字段
-     * @param fieldValues 字段值列表，参与 in 运算
-     * @param equals    实体实例,用于作为查询条件,条件之间是 and 关系.举例说明,若传递的实体为:<br>
-     *                  Student student = new Student(); <br>
-     *                  student.setDept("计算机");<br>
-     *                  student.setName("海猫");<br>
-     *                  那么会推导出 SQL 语句的查询条件为:<br>
-     *                  where dept = ? and name = ?<br>
-     *                  占位符?问号的值通过 PreparedStatement 设置<br>
-     *                  注意: 实体的属性若为 null 该属性将不参与任何运算.
-     *                  in 条件集 与 equals 条件集 之间的关系是 and
-     * @param notCount    是否求和
-     * @param pageIndex   页码
-     * @param pageSize    每页大小
-     * @param contain     true:包含 fields，反之，排除 fields
-     * @param fields      待包含或待排除的字段列表
-     * @param <E>         实体类型
-     * @param <F>         参与 in 运算字段的类型
-     * @return 分页结构对象
-     * @see #findPageByPredicate(Object, boolean, int, int, boolean, String...)
-     */
-    @Deprecated
-    @Id(MethodId.QUERY15)
-    <E, F> Page<E> findPageByIn(Class<E> entity, String fieldName, List<F> fieldValues, E equals, @NotCount boolean notCount, @PageIndex int pageIndex, @PageSize int pageSize, boolean contain, String... fields);
 }

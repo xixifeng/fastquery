@@ -423,68 +423,6 @@ public final class BeanUtil
         }
     }
 
-    public static QueryBuilder toSelectSQL(Class<?> cls, Object bean, Object likes, String dbName, String sort, String selectFields)
-    {
-        ConditionList conditions = new ConditionList();
-        Map<String, Object> parameters = new HashMap<>();
-        // 表名称
-        String tableName = getTableName(dbName, cls);
-        Field[] fields = cls.getDeclaredFields();
-
-        addCondition(bean, conditions, parameters, fields, "=", " and");
-
-        // 接下来是 like 条件集
-        conditions.add("(");
-        int andSize = conditions.size();
-
-        addCondition(likes, conditions, parameters, fields, "like", " or");
-
-        if (andSize != conditions.size())
-        {
-            conditions.add(")");
-        }
-        else
-        {
-            conditions.remove(andSize - 1); // 去掉 "（"
-        }
-
-        String query;
-        String countQuery;
-        // 取出最后一个,去掉"and"
-        if (!conditions.isEmpty())
-        {
-            query = String.format("select %s from %s #{#where} %s", selectFields, tableName, sort);
-            countQuery = String.format("select count(id) from %s #{#where}", tableName);
-        }
-        else
-        {
-            query = String.format("select %s from %s %s", selectFields, tableName, sort);
-            countQuery = String.format("select count(id) from %s", tableName);
-        }
-
-        return new QueryBuilder(query, countQuery, conditions, parameters);
-    }
-
-    // 增加一个条件单元，顺便把占位符 ？ 也记下来
-    private static void addCondition(Object bean, ConditionList conditions, Map<String, Object> parameters, Field[] fields, String symbol, String opration)
-    {
-        if (bean != null)
-        {
-            for (Field field : fields)
-            {
-                if (allowField(field))
-                {
-                    Object fv = TypeUtil.getFieldVal(bean, field);
-                    if (fv != null)
-                    {
-                        conditions.add(field.getName() + StringUtils.SPACE + symbol + " :" + field.getName() + opration);
-                        parameters.put(field.getName(), fv);// 同时把这个?号的值记下来
-                    }
-                }
-            }
-        }
-    }
-
     public static Field[] getFields(Class<?> cls)
     {
         Field[] selfFields = cls.getDeclaredFields();
