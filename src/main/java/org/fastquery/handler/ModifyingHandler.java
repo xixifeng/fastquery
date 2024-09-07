@@ -30,7 +30,6 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import org.fastquery.core.DB;
 import org.fastquery.core.Modifying;
-import org.fastquery.core.Primarykey;
 import org.fastquery.core.QueryContext;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.struct.RespUpdate;
@@ -114,17 +113,6 @@ public final class ModifyingHandler
     {
         Map<String, Object> map = mapType(autoIncKey, Object.class);
         return new JSONObject(map);
-    }
-
-    // 如果不存在主键直接返回null
-    public static Primarykey primarykeyType(Long autoIncKey)
-    {
-        Object pkey = getId();
-        if ((autoIncKey == null) && (pkey == null))
-        {
-            return null;
-        }
-        return new Primarykey(autoIncKey);
     }
 
     public static boolean booleanType(List<RespUpdate> respUpdates)

@@ -22,6 +22,8 @@
 
 package org.fastquery.test;
 
+import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.bean.*;
 import org.fastquery.core.*;
@@ -114,6 +116,12 @@ public class MethodQueryTest extends TestFastQuery
         UserInfo u3 = new UserInfo("ement", 2);
         int effect = studentDBService.saveArray(false, u1, u2, u3);
         assertThat(effect, is(3));
+
+        effect = studentDBService.saveArray(false);
+        assertThat(effect, is(0));
+
+        effect = studentDBService.saveArray(false,null);
+        assertThat(effect, is(0));
     }
 
     @Test
@@ -150,12 +158,23 @@ public class MethodQueryTest extends TestFastQuery
     {
         int[] ints = studentDBService.executeBatch(null);
         assertThat(ints, notNullValue());
+        assertThat(ints,is(ArrayUtils.EMPTY_INT_ARRAY));
+
+        ints = studentDBService.executeBatch(null,null);
+        assertThat(ints, notNullValue());
+        assertThat(ints,is(ArrayUtils.EMPTY_INT_ARRAY));
     }
 
     @Test
     public void executeBatch4()
     {
         int[] ints = studentDBService.executeBatch("create.sql");
+        assertThat(ints.length, is(3));
+
+        ints = studentDBService.executeBatch("create.sql",null);
+        assertThat(ints.length, is(3));
+
+        ints = studentDBService.executeBatch("create.sql",ArrayUtils.EMPTY_STRING_ARRAY);
         assertThat(ints.length, is(3));
     }
 
@@ -206,6 +225,9 @@ public class MethodQueryTest extends TestFastQuery
         UserInfo userInfo = new UserInfo(null, "小蜜蜂", 5);
         int effect = userInfoDBService.executeSaveOrUpdate(userInfo);
         assertThat(effect, is(1));
+
+        effect = userInfoDBService.executeSaveOrUpdate(null);
+        assertThat(effect, is(0));
     }
 
     // 使用update时,同时自定义条件的例子
@@ -249,6 +271,9 @@ public class MethodQueryTest extends TestFastQuery
         assertThat(u.getId(), equalTo(id));
         assertThat(u.getName(), equalTo(name));
         assertThat(u.getAge(), equalTo(age));
+
+        i = userInfoDBService.executeUpdate(null);
+        assertThat(i,equalTo(0));
     }
 
     // 测试批量更新集合
@@ -345,6 +370,30 @@ public class MethodQueryTest extends TestFastQuery
         assertThat(u.getId(), nullValue());
         assertThat(u.getAge(), nullValue());
 
+    }
+
+    @DataPoints("contains")
+    public static boolean[] contains = {true,false};
+
+    @DataPoints("fields")
+    public static String[][] fields = {null, ArrayUtils.EMPTY_STRING_ARRAY};
+
+    @Theory
+    public void find3(@FromDataPoints("contains") boolean contain)
+    {
+        UserInfo u = userInfoDBService.find(UserInfo.class, 2, contain);
+        assertThat(u.getId(), notNullValue());
+        assertThat(u.getName(), notNullValue());
+        assertThat(u.getAge(), notNullValue());
+    }
+
+    @Theory
+    public void find4(@FromDataPoints("contains") boolean contain, @FromDataPoints("fields")  String[] fields)
+    {
+        UserInfo u = userInfoDBService.find(UserInfo.class, 2, contain, fields);
+        assertThat(u.getId(), notNullValue());
+        assertThat(u.getName(), notNullValue());
+        assertThat(u.getAge(), notNullValue());
     }
 
     @Test

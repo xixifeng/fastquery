@@ -30,7 +30,6 @@ import java.util.Map;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.Student;
-import org.fastquery.core.Primarykey;
 import org.fastquery.core.QueryRepository;
 import org.fastquery.example.StudentDBService;
 import org.fastquery.service.FQuery;
@@ -307,16 +306,6 @@ public class StudentDBServiceTest extends TestFastQuery
         assertThat(map, notNullValue());
         assertThat(map.get("name"), equalTo("Lisi"));
         assertThat(map.get("age"), equalTo("32"));
-    }
-
-    @Test
-    public void saveUserInfo()
-    {
-        Primarykey pk = studentDBService.saveUserInfo("李四", 82);
-        // 主键
-        long id = pk.getPrimarykey();
-        // 断言主键大于1
-        assertThat(id, greaterThan(1L));
     }
 
     @Test

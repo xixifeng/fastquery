@@ -29,7 +29,6 @@ import org.fastquery.bean.Student;
 import org.fastquery.core.Id;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Param;
-import org.fastquery.core.Primarykey;
 import org.fastquery.core.Query;
 import org.fastquery.core.QueryByNamed;
 import org.fastquery.core.QueryRepository;
@@ -141,11 +140,6 @@ public interface StudentDBService extends QueryRepository
     @Modifying(table = "userinfo")
     @Query("insert into #{#table} (name,age) values (?1, ?2)")
     Map<String, String> addUserInfo2(String name, Integer age);
-
-    // 增加一条数据,返回主键信息.
-    @Modifying(table = "userinfo")
-    @Query("insert into #{#table} (name,age) values (?1, ?2)")
-    Primarykey saveUserInfo(String name, Integer age);
 
     @Modifying(table = "userinfo", selectFields = "`name`,`age`")
     @Query("insert into #{#table} (name,age) values (?1, ?2)")

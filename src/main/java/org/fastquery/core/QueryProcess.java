@@ -105,10 +105,6 @@ class QueryProcess
         {
             return jsonObjectType(autoIncKey);
         }
-        else if (returnType == Primarykey.class)
-        {
-            return primarykeyType(autoIncKey);
-        }
         else if (returnType == boolean.class)
         {
             return booleanType(respUpdates);
@@ -386,6 +382,10 @@ class QueryProcess
     {
         Object[] iargs = QueryContext.getArgs();
         Object bean = iargs[0];
+        if(bean == null)
+        {
+            return 0;
+        }
         String sql = BeanUtil.toInsertSQL(null, bean);
         log.info(sql);
         return DB.update(sql, true);
@@ -395,6 +395,10 @@ class QueryProcess
     {
         Object[] iargs = QueryContext.getArgs();
         Object bean = iargs[0];
+        if(bean == null)
+        {
+            return 0;
+        }
 
         if( bean instanceof Predicate)
         {
@@ -415,6 +419,10 @@ class QueryProcess
     {
         Object[] iargs = QueryContext.getArgs();
         Object bean = iargs[0];
+        if(bean == null)
+        {
+            return 0;
+        }
         String sql = BeanUtil.toSelectSQL(bean, null, null, false, null);
         if (sql != null && DB.exists(sql))
         {
@@ -569,12 +577,12 @@ class QueryProcess
     private static Object q11()
     {
         Object[] iargs = QueryContext.getArgs();
-        SQLValue sv;
         Object entity = iargs[0];
+        Objects.requireNonNull(entity, "findOne 入参 entity 不能为 null");
 
         boolean contain = (boolean) iargs[1];
         String[] fields = (String[]) iargs[2];
-        sv = BeanUtil.toSelectSQL(entity, null, contain, fields);
+        SQLValue sv = BeanUtil.toSelectSQL(entity, null, contain, fields);
 
         List<Map<String, Object>> list = DB.find(sv);
         if (list.isEmpty())
@@ -596,8 +604,15 @@ class QueryProcess
     {
         Object[] iargs = QueryContext.getArgs();
         Object entity = iargs[0];
-        SQLValue sv = BeanUtil.toSelectSQL(entity, null, true, "1");
-        return DB.exists(sv);
+        if(entity == null)
+        {
+         return false;
+        }
+        else
+        {
+            SQLValue sv = BeanUtil.toSelectSQL(entity, null, true, "1");
+            return DB.exists(sv);
+        }
     }
 
     private static Object q13()

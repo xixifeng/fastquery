@@ -474,6 +474,9 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
 
         int effect = db.insert(tf1);
         assertThat(effect,is(1));
+
+        effect = db.insert(null);
+        assertThat(effect,is(0));
     }
 
     @Test

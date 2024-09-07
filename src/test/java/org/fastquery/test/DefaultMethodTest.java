@@ -227,6 +227,9 @@ public class DefaultMethodTest extends TestFastQuery
         userInfo.setName("瘌蛤蟆");
         b = db.exists(userInfo);
         assertThat(b, is(false));
+
+        b = db.exists(null);
+        assertThat(b, is(false));
     }
 
     @Test

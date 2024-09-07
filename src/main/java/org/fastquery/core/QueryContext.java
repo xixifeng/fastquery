@@ -109,8 +109,7 @@ public final class QueryContext
 
     private static void setRequirePk(QueryContext context)
     {
-        if (context.returnType == Map.class || context.returnType == JSONObject.class || context.returnType == Primarykey.class
-                || TypeUtil.hasDefaultConstructor(context.returnType))
+        if (context.returnType == Map.class || context.returnType == JSONObject.class || TypeUtil.hasDefaultConstructor(context.returnType))
         {
             context.requirePk = true;
         }

@@ -175,6 +175,7 @@ public interface QueryRepository extends Repository
     @SuppressWarnings("unchecked")
     default <E> E save(E entity)
     {
+        Objects.requireNonNull(entity, "save 不能设置 null 值");
         long id = saveToId(entity).longValue();
         return (E) find(entity.getClass(), id);
     }
@@ -189,6 +190,7 @@ public interface QueryRepository extends Repository
     @SuppressWarnings("unchecked")
     default <E> E update(E entity)
     {
+        Objects.requireNonNull(entity, "update 不能设置 null 值");
         long effect = executeUpdate(entity);
         if (effect != 1)
         {
@@ -210,6 +212,7 @@ public interface QueryRepository extends Repository
     @SuppressWarnings("unchecked")
     default <E> E saveOrUpdate(E entity)
     {
+        Objects.requireNonNull(entity, "saveOrUpdate 不能设置 null 值");
         long effect = executeSaveOrUpdate(entity);
         if (effect != 1)
         {
