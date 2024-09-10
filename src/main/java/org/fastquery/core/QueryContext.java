@@ -72,6 +72,7 @@ public final class QueryContext
         context.iclass = iclass;
         context.methodInfo = methodInfo;
         context.args = args;
+        verifyArgs(); // 校验 $表达式，是否有诸如嫌疑，只校验一次
 
         context.sourceName = findSource(methodInfo.getParameters(), args);
 
@@ -158,7 +159,7 @@ public final class QueryContext
         return getQueryContext().connection;
     }
 
-    public static Object[] getArgs()
+    private static void verifyArgs()
     {
         log.debug("检测 SQL 注入");
         Parameter[] parameters = getQueryContext().methodInfo.getParameters();
@@ -172,7 +173,10 @@ public final class QueryContext
                 throw new RepositoryException(getQueryContext().args[i] + " 有注入风险！");
             }
         }
+    }
 
+    public static Object[] getArgs()
+    {
         return getQueryContext().args;
     }
 
