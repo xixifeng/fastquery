@@ -5,13 +5,13 @@
 <dependency>
     <groupId>org.fastquery</groupId>
     <artifactId>fastquery</artifactId>
-    <version>1.0.138</version> <!-- fastquery.version -->
+    <version>1.0.139</version> <!-- fastquery.version -->
 </dependency>
 ```
 
 ### Gradle/Grails
 ```
-compile 'org.fastquery:fastquery:1.0.138'
+compile 'org.fastquery:fastquery:1.0.139'
 ```
 
 # FastQuery 数据持久层框架

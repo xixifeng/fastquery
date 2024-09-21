@@ -650,7 +650,13 @@ class QueryProcess
 
         Object[] iargs = QueryContext.getArgs();
         Object equals = iargs[0];
-        Objects.requireNonNull(equals);
+        if(equals == null)
+        {
+            PageImpl emptyPage = new PageImpl();
+            emptyPage.isFirst = true;
+            emptyPage.isLast = true;
+            return emptyPage;
+        }
         Class<?> clazz = equals.getClass();
         boolean contain = (boolean) iargs[4];
         String[] fields = (String[]) iargs[5];
@@ -691,7 +697,7 @@ class QueryProcess
         private int size; // 每页行数
         private int number; // 当前页码,从0开始
         private int numberOfElements; // 当前页的真实记录行数
-        private List<?> content; // 当前页的结果集
+        private List<?> content = Collections.emptyList(); // 当前页的结果集
 
         private long totalElements; // 总行数
         private int totalPages; // 总页码
@@ -703,8 +709,8 @@ class QueryProcess
         private boolean hasNext; // 是否有下一页
         private boolean hasPrevious; // 是否有上一页
 
-        private Slice nextPageable; // 下一页的Pageable对象
-        private Slice previousPageable; // 上一页的Pageable对象
+        private Slice nextPageable = new Slice(); // 下一页的Pageable对象
+        private Slice previousPageable = nextPageable; // 上一页的Pageable对象
 
         private PageImpl(int size, int number, List<?> content, long totalElements, int totalPages, boolean hasNext, boolean isLast)
         {

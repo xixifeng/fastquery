@@ -361,6 +361,24 @@ public class TypeFeatureDBServiceTest extends TestFastQuery
         assertThat(rule.getExecutedSQLs().get(0), equalTo("select id,name from type_feature where ruits is null and gender = ? order by id desc  limit 0,3"));
     }
 
+    @Test
+    public void findPageByPredicate6()
+    {
+        TypeFeature typeFeature = new TypeFeature(); // 字段值全部为 null 情形
+        db.findPageByPredicate(typeFeature, false, 1, 3, true, "id", "name");
+        String sql = rule.getExecutedSQLs().get(0);
+        assertThat(sql, equalTo("select id,name from type_feature limit 0,3"));
+
+        Page<TypeFeature> page = db.findPageByPredicate(null, false, 1, 3, true, "id", "name");
+        assertThat(page.getContent().isEmpty(), equalTo(true));
+        assertThat(page.getPreviousPageable() == page.getNextPageable(), equalTo(true));
+        assertThat(page.getPreviousPageable().getNumber(),is(0));
+        assertThat(page.getPreviousPageable().getSize(),is(0));
+        assertThat(page.isLast(), equalTo(true));
+        assertThat(page.isHasContent(),equalTo(false));
+        assertThat(page.isFirst(),equalTo(true));
+    }
+
 
     @Test
     public void updateRuits(){

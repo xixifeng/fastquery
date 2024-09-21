@@ -273,7 +273,7 @@ public interface QueryRepository extends Repository
 
     /**
      * 根据实体条件分页查询
-     * @param entity 默认视为 equal 条件集；如果该实体继承了 Predicate 可以通过它，构建条件集
+     * @param entity 默认视为 equal 条件集，entity 中的成员属性如果为 null 表示不参与条件运算；如果该实体继承了 Predicate 可以通过它，构建条件集。entity 如果为 null，将返回一个非 null 的空 page 实例对象。
      * @param notCount 分页是否不求和
      * @param pageIndex 页码
      * @param pageSize 每页大小

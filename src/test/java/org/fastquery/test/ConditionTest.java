@@ -34,6 +34,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.hamcrest.Matchers.*;
 
 /**
@@ -154,5 +157,22 @@ public class ConditionTest extends TestFastQuery
         db.find4(age, name, new PageableImpl(1, 5));
         String sql = rule.getSQLValue().getSql();
         assertThat(sql, equalTo("select id,name,age from `userinfo` where age > ? and name = ? limit 0,5"));
+    }
+
+    @Test
+    public void find5()
+    {
+        List<Integer> ages = null;
+        db.find5(ages, new PageableImpl(1, 5));
+        String sql = rule.getSQLValue().getSql();
+        assertThat(sql, equalTo("select id,name,age from `userinfo`  limit 0,5"));
+
+        ages = new ArrayList<>();
+        db.find5(ages, new PageableImpl(1, 5));
+        sql = rule.getSQLValue().getSql();
+        assertThat(sql, equalTo("select id,name,age from `userinfo` where age in (?) limit 0,5"));
+        List<Object> values  = rule.getSQLValue().getValues();
+        assertThat(values.size(), equalTo(1));
+        assertThat(values.get(0),nullValue());
     }
 }

@@ -84,4 +84,8 @@ public interface ConditionDBService extends Repository
     @Condition("age > :age")
     @Condition(value = "and name like :name", if$ = ":age > 18 && :name!=null && :name.contains(\"Rex\")", else$ = "and name = :name")
     Page<UserInfo> find4(@Param("age") int age, @Param("name") String name, Pageable pageable);
+
+    @Query("select id,name,age from `userinfo` #{#where}")
+    @Condition("age in (?1)")
+    Page<UserInfo> find5(List<Integer> ages, Pageable pageable);
 }
