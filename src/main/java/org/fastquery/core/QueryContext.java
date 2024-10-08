@@ -168,7 +168,7 @@ public final class QueryContext
         {
             Parameter parameter = parameters[i];
             if (parameter.getAnnotation(Safe.class) != null
-                    && PreventSQLInjection.isInjectStr(getQueryContext().args[i].toString()))
+                    && PreventSQLInjection.isInjectStr(getQueryContext().args[i]))
             {
                 throw new RepositoryException(getQueryContext().args[i] + " 有注入风险！");
             }

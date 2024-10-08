@@ -23,7 +23,6 @@
 package org.fastquery.util;
 
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author mei.sir@aliyun.cn
@@ -46,19 +45,23 @@ public class PreventSQLInjection
     /**
      * 判断是否是注入SQL
      *
-     * @param str 待检测的字符串
+     * @param parameter 待检测的参数
      * @return 如果是敏感字符串就返回true, 反之false
      */
-    public static boolean isInjectStr(String str)
+    public static boolean isInjectStr(Object parameter)
     {
-        if (str != null && !StringUtils.EMPTY.equals(str.trim()))
+        if(parameter != null)
         {
-            String s = str.toLowerCase();
-            for (String key : KEYS)
+            String str = parameter.toString().trim();
+            if (!str.isEmpty())
             {
-                if (s.trim().contains(key))
+                String s = str.toLowerCase();
+                for (String key : KEYS)
                 {
-                    return true;
+                    if (s.contains(key))
+                    {
+                        return true;
+                    }
                 }
             }
         }

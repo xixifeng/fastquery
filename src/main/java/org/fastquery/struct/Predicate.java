@@ -36,6 +36,12 @@ public abstract class Predicate<E>
         return this.condition(AND,left,operator,right);
     }
 
+    @Deprecated
+    public <T> Predicate<E> and(Supplier<Chip<T,E>> left, Collection<T> collection)
+    {
+        return this.condition(AND, left,SQLOperator.IN,collection);
+    }
+
     /**
      * 用于构建 sql 查询条件单元。例如，构建 fieldName != ? 这类表达式。与上一个条件单元的关系是 or
      * @param left 表达式左边的字段名称
@@ -115,9 +121,9 @@ public abstract class Predicate<E>
 
     private  <T> Predicate<E> condition(String booleanOperator, Supplier<Chip<T,E>> left, SQLOperator operator, Collection<T> collection)
     {
-        if (collection != null && !collection.isEmpty())
+        if (collection != null)
         {
-            collection = collection.stream().filter(Objects::nonNull).collect(Collectors.toList());
+            collection = collection.isEmpty() ? collection : collection.stream().filter(Objects::nonNull).collect(Collectors.toList());
             if (!collection.isEmpty())
             {
                 if (!builder.toString().endsWith("( "))
@@ -135,18 +141,18 @@ public abstract class Predicate<E>
                     addValue(t);
                 }
             }
-        }
-        else
-        {
-            if (!builder.toString().endsWith("( "))
+            else
             {
-                builder.append(booleanOperator);
-            }
-            builder.append(left.get().getName());
+                if (!builder.toString().endsWith("( "))
+                {
+                    builder.append(booleanOperator);
+                }
+                builder.append(left.get().getName());
 
-            String op = operator.getOperator();
-            builder.append(op);
-            addValue(null);
+                String op = operator.getOperator();
+                builder.append(op);
+                addValue(null);
+            }
         }
 
         return this;

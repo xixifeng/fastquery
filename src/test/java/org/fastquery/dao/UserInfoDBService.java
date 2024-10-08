@@ -27,14 +27,7 @@ import java.util.Map;
 import org.fastquery.bean.Department;
 import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInformation;
-import org.fastquery.core.Source;
-import org.fastquery.core.Id;
-import org.fastquery.core.Modifying;
-import org.fastquery.core.Param;
-import org.fastquery.core.Query;
-import org.fastquery.core.QueryByNamed;
-import org.fastquery.core.QueryRepository;
-import org.fastquery.core.Transactional;
+import org.fastquery.core.*;
 import org.fastquery.page.NotCount;
 import org.fastquery.page.Page;
 import org.fastquery.page.PageIndex;
@@ -69,8 +62,8 @@ public interface UserInfoDBService extends QueryRepository
     @Query("select * from `userinfo` where id in (${ids})")
     JSONArray findUserInfoByIds(@Param("ids") String ids);
 
-    @Query("select * from `userinfo` where ${one} ${orderby}")
-    JSONArray findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
+    @Query("select * from `userinfo` where ${one} ${two} ${orderby}")
+    JSONArray findUserInfo(@Param("orderby") String orderby, @Param("one") int i, @Safe @Param("two") String two);
 
     @Query("select * from `userinfo` where ${one} ${orderby}")
     JSONArray findUserInfo(@Param("orderby") String orderby, @Param("one") int i,  @Param("one") int y);

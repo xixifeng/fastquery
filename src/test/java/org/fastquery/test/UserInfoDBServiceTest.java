@@ -159,8 +159,17 @@ public class UserInfoDBServiceTest extends TestFastQuery
     {
         String orderby = "order by age desc";
         int i = 1;
-        db.findUserInfo(orderby, i);
-        assertThat(rule.getSQLValue().getSql(), equalTo("select * from `userinfo` where 1 order by age desc"));
+        db.findUserInfo(orderby, i, "");
+        assertThat(rule.getSQLValue().getSql(), equalTo("select * from `userinfo` where 1  order by age desc"));
+        db.findUserInfo(null, i, null);
+        assertThat(rule.getSQLValue().getSql(), equalTo("select * from `userinfo` where 1  "));
+
+        try
+        {
+            db.findUserInfo(null, i, ";delete");
+        } catch (RepositoryException e) {
+            assertThat(e.getCause().getCause().getCause().getMessage(),equalTo(";delete 有注入风险！"));
+        }
     }
 
     @Test
