@@ -40,6 +40,8 @@ import org.fastquery.asm.Script2Class;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.page.PageIndex;
 import org.fastquery.page.PageSize;
+import org.fastquery.struct.AttributeConverter;
+import org.fastquery.struct.Convert;
 import org.fastquery.struct.ParamMap;
 import org.fastquery.where.Condition;
 import com.alibaba.fastjson.JSON;
@@ -1026,17 +1028,37 @@ public class TypeUtil
         Field[] fields = beanType.getDeclaredFields();
         for (Field field : fields)
         {
+            String name = field.getName();
             if (field.getType() == EnumSet.class && field.getGenericType() instanceof ParameterizedType)
             {
                 ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
                 if (parameterizedType.getActualTypeArguments()[0].getClass() == Class.class)
                 {
-                    enumSetFeilds.put(field.getName(), parameterizedType.getActualTypeArguments()[0]);
+                    enumSetFeilds.put(name, parameterizedType.getActualTypeArguments()[0]);
                 }
                 else
                 {
                     throw new RepositoryException("禁止出现EnumSet<?通配符>");
                 }
+            }
+
+            Convert convert = field.getAnnotation(Convert.class);
+            if(convert != null)
+            {
+                Class<? extends AttributeConverter> clazz = convert.value();
+                AttributeConverter attributeConverter;
+                try
+                {
+                    attributeConverter = clazz.getDeclaredConstructor().newInstance();
+                }
+                catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                       NoSuchMethodException e)
+                {
+                    throw new RepositoryException(e);
+                }
+
+                Object o = attributeConverter.toEntityField(map.get(name));
+                map.put(name, o);
             }
         }
 

@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -33,7 +34,9 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.fastquery.bean.Option;
 import org.fastquery.bean.Ruits;
+import org.fastquery.bean.UserInfoDTO;
 import org.fastquery.core.*;
 import org.junit.Test;
 
@@ -463,6 +466,21 @@ public class TypeUtilTest
         Object val = TypeUtil.enumSet2Val(ruits);
         log.info("val : {}", val);
         assertThat(val,equalTo("香蕉,西瓜,芒果,橘子,梨"));
+    }
+
+    @Test
+    public void map2Obj()
+    {
+        Class<?> beanType = UserInfoDTO.class;
+        Map<String, Object> map = new HashMap<>();
+        map.put("id",3);
+        map.put("name","Nicky");
+        map.put("option", 18);
+        UserInfoDTO userInfoDTO = (UserInfoDTO) TypeUtil.map2Obj(beanType, map);
+        Option option = userInfoDTO.getOption();
+        assertThat(option, notNullValue());
+        assertThat(option.getValue(), equalTo(18));
+
     }
 
 }
