@@ -21,60 +21,14 @@
  */
 package org.fastquery.struct;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 /**
  * @author xixifeng (fastquery@126.com)
  */
-@Getter
-@AllArgsConstructor
-public enum SQLOperator
+public interface AttributeConverter<A,B>
 {
-    /**
-     * = ?
-     */
-    EQ(" = ?"),
-    /**
-     * != ?
-     */
-    NE(" != ?"),
 
-    /**
-     * &gt; ?
-     */
-    GT(" > ?"),
-    /**
-     * &gt;= ?
-     */
-    GE(" >= ?"),
+    A toEntityField(B dbField);
 
-    /**
-     * &lt; ?
-     */
-    LT(" < ?"),
-    /**
-     * &lt;= ?
-     */
-    LE(" <= ?"),
+    B toDBField (A entityField);
 
-    /**
-     * in (?)
-     */
-    IN(" in (?)"),
-
-    /**
-     * not in (?)
-     */
-    NOTIN(" not in (?)"),
-
-    /**
-     * like ?
-     */
-    LIKE(" like ?"),
-    /**
-     * json 包含
-     */
-    JSON_CONTAINS("JSON_CONTAINS(");
-    private final String operator;
 }

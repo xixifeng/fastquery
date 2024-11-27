@@ -19,62 +19,30 @@
  * For more information, please see http://www.fastquery.org/.
  *
  */
-package org.fastquery.struct;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+package org.fastquery.bean;
+
+import lombok.*;
+import org.apache.commons.lang3.StringUtils;
+import org.fastquery.struct.Convert;
+import org.fastquery.core.Id;
+import org.fastquery.struct.Predicate;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Setter
 @Getter
 @AllArgsConstructor
-public enum SQLOperator
+@NoArgsConstructor
+@ToString
+public class UserInfoDTO extends Predicate<UserInfoDTO>
 {
-    /**
-     * = ?
-     */
-    EQ(" = ?"),
-    /**
-     * != ?
-     */
-    NE(" != ?"),
 
-    /**
-     * &gt; ?
-     */
-    GT(" > ?"),
-    /**
-     * &gt;= ?
-     */
-    GE(" >= ?"),
+    @Id
+    private Integer id;
+    private String name = StringUtils.EMPTY;
 
-    /**
-     * &lt; ?
-     */
-    LT(" < ?"),
-    /**
-     * &lt;= ?
-     */
-    LE(" <= ?"),
-
-    /**
-     * in (?)
-     */
-    IN(" in (?)"),
-
-    /**
-     * not in (?)
-     */
-    NOTIN(" not in (?)"),
-
-    /**
-     * like ?
-     */
-    LIKE(" like ?"),
-    /**
-     * json 包含
-     */
-    JSON_CONTAINS("JSON_CONTAINS(");
-    private final String operator;
+    @Convert(IntToOptionConverter.class)
+    Option option;
 }

@@ -63,9 +63,18 @@ public abstract class Predicate<E>
             {
                 builder.append(booleanOperator);
             }
-            builder.append(left.get().getName());
-            builder.append(operator.getOperator());
 
+            if (SQLOperator.JSON_CONTAINS.equals(operator))
+            {
+                builder.append(operator.getOperator())
+                        .append(left.get().getName())
+                       .append(", ?)");
+            }
+            else
+            {
+                builder.append(left.get().getName());
+                builder.append(operator.getOperator());
+            }
             addValue(right);
         }
 

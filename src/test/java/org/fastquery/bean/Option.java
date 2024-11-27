@@ -19,62 +19,41 @@
  * For more information, please see http://www.fastquery.org/.
  *
  */
-package org.fastquery.struct;
+package org.fastquery.bean;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
+@Setter
 @Getter
 @AllArgsConstructor
-public enum SQLOperator
+@NoArgsConstructor
+public class Option
 {
-    /**
-     * = ?
-     */
-    EQ(" = ?"),
-    /**
-     * != ?
-     */
-    NE(" != ?"),
+    private static final String EMPTY = "";
 
-    /**
-     * &gt; ?
-     */
-    GT(" > ?"),
-    /**
-     * &gt;= ?
-     */
-    GE(" >= ?"),
+    private int value;
+    private String label = EMPTY;
+    private String enLabel = EMPTY;
 
-    /**
-     * &lt; ?
-     */
-    LT(" < ?"),
-    /**
-     * &lt;= ?
-     */
-    LE(" <= ?"),
+    @Override
+    public String toString()
+    {
+        return String.valueOf(value);
+    }
+    public Option(int value)
+    {
+        this.value = value;
+    }
 
-    /**
-     * in (?)
-     */
-    IN(" in (?)"),
-
-    /**
-     * not in (?)
-     */
-    NOTIN(" not in (?)"),
-
-    /**
-     * like ?
-     */
-    LIKE(" like ?"),
-    /**
-     * json 包含
-     */
-    JSON_CONTAINS("JSON_CONTAINS(");
-    private final String operator;
+    public Option(int value, String label)
+    {
+        this.value = value;
+        this.label = label;
+    }
 }

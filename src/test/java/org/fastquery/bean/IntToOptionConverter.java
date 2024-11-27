@@ -19,62 +19,25 @@
  * For more information, please see http://www.fastquery.org/.
  *
  */
-package org.fastquery.struct;
+package org.fastquery.bean;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.fastquery.struct.AttributeConverter;
 
 /**
  * @author xixifeng (fastquery@126.com)
  */
-@Getter
-@AllArgsConstructor
-public enum SQLOperator
+public class IntToOptionConverter implements AttributeConverter<Option, Integer>
 {
-    /**
-     * = ?
-     */
-    EQ(" = ?"),
-    /**
-     * != ?
-     */
-    NE(" != ?"),
 
-    /**
-     * &gt; ?
-     */
-    GT(" > ?"),
-    /**
-     * &gt;= ?
-     */
-    GE(" >= ?"),
+    @Override
+    public Option toEntityField(Integer dbField)
+    {
+        return dbField == null ? null : new Option(dbField);
+    }
 
-    /**
-     * &lt; ?
-     */
-    LT(" < ?"),
-    /**
-     * &lt;= ?
-     */
-    LE(" <= ?"),
-
-    /**
-     * in (?)
-     */
-    IN(" in (?)"),
-
-    /**
-     * not in (?)
-     */
-    NOTIN(" not in (?)"),
-
-    /**
-     * like ?
-     */
-    LIKE(" like ?"),
-    /**
-     * json 包含
-     */
-    JSON_CONTAINS("JSON_CONTAINS(");
-    private final String operator;
+    @Override
+    public Integer toDBField(Option entityField)
+    {
+        return entityField.getValue();
+    }
 }
