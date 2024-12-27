@@ -66,9 +66,10 @@ public abstract class Predicate<E>
 
             if (SQLOperator.JSON_CONTAINS.equals(operator))
             {
-                builder.append(operator.getOperator())
+                builder.append('(')
+                        .append(operator.getOperator())
                         .append(left.get().getName())
-                       .append(", ?)");
+                        .append(", ?)");
             }
             else
             {

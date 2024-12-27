@@ -72,9 +72,11 @@ public enum SQLOperator
      * like ?
      */
     LIKE(" like ?"),
+
     /**
-     * json 包含
+     * JSON_CONTAINS(target, candidate[, path])
      */
-    JSON_CONTAINS("JSON_CONTAINS(");
+    JSON_CONTAINS("JSON_CONTAINS");
+
     private final String operator;
 }
