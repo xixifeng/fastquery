@@ -729,34 +729,5 @@ class QueryProcess
             this.previousPageable = new Slice((!isFirst) ? (number - 1) : number, size);
         }
 
-        @SuppressWarnings("unchecked")
-        @Override
-        public Page convert(Class clazz)
-        {
-            PageImpl page = new PageImpl();
-            page.size = this.size;
-            page.number = this.number;
-            page.numberOfElements = this.numberOfElements;
-
-            List bs = new ArrayList<>();
-            // JSON.toJavaObject(new JSONObject((Map<String, Object>) map), clazz)
-            this.content.forEach(map -> bs.add(TypeUtil.map2Obj(clazz, (Map<String, Object>) map)));
-            page.content = bs;
-
-            page.totalElements = this.totalElements;
-            page.totalPages = this.totalPages;
-            page.hasContent = this.hasContent;
-
-            page.isFirst = this.isFirst;
-            page.isLast = this.isLast;
-
-            page.hasNext = this.hasNext;
-            page.hasPrevious = this.hasPrevious;
-
-            page.nextPageable = new Slice(this.getNextPageable().getNumber(), this.getNextPageable().getSize());
-            page.previousPageable = new Slice(this.getPreviousPageable().getNumber(), this.getPreviousPageable().getSize());
-            return page;
-        }
-
     }
 }
