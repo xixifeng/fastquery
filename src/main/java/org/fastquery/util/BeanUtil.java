@@ -163,9 +163,9 @@ public final class BeanUtil
     // [0] where 部分， [1] sql语言中"?"对应的实参
     private static <B> SQLValue toWhere(Field[] fields, B bean, boolean ignoreId)
     {
-        if( bean instanceof Predicate)
+        if( bean instanceof Predicate<?>)
         {
-            Predicate p = (Predicate) bean;
+            Predicate<?> p = (Predicate<?>) bean;
             SQLValue sqlValue = p.getSqlValue();
             if(sqlValue != null)
             {

@@ -4,12 +4,12 @@ package org.fastquery.bean;
  * @author xixifeng (fastquery@126.com)
  */
 public enum AreaType {
-    国家("country"),
-    一级("first"),
-    二级("second"),
-    三级("third"),
-    四级("fourth"),
-    五级("fifth");
+    COUNTRY("country"),
+    FIRST("first"),
+    SECOND("second"),
+    THIRD("third"),
+    FOURTH("fourth"),
+    FIFTH("fifth");
 
     public static final String CN_NAME = "类型";
     public static final String EN_NAME = "Type";
