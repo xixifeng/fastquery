@@ -49,7 +49,7 @@ import org.junit.Test;
 public class BeanUtilTest
 {
     @Setter
-    final static class T
+    static final class T
     {
         // 有被使用
         private Integer key;

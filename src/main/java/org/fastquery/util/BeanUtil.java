@@ -206,7 +206,7 @@ public final class BeanUtil
         return sqlValue;
     }
 
-    public static SQLValue toSelectSQL(Object bean, boolean unequal, boolean or, String dbName, boolean contain, String... fields)
+    public static SQLValue toSelectSQL(Object bean, String dbName, boolean contain, String... fields)
     {
         Class<?> cls = bean.getClass();
         Field[] fs = getFields(cls);
@@ -226,10 +226,6 @@ public final class BeanUtil
         sv.setSql(sql);
         sv.setValues(values);
         return sv;
-    }
-    public static SQLValue toSelectSQL(Object bean, String dbName, boolean contain, String... fields)
-    {
-        return toSelectSQL(bean, false, false, dbName, contain, fields);
     }
 
     public static SQLValue toCount(Object bean, String dbName)
@@ -676,53 +672,8 @@ public final class BeanUtil
         {
             if (field != key && allowField(field))
             {
-                String fieldName = field.getName();
-                int caseStartIndex = sets.length();
-                sets.append(fieldName);
-                sets.append(" = case ");
-                sets.append(key.getName());
-                sets.append(' ');
-                boolean exists = false; // 判断当前 field 的值，是否全部为 null，如果全部为 null, 那么要移除这个字段的 case sql 语句
-                for (B b : beans)
-                {
-                    Object keyVal = TypeUtil.getFieldVal(b, key);
-                    Object fieldVal = TypeUtil.getFieldVal(b, field);
-                    int currentLen = sets.length();
-                    sets.append("when "); // ➀
-                    sets.append(keyVal); // ➁
-                    sets.append(" then "); // ➂
-                    if (fieldVal == null) // 满足，则销毁 ➀ -> ➂ 这三行
-                    {
-                        sets.delete(currentLen - 1, sets.length() - 1);
-                    }
-                    else
-                    {   exists = true;
-                        if (fieldVal instanceof Boolean)
-                        {
-                            sets.append(fieldVal);
-                            sets.append(' ');
-                        }
-                        else
-                        {
-                            String s = fieldVal.toString();
-                            if (fieldVal instanceof EnumSet)
-                            {
-                                s = StringUtils.substringBetween(s, "[", "]");
-                                s = StringUtils.replace(s, ", ", ",");
-                            }
-                            sets.append('\'');
-                            sets.append(s.replace("'","''"));
-                            sets.append("' ");
-                        }
-                    }
-                }
-                sets.append("else ");
-                sets.append(fieldName);
-                sets.append(" end,");
-                if(!exists)
-                {
-                    sets.delete(caseStartIndex, sets.length());
-                }
+                String caseSql = buildCaseSql(beans, key, field);
+                sets.append(caseSql);
             }
         }
         if(sets.length() != 0)
@@ -733,6 +684,62 @@ public final class BeanUtil
         else
         {
             return "id=id";
+        }
+    }
+
+    private static <B> String buildCaseSql(Iterable<B> beans, Field key, Field field)
+    {
+        StringBuilder sets = new StringBuilder();
+        String fieldName = field.getName();
+        sets.append(fieldName);
+        sets.append(" = case ");
+        sets.append(key.getName());
+        sets.append(' ');
+        boolean exists = false; // 判断当前 field 的值，是否全部为 null，如果全部为 null, 那么要移除这个字段的 case sql 语句
+        for (B b : beans)
+        {
+            Object keyVal = TypeUtil.getFieldVal(b, key);
+            Object fieldVal = TypeUtil.getFieldVal(b, field);
+            if (fieldVal != null)
+            {
+                exists = true;
+                sets.append("when ");
+                sets.append(keyVal);
+                sets.append(" then ");
+                String str = formatValue(fieldVal);
+                sets.append(str);
+                sets.append(' ');
+            }
+        }
+
+        if(exists)
+        {
+            sets.append("else ");
+            sets.append(fieldName);
+            sets.append(" end,");
+            return sets.toString();
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    private static String formatValue(Object fieldVal)
+    {
+        if (fieldVal instanceof Boolean)
+        {
+            return fieldVal.toString();
+        }
+        else
+        {
+            String str = fieldVal.toString();
+            if (fieldVal instanceof EnumSet)
+            {
+                str = StringUtils.substringBetween(str, "[", "]");
+                str = StringUtils.replace(str, ", ", ",");
+            }
+            return "'" + str.replace("'","''") + "'";
         }
     }
 
@@ -913,43 +920,4 @@ public final class BeanUtil
             return wh;
         }
     }
-
-    public static SQLValue getSqlValue(Class<?> clazz, String fieldName, List<Object> fieldValues, Object equals, boolean contain, String[] fields)
-    {
-        String selectFields = new SelectField<>(clazz, contain, fields).getFields();
-        log.debug("selectFields: {}", selectFields);
-
-        StringBuilder sb = new StringBuilder();
-        SQLValue sqlValue = new SQLValue();
-        sb.append("select ");
-        sb.append(selectFields);
-        sb.append(" from ");
-        sb.append(getTableName(null, clazz));
-        sb.append(WHERE);
-        sb.append(fieldName);
-        if (fieldValues == null || fieldValues.isEmpty())
-        {
-            sb.append(" in (null) ");
-        }
-        else
-        {
-            sqlValue.setValues(fieldValues);
-            sb.append(" in (");
-            sb.append(TypeUtil.repeatChar(fieldValues.size(), '?'));
-            sb.append(") ");
-        }
-
-        // equal
-        if(equals != null)
-        {
-            Field[] fs = getFields(clazz);
-            SQLValue objects = toWhere(fs, equals, false);
-            sb.append(objects.getSql());
-            sb.append(' ');
-            sqlValue.addValues(objects.getValues());
-        }
-        sqlValue.setSql(sb.toString());
-        return sqlValue;
-    }
-
 }
