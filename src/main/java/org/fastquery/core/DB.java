@@ -80,21 +80,18 @@ public class DB
     {
         String sql = sqlValue.getSql();
         List<Object> objs = sqlValue.getValues();
-        List<Map<String, Object>> keyvals;
         Connection conn = QueryContext.getConn();
         QueryContext.addSqls(sql);
         info(sql, objs);
         try (PreparedStatement stat = conn.prepareStatement(sql);
              ResultSet rs = executeQueryWithParams(stat, objs))
         {
-            keyvals = rs2Map(rs);
+            return rs2Map(rs);
         }
         catch (Exception e)
         {
             throw new RepositoryException(e.getMessage(), e);
         }
-
-        return keyvals;
     }
 
     // 参数设置和查询执行的封装方法
