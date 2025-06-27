@@ -177,9 +177,9 @@ public class TxTest extends TestFastQuery
                 fish = bb.update(new Fish(id, name, num));
                 part2(id, name, num, fish);
 
-                aa.save(new Fish(name, num));
-                bb.save(new Fish(name, num));
-                cc.save(new Fish(name, num));
+                aa.save(new Fish(num));
+                bb.save(new Fish(num));
+                cc.save(new Fish(num));
 
                 fish = cc.update(new Fish(id, name, num));
                 part3(id, name, num, fish);

@@ -47,7 +47,7 @@ public class Fish extends Named
         this.num = num;
     }
 
-    public Fish(String name, Integer num)
+    public Fish(Integer num)
     {
         this.num = num;
     }

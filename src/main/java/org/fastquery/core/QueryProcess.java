@@ -412,7 +412,7 @@ class QueryProcess
             }
         }
 
-        return DB.update(bean, null, null);
+        return DB.update(bean);
     }
 
     private static Object q2()
@@ -427,7 +427,7 @@ class QueryProcess
         if (sql != null && DB.exists(sql))
         {
             // 更新
-            return DB.update(bean, null, null);
+            return DB.update(bean);
         }
         else
         {

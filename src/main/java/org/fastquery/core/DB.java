@@ -66,7 +66,7 @@ public class DB
             int index = e.ordinal() + 1; // 数据库中枚举元素对应的数字索引
             stat.setObject(parameterIndex, index);
         }
-        else if(object instanceof JSON)
+        else if (object instanceof JSON)
         {
             stat.setObject(parameterIndex, object.toString());
         }
@@ -82,34 +82,32 @@ public class DB
         List<Object> objs = sqlValue.getValues();
         List<Map<String, Object>> keyvals;
         Connection conn = QueryContext.getConn();
-        PreparedStatement stat = null;
-        ResultSet rs = null;
-        try
+        QueryContext.addSqls(sql);
+        info(sql, objs);
+        try (PreparedStatement stat = conn.prepareStatement(sql);
+             ResultSet rs = executeQueryWithParams(stat, objs))
         {
-            QueryContext.addSqls(sql);
-            info(sql, objs);
-            stat = conn.prepareStatement(sql);
-            // 设置sql参数值
-            int lenTmp = objs.size(); // objs 源头上已经控制禁止为null
-            for (int i = 0; i < lenTmp; i++)
-            {
-                statSetObject(stat, i + 1, objs.get(i));
-            }
-            // 设置sql参数值 End
-            rs = stat.executeQuery();
             keyvals = rs2Map(rs);
-            stat.close();
         }
         catch (Exception e)
         {
             throw new RepositoryException(e.getMessage(), e);
         }
-        finally
-        {
-            close(rs, stat);
-        }
 
         return keyvals;
+    }
+
+    // 参数设置和查询执行的封装方法
+    private static ResultSet executeQueryWithParams(PreparedStatement stat, List<Object> objs) throws SQLException
+    {
+        // 设置sql参数值
+        int lenTmp = objs.size(); // objs 源头上已经控制禁止为null
+        for (int i = 0; i < lenTmp; i++)
+        {
+            statSetObject(stat, i + 1, objs.get(i));
+        }
+        // 设置sql参数值 End
+        return stat.executeQuery();
     }
 
     /**
@@ -265,12 +263,11 @@ public class DB
         }
     }
 
-    static int update(Object bean, String dbName, String where)
+    static int update(Object bean)
     {
         Connection conn = null;
         PreparedStatement stat = null;
-        Object[] updateInfo = (where == null || StringUtils.EMPTY.equals(where)) ? BeanUtil.toUpdateSQL(bean, dbName, false)
-                : BeanUtil.toUpdateSQL(bean, dbName, where);
+        Object[] updateInfo = BeanUtil.toUpdateSQL(bean, null, false);
         if (updateInfo == null || updateInfo.length == 0)
         {
             return 0;
@@ -465,7 +462,7 @@ public class DB
                             val = StringUtils.EMPTY;
                         }
                         Pattern p = RegexCache.getPattern("\\$\\[" + i + "]");
-                        s = RegExUtils.replaceAll(s,p,val);
+                        s = RegExUtils.replaceAll(s, p, val);
                     }
                 }
                 consumer.accept(st, s);
@@ -514,7 +511,7 @@ public class DB
         }
         finally
         {
-            if(stat != null)
+            if (stat != null)
             {
                 try
                 {
@@ -541,7 +538,7 @@ public class DB
         List<Map<String, Object>> keyvals = new ArrayList<>();
         Map<String, Object> keyval;
         // 获取列信息
-        ResultSetMetaData resultSetMetaData;
+        ResultSetMetaData resultSetMetaData = rs.getMetaData();
         // 总列数
         int columnCount;
 
@@ -549,7 +546,6 @@ public class DB
         Object obj;
         while (rs.next())
         {
-            resultSetMetaData = rs.getMetaData();
             columnCount = resultSetMetaData.getColumnCount();
             keyval = new HashMap<>();
             for (int i = 1; i <= columnCount; i++)
@@ -557,30 +553,36 @@ public class DB
                 key = resultSetMetaData.getColumnLabel(i); // 获取列别名,若没有别名那么就获取本身名称(getColumnName)
                 obj = rs.getObject(i);
                 String columnType = resultSetMetaData.getColumnTypeName(i);
-                if("JSON".equals(columnType))
+                if ("JSON".equals(columnType))
                 {
-                    if(obj == null || "null".equals(obj))
-                    {
-                        String columnName = resultSetMetaData.getColumnName(i);
-                        if(columnName.endsWith("Obj"))
-                        {
-                            obj = new JSONObject();
-                        }
-                        else if(columnName.endsWith("Array"))
-                        {
-                            obj = new JSONArray();
-                        }
-                    }
-                    else
-                    {
-                        obj = JSON.parse(obj.toString());
-                    }
+                    String columnName = resultSetMetaData.getColumnName(i);
+                    obj = processJsonValue(obj, columnName);
                 }
                 keyval.put(key, obj);
             }
             keyvals.add(keyval);
         }
         return keyvals;
+    }
+
+    private static Object processJsonValue(Object obj, String columnName)
+    {
+        if (obj == null || "null".equals(obj))
+        {
+            if (columnName.endsWith("Obj"))
+            {
+                obj = new JSONObject();
+            }
+            else if (columnName.endsWith("Array"))
+            {
+                obj = new JSONArray();
+            }
+        }
+        else
+        {
+            obj = JSON.parse(obj.toString());
+        }
+        return obj;
     }
 
     /**
