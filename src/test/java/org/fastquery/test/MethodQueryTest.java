@@ -61,11 +61,8 @@ public class MethodQueryTest extends TestFastQuery
     @Test
     public void db() throws NoSuchMethodException, SecurityException
     {
-        assertThat(QueryRepository.class.isAssignableFrom(studentDBService.getClass()), is(true));
-        // 断言是否继承了QueryRepository中的方法
-        assertThat(studentDBService.getClass().getMethod("executeBatch", String.class), notNullValue());
-        assertThat(QueryRepository.class.isAssignableFrom(userInfoDBService.getClass()), is(true));
-        assertThat(userInfoDBService.getClass().getMethod("executeBatch", String.class), notNullValue());
+        assertThat(studentDBService.getClass().getMethod("executeUpdate", Object.class), notNullValue());
+        assertThat(userInfoDBService.getClass().getMethod("findOne", Object.class, boolean.class, String[].class), notNullValue());
     }
 
     @Test
@@ -136,52 +133,6 @@ public class MethodQueryTest extends TestFastQuery
         userInfos.add(new UserInfo("我是谁", null));
         int effect = studentDBService.save(false, userInfos);
         assertThat(effect, is(4));
-    }
-
-    @Test
-    public void executeBatch1()
-    {
-        int[] ints = studentDBService.executeBatch("update.sql");
-        assertThat(ints.length, is(10));
-    }
-
-    @Test
-    public void executeBatch2()
-    {
-        int[] ints = studentDBService.executeBatch(System.getProperty("user.dir") + "/src/test/resources/testFiles" + "/update.sql");
-        assertThat(ints.length, is(10));
-    }
-
-    @Test
-    public void executeBatch3()
-    {
-        int[] ints = studentDBService.executeBatch(null);
-        assertThat(ints, notNullValue());
-        assertThat(ints,is(ArrayUtils.EMPTY_INT_ARRAY));
-
-        ints = studentDBService.executeBatch(null,null);
-        assertThat(ints, notNullValue());
-        assertThat(ints,is(ArrayUtils.EMPTY_INT_ARRAY));
-    }
-
-    @Test
-    public void executeBatch4()
-    {
-        int[] ints = studentDBService.executeBatch("create.sql");
-        assertThat(ints.length, is(3));
-
-        ints = studentDBService.executeBatch("create.sql",null);
-        assertThat(ints.length, is(3));
-
-        ints = studentDBService.executeBatch("create.sql",ArrayUtils.EMPTY_STRING_ARRAY);
-        assertThat(ints.length, is(3));
-    }
-
-    @Test
-    public void executeBatch5()
-    {
-        int[] ints = studentDBService.executeBatch("create2.sql", new String[]{null, "table", "demo_table", "table", "auto_increment", StringUtils.EMPTY});
-        assertThat(ints.length, is(3));
     }
 
     @Test

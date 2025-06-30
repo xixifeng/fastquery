@@ -43,8 +43,6 @@ class MethodId
 
     static final byte QUERY5 = 0X05;
 
-    static final byte QUERY6 = 0X06;
-
     static final byte QUERY7 = 0X07;
 
     static final byte QUERY8 = 0X08;
@@ -60,5 +58,5 @@ class MethodId
     static final byte QUERY13 = 0X13;
 
     static final byte QUERY14 = 0X14;
-    // 0X03 空出来了，下次使用
+    // 0X03, 0X06 空出来了，下次使用
 }

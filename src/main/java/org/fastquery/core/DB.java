@@ -22,8 +22,6 @@
 
 package org.fastquery.core;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,16 +29,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-import java.util.stream.Stream.Builder;
 
 import com.alibaba.fastjson.JSONArray;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.util.TypeUtil;
 import org.fastquery.struct.RespUpdate;
@@ -97,13 +90,7 @@ public class DB
     // 参数设置和查询执行的封装方法
     private static ResultSet executeQueryWithParams(PreparedStatement stat, List<Object> objs) throws SQLException
     {
-        // 设置sql参数值
-        int lenTmp = objs.size(); // objs 源头上已经控制禁止为null
-        for (int i = 0; i < lenTmp; i++)
-        {
-            statSetObject(stat, i + 1, objs.get(i));
-        }
-        // 设置sql参数值 End
+        setParameters(objs, stat);
         return stat.executeQuery();
     }
 
@@ -124,14 +111,7 @@ public class DB
         }
         catch (Exception e)
         {
-            try
-            {
-                QueryContext.rollback();
-            }
-            catch (SQLException e1)
-            {
-                throw new RepositoryException(e1.getMessage(), e1);
-            }
+            rollbackQuietly();
             throw new RepositoryException(e.getMessage(), e);
         }
 
@@ -143,55 +123,39 @@ public class DB
         List<RespUpdate> rus = new ArrayList<>();
         for (SQLValue sqlValue : sqlValues)
         {
-            ResultSet rs = null;
-            PreparedStatement stat = null;
+            String sql = sqlValue.getSql();
+            QueryContext.addSqls(sql);
+            info(sql, sqlValue.getValues());
+            List<Object> values = sqlValue.getValues();
             RespUpdate ru = new RespUpdate();
-            try
+            try (PreparedStatement stat = (hasPK ? conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS) : conn.prepareStatement(sql)))
             {
-                String sql = sqlValue.getSql();
-                QueryContext.addSqls(sql);
-                info(sql, sqlValue.getValues());
-                if (hasPK)
-                {
-                    stat = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                }
-                else
-                {
-                    stat = conn.prepareStatement(sql);
-                }
-                List<Object> values = sqlValue.getValues();
-                int len = values.size();
-                for (int i = 0; i < len; i++)
-                {
-                    // 设置sql参数值
-                    statSetObject(stat, i + 1, values.get(i));
-                }
-
+                setParameters(values, stat);
                 ru.setEffect(stat.executeUpdate());
-
                 if (hasPK)
                 {
-                    rs = stat.getGeneratedKeys();
-                    if (rs.next())
+                    try (ResultSet rs = stat.getGeneratedKeys())
                     {
-                        ru.setPk(rs.getLong(1));
+                        if (rs.next())
+                        {
+                            ru.setPk(rs.getLong(1));
+                        }
                     }
                 }
-                stat.close();
             }
-            catch (SQLException e)
-            {
-                throw new SQLException(e);
-            }
-            finally
-            {
-                close(rs, stat);
-            }
-
             rus.add(ru);
         }
 
         return rus;
+    }
+
+    private static void setParameters(List<Object> values, PreparedStatement stat) throws SQLException
+    {
+        int len = values.size();
+        for (int i = 0; i < len; i++)
+        {
+            statSetObject(stat, i + 1, values.get(i));
+        }
     }
 
     /**
@@ -203,67 +167,58 @@ public class DB
      */
     static Object update(String sql, boolean isEffect)
     {
-        Connection conn = null;
-        PreparedStatement stat = null;
-        ResultSet rs = null;
-        Object key = null;
+        Connection conn = QueryContext.getConn();
+        QueryContext.addSqls(sql);
+        log.info(sql);
         try
         {
-            conn = QueryContext.getConn();
-            QueryContext.addSqls(sql);
             QueryContext.disableAutoCommit();
-            log.info(sql);
-            if (isEffect)
+            try (PreparedStatement stat = (isEffect ? conn.prepareStatement(sql) : conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)))
             {
-                stat = conn.prepareStatement(sql); // 不需要返回主键
-            }
-            else
-            {
-                stat = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            }
-            int e = stat.executeUpdate();
-            if (isEffect)
-            {
-                QueryContext.commit();
-                return e;
-            }
-            else
-            {
-                rs = stat.getGeneratedKeys();
-                // 获取主键
-                if (rs.next())
+                int e = stat.executeUpdate();
+
+                Object result = null;
+                if (isEffect)
                 {
-                    key = rs.getObject(1);
+                    result = e;
+                }
+                else
+                {
+                    try (ResultSet rs = stat.getGeneratedKeys())
+                    {
+                        // 获取主键
+                        if (rs.next())
+                        {
+                            result = rs.getObject(1);
+                        }
+                    }
                 }
                 QueryContext.commit();
-                return key;
+                return result;
+
             }
         }
         catch (SQLException e)
         {
-            if (conn != null)
-            {
-                try
-                {
-                    QueryContext.rollback();
-                }
-                catch (SQLException e1)
-                {
-                    throw new RepositoryException(e1);
-                }
-            }
+            rollbackQuietly();
             throw new RepositoryException(e);
         }
-        finally
+    }
+
+    private static void rollbackQuietly()
+    {
+        try
         {
-            close(rs, stat);
+            QueryContext.rollback();
+        }
+        catch (SQLException e1)
+        {
+            throw new RepositoryException(e1);
         }
     }
 
     static int update(Object bean)
     {
-        Connection conn = null;
-        PreparedStatement stat = null;
         Object[] updateInfo = BeanUtil.toUpdateSQL(bean, null, false);
         if (updateInfo == null || updateInfo.length == 0)
         {
@@ -275,38 +230,29 @@ public class DB
         List<Object> args = (List<Object>) updateInfo[1];
         int count = args.size();
         int effect;
+        Connection conn = QueryContext.getConn();
+        QueryContext.addSqls(sql);
+        info(sql, args);
         try
         {
-            conn = QueryContext.getConn();
             QueryContext.disableAutoCommit();
-            QueryContext.addSqls(sql);
-            info(sql, args);
-            stat = conn.prepareStatement(sql);
-            for (int i = 1; i <= count; i++)
+            try (PreparedStatement stat = conn.prepareStatement(sql))
             {
-                statSetObject(stat, i, args.get(i - 1));
+                for (int i = 1; i <= count; i++)
+                {
+                    statSetObject(stat, i, args.get(i - 1));
+                }
+                effect = stat.executeUpdate();
+                QueryContext.commit();
             }
-            effect = stat.executeUpdate();
-            QueryContext.commit();
         }
         catch (SQLException e)
         {
             if (conn != null)
             {
-                try
-                {
-                    QueryContext.rollback();
-                }
-                catch (SQLException e1)
-                {
-                    throw new RepositoryException(e1);
-                }
+                rollbackQuietly();
             }
             throw new RepositoryException(e);
-        }
-        finally
-        {
-            close(null, stat);
         }
         return effect;
     }
@@ -314,17 +260,12 @@ public class DB
     // 查询一条数据然后转换成一个实体
     static Object select(String sql, Object bean)
     {
+        log.info(sql);
+        QueryContext.addSqls(sql);
         Class<?> cls = (bean instanceof Class) ? (Class<?>) bean : bean.getClass();
-        Connection conn;
-        Statement stat = null;
-        ResultSet rs = null;
-        try
+        Connection conn = QueryContext.getConn();
+        try (Statement stat = conn.createStatement(); ResultSet rs = stat.executeQuery(sql))
         {
-            conn = QueryContext.getConn();
-            stat = conn.createStatement();
-            log.info(sql);
-            QueryContext.addSqls(sql);
-            rs = stat.executeQuery(sql);
             List<Map<String, Object>> maps = rs2Map(rs);
             if (maps.isEmpty())
             {
@@ -337,32 +278,19 @@ public class DB
         {
             throw new RepositoryException(e);
         }
-        finally
-        {
-            close(rs, stat);
-        }
     }
 
     static boolean exists(String sql)
     {
-        Connection conn;
-        Statement stat = null;
-        ResultSet rs = null;
-        try
+        QueryContext.addSqls(sql);
+        Connection conn = QueryContext.getConn();
+        try (Statement stat = conn.createStatement(); ResultSet rs = stat.executeQuery(sql))
         {
-            conn = QueryContext.getConn();
-            stat = conn.createStatement();
-            QueryContext.addSqls(sql);
-            rs = stat.executeQuery(sql);
             return rs.next();
         }
         catch (SQLException e)
         {
             throw new RepositoryException(e);
-        }
-        finally
-        {
-            close(rs, stat);
         }
     }
 
@@ -371,154 +299,20 @@ public class DB
         String sql = sqlValue.getSql();
         List<Object> objs = sqlValue.getValues();
         Connection conn = QueryContext.getConn();
-        PreparedStatement stat = null;
-        ResultSet rs = null;
-        try
+        QueryContext.addSqls(sql);
+        info(sql, objs);
+        try (PreparedStatement stat = conn.prepareStatement(sql))
         {
-            QueryContext.addSqls(sql);
-            info(sql, objs);
-            stat = conn.prepareStatement(sql);
             // 设置sql参数值
-            int lenTmp = objs.size(); // objs 源头上已经控制禁止为null
-            for (int i = 0; i < lenTmp; i++)
+            setParameters(objs, stat);
+            try (ResultSet rs = stat.executeQuery())
             {
-                statSetObject(stat, i + 1, objs.get(i));
+                return rs.next();
             }
-            // 设置sql参数值 End
-            rs = stat.executeQuery();
-            return rs.next();
         }
         catch (Exception e)
         {
             throw new RepositoryException(e.getMessage(), e);
-        }
-        finally
-        {
-            close(rs, stat);
-        }
-    }
-
-    private static Stream<String> parserSQLFile(String name)
-    {
-        Builder<String> builder = Stream.builder();
-
-        try (FileReader reader = new FileReader(name); BufferedReader br = new BufferedReader(reader))
-        {
-            StringBuilder buff = new StringBuilder();
-            String str;
-            while ((str = br.readLine()) != null)
-            {
-                str = str.trim();
-                if (!StringUtils.EMPTY.startsWith(str) && !str.startsWith("#") && !str.startsWith("--"))
-                {
-                    buff.append(str);
-                    buff.append(' ');
-                    int index = buff.indexOf(";");
-                    if (index != -1)
-                    {
-                        builder.add(buff.substring(0, index).trim());
-                        buff.delete(0, index + 1);
-                    }
-                }
-            }
-
-            String lastStr = buff.toString().trim();
-            if (!StringUtils.EMPTY.equals(lastStr))
-            {
-                builder.add(lastStr);
-            }
-
-        }
-        catch (Exception e)
-        {
-            throw new RepositoryException(e);
-        }
-
-        return builder.build();
-    }
-
-    static int[] executeBatch(String sqlFile, String[] quotes, BiConsumer<Statement, String> consumer)
-    {
-        Connection conn = QueryContext.getConn();
-        Statement stat = null;
-        Stream<String> stream = parserSQLFile(sqlFile);
-        try
-        {
-            QueryContext.disableAutoCommit();
-            final Statement st = conn.createStatement();
-            stat = st;
-            stream.forEach(s -> {
-                if (quotes != null)
-                {
-                    int len = quotes.length;
-                    for (int i = 0; i < len; i++)
-                    {
-                        String val = quotes[i];
-                        if (val == null)
-                        {
-                            val = StringUtils.EMPTY;
-                        }
-                        Pattern p = RegexCache.getPattern("\\$\\[" + i + "]");
-                        s = RegExUtils.replaceAll(s, p, val);
-                    }
-                }
-                consumer.accept(st, s);
-            });
-            int[] ints = stat.executeBatch();
-            stat.clearBatch();
-            QueryContext.commit();
-            return ints;
-        }
-        catch (Exception e)
-        {
-            try
-            {
-                QueryContext.rollback();
-            }
-            catch (SQLException e1)
-            {
-                throw new RepositoryException(e1.getMessage(), e1);
-            }
-            throw new RepositoryException(e);
-        }
-        finally
-        {
-            close(null, stat);
-        }
-    }
-
-    /**
-     * 释放资源
-     *
-     * @param rs   ResultSet实例
-     * @param stat Statement实例
-     */
-    private static void close(ResultSet rs, Statement stat)
-    {
-        try
-        {
-            if (rs != null)
-            {
-                rs.close();
-            }
-        }
-        catch (SQLException e)
-        {
-            throw new RepositoryException(e);
-        }
-        finally
-        {
-            if (stat != null)
-            {
-                try
-                {
-                    stat.close();
-                }
-                catch (SQLException e)
-                {
-                    throw new RepositoryException("stat 关闭异常", e);
-                }
-            }
         }
     }
 

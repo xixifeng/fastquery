@@ -333,8 +333,6 @@ class QueryProcess
                 return q4();
             case MethodId.QUERY5:
                 return q5();
-            case MethodId.QUERY6:
-                return q6();
             case MethodId.QUERY7:
                 return q7();
             case MethodId.QUERY8:
@@ -484,36 +482,6 @@ class QueryProcess
         String sql = BeanUtil.toUpdateSQL(entities, null);
         log.info(sql);
         return DB.update(sql, true);
-    }
-
-    private static Object q6()
-    {
-        String sqlFile;
-        Object[] iargs = QueryContext.getArgs();
-        String f = (String) iargs[0];
-        if (f != null)
-        {
-            String[] quotes = null;
-            if (iargs.length == 2)
-            {
-                quotes = (String[]) iargs[1];
-            }
-            sqlFile = new File(f).isFile() ? f : FastQueryJSONObject.getBasedir() + iargs[0];
-            return DB.executeBatch(sqlFile, quotes, (stat, s) -> {
-                try
-                {
-                    stat.addBatch(s);
-                }
-                catch (SQLException e)
-                {
-                    throw new RepositoryException(e);
-                }
-            });
-        }
-        else
-        {
-            return ArrayUtils.EMPTY_INT_ARRAY;
-        }
     }
 
     private static Object q7()
