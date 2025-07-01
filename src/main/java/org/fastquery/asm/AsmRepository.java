@@ -240,7 +240,7 @@ public class AsmRepository
                         "this.m[j] = new org.fastquery.core.MethodInfo(m); " +
                         "}" +
                         // 缓存method... End
-                        "return ($r) org.fastquery.core.Prepared.excute(this.m[j]," + getParameterNames(ps) + ", this) ;" +
+                        "return ($r) org.fastquery.core.Prepared.execute(this.m[j]," + getParameterNames(ps) + ", this) ;" +
                         '}';
                 CtMethod cm = CtMethod.make(getMethodDef(method) + bodyBuilder, ctClass);
                 ctClass.addMethod(cm);

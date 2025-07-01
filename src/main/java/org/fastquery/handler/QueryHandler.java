@@ -141,77 +141,84 @@ public class QueryHandler
     }
 
     public static Object list(List<Map<String, Object>> keyvals)
-    { // list bean
-
+    {
         List<Object> list = new ArrayList<>();
-        if (keyvals.isEmpty())
+        if (!keyvals.isEmpty())
         {
-            return list;
-        }
-
-        // -- start
-        String returnTypeName = QueryContext.getMethodInfo().getGenericReturnType().getTypeName();
-        ParameterizedType pt = (ParameterizedType) QueryContext.getMethodInfo().getGenericReturnType();
-        java.lang.reflect.Type[] types = pt.getActualTypeArguments();
-        if (types.length == 1)
-        {
-            java.lang.reflect.Type ct = types[0];
-            if (ct instanceof Class && TypeUtil.isWarrp((Class<?>) ct))
+            String returnTypeName = QueryContext.getMethodInfo().getGenericReturnType().getTypeName();
+            ParameterizedType pt = (ParameterizedType) QueryContext.getMethodInfo().getGenericReturnType();
+            Type beanType = pt.getActualTypeArguments()[0];
+            if (beanType instanceof Class && TypeUtil.isWarrp((Class<?>) beanType))
             {
-                keyvals.forEach(map -> {
-                    if (map.values().size() > 1)
-                    {
-                        throw new RepositoryException("不能把转换成" + returnTypeName);
-                    }
-                    Object obj = map.values().iterator().next();
-                    if(obj == null)
-                    {
-                        list.add(null);
-                        return;
-                    }
-                    Class<?> clazz = (Class<?>) ct;
-                    // 如果obj就是clazz对应实例的子类
-                    if (clazz.isAssignableFrom(obj.getClass()))
-                    {
-                        list.add(obj);
-                    }
-                    else if (Enum.class.isAssignableFrom((Class<?>) ct))
-                    {
-                        list.add(EnumUtils.getEnum((Class) ct, (String) obj));
-                    }
-                    else
-                    {
-                        throw new RepositoryException("从数据库查出的类型是:" + obj.getClass() + "不能充当List<" + ct + ">的元素");
-                    }
-                });
-                return list;
+                return handleSimpleType(keyvals, returnTypeName, list, (Class<?>) beanType);
             }
-            else if (ct instanceof ParameterizedType)
+            else if (beanType instanceof ParameterizedType)
             {
-                ParameterizedType parameterizedType = (ParameterizedType) ct;
+                ParameterizedType parameterizedType = (ParameterizedType) beanType;
                 if (parameterizedType.getRawType() == EnumSet.class)
                 {
-                    keyvals.forEach(map -> {
-                        if (map.values().size() > 1)
-                        {
-                            throw new RepositoryException("不能把转换成" + returnTypeName);
-                        }
-                        Object obj = map.values().iterator().next();
-                        // 如果obj就是clazz对应实例的子类
-                        list.add(TypeUtil.toEnumSet((String) obj, (Class<Enum>) parameterizedType.getActualTypeArguments()[0]));
-                    });
-                    return list;
+                    return handleEnumSet(keyvals, returnTypeName, list, parameterizedType);
+                }
+            }
+
+            if (beanType instanceof Class)
+            {
+                for (Map<String, Object> map : keyvals)
+                {
+                    Object obj = TypeUtil.map2Obj((Class<?>) beanType, map);
+                    list.add(obj);
                 }
             }
         }
-        // end
+        return list;
+    }
 
-        Class<?> beanType = (Class<?>) pt.getActualTypeArguments()[0];
-
+    private static List<Object> handleEnumSet(List<Map<String, Object>> keyvals, String returnTypeName, List<Object> list, ParameterizedType parameterizedType)
+    {
         for (Map<String, Object> map : keyvals)
         {
-            Object obj = TypeUtil.map2Obj(beanType, map);
-            list.add(obj);
+            if (map.size() != 1)
+            {
+                throw new RepositoryException("不能把转换成" + returnTypeName);
+            }
+            else
+            {
+                Object obj = map.values().iterator().next();
+                // 如果obj就是clazz对应实例的子类
+                list.add(TypeUtil.toEnumSet((String) obj, (Class<Enum>) parameterizedType.getActualTypeArguments()[0]));
+            }
+        }
+        return list;
+    }
+
+    private static List<Object> handleSimpleType(List<Map<String, Object>> keyvals, String returnTypeName, List<Object> list, Class<?> ct)
+    {
+        for (Map<String, Object> map : keyvals)
+        {
+            if (map.size() != 1)
+            {
+                throw new RepositoryException("不能把转换成" + returnTypeName);
+            }
+            else
+            {
+                Object obj = map.values().iterator().next();
+                if (obj == null)
+                {
+                    list.add(null);
+                }
+                else if (ct.isAssignableFrom(obj.getClass()))  // 如果 obj 就是 clazz 对应实例的子类
+                {
+                    list.add(obj);
+                }
+                else if (Enum.class.isAssignableFrom(ct))
+                {
+                    list.add(EnumUtils.getEnum((Class) ct, (String) obj));
+                }
+                else
+                {
+                    throw new RepositoryException("从数据库查出的类型是:" + obj.getClass() + "不能充当List<" + ct + ">的元素");
+                }
+            }
         }
         return list;
     }
@@ -269,7 +276,8 @@ public class QueryHandler
                         Method valueOfMethod = returnType.getDeclaredMethod("valueOf", String.class);
                         return valueOfMethod.invoke(null, val.toString());
                     }
-                    catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+                    catch (NoSuchMethodException | SecurityException | IllegalAccessException |
+                           IllegalArgumentException | InvocationTargetException e)
                     {
                         throw new RepositoryException("类型转换失败,发生方法:" + methodLongName + ", 建议将这个方法的返回类型由" + returnType + " 修改成 " + typeName, e);
                     }
@@ -307,7 +315,7 @@ public class QueryHandler
             else
             {
                 map = keyvals.get(index);
-                if (map.keySet().size() == 1)
+                if (map.size() == 1)
                 { // 在此只允许map有且仅有一个键值对 X[]
                     Object val = map.values().iterator().next();
                     if (componentType == String.class)

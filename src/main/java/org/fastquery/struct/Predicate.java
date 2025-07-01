@@ -36,12 +36,6 @@ public abstract class Predicate<E>
         return this.condition(AND,left,operator,right);
     }
 
-    @Deprecated
-    public <T> Predicate<E> and(Supplier<Chip<T,E>> left, Collection<T> collection)
-    {
-        return this.condition(AND, left,SQLOperator.IN,collection);
-    }
-
     /**
      * 用于构建 sql 查询条件单元。例如，构建 fieldName != ? 这类表达式。与上一个条件单元的关系是 or
      * @param left 表达式左边的字段名称
