@@ -1022,44 +1022,16 @@ public class TypeUtil
 
     public static Object map2Obj(Class<?> beanType, Map<String, Object> map)
     {
-        // xxx
-        // 1. 从 beanType 中找出 EnumSet<Ruits> 属性,及对应的枚举类型
+        // 1. 找 EnumSet<T> 字段和处理@Convert
         Map<String, Type> enumSetFeilds = new HashMap<>();
         Field[] fields = beanType.getDeclaredFields();
         for (Field field : fields)
         {
-            String name = field.getName();
-            if (field.getType() == EnumSet.class && field.getGenericType() instanceof ParameterizedType)
-            {
-                ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-                if (parameterizedType.getActualTypeArguments()[0].getClass() == Class.class)
-                {
-                    enumSetFeilds.put(name, parameterizedType.getActualTypeArguments()[0]);
-                }
-                else
-                {
-                    throw new RepositoryException("禁止出现EnumSet<?通配符>");
-                }
-            }
+            // 找出 EnumSet<T> 类型的字段，并记录在 enumSetFeilds 中，其中 key 为字段 field.name, value 为 EnumSet<T> 中的 T(T 必须是一个 class)
+            findEnumSet(field, enumSetFeilds);
 
-            Convert convert = field.getAnnotation(Convert.class);
-            if(convert != null)
-            {
-                Class<? extends AttributeConverter> clazz = convert.value();
-                AttributeConverter attributeConverter;
-                try
-                {
-                    attributeConverter = clazz.getDeclaredConstructor().newInstance();
-                }
-                catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                       NoSuchMethodException e)
-                {
-                    throw new RepositoryException(e);
-                }
-
-                Object o = attributeConverter.toEntityField(map.get(name));
-                map.put(name, o);
-            }
+            // 找出标记有 @Convert 注解的字段，按照此注解指定的类型转换规则转换
+            convert(map, field);
         }
 
         // 2. 从 map 取出 EnumSet 本来要对应的字符串
@@ -1069,7 +1041,7 @@ public class TypeUtil
             if (val != null)
             {
                 enumSetValues.put(f, val);
-                map.put(f, null);
+                map.put(f, null);// 把源置 null, 反序列化后，会设置正确的值
             }
         });
 
@@ -1084,19 +1056,40 @@ public class TypeUtil
                 Objects.requireNonNull(e, "不能为 null");
                 enums.add(e);
             }
-            EnumSet enumSet;
-            if (enums.isEmpty())
+            EnumSet enumSet = enums.isEmpty() ? EnumSet.noneOf((Class<Enum>) enumSetFeilds.get(k)) : EnumSet.copyOf(enums);
+            getFieldAndSetVal(beanType, obj, k, enumSet);
+        });
+        return obj;
+    }
+
+    private static void findEnumSet(Field field, Map<String, Type> enumSetFeilds)
+    {
+        String name = field.getName();
+        if (field.getType() == EnumSet.class && field.getGenericType() instanceof ParameterizedType)
+        {
+            ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+            if (parameterizedType.getActualTypeArguments()[0].getClass() == Class.class)
             {
-                enumSet = EnumSet.noneOf((Class<Enum>) enumSetFeilds.get(k));
+                enumSetFeilds.put(name, parameterizedType.getActualTypeArguments()[0]);
             }
             else
             {
-                enumSet = EnumSet.copyOf(enums);
+                throw new RepositoryException("禁止出现EnumSet<?通配符>");
             }
-            getFieldAndSetVal(beanType, obj, k, enumSet);
-        });
-        // xxx end
-        return obj;
+        }
+    }
+
+    private static void convert(Map<String, Object> map, Field field)
+    {
+        Convert convert = field.getAnnotation(Convert.class);
+        if(convert != null)
+        {
+            Class<? extends AttributeConverter> clazz = convert.value();
+            AttributeConverter attributeConverter = AttributeConverter.newInstance(clazz);
+
+            Object o = attributeConverter.toEntityField(map.get(field.getName()));
+            map.put(field.getName(), o);
+        }
     }
 
     public static <E extends Enum<E>> Object enumSet2Val(Object obj)

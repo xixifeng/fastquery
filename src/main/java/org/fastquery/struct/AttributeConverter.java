@@ -21,6 +21,10 @@
  */
 package org.fastquery.struct;
 
+import org.fastquery.core.RepositoryException;
+
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * @author xixifeng (fastquery@126.com)
  */
@@ -31,4 +35,16 @@ public interface AttributeConverter<A,B>
 
     B toDBField (A entityField);
 
+    static AttributeConverter newInstance(Class<? extends AttributeConverter> clazz)
+    {
+        try
+        {
+            return clazz.getDeclaredConstructor().newInstance();
+        }
+        catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+               NoSuchMethodException e)
+        {
+            throw new RepositoryException(e);
+        }
+    }
 }
