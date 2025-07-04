@@ -22,7 +22,6 @@
 
 package org.fastquery.core;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -30,26 +29,23 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.math.BigInteger;
-import java.sql.SQLException;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.LongSupplier;
+import java.util.function.Supplier;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.fastquery.dialect.DialectScheduler;
-import org.fastquery.page.Page;
-import org.fastquery.page.PageDialect;
-import org.fastquery.page.Pageable;
-import org.fastquery.page.Slice;
+import org.fastquery.page.*;
 import org.fastquery.struct.Predicate;
 import org.fastquery.struct.RespUpdate;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.util.BeanUtil;
-import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.TypeUtil;
 
 import com.alibaba.fastjson.JSONArray;
@@ -63,8 +59,9 @@ import static org.fastquery.handler.QueryHandler.*;
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-class QueryProcess
+public class QueryProcess
 {
+    public static final Page<?> EMPTY_PAGE = new PageImpl<>();
     // 改操作
     static Object modifying()
     {
@@ -658,14 +655,13 @@ class QueryProcess
 
     @SuppressWarnings("rawtypes")
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    private static class PageImpl implements Page
+    private static class PageImpl<E> implements Page<E>
     {
 
         private int size; // 每页行数
         private int number; // 当前页码,从0开始
         private int numberOfElements; // 当前页的真实记录行数
-        private List<?> content = Collections.emptyList(); // 当前页的结果集
+        private List<E> content = Collections.emptyList(); // 当前页的结果集
 
         private long totalElements; // 总行数
         private int totalPages; // 总页码
@@ -680,7 +676,7 @@ class QueryProcess
         private Slice nextPageable = new Slice(); // 下一页的Pageable对象
         private Slice previousPageable = nextPageable; // 上一页的Pageable对象
 
-        private PageImpl(int size, int number, List<?> content, long totalElements, int totalPages, boolean hasNext, boolean isLast)
+        private PageImpl(int size, int number, List<E> content, long totalElements, int totalPages, boolean hasNext, boolean isLast)
         {
             this.size = size;
             this.numberOfElements = content.size();
@@ -697,5 +693,105 @@ class QueryProcess
             this.previousPageable = new Slice((!isFirst) ? (number - 1) : number, size);
         }
 
+        private PageImpl()
+        {
+            Slice slice = new Slice();
+            this.content = Collections.emptyList();
+            this.nextPageable = slice;
+            this.previousPageable = slice;
+        }
+        private static <S, T> List<T> copyProperties(List<S> source, Supplier<T> targetSupplier, BiConsumer<T, S> biConsumer)
+        {
+            List<T> targetList = new ArrayList<>();
+            source.forEach(s -> {
+                T t = targetSupplier.get();
+                StreamUtil.copyProperties(s, t);
+                if (biConsumer != null)
+                {
+                    biConsumer.accept(t, s);
+                }
+                targetList.add(t);
+            });
+            return targetList;
+        }
+        private <T> Page<T> newPage(Supplier<T> targetSupplier, BiConsumer<T, E> o)
+        {
+            PageImpl<T> page = new PageImpl<>();
+            page.size = this.size;
+            page.number = this.number;
+            page.numberOfElements = this.numberOfElements;
+
+            page.content = copyProperties(this.content, targetSupplier, o);
+
+            page.totalElements = this.totalElements;
+            page.totalPages = this.totalPages;
+            page.hasContent = this.hasContent;
+
+            page.isFirst = this.isFirst;
+            page.isLast = this.isLast;
+
+            page.hasNext = this.hasNext;
+            page.hasPrevious = this.hasPrevious;
+
+            page.nextPageable = new Slice(this.getNextPageable().getNumber(), this.getNextPageable().getSize());
+            page.previousPageable = new Slice(this.getPreviousPageable().getNumber(), this.getPreviousPageable().getSize());
+            return page;
+        }
+
+        @Override
+        public <T> Page<T> copy(Supplier<T> targetSupplier, BiConsumer<T, E> biConsumer)
+        {
+            Objects.requireNonNull(targetSupplier, "targetSupplier must not be null");
+
+            return newPage(targetSupplier, biConsumer);
+        }
+
+        @Override
+        public Page<E> tree(Function<E, Long> myIdFun, Function<E, Long> parentIdFun, long topLevelParentId, BiConsumer<E, List<E>> storageChildrenFun)
+        {
+            List<E> list;
+            List<E> content1 = this.getContent();
+            if (content1.size() > 1)
+            {
+                list = TreeStructure.toTree(content1, ArrayList::new, topLevelParentId, myIdFun, parentIdFun, storageChildrenFun);
+            }
+            else if (content1.size() == 1)
+            {
+                list = new ArrayList<>(content1);
+            }
+            else
+            {
+                list = new ArrayList<>();
+            }
+            this.content = list;
+            return this;
+        }
+
+        @Override
+        public <K, T> Page<E> join(Function<E, List<K>> leftFriendshipKey, Function<List<K>, List<T>> byLeftFriendshipKeyData, Function<T, K> rightFriendshipKey, BiConsumer<E, List<T>> leftSetRight)
+        {
+            return join(() -> StreamUtil.join(this.content, leftFriendshipKey, byLeftFriendshipKeyData, rightFriendshipKey, leftSetRight));
+        }
+
+        @Override
+        public <K, T> Page<E> join(Function<E, K> foreignKey, Function<List<K>, List<T>> byForeignKeyFindData, Function<T, K> primaryKey, BiConsumer<E, T> biConsumer, boolean copy, String... ignoreProperties)
+        {
+            return join(() -> StreamUtil.join(this.content, foreignKey, byForeignKeyFindData, primaryKey, biConsumer, copy, ignoreProperties));
+        }
+
+        @Override
+        public <K, B> Page<E> oneToManyJoin(Function<E, K> orOfMasterKey, Function<List<K>, List<B>> byOrOfMasterKeyFindData, Function<B, K> foreignKey, BiConsumer<E, List<B>> biConsumer)
+        {
+            return join(() -> StreamUtil.oneToManyJoin(this.content, orOfMasterKey, byOrOfMasterKeyFindData, foreignKey, biConsumer));
+        }
+
+        private Page<E> join(Runnable runnable)
+        {
+            if (!this.content.isEmpty())
+            {
+                runnable.run();
+            }
+            return this;
+        }
     }
 }

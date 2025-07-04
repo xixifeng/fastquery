@@ -48,6 +48,8 @@ public class UserInfo extends Predicate<UserInfo>
     private String description;
     @Transient
     private Long ssid;
+    @Transient
+    private Integer option;
 
     public Chip<Integer,UserInfo> id()
     {
@@ -62,6 +64,12 @@ public class UserInfo extends Predicate<UserInfo>
     public Chip<String,UserInfo> name()
     {
         return new Chip<>("name");
+    }
+
+    public UserInfo(Integer id, String name)
+    {
+        this.id = id;
+        this.name = name;
     }
 
     public UserInfo(String name, Integer age)
@@ -84,4 +92,6 @@ public class UserInfo extends Predicate<UserInfo>
         this.age = age;
         this.description = description;
     }
+
+
 }

@@ -193,7 +193,7 @@ public class DefaultMethodTest extends TestFastQuery
         userInfo.and(userInfo::name, SQLOperator.EQ,userInfo.getName());
         userInfo.orderBy();
         UserInfo u = db.findOne(userInfo, true, "id", "name");
-        assertThat(u.toString(), equalTo("UserInfo(id=4, name=婤姶, age=null, description=null, ssid=null)"));
+        assertThat(u.toString(), equalTo("UserInfo(id=4, name=婤姶, age=null, description=null, ssid=null, option=null)"));
         List<String> executedSQLs = rule.getExecutedSQLs();
         String sql = executedSQLs.get(0);
         assertThat(sql, equalTo("select id,name from UserInfo where  name = ? order by id desc limit 1"));

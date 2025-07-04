@@ -36,8 +36,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fastquery.bean.Option;
 import org.fastquery.bean.Ruits;
+import org.fastquery.bean.UserInfo;
 import org.fastquery.bean.UserInfoDTO;
 import org.fastquery.core.*;
+import org.fastquery.page.StreamUtil;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
@@ -480,6 +482,31 @@ public class TypeUtilTest
         Option option = userInfoDTO.getOption();
         assertThat(option, notNullValue());
         assertThat(option.getValue(), equalTo(18));
+
+    }
+
+    @Test
+    public void userInfoCopy()
+    {
+        Integer id = 6;
+        String name = "张三";
+        Integer option = 17;
+        UserInfo userInfo = new UserInfo(id,name);
+        userInfo.setOption(option);
+        UserInfoDTO userInfoDTO = new UserInfoDTO();
+
+        assertThat(userInfoDTO.getId(),nullValue());
+        assertThat(userInfoDTO.getName(),equalTo(""));
+        assertThat(userInfoDTO.getOption(),nullValue());
+
+        StreamUtil.copyProperties(userInfo, userInfoDTO);
+
+        assertThat(userInfoDTO.getId(),is(id));
+        assertThat(userInfoDTO.getName(),equalTo(name));
+        assertThat(userInfoDTO.getOption().getValue(),is(option));
+
+
+
 
     }
 
