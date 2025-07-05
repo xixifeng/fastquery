@@ -18,6 +18,7 @@ public class TreeStructure
      * 将任意属于 Collection 集合类型的集合，转换成树结构
      *
      * @param <E>                 集合的项, 它是一个可变类型
+     * @param <K>                 父级 id 的类型
      * @param <R>                 任意继承自 Collection 的集合类型
      * @param newInstanceSupplier 创建 R 实例的方式，用于放新的树形结构
      * @param topLevelParentId    顶级项的父级 id

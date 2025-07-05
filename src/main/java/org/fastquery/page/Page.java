@@ -24,7 +24,6 @@ package org.fastquery.page;
 
 import org.fastquery.core.QueryProcess;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -144,10 +143,10 @@ public interface Page<E>
     <T> Page<T> copy(Supplier<T> targetSupplier, BiConsumer<T, E> biConsumer);
 
     /**
-     * 将当前 E 类型的 Page 复制至 T 类型的 Page 上 <br>
-     * 注意：T 类型的 page 由内部创建
-     *
+     * 将当前类型的 Page 复制给 T 类型的 Page, 返回新分页 <br>
      * @param targetSupplier 另一个类型的实例化方式
+     * @return 复制之后的新类型分页对象 Page&lt;T&gt;
+     * @param <T> 目标类型
      */
     default <T> Page<T> copy(Supplier<T> targetSupplier)
     {

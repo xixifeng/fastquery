@@ -66,7 +66,7 @@ public class UserInfo extends Predicate<UserInfo>
         return new Chip<>("name");
     }
 
-    public UserInfo(Integer id, String name)
+    public UserInfo(int id, String name)
     {
         this.id = id;
         this.name = name;
