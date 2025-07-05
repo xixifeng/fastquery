@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.ToLongFunction;
 
 /**
  * 分页结果接口
@@ -161,7 +162,7 @@ public interface Page<E>
      * @param storageChildrenFun 存储当前子集的方式
      * @return 树形结构
      */
-    default Page<E> tree(Function<E, Long> nodeIdFun, Function<E, Long> parentIdFun, BiConsumer<E, List<E>> storageChildrenFun)
+    default Page<E> tree(ToLongFunction<E> nodeIdFun, ToLongFunction<E> parentIdFun, BiConsumer<E, List<E>> storageChildrenFun)
     {
         return this.tree(nodeIdFun, parentIdFun, 0L, storageChildrenFun);
     }
@@ -175,7 +176,7 @@ public interface Page<E>
      * @param storageChildrenFun 存储当前子集的方式
      * @return 树形结构
      */
-    Page<E> tree(Function<E, Long> nodeIdFun, Function<E, Long> parentIdFun, long topLevelParentId, BiConsumer<E, List<E>> storageChildrenFun);
+    Page<E> tree(ToLongFunction<E> nodeIdFun, ToLongFunction<E> parentIdFun, long topLevelParentId, BiConsumer<E, List<E>> storageChildrenFun);
 
     /**
      * 左表把右表的一些数据合并进来

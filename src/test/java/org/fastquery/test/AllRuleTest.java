@@ -37,7 +37,7 @@ import org.junit.runners.Suite.SuiteClasses;
 // 指定运行器
 @RunWith(Suite.class)
 @SuiteClasses({
-        FQueryTest.class, StudentDBServiceTest.class, UserInfoDBServiceTest.class, CreateDataSourceTest.class, UserInfoDBRepositoryTest.class,
+        FQueryTest.class, StudentDBServiceTest.class, UserInfoDBServiceTest.class, UserInfoDBRepositoryTest.class,
         TypeUtilTest.class, MethodQueryTest.class, QueryByNamedDBExampleTest.class, BeanUtilTest.class, PageTest.class, FastQueryJSONObjectTest.class,
         FQueryResourceImplTest.class, SunnyDBServiceTest.class, SaveToIdTest.class, RegexCacheTest.class, DBTest.class, ProductDBServiceTest.class,
         QueryPoolTest.class, ParamFilterTest.class, ConditionTest.class, MySQLPageDialectTest.class, DefaultMethodTest.class,

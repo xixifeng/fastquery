@@ -28,6 +28,8 @@ import static org.hamcrest.Matchers.*;
 
 import org.junit.Test;
 
+import java.lang.reflect.Method;
+
 /**
  * @author mei.sir@aliyun.cn
  */
@@ -40,8 +42,18 @@ public class MySQLPageDialectTest extends TestFastQuery
 
         String sql = "selEct u.id,u.name,u.tel,u.flag,u.state,u.count,u.createdate,u.lastlogindate,(select count(uid) fRom tiduid where uid=u.id) as occupy frOm `user` as u";
         String countField = "id";
-        String str = countSQLInference("org.fastquery.dialect.MySQLPageDialect", sql, countField);
+        String str = countSQLInference(sql, countField);
         assertThat(str, equalTo("select count(id) frOm `user` as u"));
 
+    }
+
+    private static String countSQLInference(String sql, String countField) throws Exception
+    {
+        Class<?> clazz = Class.forName("org.fastquery.dialect.MySQLPageDialect");
+        Method method = clazz.getDeclaredMethod("getInstance");
+        method.setAccessible(true);
+        Object pageDialectObj = method.invoke(null);
+        Method countSQLInferenceMethod = clazz.getMethod("countSQLInference", String.class, String.class);
+        return countSQLInferenceMethod.invoke(pageDialectObj, sql, countField).toString();
     }
 }

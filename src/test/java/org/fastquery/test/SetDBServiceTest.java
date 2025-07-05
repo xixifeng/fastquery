@@ -136,8 +136,8 @@ public class SetDBServiceTest extends TestFastQuery
     {
         String name = "计算机算法";
         Integer credit = 4;
-        String no = "c08";
-        int effect = db.updateCourse(name, credit, no);
+        String num = "c08";
+        int effect = db.updateCourse(name, credit, num);
         assertThat(effect, is(1));
         assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `credit` = ?  where no = ?"));
     }
@@ -147,8 +147,8 @@ public class SetDBServiceTest extends TestFastQuery
     {
         String name = "计算机算法";
         Integer credit = 4;
-        String no = "c08";
-        int effect = db.updateCourse2(name, credit, no);
+        String num = "c08";
+        int effect = db.updateCourse2(name, credit, num);
         assertThat(effect, is(1));
         assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `credit` = ?  where no = ?"));
     }
@@ -157,8 +157,8 @@ public class SetDBServiceTest extends TestFastQuery
     public void updateCourse2$2()
     {
         Integer credit = 4;
-        String no = "c08";
-        int effect = db.updateCourse2(null, credit, 9, 5, no);
+        String num = "c08";
+        int effect = db.updateCourse2(null, credit, 9, 5, num);
         assertThat(effect, is(1));
         assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `credit` = ?,`semester` = ?,`period` = ?  where no = ?"));
     }
@@ -168,8 +168,8 @@ public class SetDBServiceTest extends TestFastQuery
     {
         String name = "计算机算法";
         Integer credit = 4;
-        String no = "c08";
-        int effect = db.updateCourse3(name, credit, no);
+        String num = "c08";
+        int effect = db.updateCourse3(name, credit, num);
         assertThat(effect, is(1));
         assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `name` = ?,`credit` = ?  where no = ?"));
     }
@@ -179,8 +179,8 @@ public class SetDBServiceTest extends TestFastQuery
     {
         String name = "编程技术";
         Integer credit = 4;
-        String no = "c08";
-        int effect = db.updateCourse3(name, credit, no);
+        String num = "c08";
+        int effect = db.updateCourse3(name, credit, num);
         assertThat(effect, is(1));
         assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `credit` = ?  where no = ?"));
     }
@@ -190,8 +190,8 @@ public class SetDBServiceTest extends TestFastQuery
     {
         String name = "计算机算法";
         Integer credit = 4;
-        String no = "c08";
-        int effect = db.updateCourse4(name, credit, no);
+        String num = "c08";
+        int effect = db.updateCourse4(name, credit, num);
         assertThat(effect, is(1));
         assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `name` = ?,`credit` = ?  where no = ?"));
     }
@@ -201,8 +201,8 @@ public class SetDBServiceTest extends TestFastQuery
     {
         String name = "编程技术";
         Integer credit = 4;
-        String no = "c08";
-        int effect = db.updateCourse4(name, credit, no);
+        String num = "c08";
+        int effect = db.updateCourse4(name, credit, num);
         assertThat(effect, is(1));
         assertThat(rule.getSQLValue().getSql(), equalTo("update `Course` set `name` = name,`credit` = ?  where no = ?"));
     }

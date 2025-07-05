@@ -22,16 +22,12 @@
 
 package org.fastquery.dsm;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.sql.DataSource;
 
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.RepositoryException;
 
 /**
@@ -95,48 +91,5 @@ public class FQueryProperties
     public static DataSource findDataSource(String dataSourceName)
     {
         return dataSources.get(dataSourceName);
-    }
-
-    public static void createDataSource(String dataSourceName, Properties properties)
-    {
-        if (dataSourceName == null || StringUtils.EMPTY.equals(dataSourceName))
-        {
-            throw new RepositoryException("dataSourceName 不能为\"\"或为null");
-        }
-        else
-        {
-            if (dataSources.containsKey(dataSourceName))
-            { // 这里有必要判断. 而不是等连接池创建后在判断.
-                throw new RepositoryException(dataSourceName + " 已经存在!");
-            }
-            com.mchange.v2.c3p0.ComboPooledDataSource cpds = new com.mchange.v2.c3p0.ComboPooledDataSource();
-            cpds.setDataSourceName(dataSourceName);
-            Class<?> cls = cpds.getClass();
-            properties.forEach((k, v) -> {
-                try
-                {
-                    PropertyDescriptor pd = new PropertyDescriptor(k.toString(), cls);
-                    Method method = pd.getWriteMethod();
-                    Class<?> returnType = method.getParameterTypes()[0];
-                    if (returnType == String.class)
-                    {
-                        method.invoke(cpds, v.toString());
-                    }
-                    else if (returnType == int.class)
-                    {
-                        method.invoke(cpds, Integer.parseInt(v.toString()));
-                    }
-                    else if (returnType == boolean.class)
-                    {
-                        method.invoke(cpds, Boolean.parseBoolean(v.toString()));
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new RepositoryException(e);
-                }
-            });
-            putDataSource(dataSourceName, cpds);
-        }
     }
 }

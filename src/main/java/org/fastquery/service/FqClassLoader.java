@@ -34,7 +34,7 @@ class FqClassLoader extends ClassLoader
 
     private FqClassLoader()
     {
-        super(FqClassLoader.class.getClassLoader());
+        super(Thread.currentThread().getContextClassLoader());
     }
 
     static FqClassLoader getInstance()

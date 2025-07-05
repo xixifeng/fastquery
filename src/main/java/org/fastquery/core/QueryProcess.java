@@ -30,10 +30,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.LongSupplier;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -747,13 +744,13 @@ public class QueryProcess
         }
 
         @Override
-        public Page<E> tree(Function<E, Long> myIdFun, Function<E, Long> parentIdFun, long topLevelParentId, BiConsumer<E, List<E>> storageChildrenFun)
+        public Page<E> tree(ToLongFunction<E> myIdFun, ToLongFunction<E> parentIdFun, long topLevelParentId, BiConsumer<E, List<E>> storageChildrenFun)
         {
             List<E> list;
             List<E> content1 = this.getContent();
             if (content1.size() > 1)
             {
-                list = TreeStructure.toTree(content1, ArrayList::new, topLevelParentId, myIdFun, parentIdFun, storageChildrenFun);
+                list = TreeStructure.toTree(content1, ArrayList::new, topLevelParentId, myIdFun::applyAsLong, parentIdFun::applyAsLong, storageChildrenFun);
             }
             else if (content1.size() == 1)
             {

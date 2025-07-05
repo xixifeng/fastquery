@@ -23,13 +23,11 @@
 package org.fastquery.service;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Properties;
 
 import lombok.experimental.UtilityClass;
 import org.fastquery.core.Repository;
 import org.fastquery.core.RepositoryException;
 import org.fastquery.core.StrConst;
-import org.fastquery.dsm.FQueryProperties;
 
 /**
  * @author xixifeng (fastquery@126.com)
@@ -57,16 +55,5 @@ public class FQuery
         {
             throw new RepositoryException("获取代理实现类异常", e);
         }
-    }
-
-    /**
-     * 创建一个数据源
-     *
-     * @param dataSourceName 数据源的名称,不能重复.
-     * @param properties     连接池的配置
-     */
-    public static void createDataSource(String dataSourceName, Properties properties)
-    { // NO_UCD
-        FQueryProperties.createDataSource(dataSourceName, properties);
     }
 }
