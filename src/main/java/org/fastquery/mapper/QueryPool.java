@@ -328,8 +328,8 @@ public class QueryPool
     // 该方法永远不会返回null或空,因为在初始化时就做了检测
     public static String render(boolean isQuery)
     {
-        String className = QueryContext.getIclass().getName();
         MethodInfo method = QueryContext.getMethodInfo();
+        String className = method.getInterfaceName();
         Object[] args = QueryContext.getArgs();
         QueryByNamed qbn = method.getQueryByNamed();
         String id = qbn.value();

@@ -35,6 +35,5 @@ public final class StrConst
      */
     public static final String DB_SUF = "a$";
     public static final String TABLE = "#{#table}";
-    public static final String ID = "#{#id}";
     public static final String LIMIT = "#{#limit}";
 }

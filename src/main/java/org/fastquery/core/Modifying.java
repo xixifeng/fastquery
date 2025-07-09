@@ -40,25 +40,4 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Modifying
 {
-
-    /**
-     * 主键字段的名称,默认值"id"
-     *
-     * @return String
-     */
-    String id() default "id";
-
-    /**
-     * 指定当前正在修改的表
-     *
-     * @return String
-     */
-    String table() default StringUtils.EMPTY;
-
-    /**
-     * 改操作若返回实体,selectFields 用来明确指定查询相应表的哪几个字段,默认是 "*",字段与字段之间请用英文逗号隔开
-     *
-     * @return String
-     */
-    String selectFields() default "*";
 }

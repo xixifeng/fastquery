@@ -38,10 +38,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.*;
 import org.fastquery.asm.Script2Class;
 import org.fastquery.mapper.QueryPool;
-import org.fastquery.page.PageIndex;
-import org.fastquery.page.PageSize;
-import org.fastquery.struct.AttributeConverter;
-import org.fastquery.struct.Convert;
+import org.fastquery.struct.Converter;
 import org.fastquery.struct.ParamMap;
 import org.fastquery.where.Condition;
 import com.alibaba.fastjson.JSON;
@@ -394,17 +391,6 @@ public class TypeUtil
         return count;
     }
 
-    /**
-     * 从给定的参数列表中,搜寻出是第几个参数带有@Id注解.注意:从0开始计数
-     *
-     * @param parameters 参数类型
-     * @return 若返回 -1 表示没有找到
-     */
-    public static int findId(Parameter[] parameters)
-    {
-        return findAnnotationIndex(Id.class, parameters);
-    }
-
     private static String getReplacement(Object obj, String defVal)
     {
         return Matcher.quoteReplacement(obj != null ? obj.toString() : defVal);
@@ -678,7 +664,7 @@ public class TypeUtil
         }
         // 追加条件 End
 
-        if (!StringUtils.EMPTY.equals(sb.toString()))
+        if (!StringUtils.EMPTY.contentEquals(sb))
         {
             sb.insert(0, "where");
         }
@@ -780,52 +766,6 @@ public class TypeUtil
         List<B> bs = new ArrayList<>();
         maps.forEach(map -> bs.add((B) TypeUtil.map2Obj(b, map)));
         return bs;
-    }
-
-    /**
-     * 查找出标识有注解的参数的具体值,没有找到返回null
-     *
-     * @param clazz      注解class
-     * @param parameters 方法的参数类型列表
-     * @param args       该方的具体参数
-     * @return 值
-     */
-    public static Object findAnnotationParameterVal(Class<? extends Annotation> clazz, Parameter[] parameters, Object... args)
-    {
-        for (int i = 0; i < parameters.length; i++)
-        {
-            if (parameters[i].getAnnotation(clazz) != null)
-            {
-                return args[i];
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 标识有PageIndex注解的参数的具体的实参.
-     *
-     * @param parameters 类型集合
-     * @param args       实参
-     * @return 位置索引
-     */
-    public static int findPageIndex(Parameter[] parameters, Object... args)
-    {
-        Object obj = findAnnotationParameterVal(PageIndex.class, parameters, args);
-        return obj != null ? (int) obj : -1;
-    }
-
-    /**
-     * 标识有PageSize注解的参数的具体的实参.
-     *
-     * @param parameters 参数类型
-     * @param args       参数值
-     * @return 位置索引
-     */
-    public static int findPageSize(Parameter[] parameters, Object... args)
-    {
-        Object obj = findAnnotationParameterVal(PageSize.class, parameters, args);
-        return obj != null ? (int) obj : -1;
     }
 
     /**
@@ -1030,8 +970,8 @@ public class TypeUtil
             // 找出 EnumSet<T> 类型的字段，并记录在 enumSetFeilds 中，其中 key 为字段 field.name, value 为 EnumSet<T> 中的 T(T 必须是一个 class)
             findEnumSet(field, enumSetFeilds);
 
-            // 找出标记有 @Convert 注解的字段，按照此注解指定的类型转换规则转换
-            convert(map, field);
+            // 解释转换器
+            Converter.fit(map,field);
         }
 
         // 2. 从 map 取出 EnumSet 本来要对应的字符串
@@ -1079,19 +1019,6 @@ public class TypeUtil
         }
     }
 
-    private static void convert(Map<String, Object> map, Field field)
-    {
-        Convert convert = field.getAnnotation(Convert.class);
-        if(convert != null)
-        {
-            Class<? extends AttributeConverter> clazz = convert.value();
-            AttributeConverter attributeConverter = AttributeConverter.newInstance(clazz);
-
-            Object o = attributeConverter.toEntityField(map.get(field.getName()));
-            map.put(field.getName(), o);
-        }
-    }
-
     public static <E extends Enum<E>> Object enumSet2Val(Object obj)
     {
         if (obj instanceof EnumSet)
@@ -1116,21 +1043,6 @@ public class TypeUtil
         {
             return obj;
         }
-    }
-
-    public static String repeatChar(int size, char x)
-    {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < size; i++)
-        {
-            sb.append(x);
-            sb.append(',');
-        }
-        if (size > 0)
-        {
-            sb.deleteCharAt(sb.length() - 1);
-        }
-        return sb.toString();
     }
 
     public static <B> Object getFieldVal(B bean, Field field)

@@ -22,22 +22,10 @@
 
 package org.fastquery.handler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import lombok.experimental.UtilityClass;
-import org.fastquery.core.DB;
-import org.fastquery.core.Modifying;
-import org.fastquery.core.QueryContext;
-import org.fastquery.core.RepositoryException;
 import org.fastquery.struct.RespUpdate;
-import org.fastquery.struct.SQLValue;
-import org.fastquery.util.TypeUtil;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 
 /**
  * @author xixifeng (fastquery@126.com)
@@ -61,69 +49,9 @@ public final class ModifyingHandler
         return null;
     }
 
-    public static Map<String, Object> mapType(Long autoIncKey, Class<?> convertType)
-    {
-        Modifying modifying = QueryContext.getMethodInfo().getModifying();
-        String keyFieldName = modifying.id(); // 不可能为null
-        String tableName = modifying.table();
-        List<Object> values = new ArrayList<>(1);
-        Object e;
-        if (autoIncKey != null)
-        {
-            e = autoIncKey;
-        }
-        else
-        {
-            Object pkey = getId();
-            if (pkey == null)
-            {
-                throw new RepositoryException("针对改需求,需要主键值,可是没有找到主键值,请在方法参数中用@Id标识哪个是主键.");
-            }
-            e = pkey;
-        }
-
-        values.add(e);
-        Map<String, Object> keyval = null;
-
-        String sqlBuilder = "select " +
-                modifying.selectFields() +
-                " from " +
-                tableName +
-                " where " +
-                keyFieldName +
-                " = ?";
-        SQLValue sqlValue = new SQLValue(sqlBuilder, values);
-        List<Map<String, Object>> keyvals = DB.find(sqlValue);
-        if (!keyvals.isEmpty())
-        {
-            keyval = keyvals.get(0);
-        }
-
-        if (keyval != null && convertType == String.class)
-        {
-            Map<String, Object> map2 = new HashMap<>();
-            keyval.forEach((k, v) -> map2.put(k, v != null ? v.toString() : null));
-            return map2;
-        }
-
-        return keyval;
-    }
-
-    public static JSONObject jsonObjectType(Long autoIncKey)
-    {
-        Map<String, Object> map = mapType(autoIncKey, Object.class);
-        return new JSONObject(map);
-    }
-
     public static boolean booleanType(List<RespUpdate> respUpdates)
     {
         return intType(respUpdates) >= 0;
-    }
-
-    public static Object beanType(Long autoIncKey)
-    {
-        Map<String, Object> map = mapType(autoIncKey, Object.class);
-        return JSON.toJavaObject(new JSONObject(map), QueryContext.getReturnType());
     }
 
     public static int intType(List<RespUpdate> respUpdates)
@@ -134,19 +62,5 @@ public final class ModifyingHandler
             sum += respUpdate.getEffect();
         }
         return sum;
-    }
-
-    private static Object getId()
-    { // 获取指定的主健,没有找到返回null
-        Object[] args = QueryContext.getArgs();
-        int index = TypeUtil.findId(QueryContext.getMethodInfo().getParameters());
-        if (index != -1)
-        {
-            return args[index];
-        }
-        else
-        {
-            return null;
-        }
     }
 }

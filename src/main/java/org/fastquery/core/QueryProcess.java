@@ -62,7 +62,6 @@ public class QueryProcess
     // 改操作
     static Object modifying()
     {
-        MethodInfo method = QueryContext.getMethodInfo();
         Class<?> returnType = QueryContext.getReturnType();
 
         // 获取待执行的sql
@@ -70,8 +69,6 @@ public class QueryProcess
 
         // 执行
         List<RespUpdate> respUpdates = DB.modify(sqlValues, QueryContext.isRequirePk());
-
-        Long autoIncKey = respUpdates.get(0).getPk();
 
         if (returnType == void.class)
         {
@@ -91,23 +88,11 @@ public class QueryProcess
             }
             return effects;
         }
-        else if (returnType == Map.class)
+        else
         {
-            return mapType(autoIncKey, TypeUtil.mapValueTyep(method));
-        }
-        else if (returnType == JSONObject.class)
-        {
-            return jsonObjectType(autoIncKey);
-        }
-        else if (returnType == boolean.class)
-        {
+            // if (returnType == boolean.class)
             return booleanType(respUpdates);
         }
-        else
-        { // 把值强制转换成 returnType
-            return beanType(autoIncKey);
-        }
-
     }
 
     // 查操作

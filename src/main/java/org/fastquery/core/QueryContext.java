@@ -34,7 +34,6 @@ public final class QueryContext
     private Class<?> returnType; // 返回类型
     private Connection connection; // 当前连接
     private String sourceName; // 当前数据源名称
-    private Class<?> iclass;// 当前拦截到的接口
     private Object[] args; // 当前方法的实参
     private List<String> sqls = new ArrayList<>(); // 当前method所执行的SQL集合
     private Pageable pageable;
@@ -47,7 +46,7 @@ public final class QueryContext
         return threadLocal.get();
     }
 
-    static void start(Class<?> iclass, MethodInfo methodInfo, Object[] args) throws SQLException
+    static void start(MethodInfo methodInfo, Object[] args) throws SQLException
     {
         QueryContext context = threadLocal.get();
         if (context != null && !debug)
@@ -69,14 +68,13 @@ public final class QueryContext
             context = threadLocal.get();
         }
 
-        context.iclass = iclass;
         context.methodInfo = methodInfo;
         context.args = args;
         verifyArgs(); // 校验 $表达式，是否有诸如嫌疑，只校验一次
 
-        context.sourceName = findSource(methodInfo.getParameters(), args);
+        context.sourceName = methodInfo.findSource();
 
-        setConnection(iclass, methodInfo.getId(), context);
+        setConnection(methodInfo.getInterfaceClazz(), methodInfo.getId(), context);
 
         Transactional t = methodInfo.getT();
         context.supporTx = t == null || !t.propagation().equals(Propagation.NOT_SUPPORTED);
@@ -85,7 +83,7 @@ public final class QueryContext
 
         setRequirePk(context);
 
-        setPageable(methodInfo.getParameters(), args, context);
+        setPageable(args, context);
     }
 
     private static void setConnection(Class<?> iclass, Id id, QueryContext context) throws SQLException
@@ -116,7 +114,7 @@ public final class QueryContext
         }
     }
 
-    private static void setPageable(Parameter[] parameters, Object[] args, QueryContext context)
+    private static void setPageable(Object[] args, QueryContext context)
     {
         context.pageable = null;
         for (Object arg : args)
@@ -130,7 +128,7 @@ public final class QueryContext
         if (context.pageable == null)
         {
             // 没有传递Pageable,那么必然有 pageIndex, pageSize 不然,不能通过初始化
-            context.pageable = new PageableImpl(TypeUtil.findPageIndex(parameters, args), TypeUtil.findPageSize(parameters, args));
+            context.pageable = new PageableImpl(context.methodInfo.findPageIndex(), context.methodInfo.findPageSize());
         }
     }
 
@@ -185,11 +183,6 @@ public final class QueryContext
         return getQueryContext().pageable;
     }
 
-    public static Class<?> getIclass()
-    {
-        return getQueryContext().iclass;
-    }
-
     static void clear() throws SQLException
     {
         QueryContext context = getQueryContext();
@@ -201,7 +194,6 @@ public final class QueryContext
             context.sqls = null;
             context.returnType = null;
             context.sourceName = null;
-            context.iclass = null;
             context.args = null;
             try
             {
@@ -252,19 +244,6 @@ public final class QueryContext
         }
 
         return dataSource;
-    }
-
-    /**
-     * 标识有Source注解的参数的具体的实参.
-     *
-     * @param parameters 类型集合
-     * @param args       实参
-     * @return 值
-     */
-    private static String findSource(Parameter[] parameters, Object... args)
-    {
-        Object obj = TypeUtil.findAnnotationParameterVal(Source.class, parameters, args);
-        return obj != null ? obj.toString() : null;
     }
 
     public static Class<?> getReturnType()

@@ -415,21 +415,6 @@ public class UserInfoDBServiceTest extends TestFastQuery
     }
 
     @Test
-    public void insert()
-    {
-        int id;
-        String name = "香月儿";
-        Integer age = 23;
-
-        id = db.findByMaxId() + 1;
-        UserInfo u = db.insert(id, name, age);
-        assertThat(u.getId(), equalTo(id));
-        assertThat(u.getName(), equalTo(name));
-        assertThat(u.getAge(), equalTo(age));
-
-    }
-
-    @Test
     public void updateNameById()
     {
         int id = 2;
@@ -438,26 +423,6 @@ public class UserInfoDBServiceTest extends TestFastQuery
         UserInfo u = db.findById(id);
         assertThat(u.getId(), equalTo(id));
         assertThat(u.getName(), equalTo("戚继光"));
-    }
-
-    @Test
-    public void updateAgeById()
-    {
-        UserInfo userInfo = db.updateAgeById(null, 3);
-        assertThat(userInfo.getId(), is(3));
-        assertThat(userInfo.getAge(), nullValue());
-        userInfo = db.updateAgeById(21, 3);
-        assertThat(userInfo.getId(), is(3));
-        assertThat(userInfo.getAge(), is(21));
-    }
-
-    @Test
-    public void updateAge()
-    {
-        JSONObject userInfo = db.updateAge(null, 3);
-        assertThat(userInfo.getIntValue("id"), is(3));
-        // 断言:包含有age属性 (age即使是null)
-        assertThat(JSON.toJSONString(userInfo, SerializerFeature.WriteMapNullValue).contains("\"age\""), is(true));
     }
 
     @Test

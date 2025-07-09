@@ -91,16 +91,13 @@ class GenerateRepositoryImpl
         byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
 
 
-        /**
-         * <pre>
+
          // 把生成的文件存储起来
          try (java.io.FileOutputStream fos = new java.io.FileOutputStream("/data/tmp/fquery/" + name + ".class")) {
          fos.write(bytes);
          } catch (Exception e) {
-           log.warn(e);
+           e.printStackTrace();
          } // 把生成的文件存储起来 end
-         </pre>
-         */
 
         classLoader.defineClassByName(name, bytes, bytes.length);
     }

@@ -237,10 +237,10 @@ public class AsmRepository
                         "if(this.m[j]==null) {" +
                         "java.lang.reflect.Method m;" +
                         "try {m = c.getMethod(\"" + method.getName() + "\", $sig);} catch (Exception e) {throw new org.fastquery.core.RepositoryException(e);}" +
-                        "this.m[j] = new org.fastquery.core.MethodInfo(m); " +
+                        "this.m[j] = new org.fastquery.core.MethodInfo(m,this,c); " +
                         "}" +
                         // 缓存method... End
-                        "return ($r) org.fastquery.core.Prepared.execute(this.m[j]," + getParameterNames(ps) + ", this) ;" +
+                        "return ($r) org.fastquery.core.Prepared.execute(this.m[j]," + getParameterNames(ps) + ") ;" +
                         '}';
                 CtMethod cm = CtMethod.make(getMethodDef(method) + bodyBuilder, ctClass);
                 ctClass.addMethod(cm);

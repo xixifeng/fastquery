@@ -60,18 +60,6 @@ public class TypeUtilTest
         assertThat(strs.get(0), equalTo("#{#limit}"));
     }
 
-    public void todo(@Id Integer page, Integer size)
-    {
-    }
-
-    @Test
-    public void findAnnotationIndex() throws NoSuchMethodException, SecurityException
-    {
-        Method method = TypeUtilTest.class.getMethod("todo", Integer.class, Integer.class);
-        Parameter[] parameters = method.getParameters();
-        assertThat(TypeUtil.findAnnotationIndex(Id.class, parameters), is(0));
-    }
-
     @Test
     public void filterComments()
     {
@@ -217,7 +205,7 @@ public class TypeUtilTest
     {
         Method pf = TypeUtil.class.getDeclaredMethod("paramFilter", MethodInfo.class, Object[].class, String.class);
         pf.setAccessible(true);
-        return pf.invoke(null, new MethodInfo(method), args, sql).toString();
+        return pf.invoke(null, new MethodInfo(method,null,null), args, sql).toString();
     }
 
     @Test
@@ -239,7 +227,7 @@ public class TypeUtilTest
     {
         Method m1 = TypeUtilTest.class.getMethod("m1", int.class, int.class, int.class);
         String sql = "abc :i and :i1 where :i2";
-        String str = TypeUtil.paramNameFilter(new MethodInfo(m1), sql);
+        String str = TypeUtil.paramNameFilter(new MethodInfo(m1,null,null), sql);
         assertThat(str, equalTo("abc ?1 and ?2 where ?3"));
     }
 
@@ -363,7 +351,7 @@ public class TypeUtilTest
 
         Class<?> clazz = A.class;
         Method method = clazz.getMethod("todo");
-        assertThat(TypeUtil.mapValueTyep(new MethodInfo(method)) == String.class, is(true));
+        assertThat(TypeUtil.mapValueTyep(new MethodInfo(method,null,null)) == String.class, is(true));
     }
 
     @Test
@@ -381,7 +369,7 @@ public class TypeUtilTest
 
         Class<?> clazz = B.class;
         Method method = clazz.getMethod("todo");
-        assertThat(TypeUtil.listMapValueTyep(new MethodInfo(method)) == String.class, is(true));
+        assertThat(TypeUtil.listMapValueTyep(new MethodInfo(method,null,null)) == String.class, is(true));
     }
 
     @SuppressWarnings("unchecked")

@@ -33,6 +33,7 @@ import org.fastquery.core.RepositoryException;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.fastquery.struct.Converter;
 
 /**
  * @author xixifeng (fastquery@126.com)
@@ -50,6 +51,20 @@ public class FastQueryJSONObject
         if (jo == null)
         {
             jo = o;
+
+            // 初始化 Converter
+            JSONArray convert = o.getJSONArray("convert");
+            if(convert != null)
+            {
+                for (int i = 0; i < convert.size(); i++) {
+                    JSONObject item = convert.getJSONObject(i);
+                    String sourceType = item.getString("sourceType");
+                    String targetType = item.getString("targetType");
+                    String converter = item.getString("converter");
+                    Converter c = new Converter(sourceType, targetType, converter);
+                    Converter.add(c);
+                }
+            }
         }
         else
         {

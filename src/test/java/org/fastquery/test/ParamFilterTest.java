@@ -43,7 +43,7 @@ public class ParamFilterTest extends TestFastQuery
     {
         Method m = TypeUtil.class.getDeclaredMethod("paramFilter", MethodInfo.class, Object[].class, String.class);
         m.setAccessible(true);
-        return m.invoke(null, new MethodInfo(method), args, sql).toString();
+        return m.invoke(null, new MethodInfo(method,null,null), args, sql).toString();
     }
 
     public void m1(@Param("name1") String name, @Param("age1") Integer age)

@@ -214,18 +214,6 @@ public class StudentDBServiceTest extends TestFastQuery
     }
 
     @Test
-    public void addStudent()
-    {
-        String no = String.valueOf(System.currentTimeMillis()).substring(6);
-        Student student = studentDBService.addStudent(no, "蜘蛛", "男", 3, "爬行动物");
-        assertThat(student.getNo(), equalTo(no));
-        assertThat(student.getName(), equalTo("蜘蛛"));
-        assertThat(student.getSex(), equalTo("男"));
-        assertThat(student.getAge(), equalTo(3));
-        assertThat(student.getDept(), equalTo("爬行动物"));
-    }
-
-    @Test
     public void testFindBySex1()
     {
         Student[] students = studentDBService.findBySex(10, "男");
@@ -291,50 +279,10 @@ public class StudentDBServiceTest extends TestFastQuery
     }
 
     @Test
-    public void addUserInfo()
-    {
-        Map<String, Object> map = studentDBService.addUserInfo("张三", 36);
-        assertThat(map, notNullValue());
-        assertThat(map.get("name"), equalTo("张三"));
-        assertThat(map.get("age"), equalTo(36));
-    }
-
-    @Test
-    public void addUserInfo2()
-    {
-        Map<String, String> map = studentDBService.addUserInfo2("Lisi", 32);
-        assertThat(map, notNullValue());
-        assertThat(map.get("name"), equalTo("Lisi"));
-        assertThat(map.get("age"), equalTo("32"));
-    }
-
-    @Test
-    public void saveUserInfo2()
-    {
-        JSONObject jsonObject = studentDBService.saveUserInfo2("网五", 31);
-        log.debug(JSON.toJSONString(jsonObject, SerializerFeature.PrettyFormat));
-        assertThat(jsonObject.getString("name"), equalTo("网五"));
-        assertThat(jsonObject.getInteger("age"), equalTo(31));
-        assertThat(jsonObject.containsKey("id"), is(false));
-    }
-
-    @Test
     public void saveUserInfo3()
     {
         int effect = studentDBService.saveUserInfo3("小丽丽", 8);
         assertThat(effect, is(1));
-    }
-
-    @Test
-    public void updateUserinfoById()
-    {
-        int id = 1;
-        Integer age = 16;
-        JSONObject jsonObject = studentDBService.updateUserinfoById(16, 1);
-        assertThat(jsonObject, notNullValue());
-        log.debug(JSON.toJSONString(jsonObject, SerializerFeature.PrettyFormat));
-        assertThat(jsonObject.getInteger("id"), is(id));
-        assertThat(jsonObject.getInteger("age"), is(age));
     }
 
     @Test

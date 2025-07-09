@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.struct.AttributeConverter;
 import org.fastquery.struct.Convert;
+import org.fastquery.struct.Converter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -215,39 +216,6 @@ public class StreamUtil
     public static void copyProperties(Object source, Object target, String... ignoreProperties)
     {
         BeanUtils.copyProperties(source,target,ignoreProperties);
-
-        Class<?> sourceClass = source.getClass();
-        Class<?> targetClass = target.getClass();
-        Field[] fields = targetClass.getDeclaredFields();
-        for (Field f : fields)
-        {
-            // 目标字段明确指定转换规则
-            Convert convert = f.getAnnotation(Convert.class);
-            if(convert != null)
-            {
-                String name = f.getName();
-                Field sourceField = ReflectionUtils.findField(sourceClass, name);
-                if(sourceField != null)
-                {
-                    try
-                    {
-                        ReflectionUtils.makeAccessible(sourceField);
-                        Object fieldVal = sourceField.get(source);
-                        if(fieldVal != null)
-                        {
-                            ReflectionUtils.makeAccessible(f);
-                            Class<? extends AttributeConverter> clazz = convert.value();
-                            AttributeConverter attributeConverter = AttributeConverter.newInstance(clazz);
-                            Object targetFieldVal = attributeConverter.toEntityField(fieldVal);
-                            ReflectionUtils.setField(f,target,targetFieldVal);
-                        }
-                    }
-                    catch (IllegalAccessException e)
-                    {
-                        throw new IllegalArgumentException(e);
-                    }
-                }
-            }
-        }
+        Converter.fit(source,target);
     }
 }

@@ -92,12 +92,6 @@ public interface StudentDBService extends QueryRepository
     @Modifying
     int add(String no, String name, String sex, int age, String dept);
 
-    // 以实体bean格式返回当前保存的数据
-    @Query("insert into student (no, name, sex, age, dept) values (?1, ?2, ?3, ?4, ?5)")
-    @Modifying(table = "student", id = "no")
-    // 注意: student的主键是字符串不会自增长,在此处需要用@Id标识
-    Student addStudent(@Id String no, String name, String sex, int age, String dept);
-
     // 注意:SQL别名删除
     // 删
     @Query("delete s from student as s where s.no =  ?1") // 根据编号删除
@@ -132,26 +126,9 @@ public interface StudentDBService extends QueryRepository
     @Query("select * from information_schema.columns where table_name = ?1 and table_schema = ?2 and column_key='PRI'")
     JSONArray findColumnKey(String tableName, String tableSchema);
 
-    @Modifying(table = "userinfo")
-    @Query("insert into #{#table} (name,age) values (?1, ?2)")
-    Map<String, Object> addUserInfo(String name, Integer age);
-
-    // 把查询出的字段值包装成字符串,而不是Object
-    @Modifying(table = "userinfo")
-    @Query("insert into #{#table} (name,age) values (?1, ?2)")
-    Map<String, String> addUserInfo2(String name, Integer age);
-
-    @Modifying(table = "userinfo", selectFields = "`name`,`age`")
-    @Query("insert into #{#table} (name,age) values (?1, ?2)")
-    JSONObject saveUserInfo2(String name, Integer age);
-
-    @Modifying(table = "userinfo")
-    @Query("insert into #{#table} (name,age) values (?1, ?2)")
+    @Modifying
+    @Query("insert into userinfo (name,age) values (?1, ?2)")
     int saveUserInfo3(String name, Integer age);
-
-    @Modifying(table = "userinfo")
-    @Query("update #{#table} as ui set ui.age = ?1 where ui.id=?2")
-    JSONObject updateUserinfoById(Integer age, @Id int id);
 
     @Modifying
     @Query("DELETE FROM `userinfo` WHERE id=?1")

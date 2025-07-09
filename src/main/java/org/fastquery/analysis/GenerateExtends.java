@@ -75,12 +75,8 @@ public class GenerateExtends
             filterChain.addFilter(new SetFilter());
 
             if (modifying != null)
-            { // 改
-
-                filterChain.addFilter(new AnnotationSynxFilter());
-                filterChain.addFilter(new ArgsFilter());
+            {
                 filterChain.addFilter(new ModifyingReturnTypeFilter());
-
             }
             else
             { // 查

@@ -35,11 +35,11 @@ public interface AttributeConverter<A,B>
 
     B toDBField (A entityField);
 
-    static AttributeConverter newInstance(Class<? extends AttributeConverter> clazz)
+    static AttributeConverter newInstance(Class<?> clazz)
     {
         try
         {
-            return clazz.getDeclaredConstructor().newInstance();
+            return (AttributeConverter) clazz.getDeclaredConstructor().newInstance();
         }
         catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                NoSuchMethodException e)

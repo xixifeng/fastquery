@@ -169,25 +169,10 @@ public interface UserInfoDBService extends QueryRepository
     @Query("select id,name,age from UserInfo where id in (${ids})")
     UserInfo[] findByIds(@Param("ids") int[] ids);
 
-    @Modifying(table = "UserInfo")
-    @Query("insert into UserInfo(id,name,age) values(:id,:name,:age)")
-    UserInfo insert(@Param("id") Integer id, @Param("name") String name, @Param("age") Integer age);
-
     // 这行SQL参数完全可以用?或:name表达式,在此仅用来测试语法特性
     @Modifying
     @Query("update UserInfo set name = ${name} where id = ${id}")
     int updateNameById(@Param("name") String name, @Param("id") int id);
-
-    @Modifying(table = "UserInfo")
-    @Query("update UserInfo set age = ${age} where id = ${id}")
-    UserInfo updateAgeById(@Param(value = "age", defaultVal = "null") Integer age, @Id @Param("id") int id);
-
-    @Modifying(table = "UserInfo")
-    @Query("update UserInfo set age = ${age} where id = ${id}")
-    JSONObject updateAge(@Param(value = "age", defaultVal = "null") Integer age, @Id @Param("id") int id);
-
-    @QueryByNamed("findLimit")
-    UserInfo findLimit();
 
     @Query("select age from UserInfo where id = ?1")
     Integer findAge(Integer id);

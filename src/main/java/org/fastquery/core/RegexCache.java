@@ -22,6 +22,7 @@
 
 package org.fastquery.core;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -34,19 +35,10 @@ import java.util.regex.Pattern;
  * @author xixifeng (fastquery@126.com)
  */
 @Slf4j
+@UtilityClass
 public final class RegexCache
 {
-
-    private RegexCache()
-    {
-        throw new IllegalStateException("Placeholder is Utility class");
-    }
-
     public static final Pattern MOR_BLANK_PATT = Pattern.compile("\\s+");
-
-    static final Pattern TABLE_REG_PATT = Pattern.compile("#\\{#table}");
-
-    static final Pattern ID_REG_PATT = Pattern.compile("#\\{#id}");
 
     public static final Pattern SETS_REG_PATT = Pattern.compile("#\\{#sets}");
     public static final Pattern WHERE_REG_PATT = Pattern.compile("#\\{#where}");
@@ -90,13 +82,6 @@ public final class RegexCache
     public static Pattern getPattern(String regex)
     {
         Pattern pattern = patterns.get(regex);
-        if (pattern != null)
-        {
-            return pattern;
-        }
-        else
-        {
-            return put(regex);
-        }
+        return pattern != null ? pattern : put(regex);
     }
 }

@@ -58,7 +58,7 @@ public class QueryContextUtil
         QueryContext queryContext = getThreadLocal().get();
         Field mf = QueryContext.class.getDeclaredField("methodInfo");
         mf.setAccessible(true);
-        mf.set(queryContext, new MethodInfo(method));
+        mf.set(queryContext, new MethodInfo(method,null,null));
     }
 
     public static void setCurrentArgs(Object... args) throws Exception

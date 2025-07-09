@@ -24,6 +24,7 @@ package org.fastquery.analysis;
 
 import java.lang.reflect.Method;
 
+import org.fastquery.core.MethodInfo;
 import org.fastquery.core.RepositoryException;
 
 /**
@@ -50,7 +51,7 @@ interface MethodFilter
      */
     default void abortWith(Method method, String msg)
     {
-        throw new RepositoryException(String.format("%n%s-> 错误信息如下: %n%s ", method.toString(), msg));
+        throw new RepositoryException(String.format("%n%s-> 错误信息如下: %n%s ", MethodInfo.toReadableSignature(method), msg));
     }
 
 }

@@ -58,18 +58,11 @@ public class QueryParser
         Object[] args = QueryContext.getArgs();
         Query[] queries = method.getQueries();
 
-        Modifying modifying = method.getModifying();
-        String id = modifying.id(); // 不可能为null
-        String table = modifying.table();
-
         List<String> sqls = TypeUtil.getQuerySQL(method, queries, args);
         int sqlCount = sqls.size();
         List<SQLValue> msvs = new ArrayList<>(sqlCount);
         for (String sql : sqls)
         {
-            // 替换SQL中的占位变量符
-            sql = RegExUtils.replaceAll(sql, RegexCache.TABLE_REG_PATT, Matcher.quoteReplacement(table));
-            sql = RegExUtils.replaceAll(sql, RegexCache.ID_REG_PATT,Matcher.quoteReplacement(id));
             msvs.add(inParser(sql));
         }
 

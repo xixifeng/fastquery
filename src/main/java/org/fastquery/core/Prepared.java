@@ -47,25 +47,22 @@ public class Prepared
      *
      * @param methodInfo 当前接口方法
      * @param args       方法参数 注意: 此处参数列表的成员,永远都是包装类型(已经验证)
-     * @param target     目标 Repository
      * @return 执行之后的值
      */
-    public static Object execute(MethodInfo methodInfo, Object[] args, Repository target)
+    public static Object execute(MethodInfo methodInfo, Object[] args)
     {
         long start = System.currentTimeMillis();
         Method method = methodInfo.getMethod();
         try
         {
-            Class<?> iclazz = target.getInterfaceClass();
-
             // 如果是调试模式
             if (FastQueryJSONObject.getDebug())
             {
-                QueryPool.reset(iclazz.getName());
+                QueryPool.reset(methodInfo.getInterfaceName());
             }
 
             // QueryContext 生命开始
-            QueryContext.start(iclazz, methodInfo, args);
+            QueryContext.start(methodInfo, args);
 
             log.debug("准备执行方法:{}", method);
             return businessProcess();

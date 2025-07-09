@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  *
  * @author xixifeng (fastquery@126.com)
  */
-@Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface Id
 {

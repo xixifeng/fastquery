@@ -29,7 +29,8 @@ import java.lang.reflect.Type;
 
 import lombok.Getter;
 import org.fastquery.page.NotCount;
-import org.fastquery.util.TypeUtil;
+import org.fastquery.page.PageIndex;
+import org.fastquery.page.PageSize;
 import org.fastquery.where.Condition;
 import org.fastquery.where.Set;
 
@@ -55,9 +56,21 @@ public class MethodInfo
     private final Query query;
     private final Set[] sets;
 
-    public MethodInfo(Method method)
+    private final int sourcePosition;
+    private final int notCountPosition;
+    private final int pageIndexPosition;
+    private final int pageSizePosition;
+
+    private final Repository repository;
+    private final Class<?> interfaceClazz;
+    private final String interfaceName;
+
+    public MethodInfo(Method method, Repository repository,Class<?> interfaceClazz)
     { // NO_UCD
         this.method = method;
+        this.repository = repository;
+        this.interfaceClazz = interfaceClazz;
+        this.interfaceName = interfaceClazz != null ? interfaceClazz.getName() : null;
         this.modifying = method.getAnnotation(Modifying.class);
         this.queries = method.getAnnotationsByType(Query.class);
         this.parameters = method.getParameters();
@@ -72,26 +85,69 @@ public class MethodInfo
         this.name = method.getName();
         this.query = method.getAnnotation(Query.class);
         this.sets = method.getAnnotationsByType(Set.class);
+
+        // 顺序：Source, PageIndex, PageSize, NotCount
+        int[] indexes = getIndexes();
+        this.sourcePosition = indexes[0];
+        this.pageIndexPosition = indexes[1];
+        this.pageSizePosition = indexes[2];
+        this.notCountPosition = indexes[3];
+    }
+
+    public String findSource()
+    {
+        return sourcePosition == -1 ? null : (String) QueryContext.getArgs()[sourcePosition];
+    }
+
+    public int findPageIndex()
+    {
+        return pageIndexPosition == -1 ? -1 : (int) QueryContext.getArgs()[pageIndexPosition];
+    }
+
+    public int findPageSize()
+    {
+        return pageSizePosition == -1 ? -1 : (int) QueryContext.getArgs()[pageSizePosition];
     }
 
     public boolean isCount()
-    { // 检测到需要分页了，才会执行这个方法
-        if (notCount != null)
-        {
-            return false;
-        }
-        else
-        {
-            Boolean nc = (Boolean) TypeUtil.findAnnotationParameterVal(NotCount.class, parameters, QueryContext.getArgs());
-            if (nc != null)
-            {
-                return !nc;
+    {   // 检测到需要分页了，才会执行这个方法
+        return notCount == null && (notCountPosition == -1 || !(Boolean) QueryContext.getArgs()[notCountPosition]);
+    }
+
+    private int[] getIndexes()
+    {
+        // 顺序：Source, PageIndex, PageSize, NotCount
+        int[] indexes = {-1, -1, -1, -1}; // 默认 -1 表示未找到
+        for (int i = 0; i < parameters.length; i++) {
+            Parameter parameter = parameters[i];
+            if (parameter.isAnnotationPresent(Source.class)) {
+                indexes[0] = i;
+            } else if (parameter.isAnnotationPresent(PageIndex.class)) {
+                indexes[1] = i;
+            } else if (parameter.isAnnotationPresent(PageSize.class)) {
+                indexes[2] = i;
+            } else if (parameter.isAnnotationPresent(NotCount.class)) {
+                indexes[3] = i;
             }
-            else
-            {
-                return true;
-            }
         }
+        return indexes;
+    }
+
+    public static String toReadableSignature(Method method) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(method.getDeclaringClass().getName()); // 类的全限定名
+        sb.append("#");
+        sb.append(method.getName()); // 方法名
+        sb.append("(");
+        Class<?>[] paramTypes = method.getParameterTypes();
+        for (int i = 0; i < paramTypes.length; i++) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(paramTypes[i].getSimpleName()); // 参数类型（简短名）
+        }
+        sb.append(")");
+        return sb.toString();
     }
 
     public String toGenericString()

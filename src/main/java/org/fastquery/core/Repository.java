@@ -29,9 +29,5 @@ package org.fastquery.core;
  */
 public interface Repository
 {
-    // 当前Repository接口的class
-    default Class<? extends Repository> getInterfaceClass()
-    {
-        return null;
-    }
+    Class<? extends Repository> getInterfaceClass();
 }

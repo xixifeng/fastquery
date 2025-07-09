@@ -28,10 +28,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-import org.fastquery.page.Page;
-import org.fastquery.page.PageIndex;
-import org.fastquery.page.PageSize;
-import org.fastquery.page.Pageable;
+import org.fastquery.page.*;
 import org.fastquery.util.TypeUtil;
 
 /**
@@ -108,6 +105,10 @@ class PageableFilter implements MethodFilter
         {
             filter.abortWith(method, "@PageSize 最多只能出现一次");
         }
+        else if (TypeUtil.countRepeated(NotCount.class, parameters) > 1)
+        {
+            filter.abortWith(method, "@NotCount 最多只能出现一次");
+        }
         else if (TypeUtil.countRepeated(PageIndex.class, parameters) + TypeUtil.countRepeated(PageSize.class, parameters) == 1)
         {// 5). @PageIndex或@PageSize 不能独存
             filter.abortWith(method, "@PageIndex或@PageSize 不能独存,要么都不要出现.");
@@ -121,6 +122,11 @@ class PageableFilter implements MethodFilter
                 && Objects.requireNonNull(TypeUtil.findParameter(PageSize.class, parameters)).getType() != int.class)
         {
             filter.abortWith(method, "@PageSize 只能标识在int类型的参数上");
+        }
+        else if (TypeUtil.findAnnotationIndex(NotCount.class, parameters) != -1
+                && Objects.requireNonNull(TypeUtil.findParameter(NotCount.class, parameters)).getType() != boolean.class)
+        {
+            filter.abortWith(method, "@NotCount 标记的参数必须是 boolean 类型");
         }
     }
 
@@ -139,6 +145,10 @@ class PageableFilter implements MethodFilter
             else if (parameters[i].getAnnotation(PageSize.class) != null)
             {
                 this.abortWith(method, String.format("又不是分页,该方法的第%s个参数中为何要标识@PageSize呢?", i + 1));
+            }
+            else if (parameters[i].getAnnotation(NotCount.class) != null)
+            {
+                this.abortWith(method, String.format("又不是分页,该方法的第%s个参数中为何要标识@NotCount?", i + 1));
             }
         }
     }
