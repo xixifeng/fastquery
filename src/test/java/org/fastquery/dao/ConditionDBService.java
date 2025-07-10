@@ -41,8 +41,8 @@ public interface ConditionDBService extends Repository
 {
 
     @Query("select * ${tname} #{#where} limit 3")
-    @Condition(value = " $nameWhere", ignoreScript = ":nameWhere==null")
-    @Condition(value = " $ageCon", ignoreScript = ":ageCon==null")
+    @Condition(value = " $nameWhere", when = ":nameWhere!=null")
+    @Condition(value = " $ageCon", when = ":ageCon!=null")
     List<Student> findUserInfo(@Param("nameWhere") String w1, @Param("ageCon") String w2, @Param("tname") String tname);
 
     @Query("select * ${tname} #{#where}")
@@ -70,7 +70,7 @@ public interface ConditionDBService extends Repository
 
     @Query("select id,name,age from `userinfo` #{#where}")
     @Condition("age > :age")
-    @Condition(value = "and name like :name", ignoreScript = ":age > 18 && :name!=null && :name.contains(\"Rex\")")
+    @Condition(value = "and name like :name", when = ":age <= 18 || (:name != null && !:name.contains(\"Rex\"))")
     Page<UserInfo> find2(@Param("age") int age, @Param("name") String name, Pageable pageable);
 
 

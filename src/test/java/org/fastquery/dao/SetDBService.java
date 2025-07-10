@@ -46,7 +46,7 @@ public interface SetDBService extends QueryRepository
 
     @Modifying
     @Query("update `Course` #{#sets} where no = ?5")
-    @Set(value = "$name", ignoreScript = ":name == null")
+    @Set(value = "$name", when = ":name != null")
     @Set("`credit` = ?2")
     @Set("`semester` = ?3")
     @Set("`period` = ?4")
@@ -79,7 +79,7 @@ public interface SetDBService extends QueryRepository
 
     @Modifying
     @Query("update `Course` #{#sets} where no = ?3")
-    @Set(value = "`name` = :name", ignoreScript = ":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2")
+    @Set(value = "`name` = :name", when = "(:name!=null && !:name.startsWith(\"计算\")) || (:credit!=null && :credit.intValue() <= 2)")
     @Set("`credit` = :credit")
     int updateCourse2(@Param("name") String name, @Param("credit") Integer credit, String no);
 

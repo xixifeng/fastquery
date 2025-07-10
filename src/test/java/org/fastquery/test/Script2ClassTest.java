@@ -43,7 +43,7 @@ public class Script2ClassTest
 {
 
     @Set("AA")
-    @Set(value = "BB", ignoreScript = ":age.intValue() >18 && :name!=null && :name.contains(\"Rex\")")
+    @Set(value = "BB", when = ":age.intValue() <= 18 && (:name!=null && !:name.contains(\"Rex\"))")
     @Set("CC")
     public void todo(@Param("age") Integer age, @Param("name") String name)
     {
@@ -97,7 +97,7 @@ public class Script2ClassTest
 
         QueryContextUtil.setCurrentArgs(19, "RexLeifeng");
         b = Script2Class.getJudge(1).ignore();
-        assertThat(b, is(true));
+        assertThat(b, is(false));
 
         QueryContextUtil.setCurrentArgs(19, "Leifeng");
         b = Script2Class.getJudge(1).ignore();
