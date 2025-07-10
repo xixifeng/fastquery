@@ -41,7 +41,6 @@ class SetFilter implements MethodFilter
     {
 
         // 1). @Set#ignore() 指定的class 必须有一个不带参数且public的构造方法
-        // 2). if$ 和 ignoreScript 不能共存
         Set[] sets = method.getAnnotationsByType(Set.class);
         for (Set set : sets)
         {
@@ -54,13 +53,6 @@ class SetFilter implements MethodFilter
             {
                 this.abortWith(method, set.ignore() + " 必须有一个不带参数并且用public修饰的构造方法");
             }
-
-            // > 2)
-            if (!"true".equals(set.if$()) && !"false".equals(set.ignoreScript()))
-            {
-                this.abortWith(method, "@set中的if$属性和ignoreScript属性不能同时被自定义");
-            }
-
         }
 
     }

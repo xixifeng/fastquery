@@ -113,7 +113,7 @@ public class Script2Class
         Method[] methods = clazz.getMethods();
         for (Method method : methods)
         {
-            pickScript(method, Set.class, Set::ignoreScript, Set::if$);
+            pickScript(method, Set.class, Set::ignoreScript, Set::when);
             pickScript(method, Condition.class, Condition::ignoreScript, Condition::when);
         }
     }

@@ -31,6 +31,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 用于构建动态 SQL 的 SET 片段。支持通过参数值、判断器、脚本等方式灵活控制是否应用该项设置。同时可以标识多个 Set.
+ *
  * @author xixifeng (fastquery@126.com)
  */
 @Repeatable(Sets.class)
@@ -40,52 +42,62 @@ public @interface Set
 {
 
     /**
-     * set 选项
+     * SQL 设置项（通常为 UPDATE 语句中的 SET 子句内容）。<br>
+     * 例如：{@code @Set("name = :1")}。
      *
-     * @return String
+     * @return SQL 设置表达式
      */
     String value();
 
     /**
-     * ignoreNull 为true: 表示该set选项中的参数变量如果接受到的值是null,那么该set选项将不参与运算,反之,参与运算(默认:true).
+     * 是否忽略参数值为 {@code null} 的设置项。<br>
+     * 当设置为 {@code true}（默认）时，若变量值为 {@code null}，该设置项将不参与 SQL 构建。
      *
-     * @return boolean
+     * @return 是否忽略 null 值
      */
     boolean ignoreNull() default true;
 
     /**
-     * ignoreEmpty 为true: 表示该条件中的参数变量如果接受到的值是""(空字符串),那么该set选项将不参与运算,反之,参与运算(默认:true).
+     * 是否忽略参数值为空字符串（{@code ""}）的设置项。<br>
+     * 当设置为 {@code true}（默认）时，若变量值为 {@code ""}，该设置项将不参与 SQL 构建。
      *
-     * @return boolean
+     * @return 是否忽略空字符串
      */
     boolean ignoreEmpty() default true;
 
     /**
-     * 通过指定一个Judge子类来决定是否忽略该设置项
+     * 自定义判断器，用于动态决定是否忽略该设置项。<br>
+     * 指定的类必须实现 {@link Judge} 抽象类。默认使用 {@link DefaultJudge}。
      *
-     * @return 继承于Judge类的Class
+     * @return 判断逻辑实现类
      */
     Class<? extends Judge> ignore() default DefaultJudge.class;
 
     /**
-     * 通过运行java代码脚本,来决定是否保留该设置项.脚本运行后的结果如果是true,那么就忽略该设置项,反之,保留设置项,默认脚本是"false",表示保留该设置项. <br>
-     * 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目启动不起来.
+     * 通过运行 Java 表达式脚本决定是否忽略该设置项。<br>
+     * 当表达式结果为 {@code true} 时，将忽略该项；为 {@code false} 时，保留该项。<br>
+     * 默认值为 {@code "false"}，表示始终保留。<br>
+     * ⚠️ 脚本执行结果必须为布尔类型，否则会导致项目启动失败。
      *
-     * @return 代码脚本
+     * @return Java 脚本表达式，用于动态忽略控制
      */
     String ignoreScript() default "false";
 
     /**
-     * 通过运行java代码脚本,来决定是否保留条件项.if条件成立,就保留该Set,反之,就采取else的值(得到else的值如果是"",表示忽略该Set) <br>
+     * 指定一个 Java 表达式（脚本）用于动态判断是否保留该设置项。<br>
+     * 当表达式结果为 {@code true}，保留该项；否则使用 {@link #otherwise()} 指定的值替代新的设置项。<br>
+     * 若 {@code otherwise} 值为 {@code ""}，表示忽略该设置项（不参与 SQL 构建）。
      *
-     * @return 代码脚本
+     * @return Java 脚本表达式，用于保留/替代控制
      */
-    String if$() default "true";
+    String when() default "true";
+
 
     /**
-     * if条件不成立的情况下就取else的值,若取到else的值的为"",表示忽略该Set <br>
+     * 当 {@link #when()} 表达式结果为 {@code false} 时，使用的替代 set 项。<br>
+     * 若该值为 {@code ""}，则表示忽略该设置项。
      *
-     * @return 在if条件不成立后的可选值
+     * @return {@code when} 条件不成立时的备选值
      */
-    String else$() default StringUtils.EMPTY;
+    String otherwise() default StringUtils.EMPTY;
 }

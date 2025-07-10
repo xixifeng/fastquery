@@ -561,7 +561,7 @@ public class TypeUtil
             return null;
         }
 
-        // if$ , else$ 解析
+        // when(), otherwise() 解析
         if (!"true".equals(condition.when()) && !Script2Class.getJudge(conditionPosition).ignore())
         { // 如果if结果为假
             String elseValue = condition.otherwise();

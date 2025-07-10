@@ -57,7 +57,7 @@ final class SetParser
                 value = TypeUtil.paramFilter(method, args, value);
                 if (!ignoreSet(set, value, i))
                 {
-                    // if$ , else$ 解析
+                    // when(), otherwise() 解析
                     ifelse(sb, i, set, value);
                 }
             }
@@ -77,14 +77,14 @@ final class SetParser
 
     private static void ifelse(StringBuilder sb, int i, Set set, String value)
     {
-        if ("true".equals(set.if$()) || Script2Class.getJudge(i).ignore())
-        { // if$绑定的脚本执行之后结果如果是"真"
+        if ("true".equals(set.when()) || Script2Class.getJudge(i).ignore())
+        {   // when() 绑定的脚本执行之后结果如果是"真"
             sb.append(value);
             sb.append(",");
         }
         else
         {
-            String elseValue = set.else$();
+            String elseValue = set.otherwise();
             if (!StringUtils.EMPTY.equals(elseValue))
             {
                 elseValue = TypeUtil.paramFilter(QueryContext.getMethodInfo(), QueryContext.getArgs(), elseValue);

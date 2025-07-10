@@ -31,7 +31,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 用于构建动态 SQL 条件的注解。支持基于参数值的忽略规则、自定义判断器、脚本判断等灵活机制。可重复使用标识。
+ * 用于构建动态 SQL 条件的注解。支持基于参数值的忽略规则、自定义判断器、脚本判断等灵活机制。同时可以标识多个 Condition.
  *
  * @author xixifeng (fastquery@126.com)
  */

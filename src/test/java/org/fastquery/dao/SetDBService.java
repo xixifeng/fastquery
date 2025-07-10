@@ -85,13 +85,13 @@ public interface SetDBService extends QueryRepository
 
     @Modifying
     @Query("update `Course` #{#sets} where no = ?3")
-    @Set(value = "`name` = :name", if$ = ":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2")
+    @Set(value = "`name` = :name", when = ":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2")
     @Set("`credit` = :credit")
     int updateCourse3(@Param("name") String name, @Param("credit") Integer credit, String no);
 
     @Modifying
     @Query("update `Course` #{#sets} where no = ?3")
-    @Set(value = "`name` = :name", if$ = ":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2", else$ = "`name` = name")
+    @Set(value = "`name` = :name", when = ":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2", otherwise = "`name` = name")
     @Set("`credit` = :credit")
     int updateCourse4(@Param("name") String name, @Param("credit") Integer credit, String no);
 }
