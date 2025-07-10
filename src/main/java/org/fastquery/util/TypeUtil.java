@@ -491,11 +491,6 @@ public class TypeUtil
         return arg != null && StringUtils.EMPTY.equals(arg.toString()) && condition.ignoreEmpty();
     }
 
-    private static boolean getFactor3(Condition condition, int index)
-    {
-        return (!condition.ignoreScript().equals("false")) && Script2Class.getJudge(index).ignore();
-    }
-
     private static boolean getFactor4(Condition condition)
     {
         try
@@ -556,7 +551,7 @@ public class TypeUtil
             }
         }
 
-        if (getFactor3(condition, conditionPosition) || getFactor4(condition))
+        if (getFactor4(condition))
         {
             return null;
         }

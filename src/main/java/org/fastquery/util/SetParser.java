@@ -55,7 +55,7 @@ final class SetParser
                 Set set = sets[i];
                 String value = set.value();
                 value = TypeUtil.paramFilter(method, args, value);
-                if (!ignoreSet(set, value, i))
+                if (!ignoreSet(set, value))
                 {
                     // when(), otherwise() 解析
                     ifelse(sb, i, set, value);
@@ -97,10 +97,9 @@ final class SetParser
     /**
      * @param set         条件
      * @param value       Set.value处理之后的条件值
-     * @param setPosition 条件在方法上的位置索引
      * @return y:true/n:false
      */
-    private static boolean ignoreSet(Set set, String value, int setPosition)
+    private static boolean ignoreSet(Set set, String value)
     {
         // 忽略因子列表,任何一个都可以导致忽略
         // 这些因子不拿出来定义是有意义的, 多个 || 第一个true,后面的方法就不执行了
@@ -118,7 +117,7 @@ final class SetParser
             }
         }
 
-        return getFactor3(set, setPosition) || getFactor4(set);
+        return getFactor4(set);
     }
 
     private static boolean getFactor1(Set set, Object arg)
@@ -129,11 +128,6 @@ final class SetParser
     private static boolean getFactor2(Set set, Object arg)
     {
         return arg != null && StringUtils.EMPTY.equals(arg.toString()) && set.ignoreEmpty();
-    }
-
-    private static boolean getFactor3(Set set, int index)
-    {
-        return (!set.ignoreScript().equals("false")) && Script2Class.getJudge(index).ignore();
     }
 
     private static boolean getFactor4(Set set)

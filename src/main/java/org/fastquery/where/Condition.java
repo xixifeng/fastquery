@@ -83,15 +83,6 @@ public @interface Condition
     Class<? extends Judge> ignore() default DefaultJudge.class;
 
     /**
-     * 通过运行 Java 脚本表达式，判断是否忽略当前条件。<br>
-     * 脚本运行结果必须为布尔类型；当结果为 {@code true}，该条件将被忽略；为 {@code false}，则保留该条件。<br>
-     * 默认脚本为 {@code "false"}，表示不忽略（始终保留）。
-     *
-     * @return Java 脚本表达式，返回值必须为布尔类型
-     */
-    String ignoreScript() default "false";
-
-    /**
      * 指定一个 Java 表达式（脚本）用于判断是否保留当前条件项。<br>
      * 当表达式结果为 {@code true} 时，保留该 Condition；<br>
      * 当结果为 {@code false}，则使用 {@link #otherwise()} 指定的值作为新的条件项。<br>

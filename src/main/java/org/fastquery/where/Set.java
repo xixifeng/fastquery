@@ -72,17 +72,7 @@ public @interface Set
      * @return 判断逻辑实现类
      */
     Class<? extends Judge> ignore() default DefaultJudge.class;
-
-    /**
-     * 通过运行 Java 表达式脚本决定是否忽略该设置项。<br>
-     * 当表达式结果为 {@code true} 时，将忽略该项；为 {@code false} 时，保留该项。<br>
-     * 默认值为 {@code "false"}，表示始终保留。<br>
-     * ⚠️ 脚本执行结果必须为布尔类型，否则会导致项目启动失败。
-     *
-     * @return Java 脚本表达式，用于动态忽略控制
-     */
-    String ignoreScript() default "false";
-
+    
     /**
      * 指定一个 Java 表达式（脚本）用于动态判断是否保留该设置项。<br>
      * 当表达式结果为 {@code true}，保留该项；否则使用 {@link #otherwise()} 指定的值替代新的设置项。<br>

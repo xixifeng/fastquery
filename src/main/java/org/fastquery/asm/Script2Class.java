@@ -113,22 +113,17 @@ public class Script2Class
         Method[] methods = clazz.getMethods();
         for (Method method : methods)
         {
-            pickScript(method, Set.class, Set::ignoreScript, Set::when);
-            pickScript(method, Condition.class, Condition::ignoreScript, Condition::when);
+            pickScript(method, Set.class, Set::when);
+            pickScript(method, Condition.class, Condition::when);
         }
     }
 
-    private static <T extends Annotation> void pickScript(Method method, Class<T> clazz, Function<T, String> sf, Function<T, String> ifun)
+    private static <T extends Annotation> void pickScript(Method method, Class<T> clazz, Function<T, String> ifun)
     {
         T[] ts = method.getAnnotationsByType(clazz);
         int len = ts.length;
         for (int i = 0; i < len; i++)
         {
-            String script = sf.apply(ts[i]);
-            if (!script.equals("false"))
-            {
-                gr(method, i, script);
-            }
 
             String ifScript = ifun.apply(ts[i]);
             if (!"true".equals(ifScript))
