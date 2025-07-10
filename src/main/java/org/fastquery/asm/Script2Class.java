@@ -114,7 +114,7 @@ public class Script2Class
         for (Method method : methods)
         {
             pickScript(method, Set.class, Set::ignoreScript, Set::if$);
-            pickScript(method, Condition.class, Condition::ignoreScript, Condition::if$);
+            pickScript(method, Condition.class, Condition::ignoreScript, Condition::when);
         }
     }
 

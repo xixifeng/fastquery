@@ -511,33 +511,6 @@ public class TypeUtil
         }
     }
 
-    private static boolean getFactor5(Condition condition, Object arg)
-    {
-
-        String[] allows = condition.allowRule();
-
-        if (allows.length != 0)
-        { // 表明,允许的范围并不是全部,而是有所限定
-            if (arg == null)
-            { // 范围有明确指定,还传递null,那么必然忽略
-                return true;
-            }
-            else
-            {
-                for (String allow : allows)
-                {
-                    // 因为注解的特性 allows的集合中的成员永远不可能出现null
-                    if (!RegexCache.getPattern(allow).matcher(arg.toString()).matches())
-                    { // 不在允许范围立即忽略
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
     private static boolean getFactor6(Condition condition, Object arg)
     {
         if (arg != null)
@@ -573,7 +546,7 @@ public class TypeUtil
         {
             int index = Integer.parseInt(par.replace(StrConst.QUE, StringUtils.EMPTY)); // 计数是1开始的
             Object arg = args[index - 1];
-            if (getFactor1(condition, arg) || getFactor2(condition, arg) || getFactor5(condition, arg) || getFactor6(condition, arg))
+            if (getFactor1(condition, arg) || getFactor2(condition, arg) || getFactor6(condition, arg))
             {
                 return null;
             }
@@ -589,9 +562,9 @@ public class TypeUtil
         }
 
         // if$ , else$ 解析
-        if (!"true".equals(condition.if$()) && !Script2Class.getJudge(conditionPosition).ignore())
+        if (!"true".equals(condition.when()) && !Script2Class.getJudge(conditionPosition).ignore())
         { // 如果if结果为假
-            String elseValue = condition.else$();
+            String elseValue = condition.otherwise();
             if (StringUtils.EMPTY.equals(elseValue))
             {
                 return null;

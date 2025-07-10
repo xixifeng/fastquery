@@ -68,7 +68,7 @@ class ConditionParameterFilter implements MethodFilter
                 checkConditionConnector(method, i, value);
 
                 // > 4). if$ 和 ignoreScript 不能共存
-                if (!"true".equals(conditions[i].if$()) && !"false".equals(conditions[i].ignoreScript()))
+                if (!"true".equals(conditions[i].when()) && !"false".equals(conditions[i].ignoreScript()))
                 {
                     this.abortWith(method, "第" + (i + 1) + "个@Condition中的if$属性和ignoreScript属性不能同时被自定义");
                 }
