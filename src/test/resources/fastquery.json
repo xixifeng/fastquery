@@ -115,7 +115,7 @@
  "basedir" : "/Users/mei.sir/workspace/fastquery/src/test/resources/testFiles/",
 
   // 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目,默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式
-  "debug" : false,
+  "debug" : true,
  
   // 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹下.默认:允许放在classpath根目录下
   "queries": ["queries/","tpl/"] // 表示: SQL模板文件可以放在classpath/queries里 或 classpath/tpl里

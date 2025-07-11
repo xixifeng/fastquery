@@ -22,17 +22,21 @@
 
 package org.fastquery.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.asm.AsmRepository;
 import org.fastquery.core.FQueryResourceImpl;
+import org.fastquery.core.RepositoryException;
 import org.fastquery.core.Resource;
 import org.fastquery.core.StrConst;
 import org.fastquery.dsm.FastQueryJson;
 import org.fastquery.mapper.QueryPool;
 import org.fastquery.util.ClassUtil;
+import org.fastquery.util.FastQueryJSONObject;
 import org.fastquery.util.LoadPrperties;
 
 /**
@@ -90,13 +94,21 @@ class GenerateRepositoryImpl
 
         byte[] bytes = AsmRepository.generateBytes(repositoryClazz);
 
-         /*
-         // 把生成的文件存储起来
-         try (java.io.FileOutputStream fos = new java.io.FileOutputStream("/data/tmp/fquery/" + name + ".class")) {
-         fos.write(bytes);
-         } catch (Exception e) {
-           e.printStackTrace();
-         } // 把生成的文件存储起来 end*/
+        if(FastQueryJSONObject.getDebug())
+        {
+            File tmpDir = new File(System.getProperty("java.io.tmpdir"), "query");
+            if(!tmpDir.exists() && tmpDir.mkdir())
+            {
+                log.debug("{} 之前不存在，已经创建完毕.", tmpDir);
+            }
+            File classFile = new File(tmpDir.getAbsolutePath(),name + ".class");
+            try (FileOutputStream fos = new FileOutputStream(classFile)) {
+                fos.write(bytes);
+                log.debug("{}, 已经生成",classFile);
+            } catch (Exception e) {
+                throw new RepositoryException(e);
+            }
+        }
 
         classLoader.defineClassByName(name, bytes, bytes.length);
     }

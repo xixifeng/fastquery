@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.fastquery.bean.Student;
-import org.fastquery.core.Id;
 import org.fastquery.core.Modifying;
 import org.fastquery.core.Param;
 import org.fastquery.core.Query;

@@ -34,6 +34,5 @@ public final class StrConst
      * 生成db类的后缀名称
      */
     public static final String DB_SUF = "a$";
-    public static final String TABLE = "#{#table}";
     public static final String LIMIT = "#{#limit}";
 }

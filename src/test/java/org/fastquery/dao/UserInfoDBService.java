@@ -36,7 +36,6 @@ import org.fastquery.page.Pageable;
 import org.fastquery.where.Condition;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 /**
  * @author xixifeng (fastquery@126.com)
