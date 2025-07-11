@@ -85,11 +85,11 @@ public class AsmRepository
                 {
                     Class<?> clazz = parameterTypes[i].getComponentType();
                     sb.append(clazz.getName().replace("[L", StringUtils.EMPTY).replace("[", StringUtils.EMPTY).replace(";", StringUtils.EMPTY));
-                    sb.append("[]");
-                    while ((clazz = clazz.getComponentType()) != null)
+                    do
                     {
                         sb.append("[]");
                     }
+                    while ((clazz = clazz.getComponentType()) != null);
                 }
                 else
                 {
