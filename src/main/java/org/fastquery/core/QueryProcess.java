@@ -90,7 +90,6 @@ public class QueryProcess
         }
         else
         {
-            // if (returnType == boolean.class)
             return booleanType(respUpdates);
         }
     }
@@ -383,8 +382,16 @@ public class QueryProcess
             SQLValue sqlValue = p.getSqlValue();
             if(sqlValue != null)
             {
+                //----
+                String sql = sqlValue.getSql();
+                String trimSql = sql.trim();
+                if(trimSql.isEmpty() || trimSql.startsWith("and") || trimSql.startsWith("or"))
+                {
+                   return 0;
+                }
+                //----end
                 String tableName = BeanUtil.getTableName(null, bean.getClass());
-                sqlValue.setSql("update " + tableName + sqlValue.getSql());
+                sqlValue.setSql("update " + tableName + sql);
                 return DB.modify(Collections.singletonList(sqlValue),false).get(0).getEffect();
             }
         }

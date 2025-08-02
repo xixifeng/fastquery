@@ -928,6 +928,22 @@ public class TypeUtil
         }
     }
 
+    /**
+     * 获取当前类及其所有父类中声明的字段，包括 private 和 public。
+     *
+     * @param clazz 要反射的类
+     * @return 所有声明字段（不包括重复字段）
+     */
+    public static List<Field> getAllFields(Class<?> clazz) {
+        List<Field> fields = new ArrayList<>();
+        while (clazz != null && clazz != Object.class) {
+            Field[] declaredFields = clazz.getDeclaredFields();
+            Collections.addAll(fields, declaredFields);
+            clazz = clazz.getSuperclass(); // 向父类递归
+        }
+        return fields;
+    }
+
     public static Object map2Obj(Class<?> beanType, Map<String, Object> map)
     {
         // 1. 找 EnumSet<T> 字段和处理@Convert

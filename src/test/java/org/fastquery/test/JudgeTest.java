@@ -41,17 +41,17 @@ public class JudgeTest
 
     public void todo1(String aa, @Param("bb") Integer bb, int cc)
     {
-
+        // 测试参数解析
     }
 
     public void todo2(@Param("aa") String aa, Integer bb, int cc)
     {
-
+        // 测试参数解析
     }
 
     public void todo3(String aa, Integer bb, @Param("cc") int cc)
     {
-
+        // 测试参数解析
     }
 
     @Test

@@ -48,6 +48,7 @@ public class ParamFilterTest extends TestFastQuery
 
     public void m1(@Param("name1") String name, @Param("age1") Integer age)
     {
+        // 测试参数解析
     }
 
     private Method getMethod1() throws NoSuchMethodException

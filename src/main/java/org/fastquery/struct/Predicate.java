@@ -24,7 +24,7 @@ public abstract class Predicate<E>
     private static final String SET = " set ";
 
     /**
-     * 用于构建 sql 查询条件单元。例如，构建 fieldName != ? 这类表达式。与上一个条件单元的关系是 and
+     * 用于构建 sql 查询条件单元。例如，构建 fieldName := ? 这类表达式。与上一个条件单元的关系是 and
      * @param left 表达式左边的字段名称
      * @param operator 运算符
      * @param right 右边的值
@@ -37,7 +37,31 @@ public abstract class Predicate<E>
     }
 
     /**
-     * 用于构建 sql 查询条件单元。例如，构建 fieldName != ? 这类表达式。与上一个条件单元的关系是 or
+     * 用于构建 sql 查询条件单元，比较运算符是 equal。与上一个条件单元的关系是 and
+     * @param left 表达式左边的字段名称
+     * @param right 右边的值
+     * @return 当前对象，便于链式操作
+     * @param <T> 字段值的类型
+     */
+    public <T> Predicate<E> and(Supplier<Chip<T,E>> left, T right)
+    {
+        return this.condition(AND,left,SQLOperator.EQ,right);
+    }
+
+    /**
+     * 用于构建 sql 查询条件单元，比较运算符是 equal。与上一个条件单元的关系是 or
+     * @param left 表达式左边的字段名称
+     * @param right 右边的值
+     * @return 当前对象，便于链式操作
+     * @param <T>  字段值的类型
+     */
+    public <T> Predicate<E> or(Supplier<Chip<T,E>> left,T right)
+    {
+        return this.condition(OR,left,SQLOperator.EQ,right);
+    }
+
+    /**
+     * 用于构建 sql 查询条件单元。例如，构建 fieldName := ? 这类表达式。与上一个条件单元的关系是 or
      * @param left 表达式左边的字段名称
      * @param operator 运算符
      * @param right 右边的值
@@ -98,7 +122,7 @@ public abstract class Predicate<E>
     }
 
     /**
-     * 用于构建 sql 查询条件单元。例如，构建 fieldName != ? 这类表达式。与上一个条件单元的关系是 and
+     * 用于构建 sql 查询条件单元。例如，构建 fieldName := ? 这类表达式。与上一个条件单元的关系是 and
      * @param left 表达式左边的字段名称
      * @param operator 运算符
      * @param collection 右边的值
@@ -111,7 +135,7 @@ public abstract class Predicate<E>
     }
 
     /**
-     * 用于构建 sql 查询条件单元。例如，构建 fieldName != ? 这类表达式。与上一个条件单元的关系是 or
+     * 用于构建 sql 查询条件单元。例如，构建 fieldName := ? 这类表达式。与上一个条件单元的关系是 or
      * @param left 表达式左边的字段名称
      * @param operator 运算符
      * @param collection 右边的值
@@ -319,15 +343,17 @@ public abstract class Predicate<E>
      */
     public <T> Predicate<E> set(Supplier<Chip<T,E>> fieldName,T t)
     {
-        Objects.requireNonNull(fieldName, "fieldName cannot be null");
-        Objects.requireNonNull(t, "t cannot be null");
-        if(builder.indexOf(SET) == -1)
+        if(t != null)
         {
-            builder.append(SET);
+            Objects.requireNonNull(fieldName, "fieldName cannot be null");
+            if(builder.indexOf(SET) == -1)
+            {
+                builder.append(SET);
+            }
+            String name = fieldName.get().getName();
+            builder.append(name).append('=').append("?,");
+            addValue(t);
         }
-        String name = fieldName.get().getName();
-        builder.append(name).append('=').append("?,");
-        addValue(t);
         return this;
     }
 }

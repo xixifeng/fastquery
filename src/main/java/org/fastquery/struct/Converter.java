@@ -23,6 +23,7 @@ package org.fastquery.struct;
 
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.core.RepositoryException;
+import org.fastquery.util.TypeUtil;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -85,7 +86,7 @@ public class Converter
         Class<?> sourceClass = source.getClass();
         Class<?> targetClass = target.getClass();
 
-        Field[] targetFields = targetClass.getDeclaredFields();
+        List<Field> targetFields = TypeUtil.getAllFields(targetClass);
         for (Field targetField : targetFields)
         {
             String targetFieldName = targetField.getName();

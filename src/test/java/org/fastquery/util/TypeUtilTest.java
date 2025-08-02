@@ -24,7 +24,6 @@ package org.fastquery.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -194,10 +193,7 @@ public class TypeUtilTest
 
     public void m1(@Param("i") int i, @Param("i1") int i1, @Param("i2") int i2)
     {
-    }
-
-    public void m2(@Param("$^i") int i, @Param("$i1$") int i1, @Param("^i2") int i2)
-    {
+        // 测试解析参数
     }
 
     private static String paramFilter(Method method, Object[] args, String sql)
@@ -476,7 +472,7 @@ public class TypeUtilTest
     @Test
     public void userInfoCopy()
     {
-        Integer id = 6;
+        int id = 6;
         String name = "张三";
         Integer option = 17;
         UserInfo userInfo = new UserInfo(id,name);
@@ -492,10 +488,5 @@ public class TypeUtilTest
         assertThat(userInfoDTO.getId(),is(id));
         assertThat(userInfoDTO.getName(),equalTo(name));
         assertThat(userInfoDTO.getOption().getValue(),is(option));
-
-
-
-
     }
-
 }

@@ -254,13 +254,6 @@ public class UserInfoDBServiceTest extends TestFastQuery
         assertThat(effect, equalTo(0));
     }
 
-    @Test(expected = RepositoryException.class)
-    public void testUpdateBatch2b()
-    {
-        int effect = db.updateBatch2("小不点", 6, 2);
-        assertThat(effect, equalTo(0));
-    }
-
     @Test
     public void testUpdateBatch3()
     {

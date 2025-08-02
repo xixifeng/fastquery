@@ -226,6 +226,19 @@ public class MethodQueryTest extends TestFastQuery
         assertThat(i,equalTo(0));
     }
 
+    @Test
+    public void update6()
+    {
+        UserInfo userInfo = new UserInfo();
+        userInfo.set(userInfo::name, null);
+        userInfo.set(userInfo::age, null);
+        userInfo.and(userInfo::id, SQLOperator.EQ, userInfo.getId());
+        userInfo.finish();
+
+        int i = userInfoDBService.executeUpdate(userInfo);
+        assertThat(i, equalTo(0));
+    }
+
     // 测试批量更新集合
     @Test
     public void updateCollection1()
