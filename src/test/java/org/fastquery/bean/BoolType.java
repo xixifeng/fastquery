@@ -44,12 +44,14 @@ public class BoolType
     private Boolean activated;
     private Boolean auth;
     private String gender;
+    private Opt opt;
 
-    public BoolType(Boolean deleted, Boolean activated, Boolean auth, String gender)
+    public BoolType(Boolean deleted, Boolean activated, Boolean auth, String gender, Opt opt)
     {
         this.deleted = deleted;
         this.activated = activated;
         this.auth = auth;
         this.gender = gender;
+        this.opt = opt;
     }
 }

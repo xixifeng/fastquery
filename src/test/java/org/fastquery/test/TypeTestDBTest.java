@@ -24,8 +24,12 @@ package org.fastquery.test;
 
 import lombok.extern.slf4j.Slf4j;
 import org.fastquery.bean.BoolType;
+import org.fastquery.bean.Opt;
+import org.fastquery.bean.Option;
+import org.fastquery.example.TypeTest;
 import org.fastquery.example.TypeTestDB;
 import org.fastquery.service.FQuery;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import java.util.List;
@@ -52,12 +56,12 @@ public class TypeTestDBTest extends TestFastQuery
         long id1 = 1L;
         long id3 = 3L;
         long id5 = 5L;
-        BoolType tt1 = new BoolType(id1, true, false, true, "男");
-        BoolType tt2 = new BoolType(id3, false, true, false, "女");
-        BoolType tt3 = new BoolType(id5, true, false, true, "男");
+        BoolType tt1 = new BoolType(id1, true, false, true, "男", Opt.可选1);
+        BoolType tt2 = new BoolType(id3, false, true, false, "女", Opt.可选3);
+        BoolType tt3 = new BoolType(id5, true, false, true, "男", Opt.可选5);
         List<BoolType> list = Stream.of(tt1, tt2, tt3).collect(Collectors.toList());
         int effect = db.update(list);
-        assertThat(rule.getExecutedSQLs().get(0), equalTo("update TypeTest set deleted = case id when 1 then true when 3 then false when 5 then true else deleted end,activated = case id when 1 then false when 3 then true when 5 then false else activated end,auth = case id when 1 then true when 3 then false when 5 then true else auth end,gender = case id when 1 then '男' when 3 then '女' when 5 then '男' else gender end where id in(1,3,5)"));
+        assertThat(rule.getExecutedSQLs().get(0), equalTo("update TypeTest set deleted = case id when 1 then true when 3 then false when 5 then true else deleted end,activated = case id when 1 then false when 3 then true when 5 then false else activated end,auth = case id when 1 then true when 3 then false when 5 then true else auth end,gender = case id when 1 then '男' when 3 then '女' when 5 then '男' else gender end,opt = case id when 1 then '1' when 3 then '3' when 5 then '5' else opt end where id in(1,3,5)"));
         assertThat(effect, is(3));
         BoolType t1 = db.find(BoolType.class, id1);
         BoolType t2 = db.find(BoolType.class, id3);
@@ -79,7 +83,7 @@ public class TypeTestDBTest extends TestFastQuery
     public void save()
     {
         String gender = "男";
-        BoolType tt = new BoolType(true, false, true, gender);
+        BoolType tt = new BoolType(true, false, true, gender, Opt.可选1);
         BoolType t = db.save(tt);
         assertThat(t.getDeleted(), is(true));
         assertThat(t.getActivated(), is(false));
@@ -87,12 +91,68 @@ public class TypeTestDBTest extends TestFastQuery
         assertThat(t.getGender(), equalTo(gender));
 
         gender = "女";
-        tt = new BoolType(false, true, false, gender);
+        tt = new BoolType(false, true, false, gender, Opt.可选3);
         t = db.save(tt);
         assertThat(t.getDeleted(), is(false));
         assertThat(t.getActivated(), is(true));
         assertThat(t.getAuth(), is(false));
         assertThat(t.getGender(), equalTo(gender));
+    }
+
+    @Ignore
+    @Test
+    public void activatedById()
+    {
+        Option option = db.activatedById(19L);
+        int value = option.getValue();
+        assertThat(value,is(0));
+
+        option = db.activatedById(20L);
+        value = option.getValue();
+        assertThat(value,is(1));
+    }
+
+    @Test
+    public void findById()
+    {
+        TypeTest typeTest = db.find(TypeTest.class, 1);
+        assertThat(typeTest.getId(),is(1L));
+        assertThat(typeTest.getDeleted(),is(true));
+        assertThat(typeTest.getActivated(),is(false));
+        assertThat(typeTest.getAuth(),nullValue());
+        assertThat(typeTest.getGender().name(),equalTo("男"));
+
+        assertThat(typeTest.getUserType().getValue(),is(1));
+        assertThat(typeTest.getOpt().getValue(),is(5));
+    }
+
+    @Test
+    public void optById()
+    {
+        TypeTest typeTest = db.optById(3L);
+        assertThat(typeTest.getId(),is(3L));
+        assertThat(typeTest.getDeleted(),is(true));
+        assertThat(typeTest.getActivated(),is(false));
+        assertThat(typeTest.getAuth(),nullValue());
+        assertThat(typeTest.getGender().name(),equalTo("男"));
+
+        assertThat(typeTest.getUserType().getValue(),is(5));
+        assertThat(typeTest.getOpt().getValue(),is(1));
+    }
+
+    @Test
+    public void updateOpt()
+    {
+        Long id = 5L;
+        Option userType = new Option(3);
+        Opt opt = Opt.可选5;
+
+        int effect = db.updateOpt(userType,opt,id);
+        assertThat(effect,is(1));
+
+        TypeTest typeTest = db.find(TypeTest.class, id);
+        assertThat(typeTest.getUserType().getValue(),is(userType.getValue()));
+        assertThat(typeTest.getOpt().getValue(),is(opt.getValue()));
     }
 
 }

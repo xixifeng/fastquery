@@ -35,6 +35,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.fastquery.struct.AttributeConverter;
+import org.fastquery.struct.Converter;
 import org.fastquery.util.TypeUtil;
 import org.fastquery.struct.RespUpdate;
 import org.fastquery.struct.SQLValue;
@@ -53,7 +55,14 @@ public class DB
 {
     private static void statSetObject(PreparedStatement stat, int parameterIndex, Object object) throws SQLException
     {
-        if (object instanceof Enum)
+        AttributeConverter converter = Converter.findConverter(object != null ? object.getClass() : null);
+        if(converter != null)
+        {
+            Object dbField = converter.toDBField(object);
+            log.info("其中第 {} 个 ? 由 {}({}) 转换成 {}", parameterIndex,object.getClass().getSimpleName(),object,dbField);
+            stat.setObject(parameterIndex, dbField);
+        }
+        else if (object instanceof Enum)
         {
             Enum<?> e = (Enum<?>) object;
             int index = e.ordinal() + 1; // 数据库中枚举元素对应的数字索引

@@ -38,6 +38,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.fastquery.core.*;
 import org.fastquery.asm.Script2Class;
 import org.fastquery.mapper.QueryPool;
+import org.fastquery.struct.AttributeConverter;
 import org.fastquery.struct.Converter;
 import org.fastquery.struct.ParamMap;
 import org.fastquery.where.Condition;
@@ -847,7 +848,7 @@ public class TypeUtil
         else
         {
             return ct == String.class || ct == Byte.class || ct == Short.class || ct == Integer.class || ct == Long.class || ct == Float.class
-                    || ct == Double.class || ct == Character.class || ct == Boolean.class || Enum.class.isAssignableFrom(ct) || EnumSet.class == ct || ct == JSONObject.class || ct == JSONArray.class;
+                    || ct == Double.class || ct == Character.class || ct == Boolean.class || Enum.class.isAssignableFrom(ct) || EnumSet.class == ct || ct == JSONObject.class || ct == JSONArray.class || Converter.findConverter(ct) != null;
         }
     }
 
@@ -1036,6 +1037,12 @@ public class TypeUtil
         {
             field.setAccessible(true);
             val = field.get(bean);
+
+            AttributeConverter converter = Converter.findConverter(val != null ? val.getClass() : null);
+            if(converter != null)
+            {
+                val = converter.toDBField(val);
+            }
         }
         catch (IllegalAccessException | IllegalArgumentException e)
         {

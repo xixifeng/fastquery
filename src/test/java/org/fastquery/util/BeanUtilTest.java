@@ -34,10 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import com.alibaba.fastjson.JSON;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.fastquery.bean.Fish;
-import org.fastquery.bean.Student;
-import org.fastquery.bean.BoolType;
-import org.fastquery.bean.UserInfo;
+import org.fastquery.bean.*;
 import org.fastquery.struct.SQLValue;
 import org.fastquery.core.SelectField;
 import org.junit.Test;
@@ -478,14 +475,14 @@ public class BeanUtilTest
     @Test
     public void toUpdateSQL6()
     {
-        BoolType tt1 = new BoolType(1L, true, false, true, "男");
-        BoolType tt2 = new BoolType(3L, false, true, false, "女");
-        BoolType tt3 = new BoolType(5L, true, false, true, "男");
+        BoolType tt1 = new BoolType(1L, true, false, true, "男", Opt.可选1);
+        BoolType tt2 = new BoolType(3L, false, true, false, "女", Opt.可选3);
+        BoolType tt3 = new BoolType(5L, true, false, true, "男", Opt.可选5);
         List<BoolType> list = Stream.of(tt1, tt2, tt3).collect(Collectors.toList());
 
         String sql = BeanUtil.toUpdateSQL(list, null);
         assertThat(sql, equalTo(
-                "update TypeTest set deleted = case id when 1 then true when 3 then false when 5 then true else deleted end,activated = case id when 1 then false when 3 then true when 5 then false else activated end,auth = case id when 1 then true when 3 then false when 5 then true else auth end,gender = case id when 1 then '男' when 3 then '女' when 5 then '男' else gender end where id in(1,3,5)"));
+                "update TypeTest set deleted = case id when 1 then true when 3 then false when 5 then true else deleted end,activated = case id when 1 then false when 3 then true when 5 then false else activated end,auth = case id when 1 then true when 3 then false when 5 then true else auth end,gender = case id when 1 then '男' when 3 then '女' when 5 then '男' else gender end,opt = case id when 1 then '1' when 3 then '3' when 5 then '5' else opt end where id in(1,3,5)"));
     }
 
     @Test

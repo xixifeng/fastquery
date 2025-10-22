@@ -73,12 +73,27 @@ public class Converter
     {
         for (Converter c : converters)
         {
-            if ((c.sourceType == newConverter.sourceType && c.targetType == newConverter.targetType) || c.converterClazz == newConverter.converterClazz)
+            if (c.targetType == newConverter.targetType || c.targetType.isAssignableFrom(newConverter.targetType) || newConverter.targetType.isAssignableFrom(c.targetType) || c.converterClazz == newConverter.converterClazz)
             {
-                return true;
+                throw new RepositoryException(c + " 与 " + newConverter + " 存在类型冲突。");
             }
         }
         return false;
+    }
+
+    public static AttributeConverter findConverter(Class<?> targetType)
+    {
+        if (targetType != null)
+        {
+            for (Converter c : converters)
+            {
+                if (c.targetType == targetType || c.targetType.isAssignableFrom(targetType))
+                {
+                    return AttributeConverter.newInstance(c.converterClazz);
+                }
+            }
+        }
+        return null;
     }
 
     public static void fit(Object source, Object target)
@@ -121,7 +136,7 @@ public class Converter
             if (c != null)
             {
                 converterClazz = c.converterClazz;
-                change(AttributeConverter.newInstance(converterClazz), sourceFieldVal, map, targetFieldName);
+                change(AttributeConverter.newInstance(converterClazz), sourceFieldVal, map, targetField);
             }
 
             Convert convert = targetField.getAnnotation(Convert.class);
@@ -130,17 +145,18 @@ public class Converter
                 Class<?> clazz = convert.value();
                 if(converterClazz != clazz) // 全局和局部排除被同一个转换器执行
                 {
-                    change(AttributeConverter.newInstance(clazz), sourceFieldVal, map, targetFieldName);
+                    change(AttributeConverter.newInstance(clazz), sourceFieldVal, map, targetField);
                 }
             }
 
         }
     }
 
-    private static void change(AttributeConverter clazz, Object sourceFieldVal, Map<String, Object> map, String targetFieldName)
+    private static void change(AttributeConverter clazz, Object sourceFieldVal, Map<String, Object> map, Field targetField)
     {
-        AttributeConverter attributeConverter = clazz;
-        Object o = attributeConverter.toEntityField(sourceFieldVal);
+        String targetFieldName = targetField.getName();
+        Class<?> targetFieldType = targetField.getType();
+        Object o = clazz.toEntityField(sourceFieldVal,targetFieldType);
         map.put(targetFieldName, o);
     }
 
@@ -169,7 +185,7 @@ public class Converter
             {
                 ReflectionUtils.makeAccessible(targetField);
                 AttributeConverter attributeConverter = AttributeConverter.newInstance(converterClazz);
-                Object targetFieldVal = attributeConverter.toEntityField(sourceFieldVal);
+                Object targetFieldVal = attributeConverter.toEntityField(sourceFieldVal,targetField.getType());
                 ReflectionUtils.setField(targetField, target, targetFieldVal);
             }
         }
@@ -183,7 +199,7 @@ public class Converter
     {
         for (Converter c : converters)
         {
-            if (c.sourceType == sourceType && c.targetType == targetType)
+            if (c.sourceType == sourceType && (c.targetType == targetType || c.targetType.isAssignableFrom(targetType)))
             {
                 return c;
             }

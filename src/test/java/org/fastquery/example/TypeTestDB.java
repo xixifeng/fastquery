@@ -22,6 +22,10 @@
 
 package org.fastquery.example;
 
+import org.fastquery.bean.Opt;
+import org.fastquery.bean.Option;
+import org.fastquery.core.Modifying;
+import org.fastquery.core.Query;
 import org.fastquery.core.QueryRepository;
 
 /**
@@ -29,4 +33,13 @@ import org.fastquery.core.QueryRepository;
  */
 public interface TypeTestDB extends QueryRepository
 {
+    @Query("select activated from typetest where id = ?1")
+    Option activatedById(Long id);
+
+    @Query("select id,deleted,activated,auth,gender,userType,opt from typetest where id = ?1")
+    TypeTest optById(Long id);
+
+    @Modifying
+    @Query("update typetest set userType = ?1, opt = ?2 where id = ?3")
+    int updateOpt(Option userType, Opt opt, Long id);
 }

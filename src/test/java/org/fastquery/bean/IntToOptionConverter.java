@@ -30,7 +30,7 @@ public class IntToOptionConverter implements AttributeConverter<Option, Integer>
 {
 
     @Override
-    public Option toEntityField(Integer dbField)
+    public Option toEntityField(Integer dbField, Class<? extends Option> clazz)
     {
         return dbField == null ? null : new Option(dbField);
     }

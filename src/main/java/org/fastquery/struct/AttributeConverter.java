@@ -31,7 +31,7 @@ import java.lang.reflect.InvocationTargetException;
 public interface AttributeConverter<A,B>
 {
 
-    A toEntityField(B dbField);
+    A toEntityField(B dbField, Class<? extends A> clazz);
 
     B toDBField (A entityField);
 
