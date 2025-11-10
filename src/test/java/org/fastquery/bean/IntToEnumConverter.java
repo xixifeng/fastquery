@@ -26,17 +26,17 @@ import org.fastquery.struct.AttributeConverter;
 /**
  * @author xixifeng (fastquery@126.com)
  */
-public class IntToEnumConverter implements AttributeConverter<IntEnum, Integer>
+public class IntToEnumConverter implements AttributeConverter<IntEnum, Number>
 {
 
     @Override
-    public IntEnum toEntityField(Integer dbField, Class<? extends IntEnum> clazz)
+    public IntEnum toEntityField(Number dbField, Class<? extends IntEnum> clazz)
     {
-        return IntEnum.fromValue(clazz,dbField);
+        return IntEnum.fromValue(clazz,dbField.intValue());
     }
 
     @Override
-    public Integer toDBField(IntEnum entityField)
+    public Number toDBField(IntEnum entityField)
     {
         return entityField.getValue();
     }

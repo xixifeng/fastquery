@@ -199,7 +199,7 @@ public class Converter
     {
         for (Converter c : converters)
         {
-            if (c.sourceType == sourceType && (c.targetType == targetType || c.targetType.isAssignableFrom(targetType)))
+            if ((c.sourceType == sourceType || c.sourceType.isAssignableFrom(sourceType)) && (c.targetType == targetType || c.targetType.isAssignableFrom(targetType)))
             {
                 return c;
             }

@@ -25,6 +25,12 @@ public enum Opt implements IntEnum
         return message;
     }
 
+    @Override
+    public String toString()
+    {
+        return Integer.toString(value);
+    }
+
     public String getEnMessage()
     {
         return enMessage;
