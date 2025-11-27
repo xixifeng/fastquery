@@ -1,16 +1,18 @@
 package org.fastquery.page;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.fastquery.struct.AttributeConverter;
-import org.fastquery.struct.Convert;
 import org.fastquery.struct.Converter;
+import org.fastquery.util.TypeUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -212,7 +214,7 @@ public class StreamUtil
     }
 
     /**
-     * 讲源对象浅复制到目标对象。如果目标字段标记了类型转换器 @Convert，就依据其规则转换
+     * 将源对象浅复制到目标对象。如果目标字段标记了类型转换器 @Convert，就依据其规则转换
      * @param source 源对象
      * @param target 目标对象
      * @param ignoreProperties 指定不参与复制的字段名称
@@ -221,5 +223,60 @@ public class StreamUtil
     {
         BeanUtils.copyProperties(source,target,ignoreProperties);
         Converter.fit(source,target);
+
+        Class<?> sourceClass = source.getClass();
+        Class<?> targetClass = target.getClass();
+        List<Field> fields = TypeUtil.getAllFields(targetClass);
+
+        for (Field targetField : fields)
+        {
+            Class<?> targetFieldType = targetField.getType();
+
+            if (JSONArray.class == targetFieldType)
+            {
+                String name = targetField.getName();
+                Field sourceField = ReflectionUtils.findField(sourceClass, name);
+                if(sourceField != null && List.class.isAssignableFrom(sourceField.getType()))
+                {
+                    try
+                    {
+                        ReflectionUtils.makeAccessible(sourceField);
+                        List<?> sourceList = (List<?>) sourceField.get(source);
+                        if(sourceList != null)
+                        {
+                            ReflectionUtils.makeAccessible(targetField);
+                            ReflectionUtils.setField(targetField,target,JSON.parseArray(JSON.toJSONString(sourceList)));
+                        }
+                    }
+                    catch (IllegalAccessException e)
+                    {
+                        log.warn("转换失败，source：{}，sourceField：{}， target：{}，targetField：{} ", source, target, sourceField, targetField);
+                    }
+                }
+            }
+            else if (List.class.isAssignableFrom(targetFieldType))
+            {
+                String name = targetField.getName();
+                Field sourceField = ReflectionUtils.findField(sourceClass, name);
+                if(sourceField != null && JSONArray.class == sourceField.getType())
+                {
+                    try
+                    {
+                        ReflectionUtils.makeAccessible(sourceField);
+                        JSONArray sourceList = (JSONArray) sourceField.get(source);
+                        if(sourceList != null && targetField.getGenericType() instanceof ParameterizedType)
+                        {
+                            ParameterizedType genericType = (ParameterizedType) targetField.getGenericType();
+                            ReflectionUtils.makeAccessible(targetField);
+                            ReflectionUtils.setField(targetField, target, sourceList.toJavaList((Class<?>) genericType.getActualTypeArguments()[0]));
+                        }
+                    }
+                    catch (IllegalAccessException e)
+                    {
+                        log.warn("转换失败，source：{}，sourceField：{}， target：{}，targetField：{} ", source, target, sourceField, targetField);
+                    }
+                }
+            }
+        }
     }
 }
