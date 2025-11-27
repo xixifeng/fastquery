@@ -26,7 +26,7 @@ import org.fastquery.struct.AttributeConverter;
 /**
  * @author xixifeng (fastquery@126.com)
  */
-public class IntToEnumConverter implements AttributeConverter<IntEnum, Number>
+public class NumberToEnumConverter implements AttributeConverter<IntEnum, Number>
 {
 
     @Override

@@ -129,9 +129,9 @@
         "converter"  : "org.fastquery.bean.IntToOptionConverter"
       },
       {
-        "sourceType" : "java.lang.Integer",
+        "sourceType" : "java.lang.Number",
         "targetType" : "org.fastquery.bean.IntEnum",
-        "converter"  : "org.fastquery.bean.IntToEnumConverter"
+        "converter"  : "org.fastquery.bean.NumberToEnumConverter"
       }
    ]
 }
