@@ -56,12 +56,13 @@ public class StreamUtil
      * @return 得到右表数据之后的左表
      */
     public static <E, K, T> List<E> join(List<E> left, Function<E, List<K>> leftFriendshipKey, Function<List<K>,
-            List<T>> byLeftFriendshipKeyData, Function<T, K> rightFriendshipKey,  @Nullable BiConsumer<E, List<T>> leftSetRight)
+            List<T>> byLeftFriendshipKeyData, Function<T, K> rightFriendshipKey, BiConsumer<E, List<T>> leftSetRight)
     {
         Assert.notNull(left, "left must not be null");
         Assert.notNull(leftFriendshipKey, "leftFriendshipKey must not be null");
         Assert.notNull(byLeftFriendshipKeyData, "byLeftFriendshipKeyData must not be null");
         Assert.notNull(rightFriendshipKey, "rightFriendshipKey must not be null");
+        Assert.notNull(leftSetRight, "leftSetRight must not be null");
 
         // 收集左表的关系键
         List<List<K>> ids = StreamUtil.collected(left, leftFriendshipKey, true);
@@ -73,7 +74,7 @@ public class StreamUtil
             leftKeys.addAll(id);
         }
         // 根据左表的关系键查询出右表数据
-        Map<K, T> map = getKtMap(leftKeys, byLeftFriendshipKeyData, rightFriendshipKey);
+        Map<K, List<T>> map = getKtListMap(leftKeys, byLeftFriendshipKeyData, rightFriendshipKey);
 
         // 将 entities.id 和  this.content. 指定的外键 合并
         left.forEach(target -> {
@@ -83,21 +84,24 @@ public class StreamUtil
                 List<T> list = new ArrayList<>();// 用于存放当前单元项要合并的数据
                 for (K leftKey : leftKeyIds)
                 {
-                    T t = map.get(leftKey);
+                    List<T> t = map.get(leftKey);
                     if (t != null)
                     {
-                        list.add(t);
+                        list.addAll(t);
                     }
                 }
 
-                if (leftSetRight != null)
-                {
-                    leftSetRight.accept(target, list);
-                }
+                leftSetRight.accept(target, list);
             }
         });
 
         return left;
+    }
+
+    private static <K, T> Map<K, List<T>> getKtListMap(List<K> leftKeys, Function<List<K>, List<T>> byLeftFriendshipKeyData, Function<T, K> rightFriendshipKey)
+    {
+        // 把右表转化成 Map 右表的关系键作为 key
+        return byLeftFriendshipKeyData.apply(leftKeys).stream().collect(Collectors.groupingBy(rightFriendshipKey));
     }
 
     private static <K, T> Map<K, T> getKtMap(List<K> leftKeys, Function<List<K>, List<T>> byLeftFriendshipKeyData, Function<T, K> rightFriendshipKey)
