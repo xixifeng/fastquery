@@ -30,13 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.fastquery.bean.Option;
-import org.fastquery.bean.Ruits;
-import org.fastquery.bean.UserInfo;
-import org.fastquery.bean.UserInfoDTO;
+import org.fastquery.bean.*;
+import static org.fastquery.bean.CopyBean.*;
 import org.fastquery.core.*;
 import org.fastquery.page.StreamUtil;
 import org.junit.Test;
@@ -488,5 +488,29 @@ public class TypeUtilTest
         assertThat(userInfoDTO.getId(),is(id));
         assertThat(userInfoDTO.getName(),equalTo(name));
         assertThat(userInfoDTO.getOption().getValue(),is(option));
+
+        Dog dog1 = new Dog(1,"Rocky");
+        Dog dog2 = new Dog(2,"Zuu");
+        Dog dog3 = new Dog(3,"Moto");
+
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.add(dog1);
+        jsonArray.add(dog2);
+        jsonArray.add(dog3);
+        jsonArray = JSON.parseArray(jsonArray.toJSONString());
+        LittleBean littleBean = new LittleBean(3,jsonArray);
+
+        SmallBean smallBean = new SmallBean();
+        // JSONArray -> list
+        StreamUtil.copyProperties(littleBean, smallBean);
+        assertThat(smallBean.getId(),equalTo(3));
+        assertThat(smallBean.getDogs().toString(),equalTo("[CopyBean.Dog(id=1, name=Rocky), CopyBean.Dog(id=2, name=Zuu), CopyBean.Dog(id=3, name=Moto)]"));
+
+
+        littleBean = new LittleBean();
+        // list -> JSONArray
+        StreamUtil.copyProperties(smallBean, littleBean);
+        assertThat(littleBean.getId(),equalTo(3));
+        assertThat(littleBean.getDogs().toJSONString(),equalTo("[{\"name\":\"Rocky\",\"id\":1},{\"name\":\"Zuu\",\"id\":2},{\"name\":\"Moto\",\"id\":3}]"));
     }
 }

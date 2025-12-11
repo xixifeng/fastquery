@@ -222,7 +222,7 @@ public class StreamUtil
     public static void copyProperties(Object source, Object target, String... ignoreProperties)
     {
         BeanUtils.copyProperties(source,target,ignoreProperties);
-        Converter.fit(source,target);
+        Converter.fit(source,target,ignoreProperties);
 
         Class<?> sourceClass = source.getClass();
         Class<?> targetClass = target.getClass();
@@ -231,49 +231,51 @@ public class StreamUtil
         for (Field targetField : fields)
         {
             Class<?> targetFieldType = targetField.getType();
+            String name = targetField.getName();
 
-            if (JSONArray.class == targetFieldType)
+            if(!Arrays.asList(ignoreProperties).contains(name))
             {
-                String name = targetField.getName();
-                Field sourceField = ReflectionUtils.findField(sourceClass, name);
-                if(sourceField != null && List.class.isAssignableFrom(sourceField.getType()))
+                if (JSONArray.class == targetFieldType)
                 {
-                    try
+                    Field sourceField = ReflectionUtils.findField(sourceClass, name);
+                    if(sourceField != null && List.class.isAssignableFrom(sourceField.getType()))
                     {
-                        ReflectionUtils.makeAccessible(sourceField);
-                        List<?> sourceList = (List<?>) sourceField.get(source);
-                        if(sourceList != null)
+                        try
                         {
-                            ReflectionUtils.makeAccessible(targetField);
-                            ReflectionUtils.setField(targetField,target,JSON.parseArray(JSON.toJSONString(sourceList)));
+                            ReflectionUtils.makeAccessible(sourceField);
+                            List<?> sourceList = (List<?>) sourceField.get(source);
+                            if(sourceList != null)
+                            {
+                                ReflectionUtils.makeAccessible(targetField);
+                                ReflectionUtils.setField(targetField,target,JSON.parseArray(JSON.toJSONString(sourceList)));
+                            }
                         }
-                    }
-                    catch (IllegalAccessException e)
-                    {
-                        log.warn("转换失败，source：{}，sourceField：{}， target：{}，targetField：{} ", source, target, sourceField, targetField);
+                        catch (IllegalAccessException e)
+                        {
+                            log.warn("转换失败，source：{}，sourceField：{}， target：{}，targetField：{} ", source, target, sourceField, targetField);
+                        }
                     }
                 }
-            }
-            else if (List.class.isAssignableFrom(targetFieldType))
-            {
-                String name = targetField.getName();
-                Field sourceField = ReflectionUtils.findField(sourceClass, name);
-                if(sourceField != null && JSONArray.class == sourceField.getType())
+                else if (List.class.isAssignableFrom(targetFieldType))
                 {
-                    try
+                    Field sourceField = ReflectionUtils.findField(sourceClass, name);
+                    if(sourceField != null && JSONArray.class == sourceField.getType())
                     {
-                        ReflectionUtils.makeAccessible(sourceField);
-                        JSONArray sourceList = (JSONArray) sourceField.get(source);
-                        if(sourceList != null && targetField.getGenericType() instanceof ParameterizedType)
+                        try
                         {
-                            ParameterizedType genericType = (ParameterizedType) targetField.getGenericType();
-                            ReflectionUtils.makeAccessible(targetField);
-                            ReflectionUtils.setField(targetField, target, sourceList.toJavaList((Class<?>) genericType.getActualTypeArguments()[0]));
+                            ReflectionUtils.makeAccessible(sourceField);
+                            JSONArray sourceList = (JSONArray) sourceField.get(source);
+                            if(sourceList != null && targetField.getGenericType() instanceof ParameterizedType)
+                            {
+                                ParameterizedType genericType = (ParameterizedType) targetField.getGenericType();
+                                ReflectionUtils.makeAccessible(targetField);
+                                ReflectionUtils.setField(targetField, target, sourceList.toJavaList((Class<?>) genericType.getActualTypeArguments()[0]));
+                            }
                         }
-                    }
-                    catch (IllegalAccessException e)
-                    {
-                        log.warn("转换失败，source：{}，sourceField：{}， target：{}，targetField：{} ", source, target, sourceField, targetField);
+                        catch (IllegalAccessException e)
+                        {
+                            log.warn("转换失败，source：{}，sourceField：{}， target：{}，targetField：{} ", source, target, sourceField, targetField);
+                        }
                     }
                 }
             }

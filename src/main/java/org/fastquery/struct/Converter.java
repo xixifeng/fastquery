@@ -28,6 +28,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -96,7 +97,7 @@ public class Converter
         return null;
     }
 
-    public static void fit(Object source, Object target)
+    public static void fit(Object source, Object target, String...ignoreProperties)
     {
         Class<?> sourceClass = source.getClass();
         Class<?> targetClass = target.getClass();
@@ -105,19 +106,22 @@ public class Converter
         for (Field targetField : targetFields)
         {
             String targetFieldName = targetField.getName();
-            Field sourceField = ReflectionUtils.findField(sourceClass, targetFieldName);
-            if (sourceField != null)
+            if(!Arrays.asList(ignoreProperties).contains(targetFieldName))
             {
-                Class<?> sourceFieldType = sourceField.getType();
-                Class<?> targetFieldType = targetField.getType();
-                Converter c = find(sourceFieldType, targetFieldType);
-                Class<?> converterClazz = null;
-                if (c != null)
+                Field sourceField = ReflectionUtils.findField(sourceClass, targetFieldName);
+                if (sourceField != null)
                 {
-                    converterClazz = c.converterClazz;
-                    convert(source, sourceField, target, targetField, converterClazz);
+                    Class<?> sourceFieldType = sourceField.getType();
+                    Class<?> targetFieldType = targetField.getType();
+                    Converter c = find(sourceFieldType, targetFieldType);
+                    Class<?> converterClazz = null;
+                    if (c != null)
+                    {
+                        converterClazz = c.converterClazz;
+                        convert(source, sourceField, target, targetField, converterClazz);
+                    }
+                    annotationConvert(source, sourceField, target, targetField, converterClazz);
                 }
-                annotationConvert(source, sourceField, target, targetField, converterClazz);
             }
         }
     }
@@ -199,11 +203,22 @@ public class Converter
     {
         for (Converter c : converters)
         {
-            if ((c.sourceType == sourceType || c.sourceType.isAssignableFrom(sourceType)) && (c.targetType == targetType || c.targetType.isAssignableFrom(targetType)))
+            if ((c.sourceType == sourceType || isAssignableFrom(sourceType, c)) && (c.targetType == targetType || c.targetType.isAssignableFrom(targetType)))
             {
                 return c;
             }
         }
         return null;
+    }
+
+    private static boolean isAssignableFrom(Class<?> type, Converter c)
+    {
+        if (c.sourceType == Number.class && type.isPrimitive()) {
+            return type == int.class
+                    || type == long.class
+                    || type == short.class
+                    || type == byte.class;
+        }
+        return c.sourceType.isAssignableFrom(type);
     }
 }
