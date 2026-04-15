@@ -44,8 +44,8 @@ class SQLFilter implements MethodFilter
             String sql = query.value();
 
             if (StringUtils.EMPTY.equals(sql))
-            { // 如果@Query的value为"",并且又没有传递QueryBuilder(用于构建SQL)
-                this.abortWith(method, sql + "该方法,没有标注任何SQL语句. 帮定SQL又多种方式:通过@Query;采用xml模板;用QueryBuilder,或参数传入...");
+            { // 如果@Query的value为""
+                this.abortWith(method, sql + "该方法,没有标注任何SQL语句. 帮定SQL又多种方式:通过@Query;采用xml模板,或参数传入...");
             }
             else if (sql.length() < 2)
             {

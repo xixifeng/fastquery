@@ -301,6 +301,7 @@ List<String> findNames();
 ```
 
 ## 类属性名称与表字段不一致时,如何映射?  
+
 为了说明这个问题先准备一个实体  
 
 ```java
@@ -324,7 +325,7 @@ UserInformation findUserInfoById(Integer id);
 ## 动态条件查询
 
 ### 采用`Annotation`实现简单动态条件  
-看到这里,可别认为`SQL`只能写在Annotation(注解)里.`FastQuery`还提供了另二种方案: ① 采用`@QueryByNamed`(命名式查询),将`SQL`写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活. ② 通过`QueryBuilder`构建`SQL`.下面章节有详细描述. 
+看到这里,可别认为`SQL`只能写在Annotation(注解)里.`FastQuery`还提供了另一种方案: 采用`@QueryByNamed`(命名式查询),将`SQL`写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活.下面章节有详细描述. 
 
 ```java
 @Query("select no, name, sex from Student #{#where} order by age desc")
@@ -709,7 +710,7 @@ int updateCourse(@Param("name") String name,@Param("credit") Integer credit,Stri
 ```
 关于修改`name`的那个设置项, 有三种可能使它作废: ① name的值是null; ② name的值是""; ③ NameJudge类的ignore方法返回了`true`.
 
-根据参数动态增减set不同字段,除了用`@Set`实现之外,别忘了还有其他几种解决办法: a.调用内置方法`int executeUpdate(E entity)`,实体的字段若是`null`值,那么,该字段将不会参与set运算; b.使用SQL模版,在里头做逻辑判断; c.采用`QueryBuilder`; d.采用`$表达式`. 开发者将会发现很难不能选择出适合的解决方式.
+根据参数动态增减set不同字段,除了用`@Set`实现之外,别忘了还有其他几种解决办法: a.调用内置方法`int executeUpdate(E entity)`,实体的字段若是`null`值,那么,该字段将不会参与set运算; b.使用SQL模版,在里头做逻辑判断; c.采用`$表达式`. 开发者将会发现很难不能选择出适合的解决方式.
 
 ## 事务
 
@@ -995,50 +996,6 @@ org.fastquery.dao.QueryByNamedDBExtend.queries.xml 模板文件的内容:
 
 其中 `${_method.getName()}` 可简写成 `${_method.name}`. 在`Velocity`里调用对象或方法,不是本文的重点,点到为止.
 
-## QueryBuilder
-上面介绍了`SQL`不仅可以绑定在`@Query`里, 也可以写到`XML`里. 还有另一种方式,**通过构造QueryBuilder对象**构建`Query`语句.  
-用法举例:
-
-```java
-@Query
-Page<Map<String, Object>> pageByQueryBuilder(QueryBuilder queryBuilder,Pageable pageable);
-```
-
-如果分页不要求得到总页数,在接口的方法上加`@NotCount`便可(谁说分页一定要执行count语句?).
-
-不用去实现那个接口,直接调用:
-
-```java
-// 获取Repository实例
-UserInfoDBService db = FQuery.getRepository(UserInfoDBService.class);
-
-String query = "select id,name,age from userinfo #{#where}";
-String countQuery = "select count(name) from userinfo #{#where}";
-ConditionList conditions = ConditionList.of("age > :age","and id < :id");
-Map<String, Object> parameters = new HashMap<>();
-parameters.put("age", 18);
-parameters.put("id", 50);
-
-QueryBuilder queryBuilder = new QueryBuilder(query, countQuery, conditions, parameters);
-Page<Map<String, Object>> page = db.pageByQueryBuilder(queryBuilder,new PageableImpl(1, 3));
-List<Map<String, Object>> content = page.getContent();
-content.forEach(map -> {
-	Integer age = (Integer) map.get("age");
-	Integer id = (Integer) map.get("id");
-	assertThat(age, greaterThan(18));
-	assertThat(id, lessThan(50));
-});
-
-List<String> executedSQLs = rule.getExecutedSQLs();
-assertThat("断言：执行过的sql有两条",executedSQLs.size(), is(2));
-assertThat(executedSQLs.get(0), equalTo("select id,name,age from userinfo where age > ? and id < ? limit 0,3"));
-assertThat(executedSQLs.get(1), equalTo("select count(name) from userinfo where age > ? and id < ?"));
-```
-
-引用问号表达式(?expression) , 冒号表达式(:expression), 其中?1表示方法的第一个参数,`:age`表示匹配`@Param("age")`那个参数,采用问号或冒号表达式不会有注入问题.
-
-**如果要查的表是一个变量(甚至表是自动生成的),要查的字段也是变量,条件单元的可选范围也是个变量,整个 SQL 都是动态生成的,在这种情形就只能用 `QueryBuilder`, 使用`@Query`模板,就无能为力了,`QueryBuilder`有不可取代的功能**.不过,能用`@Query`模板解决问题,就尽量使用它,因为它的设计,只用写一个抽象方法,零实现,让你没办法去写第二行 Java 代码,从设计上让你无法犯错.
-
 ## 支持存储过程
 
 只支持in(输入)参数,不支持out(输出参数), 如果想输出存储过程的处理结果,在过程内部使用`select`查询输出.  
@@ -1075,7 +1032,7 @@ JSONObject callProcedure(String no,@Param("name")String name,String sex,int age,
 ```
 
 ## 分页
-要处理查询语句的参数,只需定义方法参数,为了在运行时对参数名称可见就额外加上`@Param`,上面有很多示例.另外,方法的设计还能识别某些特殊的类型,如`QueryBuilder`,`Pageable`,以便核心能智能地将动态构建查询和分页应用于查询中.
+要处理查询语句的参数,只需定义方法参数,为了在运行时对参数名称可见就额外加上`@Param`,上面有很多示例.另外,方法的设计还能识别某些特殊的类型,如`Pageable`,以便核心能智能地将动态构建查询和分页应用于查询中.
 
 - 通过`@QueryByNamed`实现分页
 
@@ -1434,16 +1391,7 @@ assertThat(executedSQLs.get(0), not(containsString("count")));
 ## 源码
 
 - https://gitee.com/fastquery2016/fastquery
-- https://github.com/fastquery2016/fastquery
-
-## 开发环境
-仅仅是建议,并不局限于此         
-  IDE: IntellIJ IDEA          
-build: maven 
-
-## 微信交流
-![FastQuery 微信交流](file/wx.png "微信交流群,与作者交流FastQuery.")  
-与作者一起探讨FastQuery(加入时请标注java,谢谢).
+- https://github.com/xixifeng/fastquery
 
 ## 反馈问题
 https://gitee.com/fastquery2016/fastquery/issues  
