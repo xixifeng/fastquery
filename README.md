@@ -532,7 +532,6 @@ Map<String, Object> addUserInfo(String name,Integer age);
 | `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),若给where传递null或"",默认按照主键修改,返回影响行数 |
 | `<E> int update(Collection<E> entities)` | 更新集合实体,成员属性如果是null,那么该属性将不会参与改运算,每个实体必须包含主键 |
 | `int delete(String tableName,String primaryKeyName,long id)` | 根据主键删除实体,返回影响行数 |
-| `int[] executeBatch(String sqlName)` | 根据指定的SQL文件名称或绝对路径,执行批量操作SQL语句,返回int[],数组中的每个数对应一条SQL语句执行后所影响的行数 |
 | `int tx(Supplier<Integer> fun)` | 事务函数. |
 | `<E> long count(E entity)` | 根据指定的条件统计总记录数，实体属性若为 null 值，则，该属性不参与运算，反之，参与 and 运算 |
 
@@ -1194,41 +1193,7 @@ int number = page.getNumber();                // 当前页数(当前是第几页
 ### 扩展分页实现
 目前该框架默认支持分页的数据库有`MySQL`,`Microsoft SQL Server`,`PostgreSQL`,因此,扩展的空间非常大,并且非常容易.实现`org.fastquery.page.PageDialect`类,有针对性地重写相关方法,解决`SQL`中的差异.欲了解更多细节请参考`org.fastquery.dialect.MySQLPageDialect`,`org.fastquery.dialect.PostgreSQLPageDialect`.
 
-## 执行SQL文件
-```java
-String sqlName = "update.sql";
-int[] effects = studentDBService.executeBatch(sqlName);
-```
-
-- sqlName 指定基准目录下的SQL文件. 注意: 基准目录在fastquery.json里配置,sqlName 为绝对路径也行
-- 返回 `int[]`类型,用于记录SQL文件被执行后所影响的行数.若,effects[x] = m 表示第x行SQL执行后影响的行数是m; effects[y] = n 表示第y行SQL执行后所影响的行数是n
-- 判定SQL文件里有多少条语句,依据以分号分割的结果作为标准
-- 只支持整行注释,以`#`或`--`开头的行将视为注释
-
-一个数据源可能管理着多个数据库,执行的SQL文件也有可能需要根据参数的不同而服务于不同的数据库.或者说SQL文件里有动态的部分,需要根据传递的参数加以区分.那么,可以使用`executeBatch(String sqlName,String[] quotes)`,第二个参数可以被SQL文件所用,引用方式为`$[N]`,表示引用数组的第`N`个元素.
-
-```sql
-drop table if exists $[0].demo_table;
-```
-
 ## 动态适配数据源
-### 创建数据源
-如果想在项目运行期间动态创建一个新数据源,那么请使用`FQuery.createDataSource`.
-
-```java
-// 数据源名称
-String dataSourceName = "xk1";
-
-// 连接池配置
-Properties properties = new Properties();
-properties.setProperty("driverClass", "com.mysql.cj.jdbc.Driver");
-properties.setProperty("jdbcUrl", "jdbc:mysql://db.fastquery.org:3306/xk1");
-properties.setProperty("user", "xk1");
-properties.setProperty("password", "abc1");
-
-// 创建数据源
-FQuery.createDataSource(dataSourceName, properties);
-```
 
 ### 适配数据源
 使用`@Source`动态适配当前`Repository`的方法应该采用哪个数据源. 显然这个功能很有用.      

@@ -50,22 +50,6 @@ public class ConditionTest extends TestFastQuery
     @Rule
     public FastQueryTestRule rule = new FastQueryTestRule();
 
-    @Test
-    public void db()
-    {
-        assertThat(QueryRepository.class.isAssignableFrom(db.getClass()), is(false));
-        // 断言是否继承了QueryRepository中的方法
-        try
-        {
-            db.getClass().getMethod("executeBatch", String.class, String.class);
-        }
-        catch (Exception e)
-        {
-            String stackTrace = ExceptionUtils.getStackTrace(e);
-            assertThat(stackTrace, containsString("java.lang.NoSuchMethodException:"));
-            assertThat(stackTrace, containsString("executeBatch(java.lang.String, java.lang.String)"));
-        }
-    }
 
     @Test
     public void findUserInfo1()
