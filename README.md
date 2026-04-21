@@ -1,6 +1,45 @@
-<p align="center"><img src="file/logo.png" alt="FastQuery logo"></p>
+## 1. FastQuery 是什么
 
-### Apache Maven
+FastQuery 是一个基于 Java 的数据持久层框架。它的目标不是把数据库访问“包装得更复杂”，而是让开发者以尽可能简单、清晰、稳定的方式操作数据层。框架强调几个核心方向：少量注解、接口式编程、初始化阶段完成大量校验、运行期尽量轻量，以及通过 `@Query`、`@Condition`、`@Set`、`@QueryByNamed` 等机制来表达查询与动态 SQL。
+
+FastQuery 不是传统意义上那种依赖大量 XML、约定隐蔽、运行期才暴露错误的框架。它更希望把许多原本会在运行期才发生的问题，尽量提前到项目初始化阶段发现并阻断。这样做的结果是：开发阶段暴露问题更早，运行阶段的执行路径更直接，代码维护成本也更低。
+
+## 2. FastQuery 的设计目标
+
+如果只用一句话概括 FastQuery，可以这样说：
+
+> **让开发者只面对接口、注解与 SQL，本身不再承担实现类、样板代码和大量重复判断的负担。**
+
+- DAO 只需要定义接口，不需要编写实现类；
+- 框架会在初始化阶段为接口生成实现；
+- SQL 绑定、方法返回值、分页参数、模板调用等都会在初始化阶段进行检查；
+- 如果存在明显问题，项目应当直接无法启动，从而把错误尽可能留在开发阶段解决。
+
+这意味着 FastQuery 的价值，不只是“省代码”，更在于：
+
+- 降低出错面；
+- 强迫接口设计更清晰；
+- 把动态能力建立在受控规则之上，而不是随意拼接字符串；
+- 让查询、分页、事务、多数据源等能力都保持统一风格。
+
+## 3. 适用场景
+
+FastQuery 适合以下类型的项目：
+
+- 以 SQL 为核心表达方式的业务系统；
+- 希望接口层清晰、实现层自动生成的数据访问场景；
+- 既需要静态 SQL，又需要一定动态 SQL 能力的项目；
+- 希望通过注解风格完成绝大部分数据访问定义的项目；
+- 对分页、事务、批量更新、多数据源、命名式查询有明确需求的项目。
+
+如果你的项目更希望把 SQL 完整掌握在开发者手里，而不是把查询逻辑大量隐藏在方法名解析或复杂的 Criteria API 中，那么 FastQuery 会更直接。
+
+## 4. 运行环境与依赖
+
+FastQuery 的运行环境要求是 **Java 8+**。
+
+### Maven
+
 ```xml
 <dependency>
     <groupId>org.fastquery</groupId>
@@ -9,177 +48,66 @@
 </dependency>
 ```
 
-### Gradle/Grails
-```
+### Gradle
+
+```groovy
 compile 'org.fastquery:fastquery:1.0.149'
 ```
 
-# FastQuery 数据持久层框架
-FastQuery 基于Java语言.简化Java操作数据层.<br />
-提供少许`Annotation`,消费者只用关心注解的含义,这就使得框架的核心便于重构,便于持续良性发展.<br />
+## 5. 第一个 FastQuery 程序
 
-## FastQuery 主要特性如下:
-- 遵循非侵入式原则,设计优雅或简单,极易上手
-- 在项目初始化阶段采用生成好字节码,因此支持编译前预处理,可最大限度减少运行期的错误,显著提升程序的强壮性
-- 支持安全查询,防止SQL注入
-- 支持与主流数据库连接池框架集成
-- 支持 `@Query` 查询,使用 `@Condition`,可实现动态 `where` 条件查询
-- 支持查询结果集以JSON类型返回
-- 拥有非常优雅的`Page`(分页)设计
-- 使用`@Source`可实现动态适配数据源.这个特性特别适合多租户系统中要求数据库彼此隔离其结构相同的场景里
-- 支持`@QueryByNamed`命名式查询,SQL动态模板
-- 支持存储过程
-- 支持批量更新集合实体(根据主键,批量更新不同字段,不同内容).
+第一次使用 FastQuery，需要理解 5 个角色：
 
-## 运行环境要求
-JRE 8+
+- 配置数据源 DataSource
+- 配置`fastquery.json`
+- 实体类
+- DAO 接口
+- 通过 `FQuery.getRepository(...)` 获取接口实现并调用
 
-## 配置文件
+### 5.1 配置数据库数据源
 
-### 配置文件的存放位置
+几乎支持所有的主流连接池，这里用 `HikariCP` 做示例:
 
-默认从`classpath`目录下去寻找配置文件. 配置文件的存放位置支持自定义, 如: `System.setProperty("fastquery.config.dir","/data/fastquery/configs");`, 它将会覆盖`classpath`目录里的同名配置文件.  如果项目是以jar包的形式启动,那么可以通过java命令的 `-D` 参数指定配置文件的目录, 如: `java -jar Start.jar -Dfastquery.config.dir=/data/fastquery/configs`. 
-
-### c3p0-config.xml
-完全支持c3p0官方配置,详情配置请参照c3p0官网的说明.
+druid.xml
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<c3p0-config>  
-    <named-config name="xk-c3p0">  
-        <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
-        <property name="jdbcUrl">jdbc:mysql://192.168.1.1:3306/xk?useSSL=false</property>  
-        <property name="user">xk</property>  
-        <property name="password">abc123</property>  
-        <property name="acquireIncrement">50</property>  
-        <property name="initialPoolSize">100</property>  
-        <property name="minPoolSize">50</property>  
-        <property name="maxPoolSize">1000</property>
-        <property name="maxStatements">0</property>  
-        <property name="maxStatementsPerConnection">5</property>     
-    </named-config>
-     <!-- 可以配置多个named-config节点,多个数据源 -->
-    <named-config name="name-x"> ... ... </named-config>
-</c3p0-config>
-```
-
-### druid.xml
-用于配置支持Druid连接池,详细配置请参照 https://github.com/alibaba/druid
-
-```xml
 <beans>
-	 <bean name="xkdb1" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" 
-                                        init-method="init" destroy-method="close"> 
-	     <property name="url" value="jdbc:mysql://db.fastquery.org:3305/xk" />
-	     <property name="username" value="xk" />
-	     <property name="password" value="abc123" />
-	     <property name="filters" value="stat" />
-	     <property name="maxActive" value="20" />
-	     <property name="initialSize" value="1" />
-	     <property name="maxWait" value="60000" />
-	     <property name="minIdle" value="1" />
-	     <property name="timeBetweenEvictionRunsMillis" value="60000" />
-	     <property name="minEvictableIdleTimeMillis" value="300000" />
-	     <property name="testWhileIdle" value="true" />
-	     <property name="testOnBorrow" value="false" />
-	     <property name="testOnReturn" value="false" />
-	     <property name="poolPreparedStatements" value="true" />
-	     <property name="maxOpenPreparedStatements" value="20" />
-	 </bean>
-	 <!-- 再配置一个数据源 --> 
-	 <bean name="xkdb2" id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" 
-                                        init-method="init" destroy-method="close"> 
-	     <property name="url" value="jdbc:mysql://db.fastquery.org:3305/xk" />
-	     <property name="username" value="xk" />
-	     <property name="password" value="abc123" />
-	 </bean>
-</beans>
-```
-
-### hikari.xml
-用于配置支持HikariCP连接池,详细配置选项请参照 https://github.com/brettwooldridge/HikariCP  
-连接MySQL,为了得到更好的性能,推荐配置
-
-```xml
-<beans>
-	<bean name="xkdb2">
-		<property name="jdbcUrl" value="jdbc:mysql://192.168.1.1:3306/xk" />
+  <!-- 数据源名称 -->
+	<bean name="xkdb">
+    <!-- 数据库连接地址 -->
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/xk" />
+    <!-- 数据库用户名 -->
 		<property name="dataSource.user" value="xk" />
-		<property name="dataSource.password" value="abc123" />
-		<property name="dataSource.cachePrepStmts" value="true" />
-		<property name="dataSource.prepStmtCacheSize" value="250" />
-		<property name="dataSource.prepStmtCacheSqlLimit" value="2048" />
-		<property name="dataSource.useServerPrepStmts" value="true" />
-		<property name="dataSource.useLocalSessionState" value="true" />
-		<property name="dataSource.rewriteBatchedStatements" value="false" />
-		<property name="dataSource.cacheResultSetMetadata" value="true" />
-		<property name="dataSource.cacheServerConfiguration" value="true" />
-		<property name="dataSource.elideSetAutoCommits" value="true" />
-		<property name="dataSource.maintainTimeStats" value="false" />
-	</bean>
-	<!-- 可以配置多个bean节点,提供多个数据源 -->
-	<bean name="name-x"> ... ... </bean>
+    <!-- 数据库密码 -->
+		<property name="dataSource.password" value="abc123" />	
+    <!-- HikariCP 的其他配置选项请参照其官网 -->
+    
+    <!-- 若有需要，也可以配置多个 bean 节点，提供多个数据源 -->
 </beans>
 ```
 
-支持多连接池共存,如,同时让Druid,HikariCP工作,并配置多个数据源.
+详细配置选项请参照 https://github.com/brettwooldridge/HikariCP
 
-### fastquery.json
-配置数据源的作用范围
+### 5.2 配置`fastquery.json`
 
-```js
-// @author xixifeng (fastquery@126.com)
-// 配置必须遵循标准的json语法.
+```json 
+// 配置必须遵循标准的 json 语法.
 {
-  "scope":[
-		    // config 用于指定由谁来提供数据源,如,"c3p0","druid","hikari"等等
-		    {
-		        "config": "c3p0",            // 表示由c3p0负责提供数据源
-		        "dataSourceName": "xk-c3p0", // 数据源的名称
-		        "basePackages": [            // 该数据源的作用范围
-		            "org.fastquery.example",              // 包地址
-		            "org.fastquery.dao.UserInfoDBService" // 完整类名称 
-		            // 在这可以配置多个DB接口或包地址,以","号隔开
-		            // 提醒:在json结构中,数组的最后一个元素的后面不能加","
-		        ]
-		    },
-		    
-		     /*
-		      再配置一个数据源作用域
-		     */
-		     {
-		        "config" : "mySQLDriver",      // 表示由mySQLDriver负责提供数据源
-		        "dataSourceName": "shtest_db", // 数据源的名称
-		        "basePackages": [              // 该数据源的作用范围
-		            "org.fastquery.example.DataAcquireDbService"
-		             // 在这可以配置多个DB接口,以","号隔开
-		        ]
-		     },
-		    
-		     {
-		        "config": "c3p0",              // 表示由c3p0负责提供数据源
-		        "basePackages": [   
-		             "org.fastquery.dao2.UserInfoDB"
-		        ]
-		     }
-		  ] 
+"scope":[
+      {
+          "config": "hikari", // 连接池厂商,如，"hikari","druid","c3p0" 等等
+          "dataSourceName": "xkdb", // 这里指定由上个步骤配置的数据源名称
+          "basePackages": [         // 该数据源的作用范围
+              "org.fastquery.example",              // 包地址
+              "org.fastquery.dao.UserInfoDBService" // 完整类名称 
+          ]
+      }
+    ] 
 }
 ```
-**注意**: 在fastquery.json中配置作用域,其中"dataSourceName"不是必须的,"dataSourceName"要么不指定,要指定的话那么必须正确.如果没有指定"dataSourceName",那么在调用接口的时候必须指定数据源的名称.下面的适配数据源章节会讲到."basePackages"若配置了包地址,那么对应的数据源会作用这个包的所有类,及所有子包中的类.  
 
-数据源的初始化是从"fastquery.json"开始的,根据从里面读到"dataSourceName"的值,取相应的配置,继而完成数据源的创建.如,创建一个名为"rex-db"的数据源:
-
-```js   
-{
-    "config": "c3p0",           
-    "dataSourceName": "rex-db"
-}
-```
-在这里,"basePackages"不是必须的,该数据源可以当做是一个服务,供没有明确指定数据源的Repository使用.
-
-## 入门例子
-当看到一个例子时,切勿断章取义,多看一眼,往往会有意想不到的结果.  
-- 准备一个实体
+### 5.3 定义实体
 
 ```java
  public class Student
@@ -193,9 +121,9 @@ JRE 8+
  } 
 ```
 
-**实体属性跟数据库映射的字段必须为包装类型,否则被忽略**. 在实体属性上标识`@Transient`,表示该字段不参与映射.   
+这里有一个非常关键的约定：**实体属性与数据库字段映射时，应使用包装类型，而不是基本类型；否则会被忽略。** 如果某个字段不参与映射，可以在属性上加 `@Transient`。
 
-- DAO接口
+### 5.4 定义 Repository 接口
 
 ```java
  public interface StudentDBService extends org.fastquery.core.Repository {
@@ -206,7 +134,7 @@ JRE 8+
  }
 ```
 
-- 使用DAO接口.
+### 5.5 获取并调用
 
 ```java
 public class StudentDBServiceTest {
@@ -222,26 +150,315 @@ public class StudentDBServiceTest {
 }
 ```
 
-**注意**:不用去实现StudentDBService接口.通过`FQuery.getRepository`获取DAO接口对应的实例,虽然每次获取实例消耗的性能微乎其微可以忽略不计,但是,作为一个接口并且频繁被调用,因此,建议把获取到的实例赋值给类成员变量,最好是用`static`修饰.`FQuery.getRepository`获得的实例是唯一的,不可变的.  
+需要特别说明：
 
-一个接口不实现它的`public abstract`方法就毫无作用可言,因此,与之对应的实例对象是必须的,只不过是FastQuery内部替用户实现了.读者可能会问,这个自动生成的实例在什么时候生成? 动态生成的效率如何保持高效? 为此, 笔者做了相当多的功课:让所有DB实现类在项目初始化阶段进行,并且尽可能地对接口方法做静态分析,把有可能在运行期发生的错误尽最大努力提升到初始化阶段,生成代码前会检测SQL绑定是否合法有效、检测方法返回值是否符合常规、方法的参数是否满足模版的调用、是否正确地使用了分页...诸如此类问题.这些潜在问题一旦暴露,项目都启动不起来,错误信息将在开发阶段详细输出,并且必须干掉这些本该在生产环境才发生的错误,才能继续开发,迫使开发者必须朝正确的道路走,或者说框架的优良设计其核心理念引导开发者不得不写出稳健的程式.项目进入运行期,大量的校验就没必要写了,从而最大限度保证快速执行.  
+1. **不要手动实现 Repository 接口**
+2. `FQuery.getRepository(...)` 返回的实例是单例且不可变的
 
-唯一的出路,只能引用接口,这就使得开发者编程起来不得不简单,因为面对的是一个高度抽象的模型,而不必去考虑细枝末节.接口可以看成是一个能解析SQL并能自动执行的模型,方法的参数、绑定的模版和标识的注解无不是为了实现一个目的:执行SQL,返回结果.  
+在 FastQuery 中，接口的实现类由框架在**项目启动阶段自动生成**。在生成过程中，框架会对接口方法进行静态分析，包括：
 
-这种不得不面向接口的编程风格,有很多好处:耦合度趋向0,天然就是**对修改封闭,对扩展开放**,不管是应用层维护还是对框架增加新特性,这些都变得特别容易.隐藏实现,可以减少bug或者是能消灭bug,就如**解决问题,不如消灭问题**一般,解决问题的造诣远远落后于消灭问题,原因在于问题被解决后,不能证明另一个潜在问题在解决代码中不再出现,显然消灭问题更胜一筹.应用层只用写声明抽象方法和标识注解,试问bug从何而来?该框架最大的优良之处就是让开发者没办法去制造bug,至少说很难搞出问题来.不得不简便,没法造bug,显然是该项目所追求的核心目标之一.  
+- SQL 语句是否合法
+- 参数绑定是否正确
+- 返回值类型是否匹配
+- 是否正确使用分页等特性
 
-不管用不用这个项目,笔者期望读者至少能快速地检阅一下该文档,有很多设计是众多同类框架所不具备的,希望读者从中得到正面启发或反面启发,哪怕一点点,都会使你收益.  
+如果存在问题，应用将无法启动，并在开发阶段直接报错，从而避免将错误带入运行期。这种设计将大量运行期校验前移到初始化阶段，在保证安全性的同时，也提升了运行时性能。
 
-## 针对本文@Query的由来
-该项目开源后,有些习惯于繁杂编码的开发者表示,"*使用`@Query`语义不强,为何不用@SQL,@Select,@Insert,@Update...?*". SQL的全称是 Structured Query Language,本文的 `@Query` 就是来源于此. `@Query`只作为运行SQL的载体,要做什么事情由SQL自己决定.因此,不要片面的认为Query就是select操作. 针对数据库操作的注解没有必要根据SQL的四种语言(DDL,DML,DCL,TCL)来定义,定义太多,只会增加复杂度,并且毫无必要,如果是改操作加上`@Modifying`注解,反之,都是"查",这样不更简洁实用吗? 诸如此类:`@Insert("insert into table (name) values('Sir.Xi')")`,`@Select("select * from table")`,SQL的表达能力还不够吗? 就不觉得多出`@insert`和`@Select`有拖泥带水之嫌? SQL的语义本身就很强,甚至连`@Query`和`@Modifying`都略显多余,但是毕竟SQL需要有一个载体和一个大致的分类.
+从使用角度来看，开发者只需定义接口和 SQL，无需关注底层实现细节。框架会自动完成 SQL 执行和结果映射，使代码更加简洁、低耦合。
 
-## 带条件查询
+这种基于接口的编程方式，使系统更容易扩展，同时减少人为实现带来的错误风险。
+
+## 6. 配置文件
+
+### 6.1 配置文件位置
+
+默认情况下，FastQuery 会从 `classpath` 目录加载配置文件。
+
+你也可以通过以下方式自定义配置目录：
 
 ```java
-// sql中的?1 表示对应当前方法的第1个参数
-// sql中的?2 表示对应当前方法的第2个参数
-//       ?N 表示对应当前方法的第N个参数
-	
+System.setProperty("fastquery.config.dir", "/data/fastquery/configs");
+```
+
+该设置会覆盖 `classpath` 中的同名配置文件。
+
+如果项目以 JAR 方式启动，可以通过 JVM 参数指定：
+
+```bash
+java -Dfastquery.config.dir=/data/fastquery/configs -jar Start.jar
+```
+
+------
+
+### 6.2 连接池配置示例
+
+FastQuery 支持多种主流连接池（如 HikariCP、c3p0、Druid），并允许**多数据源共存**。
+
+------
+
+#### 1）c3p0 配置示例
+
+FastQuery 完全兼容 c3p0 官方配置：
+
+命名：c3p0.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<c3p0-config>  
+    <named-config name="xk-c3p0">  
+        <property name="driverClass">com.mysql.cj.jdbc.Driver</property>  
+        <property name="jdbcUrl">jdbc:mysql://localhost:3306/xk</property>  
+        <property name="user">xk</property>  
+        <property name="password">abc123</property>  
+        <property name="initialPoolSize">100</property>  
+        <property name="minPoolSize">50</property>  
+        <property name="maxPoolSize">1000</property>
+    </named-config>
+
+    <!-- 可配置多个数据源 -->
+    <named-config name="name-x"> ... </named-config>
+</c3p0-config>
+```
+
+------
+
+#### 2）Druid 配置示例
+
+命名：druid.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+	 <bean name="xkdb1" class="com.alibaba.druid.pool.DruidDataSource" 
+           init-method="init" destroy-method="close"> 
+	     <property name="url" value="jdbc:mysql://localhost:3306/xk" />
+	     <property name="username" value="xk" />
+	     <property name="password" value="abc123" />
+	     <property name="maxActive" value="20" />
+	 </bean>
+</beans>
+```
+
+------
+
+👉 支持多个连接池同时存在（例如：HikariCP + Druid）。
+
+------
+
+### 6.3 fastquery.json 配置说明
+
+```json
+{
+  "scope":[
+    {
+      "config": "hikari",
+      "dataSourceName": "xkdb",
+      "basePackages": [
+        "org.fastquery.example",
+        "org.fastquery.dao.UserInfoDBService"
+      ]
+    },
+    {
+      "config": "mySQLDriver",
+      "dataSourceName": "world-mysql",
+      "basePackages": ["org.fastquery.sqlserver.dao"]
+    }
+  ],
+
+  "debug": true,
+
+  "queries": ["queries/", "tpl/"],
+
+  "slowQueryTime": 50,
+
+  "convert": [
+    {
+      "sourceType": "java.lang.Integer",
+      "targetType": "org.fastquery.bean.Option",
+      "converter": "org.fastquery.bean.IntToOptionConverter"
+    }
+  ]
+}
+```
+
+#### 配置项说明
+
+##### 1）scope（数据源作用域）
+
+定义“**哪个数据源作用于哪些接口/包**”：
+
+- `config`：连接池类型（hikari / c3p0 / druid）
+- `dataSourceName`：数据源名称（可选）
+- `basePackages`：作用范围（包或类）
+
+👉 规则：
+
+- 如果指定了 `dataSourceName` → 必须存在且正确
+- 如果未指定 → 调用时必须手动指定数据源
+
+------
+
+##### 2）debug（调试模式）
+
+- `true`：支持 SQL 模板热加载（无需重启）
+- `false`：默认关闭
+
+⚠️ **生产环境禁止开启**
+
+------
+
+##### 3）queries（SQL 模板路径）
+
+指定 `*.queries.xml` 的扫描目录：
+
+```json
+"queries": ["queries/", "tpl/"]
+```
+
+表示：
+
+```text
+classpath/queries/
+classpath/tpl/
+```
+
+------
+
+##### 4）slowQueryTime（慢查询阈值）
+
+- 单位：毫秒
+- 超过该时间将记录警告日志
+
+------
+
+##### 5）convert（类型转换器）
+
+用于自定义结果映射：
+
+```json
+{
+  "sourceType": "java.lang.Integer",
+  "targetType": "org.fastquery.bean.Option",
+  "converter": "xxxConverter"
+}
+```
+
+------
+
+### 6.5 关键说明
+
+数据源的初始化流程如下：
+
+1. 读取 `fastquery.json`
+2. 解析 `scope`
+3. 根据 `dataSourceName` 查找对应连接池配置
+4. 创建数据源并建立映射关系
+
+## 7. Repository 与 QueryRepository
+
+FastQuery 中有两个内置基础接口需要理解：
+
+### 7.1 Repository 
+
+如果你的 DAO 仅仅需要声明式的查询或更新，不需要内置 CRUD 能力，那么继承 `Repository` 就够了。它更轻量。
+
+### 7.2 QueryRepository
+
+如果你希望直接使用框架提供的内置方法，例如：
+
+- 根据主键查询
+- 保存实体
+- 更新实体
+- 保存或更新
+- 批量更新
+- 统计记录数
+- 执行事务函数
+
+那么应继承 `QueryRepository`。它包含若干内置函数，例如 `find`、`insert`、`save`、`saveToId`、`update`、`saveOrUpdate`、`tx`、`count` 等。
+
+一个简单例子：
+
+```java
+public interface UserInfoDBService extends QueryRepository {
+}
+```
+
+这样你就可以直接调用：
+
+```java
+UserInfo u1 = new UserInfo(36, "Dick", 23);
+userInfoDBService.save(u1);
+
+UserInfo u2 = new UserInfo(36, "Dick", null);
+userInfoDBService.update(u2);
+```
+
+当实体某些属性为 `null` 时，更新时这些字段默认不会参与 `set` 运算。
+
+## 8. `@Query`：最核心的查询入口
+
+`@Query` 是 `FastQuery` 中最基础、最重要的注解。它的职责非常纯粹：**承载 SQL**。
+
+### 设计说明
+
+在 `FastQuery` 中，没有区分 `@Select`、`@Insert`、`@Update` 等多种注解，而是统一使用 `@Query`。
+
+原因如下：
+
+- `SQL` 本身已经具备完整语义（`SELECT` / `INSERT` / `UPDATE` / `DELETE`）
+- 过多注解会增加学习成本和维护复杂度
+- 统一入口可以降低接口设计复杂度
+
+对于“写操作”（`INSERT` / `UPDATE` / `DELETE`），只需额外标注：`@Modifying` 即可。
+
+------
+
+### 对比说明
+
+例如：
+
+```java
+@Query("insert into table (name) values ('Tom')")
+```
+
+相比：
+
+```java
+@Insert("insert into...")
+```
+
+👉 FastQuery 更倾向于：
+
+- 减少注解种类
+- 保持模型简单
+- 将语义交给 SQL 本身
+
+### 8.1 基本查询
+
+```java
+@Query("select no, name, sex from student")
+JSONArray findAll();
+```
+
+### 8.2 带参数查询
+
+```java
+@Query("select no,name,sex,age,dept from student s where s.sex=:sex and s.age > ?1")
+Student[] find(Integer age, @Param("sex") String sex);
+```
+
+`Query`中的`SQL`语句支持两类参数引用方式：
+
+- `?1`、`?2`、`?N`：按方法参数位置绑定
+- `:name`：按参数名绑定，需要配合 `@Param("name")`
+
+当参数较多时，更推荐 `:name` 方式，因为它与顺序解耦，更利于维护。
+
+## 9. 返回值类型
+
+`Repository` 接口的方法支持多种返回值映射方式，用于将查询结果自动转换为目标类型。
+
+```java
 // 查询返回数组格式
 @Query("select no,name,sex,age,dept from student s where s.sex=:sex and s.age > ?1")
 Student[] find(Integer age,@Param("sex")String sex);
@@ -258,1107 +475,3478 @@ List<Map<String, Object>> findBy(String sex,@Param("age")Integer age);
 @Query("select id,name,age from `userinfo` as u where u.id>?1")
 List<UserInfo> findSome(@Param("id")Integer id);
 ```
-参数较多时不建议使用问号(?)引用参数,因为它跟方法的参数顺序有关,不便维护,可以使用冒号(:)表达式,跟顺序无关, ":name" 表示引用标记有@Param("name")的那个参数.  
-若返回`List<Map<String, String>>`或`Map<String, String>`,会把查询出的字段值(value)包装成字符串.   
 
-**注意**: 在没有查询到数据的情况下,如果返回值是集合类型或`JSON`类型或者是数组类型,返回具体的值不会是`null`,而是一个空对象(empty object)集合或空对象`JSON`或者是长度为0的数组.   
-使用空对象来代替返回`null`,它与有意义的对象一样,并且能避免`NullPointerException`,阻止`null`肆意传播,可以减少运行期错误.反对者一般都从性能的角度来考虑,认为`new`一个空对象替代`null`,会增加系统的开销.可是,&lt;&lt;Effective Java&gt;&gt;的作者**Josh Bloch**说,在这个级别上担心性能问题是不明智的,除非有分析表明,返回空对象来替代返回`null`正是造成性能问题的源头.细心的人可能已经发现JDK新版本的API都在努力避免返回`null`.  
-举例说明: 
+------
+
+### 9.1 常见返回类型
+
+#### 1）JSON 类型
+
+- `JSONArray`
+- `JSONObject`
+
+------
+
+#### 2）对象类型
+
+- 单个对象：`UserInfo`
+- 对象数组：`Student[]`
+- 集合：`List<UserInfo>`
+
+------
+
+#### 3）通用结构
+
+- `List<Map<String, Object>>`
+
+适用于不固定字段或动态查询场景。
+
+------
+
+### 9.2 单字段返回（标量查询）
+
+当 `SQL` 只查询**一个字段**时，支持以下类型：
+
+- 单值：`String`、`Integer`、`Long`、`Double` 等
+- 数组：`String[]`、`Integer[]` 等
+- 集合：`List<String>`、`List<Integer>` 等
+
+👉 所有类型均为**包装类型（Wrapper）**
+
+------
+
+### 9.3 重要规则
+
+  #### ❗ 规则 1：优先使用包装类型（Wrapper）
+
+  ```java
+int ❌
+Integer ✔
+  ```
+
+  **原因：**
+
+  - `SQL` 查询结果可能为 `NULL`
+  - `Java` 基本类型无法表示 `null`
+
+------
+
+  #### ✅ 例外：`COUNT` 查询
+
+  当 `@Query` 明确用于统计行数（如 `COUNT(*)`）时，可以使用基本类型：
+
+  ```java
+@Query("select count(*) from student")
+int count();
+  ```
+
+  **说明：**
+
+  - `COUNT` 函数在 `SQL` 中**始终返回非 NULL 值**
+  - 因此可以安全映射为基本类型（如 `int`、`long`）
+
+#### ❗ 规则 2：包装类型返回 `null` 的含义
+
+当返回值为单个对象（如 `Integer`、`String`）时：
+
+```text
+返回 null 可能表示：
+1. 查询结果为空（没有记录）
+2. 查询字段值为 NULL
+```
+
+👉 两种情况不会区分（需自行处理）
+
+------
+
+#### ❗ 规则 3：集合返回值不会为 null
 
 ```java
-// 针对该方法,如果没有查询到数据,返回值的结果是一个长度为0的Student[]
-@Query("sql statements")
-Student[] find(Integer age,String sex); 
+@Query("select name from Student limit 3")
+List<String> findNames();
+```
 
-// 针对该方法,如果没有查询到数据,返回值的结果是一个空Map(非null)
-@Query("sql statements")
-Map<String,Object> find(Integer id);
+返回结果：
 
-// 针对该方法,如果没有查询到数据,返回值的结果是一个空List<Map>(非null)
+- 有数据 → `["A", "B", "C"]`
+- 无数据 → `[]`（空集合）
+
+👉 **不会返回 null**
+
+------
+
+### 9.4 返回类型选择建议
+
+| 场景            | 推荐类型                   |
+| --------------- | -------------------------- |
+| 多行多列        | `List<实体>`               |
+| 单行            | `实体`                     |
+| 单字段多行      | `List<T>`                  |
+| 单字段单值      | `T`                        |
+| 不确定结构      | `List<Map<String,Object>>` |
+| 调试 / 快速开发 | `JSONArray`                |
+
+## 10. 空结果约定
+
+FastQuery 采用如下统一约定：**当查询结果为空时，不返回 `null`，而是返回“空对象”。**
+
+------
+
+### 10.1 行为规则
+
+当查询没有匹配数据时：
+
+| 返回类型                           | 返回结果        |
+| ---------------------------------- | --------------- |
+| `List`                             | 空集合（`[]`）  |
+| `Map`                              | 空对象（`{}`）  |
+| 数组（如 `Student[]`）             | 长度为 0 的数组 |
+| JSON（`JSONArray` / `JSONObject`） | 空 JSON 对象    |
+
+------
+
+### 10.2 示例
+
+```java
+@Query("sql statements")
+Student[] find(Integer age, String sex);
+
+@Query("sql statements")
+Map<String, Object> find(Integer id);
+
 @Query("sql statements")
 List<Map<String, Object>> find(String sex);
 ```
 
-**注意**: 查询单个字段,还支持返回如下类型:
-- `List<String>`,`String[]` 或 `String`
-- `List<Byte>`,`Byte[]` 或 `Byte`
-- `List<Short>`,`Short[]` 或 `Short`
-- `List<Integer>`,`Integer[]` 或 `Integer`
-- `List<Long>`,`Long[]` 或 `Long`
-- `List<Float>`,`Float[]` 或 `Float`
-- `List<Double>`,`Double[]` 或 `Double`
-- `List<Character>`,`Character[]` 或 `Character`
-- `List<Boolean>`,`Boolean[]` 或 `Boolean`  
+当查询不到结果时：
 
-除了改操作或count外,查单个字段不能返回基本类型,因为:基本类型不能接受`null`值,而SQL表字段可以为`null`.
-返回类型若是基本类型的包装类型,若返回null, 表示:没有查到或查到的值本身就是null.
-例如: 
+- `Student[]` → `new Student[0]`
+- `Map` → 空 `Map`
+- `List` → 空 `List`
+
+------
+
+### 10.3 设计目的
+
+这种设计可以：
+
+- 避免 `NullPointerException`
+- 减少空值判断（`if (x != null)`）
+- 提高代码稳定性与可读性
+
+------
+
+### 10.4 设计依据
+
+这一约定与 Java 社区的最佳实践一致。
+
+Joshua Bloch 在《Effective Java》中建议：
+
+> “Return empty collections or arrays, not nulls.”（返回空集合或空数组，而不是返回 null）
+
+他同时指出：
+
+> “There is no reason ever to return null from an array- or collection-valued method.”（对于返回集合或数组的方法，没有理由返回 null）
+
+------
+
+### 10.5 关于性能的说明
+
+有观点认为：返回空对象（如 `new ArrayList<>()`）会带来额外开销。
+
+但实践表明：
+
+- 这类开销通常可以忽略
+- 相比之下，避免 `NullPointerException` 带来的收益更大
+
+除非经过性能分析证明这是瓶颈，否则无需优化。
+
+## 11. 参数绑定：`?N`、`:name` 与 `$name`
+
+FastQuery 支持三种参数处理方式：
+
+| 类型       | 语法                | 机制                   | 是否防 SQL 注入 |
+| ---------- | ------------------- | ---------------------- | --------------- |
+| 位置参数   | `?N`                | 预编译参数绑定         | ✅               |
+| 命名参数   | `:name`             | 预编译参数绑定         | ✅               |
+| 模板表达式 | `$name` / `${name}` | SQL 生成阶段字符串替换 | ❌（需自行控制） |
+
+### 11.1 `?N`（位置参数）
+
+`?1` 表示方法第一个参数，`?2` 表示第二个参数，以此类推。
 
 ```java
-// 查询单个字段,若没有查到,就返回空List<String>(非null)
-@Query("select name from Student limit 3")
-List<String> findNames(); 
+@Query("select * from UserInfo where name in (?1) and id > ?2")
+List<UserInfo> findByNameListIn(List<String> names, Integer id);
 ```
 
-## 类属性名称与表字段不一致时,如何映射?  
+👉 特点：
 
-为了说明这个问题先准备一个实体  
+- 简单直接
+- 参数较多时可读性较差
+
+------
+
+### 11.2 `:name`（命名参数）
+
+命名参数需配合 `@Param` 使用。其中：`:name` 对应方法参数中：`@Param("name")` 所绑定的实际值。
+
+基本示例：
 
 ```java
-public class UserInformation {
-	private Integer uid;
-	private String myname;
-	private Integer myage;
-	// getters / setters
-	// ... ...
+@Query("select name,age from UserInfo u where u.name = :name or u.age = :age")
+UserInfo[] findUserInfoByNameOrAge(
+        @Param("name") String name,
+        @Param("age") Integer age);
+```
+
+说明：
+
+- `:name` → 绑定参数 `name`
+- `:age` → 绑定参数 `age`
+
+机制说明：
+
+命名参数在解析阶段会被转换为 JDBC 占位符：`:name` 转换为：`?`，最终通过 `PreparedStatement` 完成安全绑定。即：SQL 结构与参数值分离，避免字符串拼接式注入风险。
+
+优点：
+
+- 与参数顺序解耦
+- SQL 可读性更强
+- 参数含义明确
+- 更适合多参数、复杂查询场景
+
+**冒号转义规则**：
+
+在 `@Query` 中，冒号 `:` 并不一定表示命名参数，有时它只是普通字符。例如，你希望 SQL 中保留字面量：":name"，而不是把它识别成参数表达式。此时可使用：`::name` 表示转义后的字面字符串。
+
+示例：
+
+```java
+@Query("... where name like '%::name%'")
+```
+
+实际含义为：
+
+```sql
+where u.name like '%:name%'
+```
+
+即：
+
+- `::name` → 字面文本 `:name`
+- 不参与参数绑定
+- 不会被替换为 `?`
+
+------
+
+### 11.3 `$name` / `${name}`（模板表达式）
+
+`$` 表达式属于 **template expression（模板表达式）**，其行为是：**在 SQL 生成阶段进行字符串替换，而不是参数绑定**。
+
+```java
+@Query("select * from userinfo where ${one} $orderby")
+UserInfo findUserInfo(@Param("orderby") String orderby,
+                      @Param("one") int i);
+```
+
+若 `orderby = "order by age desc"`，`i = 1`，最终生成 SQL：
+
+```sql
+select * from userinfo where 1 order by age desc
+```
+
+若 `orderby = null`，`i = 1`，最终生成 SQL：
+
+```sql
+select * from userinfo where 1
+```
+
+#### ⚠️ 安全约束
+
+由于 `$` 表达式是**直接拼接 SQL**，因此：
+
+- 传递 `null` 值，模板变量默认取空字符串`""`
+- 不经过预编译
+- 不进行参数转义
+- 存在 SQL 注入风险
+
+#### 使用规范
+
+- **仅用于 SQL 结构片段**（如 `ORDER BY`、列名、表名等）
+- **禁止拼接用户输入**
+- 推荐采用**白名单控制**
+
+对于必须使用 `$` 表达式的场景，可通过：`@Safe`标识参数，由框架执行严格校验，以降低风险。
+
+------
+
+#### `$` 表达式的边界规则
+
+`$` 表达式支持两种形式：`$name` 或 `${name}`
+
+##### 1）可省略 `{}` 的场景
+
+当变量与后续内容之间存在**明确分隔符**（如空格、关键字、符号）时：
+
+```sql
+where $name and age > 18 $orderby
+```
+
+👉 解析结果：
+
+- `$name` → 变量 `name`
+- `$orderby` → 变量 `orderby`
+
+##### 2）必须使用 `{}` 的场景
+
+当变量与后续字符**无分隔（连续拼接）**时：
+
+```sql
+${field}where   ✔
+$fieldwhere     ❌
+```
+
+👉 否则会被解析为变量：`fieldwhere`
+
+##### 3）解析规则
+
+`$` 表达式采用：**最长匹配原则（longest match）进行变量解析**
+
+具体表现为：
+
+- 连续字符会被尽可能解析为变量名
+- 不存在分隔符时，会发生“吞并”
+
+##### 4）推荐实践
+
+| 场景     | 建议           |
+| -------- | -------------- |
+| 简单拼接 | `$name`        |
+| 紧邻文本 | `${name}`      |
+| 动态 SQL | 优先使用 `${}` |
+
+## 12. 实体字段与表字段的映射
+
+FastQuery **不要求实体属性名与数据库字段名保持一致**。字段映射关系由 SQL 决定，同时也支持通过注解进行配置。
+
+### 12.1 默认映射规则
+
+在未使用注解或 SQL 别名时，FastQuery 采用默认约定：
+
+- 实体类名 → 数据库表名
+- 实体属性名 → 数据库字段名
+
+👉 即：**同名自动映射**
+
+------
+
+### 12.2 使用 `@Table` 自定义表映射
+
+当实体类名与数据库表名不一致时，可以通过 `@Table` 指定表名：
+
+```java
+@Table("user_info")
+public class UserInfo {
 }
 ```
 
-而数据库中的表字段分别是id,name,age,通过`SQL`别名的方式,可以解决类属性名称与表字段不一致的映射问题.如下:  
+### 12.3 使用 SQL 别名进行字段映射
+
+当字段名不一致时，可以通过 SQL `AS` 别名显式指定映射关系：
 
 ```java
-// 把查询到的结果映射给UserInformation
-@Query("select id as uid,name as myname,age as myage from UserInfo u where u.id = ?1")
+public class UserInformation {
+    private Integer uid;
+    private String myname;
+    private Integer myage;
+}
+
+@Query("select id as uid, name as myname, age as myage from user_info where id = ?1")
 UserInformation findUserInfoById(Integer id);
 ```
 
-## 动态条件查询
+### 12.4 多表查询场景说明
 
-### 采用`Annotation`实现简单动态条件  
-看到这里,可别认为`SQL`只能写在Annotation(注解)里.`FastQuery`还提供了另一种方案: 采用`@QueryByNamed`(命名式查询),将`SQL`写入到模板文件中,并允许在模板文件里做复杂的逻辑判断,相当灵活.下面章节有详细描述. 
+在单表场景下，实体字段与数据库字段保持一致确实有助于简化映射。但在实际业务中，多表关联查询非常常见。例如：
+
+```sql
+select a.name, b.name from A a join B b on a.id = b.a_id
+```
+
+此时：
+
+- 表 A 中存在字段 `name`
+- 表 B 中同样存在字段 `name`
+
+👉 查询结果中会出现**字段名冲突**，无法直接映射到同一个实体属性。
+
+因此，必须通过 SQL 别名进行区分：
+
+```sql
+select a.name as aName, b.name as bName from A a join B b on a.id = b.a_id
+```
+
+再映射到实体：
+
+```java
+public class ABView {
+    private String aName;
+    private String bName;
+}
+```
+
+👉 这也是 FastQuery 不强制字段名一致的重要原因：**在多表查询场景下，字段映射必须由 SQL 显式控制，而无法依赖默认命名规则。**
+
+### 12.5 映射优先级
+
+当多种映射方式同时存在时，优先级如下：
+
+```text
+SQL 别名（最高）
+↓
+@Table（表级映射）
+↓
+默认映射（同名规则）
+```
+
+### 12.6 命名解耦原则
+
+FastQuery 采用“**SQL 映射驱动**”的设计：
+
+- 数据库字段名 **无需** 与实体属性名一致
+- 数据库表名 **无需** 与实体类名一致
+
+👉 映射关系最终由 SQL（或显式配置）控制。
+
+### 12.7 设计优势
+
+这种设计带来的好处：
+
+- **降低耦合**：数据库结构变化不强制修改实体
+- **提高灵活性**：支持复杂查询与多表结果映射
+- **避免冲突**：多表查询时可通过别名解决字段重名问题
+
+## 13. 动态条件查询：`@Condition`
+
+`@Condition` 是 FastQuery 中用于构建动态查询条件的核心机制。可以理解为：**在注解层面声明式构建动态 WHERE 条件**。
+
+
+### 13.1 基本用法
 
 ```java
 @Query("select no, name, sex from Student #{#where} order by age desc")
-// 增加若干个条件
-@Condition("no like ?1")                            // ?1的值,如果是null, 该行条件将不参与运算
-@Condition("and name like ?2")                      // 参数 ?2,如果接收到的值为null,该条件不参与运算
-// 通过 ignoreNull=false 开启条件值即使是null也参与运算
-@Condition(value = "and age > ?3",ignoreNull=false) // ?3接收到的值若为null,该条件将保留
-@Condition("and name not like ?4") 
+@Condition("no like ?1")
+@Condition("and name like ?2")
+@Condition(value = "and age > ?3", ignoreNull = false)
+@Condition("and name not like ?4")
 @Condition("or age between ?5 and ?6")
 Student[] findAllStudent(... args ...);
 ```
 
-**注意**:  
-- 如果参数是`String`类型,值若为`null`或""(空字符串),在默认情况下,都会使条件移除
-- `ignoreNull=false` : 参数值即便为null,条件也参与
-- `ignoreEmpty=false` : 参数值即使为"",条件也保留
+执行模型
 
-`@Condition(value="name = ?1",ignoreNull=false)`表示`?1`接受到的值若是`null`,该条件也参与运算,最终会翻译成`name is null`.`SQL`中的`null`无法跟比较运算符(如`=`,`<`,或者`<>`)一起运算,但允许跟`is null`,`is not null`,`<=>`操作符一起运算,故,将`name = null`想表达的意思,解释成`name is null`.  
-`@Condition(value="name != ?1",ignoreNull=false)` 若`?1`的值为`null`,最终会解释成`name is not null`. 
+- `#{#where}`：动态 WHERE 占位符
+- 每个 `@Condition`：定义一个**条件单元（condition fragment）**
+- 框架根据参数值判断是否拼接该条件单元
 
-在`In`查询作为一个条件单元时,请忽略null判断,如`@Condition("or dept in(?4,?5,?6)"`其中的一个参数为`null`就将条件移除显然不太合理.
+👉 最终 SQL = 基础 SQL + 动态拼接的条件单元
 
-### 通过JAVA脚本控制条件增减
-`@Condition`中的`ignoreScript`属性可以绑定一个JAVA脚本(不是JS),根据脚本运行后的布尔结果,来决定是否保留条件项.脚本运行后的结果如果是`true`,那么就删除该条件项,反之,保留条件项,默认脚本是`false`,表示保留该条件项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
-举例:
+
+### 13.2 条件参与规则
+
+默认情况下，`@Condition` 是否参与拼接，取决于其**所有相关参数**：
+
+| 参数情况                    | 行为           |
+| --------------------------- | -------------- |
+| 任一参数为 `null`           | 移除该条件单元 |
+| 任一参数为 `""`（空字符串） | 移除该条件单元 |
+
+#### 多参数条件说明
+
+当一个条件单元包含多个参数时（如 `between`）：
 
 ```java
-@Query("select id,name,age from `userinfo` #{#where}")
+@Condition("or age between ?5 and ?6")
+```
+
+👉 规则：
+
+- 只要任一参数为 `null` 或 `""`
+- 整个 `@Condition` 将被移除
+
+#### 控制选项
+
+```java
+@Condition(value = "...", ignoreNull = false)
+@Condition(value = "...", ignoreEmpty = false)
+```
+
+- `ignoreNull = false` → `null` 参数仍参与条件
+- `ignoreEmpty = false` → 空字符串仍参与条件
+
+👉 默认值：
+
+```java
+ignoreNull = true
+ignoreEmpty = true
+```
+
+### 13.3 `$` 模板表达式的特殊规则
+
+当 `@Condition` 中使用 `$` 表达式（`$name` / `${name}`）时，条件参与规则发生变化：**`$` 表达式不参与参数判空逻辑，不受 `ignoreNull` 和 `ignoreEmpty` 控制**。
+
+#### 行为说明
+
+- `$` 表达式属于**模板替换（template substitution）**
+- 不属于参数绑定（不会转为 `?`）
+- 即使参数为 `null` 或 `""`，条件仍然保留
+
+#### 示例
+
+```java
+@Query("select * from userinfo #{#where}")
+@Condition("age between $age1 and ${age2}")
+List<Map<String, Object>> between(@Param("age1") Integer age1,
+                                  @Param("age2") Integer age2);
+```
+
+当：
+
+```java
+age1 = null
+age2 = 30
+```
+
+生成 SQL（示意）：
+
+```sql
+age between  and 30
+```
+
+#### 设计说明
+
+这是因为：
+
+- `$` 表达式仅进行**字符串替换**
+- `null` 默认会被替换为 `""`（空字符串）
+- 框架不会基于 `$` 表达式的值判断条件是否移除
+
+#### 结论
+
+`?N` / `:name` → 影响条件是否参与，`$表达式` → 只影响 SQL 内容，不影响条件存在。
+
+### 13.4 `null` 语义转换
+
+当 `ignoreNull = false` 时，`null` 参数不会导致条件移除，而会参与 SQL 生成。此时框架会进行语义转换：
+
+#### 等值判断
+
+```java
+@Condition(value = "name = ?1", ignoreNull = false)
+```
+
+当参数为 `null`：
+
+```sql
+name is null
+```
+
+#### 不等判断
+
+```java
+@Condition(value = "name != ?1", ignoreNull = false)
+```
+
+当参数为 `null`：
+
+```sql
+name is not null
+```
+
+#### 设计说明
+
+这是因为：
+
+- SQL 中 `NULL` 不能参与 `=`、`!=` 等比较运算
+- 必须使用 `IS NULL` / `IS NOT NULL`
+
+👉 框架会自动完成该语义转换
+
+
+### 13.5 补充说明
+
+`@Condition` 适用于中等复杂度的动态条件拼接。
+
+对于更复杂的场景（如嵌套条件、分支逻辑、条件复用等），建议使用 `@QueryByNamed`。通过将 SQL 定义在模板文件中，可以在其中进行更灵活的逻辑控制，从而实现更高复杂度的动态查询能力。
+
+## 14. `@Condition` 的高级控制
+
+在基础的“参数为空则移除条件”之上，FastQuery 提供了更灵活的条件控制机制：
+
+- 基于脚本的控制（`ignoreScript`）
+- 条件分支控制（`if$ / else$`）
+- 自定义判定逻辑（`Judge`）
+
+👉 本质：**将“条件是否参与拼接”的决策逻辑外部化**
+
+
+### 14.1 `ignoreScript`（脚本控制）
+
+通过 `ignoreScript` 属性，可以使用一段 Java 表达式决定条件是否被移除。
+
+```java
+@Query("select id,name,age from userinfo #{#where}")
 @Condition("age > :age")
-@Condition(value="and name like :name",ignoreScript=":age > 18 && :name!=null && :name.contains(\"Rex\")")
-Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable pageable);
+@Condition(value="and name like :name",
+           ignoreScript=":age > 18 && :name != null && :name.contains(\"Rex\")")
+Page<UserInfo> find(@Param("age") int age,
+                    @Param("name") String name,
+                    Pageable pageable);
 ```
-其中, `:age`引用的是`@Param("age")int age`的实参值.`:name`是`@Param("name")String name`的实参值.这个脚本要表达的意思不言而喻. 不过脚本的解析能力还不能自动**拆箱**(unboxing),需要调用拆箱方法,在这里age变量如果是`Integer`类型,要想如上脚本能正确编译,必须这么做: `":age.intValue() > 18 && :name!=null && :name.contains(\"Rex\")"`, 请留意住`:age.intValue()`. 其他包装类型`Short`, `Long`, `Byte`, `Boolean`, `Character`, `Float`, `Double` 以此类推.  
 
-### 什么是JAVA脚本?
-在这里将一段承载着程序的字符串称之为JAVA脚本.脚本在初始化阶段被解释成能在`JVM`里运行的字节码,在脚本里能通过`:expression`(冒号表达式)获取当前方法在运行时所接受到的所有参数,引用的参数可以是一个复杂对象,完全可以把`:expression`当成是对象的引用句柄.虽然允许把脚本写得很长,更支持写出较为复杂的逻辑,但是,不建议这么做,因为那样可读性极差,不便迭代维护.做再庞杂的程序,都应该拆分成若干小而简单的功能,然后以优良的设计将其串联起来.`FastQuery`自始自终会遵守简单,严谨,清晰的编程风格.
 
-### @Condition 中的 if...else
-条件是否保留可以通过`if`条件来确定,`if`绑定的JAVA脚本运行后的结果若为`true`就保留该`Condition`,反之就取`else`的捆绑值,`else`如果没有值或者是空值,表示移除该`Condition`.  
-举例:
+#### 行为规则
+
+- 脚本返回 `true` → **移除条件**
+- 脚本返回 `false` → **保留条件**
+
+
+#### 执行机制
+
+- 脚本在**初始化阶段编译为字节码**
+- 运行时直接执行，不引入额外解析开销
+
+
+#### 参数引用
+
+脚本中通过 `:name` 形式引用方法参数：
+
+```text
+:age  → @Param("age")
+:name → @Param("name")
+```
+
+
+#### 注意事项
+
+- 表达式必须返回 `boolean`，否则启动失败
+- 脚本内不支持自动拆箱（unboxing），需显式调用：
+
+```text
+:age.intValue() > 18
+```
+
+
+#### 使用建议
+
+- 适用于简单逻辑判断
+- 不建议编写过长或复杂脚本（影响可读性和维护性）
+
+
+### 14.2 `if$` / `else$`（条件分支）
+
+用于在同一个条件位置，根据不同情况选择不同 SQL 片段。
 
 ```java
-@Query("select id,name,age from `userinfo` #{#where}")
-@Condition(value="age > :age",if$=":age < 18", else$="name = :name")
-Page<UserInfo> findPage(@Param("age")int age,@Param("name")String name,Pageable pageable);
+@Query("select id,name,age from userinfo #{#where}")
+@Condition(value="age > :age",
+           if$=":age < 18",
+           else$="name = :name")
+Page<UserInfo> findPage(@Param("age") int age,
+                        @Param("name") String name,
+                        Pageable pageable);
 ```
-如果`age`的实参值小于18,则,保留该`Condition`,否则,该`Condition`的值变为`name = :name`.当然,`else`不是必须的,如果`if`运算为假,直接删除该行`SQL`条件.
 
-### 自定义类控制条件增减
-决定一个条件是否参与运算,有时候需要根据多个不同的参数进行某种计算来决定, 并且这种计算逻辑用JAVA脚本(非JS)难以表达或者不太乐意让JAVA脚本登场. 那么就使用`@Condition`中的`ignore`选项,指定一个类,它叫`Judge`,是一个裁判员,条件是否去除的决定权可以理所当然地委托给自定义的`Judge`类来处理.   
-举例: 若:年龄大于18及姓名不为空且包含"Rex".则,剔除条件`and name like :name`.  
-定制一个决定条件存活的类,需要遵循一些约定: 继承`org.fastquery.where.Judge`,当完成这一步,IDE就会提示开发者必须实现ignore方法, 否则,面对的是红叉. 这样的设计可以减少犯错的可能. 当`ignore`方法最终返回`true`时,则,删除相对应的条件;当最后返回`false`时,则,保留条件.
+
+#### 行为规则
+
+- `if$ = true` → 使用原始条件（`value`）
+- `if$ = false` → 使用 `else$` 中的 SQL
+- 若未提供 `else$` → 移除该条件
+
+
+#### 示例说明
+
+```text
+age < 18  → 使用：age > :age
+age ≥ 18  → 使用：name = :name
+```
+
+
+### 14.3 自定义 `Judge`（复杂逻辑控制）
+
+当条件逻辑较复杂，不适合使用脚本表达时，可以通过自定义类进行控制。
+
+
+#### 定义方式
+
+继承 `org.fastquery.where.Judge` 并实现 `ignore()` 方法：
 
 ```java
 public class LikeNameJudge extends Judge {
-	@Override
-	public boolean ignore() {
-		// 获取方法中名称为"age"的参数值
-		int age = this.getParameter("age", int.class);
-		// 获取方法中名称为"name"的参数值
-		String name = this.getParameter("name", String.class);
-		return age > 18 && name!=null && name.contains("Rex");
-	}
+    @Override
+    public boolean ignore() {
+        int age = this.getParameter("age", int.class);
+        String name = this.getParameter("name", String.class);
+        return age > 18 && name != null && name.contains("Rex");
+    }
 }
 ```
-在`LikeNameJudge`的`this`范围内可以获得当前DB方法的所有实参.这些参数都有资格决定条件的存亡.   
-指定 `LikeNameJudge`:
+
+
+#### 使用方式
 
 ```java
-@Query("select id,name,age from `userinfo` #{#where}")
-@Condition("age > :age")
-@Condition(value="and name like :name",ignore=LikeNameJudge.class)
-Page<UserInfo> find(@Param("age")int age,@Param("name")String name,Pageable pageable);
+@Condition(value="and name like :name", ignore=LikeNameJudge.class)
 ```
 
-其中,`ignore`选项默认指定`DefaultJudge`,它是一个无所事事的裁判员,当它是空气好了.
 
-若`@Condition`的值使用了`${表达式}`,`$表达式`,不管方法的参数传递了什么都不会使条件移除,因为`$`表达式(或称之为EL表达式)仅作为简单模版使用,传null,默认会替换为""(空字符串).举例:
+#### 行为规则
+
+- `ignore()` 返回 `true` → 移除条件
+- 返回 `false` → 保留条件
+
+
+#### 参数获取
+
+在 `Judge` 内部可获取所有方法参数：
 
 ```java
-@Query("select * from `userinfo` #{#where}")
-@Condition("age between $age1 and ${age2}")
-List<Map<String, Object>> between(@Param("age1") Integer age1,@Param("age2") Integer age2);	
+this.getParameter("name", String.class);
 ```
-该例中`@Condition`使用到了`$`表达式,`$age1`,`${age2}`仅作为模板替换,age1为null,即便设置`ignoreNull=true`也不会影响条件的增减.**总之,`$` 表达式不会动摇条件的存在**.  
-
-单个`@Condition`针对出现多个`SQL`参数的情形,如 `@Condition("or age between ?5 and ?6")` 或 `@Condition("or age between :age1 and :age2")` 参数 `?5`、`?6`、`:age1`、 `:age2`中的任意一个为`null`都会导致该行条件移除.
-
-## 类型映射
-
-不是强类型映射，只要 Java 类型的存储空间 `>=` `SQL`类型的存储空间。换言之，只要 Java 类型装得下就行，反之，不行。
-
-| Java      | SQL                               |
-| --------- | --------------------------------- |
-| Boolean   | `BIT(1)`, `TINYINT(1)`, `CHAR(1)` |
-| Byte      | TINYINT                           |
-| Short     | SMALLINT                          |
-| Integer   | INT                               |
-| Long      | BIGINT                            |
-| Float     | FLOAT                             |
-| Double    | DOUBLE                            |
-| Character | CHAR(1)                           |
-| Enum      | ENUM                              |
-| EnumSet   | SET                               |
-| String    | 所有类型                          |
 
 
-## count
+#### 默认实现
 
-统计查询行数
+- 默认使用 `DefaultJudge`
+- 默认行为：始终保留条件（不做处理）
+
+
+### 14.4 使用建议
+
+| 场景         | 推荐方式       |
+| ------------ | -------------- |
+| 简单条件控制 | `ignoreScript` |
+| 分支逻辑     | `if$ / else$`  |
+| 复杂业务判断 | 自定义 `Judge` |
+
+## 15. SQL `IN` 查询
+
+在 `IN` 查询中使用集合、数组或可变参数，并自动展开为 SQL 列表。
+
+### 15.1 使用 `?N`（位置参数）
+
+```java
+@Query("select * from UserInfo where name in (?1)")
+List<UserInfo> findByNameIn(String... names);
+
+@Query("select * from UserInfo where name in (?1) and id > ?2")
+List<UserInfo> findByNameListIn(List<String> names, Integer id);
+```
+
+#### 参数规则
+
+- 支持类型：
+  - 数组（如 `String[]`）
+  - 集合（如 `List` / `Set`）
+  - 可变参数（`varargs`）
+
+👉 框架会自动展开为：
+
+```sql
+name in (?, ?, ?)
+```
+
+#### 空集合处理
+
+当参数为：空集合 / 空数组
+
+👉 框架会将其转换为：
+
+```sql
+name in (null)
+```
+
+#### SQL 语义说明
+
+在 SQL 中，`NULL` 参与 `IN / NOT IN` 运算具有特殊语义：
+
+```sql
+id in (null)          -- 永远为 UNKNOWN，因此条件不会成立，查询结果为空。换言之，无论 id 是否为 NULL，都不会匹配到任何记录。
+id in (1, 2, null)    -- null 不参与匹配，不影响已有值（1、2）的查询结果，但不会匹配 id IS NULL 的行
+id not in (1,2,null)  -- 表达式结果始终为 UNKNOWN，因此不会返回任何记录
+```
+
+#### 结论
+
+- `IN` 中包含 `NULL`：
+  - 不影响已有匹配值（如 `1,2`）
+- `NOT IN` 中包含 `NULL`：
+  - 会导致整个条件失效（返回空结果）
+
+### 15.2 使用 `:name`（命名参数）
+
+```java
+@Query("select * from student where sex = :sex and age > :age and name in (:names)")
+List<Student> findByIn(@Param("sex") String sex,
+                       @Param("age") Integer age,
+                       @Param("names") Set<String> names);
+```
+
+行为说明
+
+- 命名参数与 `?N` 规则一致
+- 集合参数会自动展开为多个占位符
+
+### 15.3 使用建议
+
+为避免 SQL 语义陷阱，建议：
+
+- **避免传入空集合**
+- 在业务层提前判断：
+
+```java
+if (names.isEmpty()) {
+    return Collections.emptyList();
+}
+```
+
+- 避免在 `NOT IN` 中使用可能包含 `null` 的集合
+
+## 16. `@Modifying`：改操作
+
+当 SQL 为 **插入（INSERT）**、**更新（UPDATE）** 或 **删除（DELETE）** 时，需要配合 `@Modifying` 使用。
+
+👉 **默认开启事务（自动事务管理）**
+
+### 16.1 返回值类型
+
+`@Modifying` 支持多种返回方式，用于表达不同的业务语义。
+
+#### 1）返回影响行数（推荐）
+
+```java
+@Query("update student s set s.age=?3, s.name=?2 where s.no=?1")
+@Modifying
+int update(String no, String name, int age);
+```
+
+**说明：**
+
+- 返回值表示受影响的行数
+- 返回 `0` 不代表失败，仅表示未命中任何数据
+
+#### 2）返回布尔值
+
+```java
+@Modifying
+@Query("delete from userinfo where id=?1")
+boolean deleteUserinfoById(int id);
+```
+
+**说明：**
+
+- 内部基于影响行数判断
+- 影响行数 ≥ 0 → 返回 `true`
+
+⚠️ 注意：
+
+> 返回 `true` 并不意味着一定修改了数据，仅表示 SQL 执行成功
+
+### 16.2 插入或修改后返回结果
+
+支持在插入或修改操作后回查并返回数据（Post-Insert Fetch）。
+
+```java
+@Modifying(id="id", table="userinfo")
+@Query("insert into #{#table} (name, age) values (?1, ?2)")
+UserInfo saveUserInfo(String name, Integer age);
+```
+
+### 16.3 `@Modifying` 参数说明
+
+| 参数           | 说明                 |
+| -------------- | -------------------- |
+| `table`        | 指定表名（用于回查） |
+| `id`           | 主键字段             |
+| `selectFields` | 回查字段列表         |
+
+**`selectFields` 示例**
+
+```java
+@Modifying(id="id", table="userinfo", selectFields="name,age")
+@Query("insert into #{#table} (name, age) values (?1, ?2)")
+UserInfo addUserInfo(String name, Integer age);
+```
+
+默认行为：`selectFields = "*"`
+
+👉 默认查询所有字段
+
+### 16.4 主键说明
+
+当满足以下条件时：
+
+- 主键不是自增字段
+- 主键值由外部传入
+- 且操作后需要进行回查
+
+👉 必须使用 `@Id` 标识主键参数：
+
+```java
+Student addStudent(@Id String no, ...);
+```
+
+**说明：**
+
+- `@Id` 用于标识主键来源
+- 框架将基于该值构造回查条件
+
+👉 若未指定，框架将无法确定回查依据
+
+## 17. `@Set`：动态更新字段
+
+`@Set` 是 `@Condition` 在更新语句中的对应机制，用于**动态构建 `SET` 子句**。
+
+> 可以理解为：**根据参数情况，声明式控制哪些字段参与更新**
+
+### 17.1 基本用法
+
+```java
+@Modifying
+@Query("update Course #{#sets} where no = ?5")
+@Set("name = ?1")
+@Set("credit = ?2")
+@Set("semester = ?3")
+@Set("period = ?4")
+int updateCourse(String name, Integer credit, Integer semester, Integer period, String no);
+```
+
+执行模型：
+
+- `#{#sets}`：动态 `SET` 占位符
+- 每个 `@Set`：定义一个**设置单元（set fragment）**
+- 框架根据参数决定是否拼接该设置单元
+
+👉 最终 SQL：
+
+```text
+update ... set 动态拼接的字段列表 where ...
+```
+
+------
+
+### 17.2 默认参与规则
+
+默认情况下，`@Set` 是否参与拼接，取决于其参数值：
+
+| 参数情况          | 行为           |
+| ----------------- | -------------- |
+| 任一参数为 `null` | 移除该设置单元 |
+| 任一参数为 `""`   | 移除该设置单元 |
+
+#### 多参数说明
+
+当一个 `@Set` 包含多个参数时：
+
+```java
+@Set("name = ?1, credit = ?2")
+```
+
+👉 规则：
+
+- 任一参数为 `null` 或 `""`
+- 整个设置单元将被移除
+
+#### 控制选项
+
+```java
+@Set(value="...", ignoreNull=false, ignoreEmpty=false)
+```
+
+- `ignoreNull = false` → `null` 参数仍参与更新
+- `ignoreEmpty = false` → 空字符串仍参与更新
+
+👉 默认值：
+
+```text
+ignoreNull = true  
+ignoreEmpty = true
+```
+
+### 17.3 空 `SET` 风险
+
+当所有 `@Set` 被移除时，可能生成非法 SQL：
+
+```sql
+update Course set where no = ?
+```
+
+解决方案
+
+**方式一：添加保底设置（推荐）**
+
+```java
+@Set("name = name")
+```
+
+👉 永不移除，且不会影响数据
+
+**方式二：调用前进行参数校验**
+
+确保至少有一个字段参与更新
+
+### 17.4 高级控制能力
+
+与 `@Condition` 保持一致，`@Set` 支持以下控制方式：
+
+- `ignoreScript`
+- `if$ / else$`
+- 自定义 `Judge`
+
+#### 1）`ignoreScript`（脚本控制）
+
+```java
+@Set(value="name = :name",
+     ignoreScript=":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2")
+```
+
+规则：
+
+- 返回 `true` → 移除该设置单元
+- 返回 `false` → 保留
+
+注意事项：
+
+- 表达式必须返回 `boolean`
+- 不支持自动拆箱：
+
+```text
+:credit.intValue() > 2
+```
+
+执行机制：
+
+- 脚本在**初始化阶段编译**
+- 运行期无额外解析开销
+
+#### 2）`if$ / else$`（条件分支）
+
+```java
+@Set(value="name = :name", if$="!:name.contains(\"root\")", else$="name = name")
+```
+
+规则：
+
+- `if$ = true` → 使用原始设置
+- `if$ = false` → 使用 `else$`，若未提供 `else$` → 移除该设置单元
+
+#### 3）自定义 `Judge`（复杂逻辑）
+
+```java
+public class NameJudge extends Judge {
+    @Override
+    public boolean ignore() {
+        String name = this.getParameter("name", String.class);
+        Integer credit = this.getParameter("credit", Integer.class);
+        return name.startsWith("计算") && credit != null && credit > 2;
+    }
+}
+```
+
+使用：
+
+```java
+@Set(value="name = :name", ignore=NameJudge.class)
+```
+
+规则：
+
+- `ignore()` 返回 `true` → 移除
+- 返回 `false` → 保留
+
+### 17.5 组合生效规则
+
+一个 `@Set` 被移除的条件包括：
+
+- 参数为 `null`
+- 参数为空字符串
+- `ignoreScript` 返回 `true`
+- `if$` 判断失败且未提供 `else$`
+- 自定义 `Judge` 返回 `true`
+
+👉 满足任一条件，该设置单元都会被移除
+
+### 17.6 其他实现方式
+
+动态更新字段还可以通过以下方式实现：
+
+#### 1）实体更新
+
+```java
+int executeUpdate(E entity)
+```
+
+👉 值为 `null` 的字段不会参与更新
+
+#### 2）SQL 模板
+
+使用 `@QueryByNamed` 实现更复杂逻辑
+
+#### 3）模板表达式
+
+使用 `$` 表达式实现动态 SQL（需自行控制安全性）
+
+### 17.7 统一模型说明
+
+FastQuery 提供统一的动态 SQL 构建模型：
+
+```text
+WHERE → @Condition  
+SET   → @Set
+```
+
+## 18. Predicate：单表条件构建器
+
+### 18.1 什么是 Predicate？
+
+`Predicate` 是 FastQuery 提供的**条件构建器（Condition Builder）**，用于：
+
+- 构建 SQL 的 `WHERE` 条件
+- 支持 `AND / OR` 组合
+- 支持动态条件（参数为空自动忽略）
+- 支持函数式表达（避免字符串拼接 SQL）
+
+👉 核心定位：
+
+> 面向**单表查询**，基于**实体 + 函数式表达式**构建查询条件
+
+### 18.2 核心设计思想
+
+#### 18.2.1 不再手写 SQL 字符串
+
+传统方式：
+
+```java
+"where age > 18 and name like ?"
+```
+
+Predicate：
+
+```java
+user.and(User::age, GT, 18)
+    .and(User::name, LIKE, "Tom%");
+```
+
+👉 SQL 由框架自动生成
+
+#### 18.2.2 列名使用 Chip（避免字符串）
+
+```java
+public static Chip<Integer, User> age() {
+    return new Chip<>("age");
+}
+```
+
+调用：
+
+```java
+user.and(User::age, GT, 18);
+```
+
+👉 优势：
+
+- 编译期安全（避免拼错字段名）
+- 重构安全（字段改名自动同步）
+
+#### 18.2.3 条件链式累加
+
+```java
+user.and(...).or(...).and(...);
+```
+
+👉 生成：
+
+```sql
+where ... and ... or ... and ...
+```
+
+### 18.3 快速开始
+
+#### 第1步 定义实体（必须继承 Predicate）
+
+```java
+public class User extends Predicate<User> {
+
+    private Long id;
+    private String name;
+    private Integer age;
+
+    public static Chip<Long,User> id() {
+        return new Chip<>("id");
+    }
+
+    public static Chip<String,User> name() {
+        return new Chip<>("name");
+    }
+
+    public static Chip<Integer,User> age() {
+        return new Chip<>("age");
+    }
+}
+```
+
+每个字段都要提供一个 `Chip` 方法
+
+#### 第2步 定义 Repository
+
+```java
+public interface UserDBService extends QueryRepository {
+}
+```
+
+#### 第3步 构建条件
+
+```java
+User user = new User();
+
+user.and(User::age, SQLOperator.GT, 18)
+    .and(User::name, SQLOperator.LIKE, "Tom%")
+    .orderBy();
+```
+
+#### 第4步 执行查询
+
+```java
+@Resource
+UserDBService db;
+
+User result = db.findOne(user, false);
+```
+
+#### `QueryRepository` 中的如下内置方法支持`Predicate`特性：
+
+- `executeUpdate`
+- `count`
+- `findOne`
+- `exists`
+- `existsEachOn`
+- `findPageByPredicate`
+
+### 18.4 条件来源模型
+
+支持两种条件构建模式：
+
+#### 18.4.1 模式一：实体字段自动生成条件（默认）
+
+当出现以下任一情况时，框架会根据实体字段值自动生成 `WHERE` 条件：
+
+- 实体**没有继承** `Predicate`
+- 或者实体**继承了** `Predicate`，但**没有调用** `and / or` 等方法显式构建条件
+
+规则：
+
+- 字段值不为 `null` → 参与条件（默认 `=`）
+- 字段值为 `null` → 自动忽略
+- 条件之间默认使用 `AND` 连接
+
+示例：
+
+```java
+user.setName("Tom");
+user.setAge(18);
+```
+
+会生成 SQL：`where name = ? and age = ?`
+
+#### 18.4.2 模式二：Predicate 显式构建条件
+
+当实体继承 `Predicate`，且调用 `and / or` 等方法显式添加条件时：
+
+```java
+user.and(User::age, GT, 18)
+    .and(User::name, LIKE, "Tom%");
+```
+
+支持：
+
+- 比较操作（`> < like in is null`）
+- AND / OR
+- 分组（括号）
+
+#### 18.4.3 使用建议
+
+你可以把条件构建理解为两层机制：
+
+| 层级   | 方式                        | 适用场景 |
+| :----- | :-------------------------- | :------- |
+| 第一层 | 实体字段（自动 equal 条件） | 简单查询 |
+| 第二层 | `Predicate`（显式条件构建） | 复杂查询 |
+
+建议做法：
+
+- 简单查询：直接 `set` 字段值（更简洁）
+- 复杂查询：使用 `Predicate` 构建条件（更灵活）
+- 为了可读性，避免混用两种模式
+
+重要说明：
+
+- 模式一与模式二**不能同时生效**，两者之间不存在交织与叠加。
+
+一句话总结：
+
+> 即使不显式使用 `Predicate`，实体本身也可以作为“天然的 WHERE 条件构建器”。
+
+### 18.5 条件构建详解
+
+#### 基础条件（最常用）
+
+```java
+user.and(User::age, SQLOperator.GT, 18);
+```
+
+生成 SQL：
+
+```sql
+age > ?
+```
+
+#### 默认等于（简写）
+
+```java
+user.and(User::age, 18);
+```
+
+等价于：
+
+```java
+user.and(User::age, SQLOperator.EQ, 18);
+```
+
+#### OR 条件
+
+```java
+user.or(User::age, 18);
+```
+
+#### LIKE 模糊查询
+
+```java
+user.and(user::name, SQLOperator.LIKE, "Tom%");
+```
+
+#### IN 查询
+
+```java
+user.and(User::age, SQLOperator.IN, List.of(18, 20, 25));
+```
+
+生成 SQL：
+
+```sql
+age in (?, ?, ?)
+```
+
+注意（非常重要），如果集合为空：
+
+```java
+List.of()
+```
+
+会生成 SQL：
+
+```sql
+age in (NULL)
+```
+
+建议你自己判断：
+
+```java
+if (!list.isEmpty()) {
+    user.and(User::age, IN, list);
+}
+```
+
+#### NULL 判断
+
+```java
+user.and(user::name, NulOperator.ISNULL);
+user.and(user::name, NulOperator.ISNOTNULL);
+```
+
+生成 SQL：
+
+```sql
+name is null
+name is not null
+```
+
+### 18.6 复杂条件
+
+```java
+user.and(User::age, SQLOperator.GE, 18)
+    .and(p -> p
+        .or(user::name, LIKE, "Tom%")
+        .or(user::name, LIKE, "Jerry%")
+    )
+    .orderBy();
+```
+
+生成 SQL：
+
+```sql
+where age >= ?
+and ( name like ? or name like ? )
+order by id desc
+```
+
+### 18.7 排序（orderBy）
+
+#### 默认排序
+
+```java
+user.orderBy();
+```
+
+生成 SQL：`order by id desc`
+
+#### 自定义排序
+
+```java
+user.orderBy("age desc, id asc");
+```
+
+强烈建议：
+
+❌ 不要直接拼用户输入
+
+✅ 使用白名单：
+
+```java
+String sort = switch(param) {
+    case "age" -> "age desc";
+    case "name" -> "name asc";
+    default -> "id desc";
+};
+user.orderBy(sort);
+```
+
+### 18.8 更新能力
+
+#### set 更新字段
+
+```java
+user.set(User::name, "Tom");
+```
+
+生成 SQL：
+
+```sql
+set name = ?
+```
+
+#### increment 自增
+
+```java
+user.increment(User::age, 1);
+```
+
+生成 SQL：
+
+```sql
+set age = age + 1
+```
+
+注意：
+
+- `set()` 会自动忽略 `null`
+- `increment()` 不允许 null
+
+### 18.9 重要行为
+
+#### 18.9.1 null 自动忽略
+
+```java
+user.and(User::age, null);
+```
+
+👉 不生成条件，非常适合搜索接口
+
+#### 18.9.2 延迟生成
+
+SQL 在以下时机生成：
+
+```java
+orderBy() 或 finish()
+```
+
+#### 18.9.3 自动参数绑定
+
+```sql
+age > ?
+```
+
+👉 防 SQL 注入
+
+## 19. `@QueryByNamed`：命名式查询（模板 SQL）
+
+`@QueryByNamed` 用于将 SQL 定义在外部模板文件中，并通过注解按名称进行绑定与执行。
+
+👉 核心能力：
+
+- 将 SQL 与 Java 代码解耦
+- 支持复杂动态 SQL（基于模板引擎）
+- 支持 SQL 片段复用
+- 适用于复杂查询与动态逻辑场景
+
+### 19.1 基本概念
+
+使用方式：
+
+```java
+@QueryByNamed("findUserInfoAll")
+JSONArray findUserInfoAll();
+```
+
+👉 表示绑定模板文件中 `id="findUserInfoAll"` 的 SQL
+
+模板文件命名规则：
+
+```text
+类全限定名 + .queries.xml
+```
+
+例如：
+
+```text
+org.fastquery.dao.QueryByNamedDBExample.queries.xml
+```
+
+👉 要求：
+
+- 必须位于 `classpath` 下
+- 可通过 `fastquery.json` 中的 `queries` 属性配置模板目录
+
+### 19.2 模板文件结构
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<queries>
+
+    <query id="findUserInfoAll">
+        select id,name,age from UserInfo
+    </query>
+
+    <query id="findUserInfoOne">
+        <value>
+            select id,name,age from UserInfo where id = :id
+        </value>
+    </query>
+
+</queries>
+```
+
+`<query>` 元素说明
+
+| 元素           | 说明         |
+| -------------- | ------------ |
+| `id`           | 唯一标识     |
+| `<value>`      | SQL 主体     |
+| `<parts>`      | SQL 片段定义 |
+| `<countQuery>` | 分页统计 SQL |
+
+👉 说明：若 `<query>` 仅包含一段 SQL 文本，可直接作为节点内容；当存在多结构元素（如 `<parts>`）时，建议使用 `<value>` 明确 SQL 主体。
+
+### 19.3 模板引擎（Velocity）
+
+模板文件中的 SQL 会经过 **Apache Velocity** 模板引擎渲染（Template Rendering）。
+
+👉 支持：
+
+- 条件控制：`#if / #else / #end` 等 Velocity 控制指令
+- 变量引用：`${}`（用于模板变量与上下文数据）
+- 动态拼接 SQL（基于模板逻辑生成最终语句）
+
+示例：动态条件
+
+```xml
+<query id="findUserInfoByNameAndAge">
+    <value>
+        select id,name,age from UserInfo where 1 #{#condition}
+    </value>
+
+    <parts>
+        <part name="condition">
+        <![CDATA[
+            #if(${name})
+                and name = :name
+            #end
+
+            #if(${age})
+                and age = :age
+            #end
+        ]]>
+        </part>
+    </parts>
+</query>
+```
+
+### 19.4 表达式说明（重要）
+
+模板中存在三类表达式：
+
+| 表达式              | 作用     | 是否参与预编译 |
+| ------------------- | -------- | -------------- |
+| `:name`             | 参数绑定 | ✅              |
+| `?N`                | 位置参数 | ✅              |
+| `$name` / `${name}` | 模板变量 | ❌              |
+
+关键区别
+
+参数绑定（`:name` / `?N`）
+
+```sql
+where id = :id
+```
+
+👉 转换为：
+
+```sql
+where id = ?
+```
+
+👉 使用 `PreparedStatement`，防止 SQL 注入
+
+模板变量（`${name}`）
+
+```xml
+#if(${name})
+```
+
+👉 用于：
+
+- 参与模板阶段的逻辑判断
+- 控制 SQL 结构的动态生成
+- 在模板中直接引用参数源值
+
+👉 特性说明：
+
+- 仅作用于**模板渲染阶段**
+- 不参与 `PreparedStatement` 参数绑定
+- 不属于 SQL 预编译参数
+
+一句话总结
+
+> `:name` / `?N` 用于参数绑定，`${name}` 用于模板渲染与逻辑控制
+
+### 19.5 SQL 片段复用（parts）
+
+```xml
+<parts>
+    <part name="fields">id,name,age</part>
+</parts>
+```
+
+使用：
+
+```sql
+select #{#fields} from UserInfo
+```
+
+作用范围
+
+- `<query>` 内定义 → 局部作用域
+- `<queries>` 下定义 → 全局作用域
+
+### 19.6 XML 特殊字符处理
+
+XML 中以下字符需要转义：
+
+| 字符 | 实体     |
+| ---- | -------- |
+| `<`  | `&lt;`   |
+| `>`  | `&gt;`   |
+| `&`  | `&amp;`  |
+| `'`  | `&apos;` |
+| `"`  | `&quot;` |
+
+推荐方式：使用 CDATA
+
+```xml
+<![CDATA[
+    select * from UserInfo where age < 18
+]]>
+```
+
+👉 推荐使用 CDATA 避免转义问题
+
+### 19.7 方法绑定规则
+
+```java
+@QueryByNamed("findUserInfoOne")
+UserInfo findUserInfoOne(@Param("id") Integer id);
+```
+
+默认行为
+
+```java
+@QueryByNamed
+List<Student> findSomeStudent();
+```
+
+👉 等价：
+
+```java
+@QueryByNamed("findSomeStudent")
+```
+
+### 19.8 是否启用模板引擎（render）
+
+```java
+@QueryByNamed(render = false)
+```
+
+说明
+
+- `render = true`（默认） → 启用模板引擎
+- `render = false` → 不进行模板渲染
+
+👉 注意：
+
+- `:name`、`?N` 参数绑定 **不依赖模板引擎**
+- `${name}` 在参与逻辑运算（如 `#if` 判断）时依赖模板引擎（需设置 `render = true`）；若仅用于引用参数源值（简单替换），则不涉及模板逻辑执行，可关闭模板引擎（`render = false`）
+
+使用建议
+
+| 场景                     | 建议             |
+| ------------------------ | ---------------- |
+| 存在模板逻辑（`#if` 等） | `render = true`  |
+| 仅作为 SQL 存储          | `render = false` |
+
+### 19.9 改操作支持
+
+```java
+@Modifying
+@QueryByNamed("updateUserInfoById")
+int updateUserInfoById(@Param("id") int id,
+                       @Param("name") String name,
+                       @Param("age") int age);
+```
+
+模板：
+
+```xml
+<query id="updateUserInfoById">
+    update UserInfo set name = :name, age = :age where id = :id
+</query>
+```
+
+### 19.10 SQL 中的参数逻辑控制
+
+参数不仅可以绑定，还可以参与 SQL 逻辑：
+
+```sql
+select if(?1 > 10, '大于10', '不大于10')
+select if(:number > 10, t.B > 10, t.C > 100)
+```
+
+👉 支持常见函数：
+
+- `IF`
+- `IFNULL`
+- `NULLIF`
+- `ISNULL`
+
+⚠️ 注意：上述函数依赖具体数据库实现（如 MySQL 的 `IF`），不同数据库可能存在语法差异。
+
+### 19.11 多方法复用同一模板
+
+```java
+@QueryByNamed("findSome")
+JSONArray findLittle();
+
+@QueryByNamed("findSome")
+JSONArray findSome();
+```
+
+`_method` 上下文变量，模板中可访问当前方法：
+
+```xml
+#if(${_method.name} == "findLittle")
+    select ... limit 3
+#else
+    select ... limit 5
+#end
+```
+
+👉 `_method` 类型：
+
+```text
+org.fastquery.core.MethodInfo
+```
+
+👉 说明：
+
+- `${_method.getName()}` 可简写为 `${_method.name}`
+- 该能力用于根据调用上下文动态选择 SQL。⚠️ 建议谨慎使用，避免在模板中引入过多分支逻辑，影响可读性与维护性。
+
+### 19.12 使用建议
+
+适用于：
+
+- 复杂动态 SQL（多条件、多分支）
+- SQL 需要复用
+- SQL 过长，不适合写在注解中
+- 需要模板逻辑控制
+
+不推荐使用场景
+
+- 简单 CRUD
+- SQL 简短且固定
+- 无动态逻辑
+
+👉 优先使用 `@Query`
+
+### 19.13 一句话总结
+
+`@QueryByNamed` 是 FastQuery 的模板化 SQL 方案，用于解决复杂动态 SQL 场景，是 `@Query` 的增强形态。
+
+## 20. 分页
+
+FastQuery 内置分页能力。当方法返回值为 `Page<T>`，且参数中声明了分页参数（如 `Pageable` 或 `@PageIndex` / `@PageSize`）时，框架会自动识别为分页查询，并完成以下工作：
+
+- 查询当前页数据
+- 统计总记录数（可关闭）
+- 生成分页元信息
+- 按数据库方言自动拼接分页语句（如 `LIMIT / OFFSET`）
+
+### 20.1 分页查询的两种实现方式
+
+FastQuery 支持两种分页写法：
+
+| 方式            | 适用场景            |
+| --------------- | ------------------- |
+| `@Query`        | 简单、固定 SQL 分页 |
+| `@QueryByNamed` | 复杂动态 SQL 分页   |
+
+### 20.2 使用 `@Query` 实现分页
+
+适用于结构清晰、逻辑较简单的分页查询。
+
+#### 示例 1：指定统计字段
+
+```java
+@Query(value = "select id,name,age from userinfo", countField = "id")
+Page<Map<String,Object>> findAll(Pageable pageable);
+```
+
+说明：
+
+- `countField` 用于生成统计语句：
+
+```sql
+select count(id) ...
+```
+
+- 默认值通常为：`id`
+
+#### 示例 2：自动推导统计 SQL
+
+```java
+@Query("select id,name,age from userinfo #{#where}")
+@Condition("age > ?1")
+@Condition("and id < ?2")
+Page<UserInfo> find(Integer age, Integer id, Pageable pageable);
+```
+
+说明：
+
+若未显式指定 `countQuery`，框架会尝试自动生成统计 SQL。
+
+⚠️ 自动推导属于便利能力，适合中低复杂度 SQL；复杂查询建议显式指定 `countQuery`。
+
+#### 示例 3：自定义统计 SQL
+
+```java
+@Query(
+    value = "select id,name,age from userinfo #{#where}",
+    countQuery = "select count(id) from userinfo #{#where}"
+)
+@Condition("age > ?1")
+@Condition("and id < ?2")
+Page<UserInfo> findSome(Integer age, Integer id, Pageable pageable);
+```
+
+适用于：
+
+- 多表关联
+- 子查询
+- `group by`
+- `distinct`
+- 自动推导不准确的场景
+
+### 20.3 使用 `@QueryByNamed` 实现分页
+
+适用于复杂动态 SQL、条件较多、模板复用场景。
+
+```java
+@QueryByNamed("findPage")
+Page<Student> findPage(Pageable pageable, @Param("name") String name, @Param("age") Integer age);
+```
+
+对应模板文件
+
+```xml
+<query id="findPage">
+
+    <value>
+        select no, name, sex from Student #{#condition} #{#order}
+    </value>
+
+    <countQuery>
+        select count(no) from Student #{#condition}
+    </countQuery>
+
+    <parts>
+
+        <part name="condition">
+        <![CDATA[
+        <where>
+
+        #if($name)
+            and name like :name
+        #end
+
+        #if($age)
+            and age > :age
+        #end
+
+        </where>
+        ]]>
+        </part>
+
+        <part name="order">
+            order by age desc
+        </part>
+
+    </parts>
+
+</query>
+```
+
+### 20.4 分页模板内置能力
+
+#### 1）`#{#limit}`：分页片段
+
+```sql
+#{#limit}
+```
+
+表示分页区间，由框架按数据库方言自动生成，例如：
+
+```sql
+limit ?, ?
+offset ? rows fetch next ? rows only
+```
+
+说明：
+
+- 默认自动追加到 SQL 尾部
+- 如语法特殊，也可手动放置在合法位置
+
+#### 2）`<where>`：动态条件整理器
+
+```xml
+<where>
+    #if(...)
+        and ...
+    #end
+</where>
+```
+
+作用：
+
+- 自动追加 `where`
+- 自动去除首个 `and / or`
+- 避免非法 SQL
+
+例如：
+
+```sql
+where and age > 10
+```
+
+不会出现。
+
+### 20.5 分页参数方式
+
+FastQuery 提供两种传参方式。
+
+#### 方式一：`Pageable`（推荐）
+
+```java
+Pageable pageable = new PageableImpl(1, 10);
+```
+
+含义：
+
+- 第 1 页
+- 每页 10 条
+
+推荐原因：
+
+- 接口语义清晰
+- 扩展性更好
+- 统一分页模型
+
+#### 方式二：`@PageIndex` + `@PageSize`
+
+```java
+@Query("select id,name,age from userinfo")
+Page<Map<String,Object>> findSome(@PageIndex int pageIndex, @PageSize int pageSize);
+```
+
+规则：
+
+- `@PageIndex`：页码，从 **1** 开始
+- 小于 1 按 1 处理
+- `@PageSize`：每页数量
+- 小于 1 按 1 处理
+
+⚠️ 注意：
+
+> `@PageIndex / @PageSize` 不能与 `Pageable` 同时使用。
+
+适用于简单接口、快速接收前端 `page/size` 参数场景。
+
+### 20.6 使用分页结果对象 `Page<T>`
+
+```java
+Pageable pageable = new PageableImpl(1, 10);
+Page<UserInfo> page = userInfoDBService.findSome(18, 100, pageable);
+```
+
+常用方法:
+
+```java
+page.getContent();        // 当前页数据
+page.getNumber();         // 当前页码
+page.getSize();           // 每页大小
+page.hasNext();           // 是否有下一页
+page.hasPrevious();       // 是否有上一页
+page.getTotalElements();  // 总记录数
+page.getTotalPages();     // 总页数
+page.isFirst();           // 是否第一页
+page.isLast();            // 是否最后一页
+```
+
+### 20.7 `@NotCount`：关闭总数统计
+
+表示分页查询时不执行 `count(id)` 统计。
+
+适用于：
+
+- 大表分页
+- 深分页
+- 无限滚动
+- 只关心当前页数据
+- 对性能敏感的场景
+
+返回值约定
+
+| 字段            | 值   |
+| --------------- | ---- |
+| `totalElements` | `-1` |
+| `totalPages`    | `-1` |
+
+其他分页信息仍然有效。
+
+说明：
+
+若使用 `@NotCount`，则：`countField` `countQuery` 将失去意义。
+
+### 20.8 JSON 输出结构（示意）
+
+```json
+{
+  "content": [...],
+  "number": 1,
+  "size": 15,
+  "hasNext": true,
+  "hasPrevious": false,
+  "first": true,
+  "last": false,
+  "totalElements": 188,
+  "totalPages": 13
+}
+```
+
+### 20.9 数据库方言支持
+
+当前内置支持：
+
+- MySQL
+- Microsoft SQL Server
+- PostgreSQL
+
+框架会自动生成对应分页语法。
+
+### 20.10 扩展分页方言
+
+如需支持其他数据库，可实现：
+
+```text
+org.fastquery.page.PageDialect
+```
+
+参考实现：
+
+- `MySQLPageDialect`
+- `PostgreSQLPageDialect`
+
+### 20.11 使用建议
+
+推荐优先使用 `Pageable`
+
+```java
+Page<T> find(..., Pageable pageable)
+```
+
+作为标准分页方式，更利于维护与扩展。
+
+count 查询优化建议，复杂 SQL 建议显式指定：
+
+```java
+countQuery = "..."
+```
+
+避免自动推导失准或性能下降。
+
+大表分页建议使用：`@NotCount` 减少统计成本。
+
+### 20.12 一句话总结
+
+FastQuery 将分页查询、总数统计、分页元信息与数据库方言统一封装，让分页开发保持简洁，同时具备工程级扩展能力。
+
+## 21. 事务（Transaction）
+
+事务用于保证一组数据库操作具备 **原子性（Atomicity）**：要么全部成功提交，要么发生异常时全部回滚。
+
+FastQuery 提供两种事务使用方式：
+
+- 注解式事务：`@Transactional`
+- 函数式事务：`tx(...)`
+
+### 21.1 使用 `@Transactional` 声明事务
+
+当一个方法包含多条改操作（`INSERT / UPDATE / DELETE`）时，可通过 `@Transactional` 将其纳入同一事务。
+
+```java
+@Transactional
+@Modifying
+@Query("update userinfo set name = ?1 where id = ?3")
+@Query("update userinfo set age = ?2 where id = ?3")
+@Query("update userinfo set id = 1 where id = ?3")
+int updateBatch(String name, Integer age, Integer id);
+```
+
+以上三条 SQL 会作为一个事务执行：
+
+1. 修改姓名
+2. 修改年龄
+3. 修改主键
+
+若第三条语句因主键冲突失败（例如 `id=1` 已存在），则：
+
+- 前两条修改也会回滚
+- 整个事务失败
+- 数据保持原状
+
+即：三条语句要么全部成功，要么全部失效。
+
+### 21.2 返回值规则
+
+返回 `int`：
+
+```java
+int updateBatch(...)
+```
+
+表示事务成功提交后，**所有改操作影响行数之和**。
+
+例如：
+
+```text
+update1 → 1 行
+update2 → 1 行
+update3 → 1 行
+```
+
+返回：`3`
+
+返回 `int[]`:
+
+```java
+int[] updateBatch(...)
+```
+
+表示事务成功提交后，每条 SQL 各自影响的行数。
+
+例如事务内有三条语句：
+
+- U1 → 1 行
+- U2 → 2 行
+- U3 → 0 行
+
+返回：
+
+```java
+new int[]{1, 2, 0}
+```
+
+适用于需要了解每一步执行结果的场景。
+
+### 21.3 使用函数式事务 `tx(...)`
+
+除注解方式外，FastQuery 还提供内置事务函数：
+
+```java
+int effect = userInfoDBService.tx(() -> {
+
+    // update 1
+    // update 2
+    // update 3
+
+    return 3;
+});
+```
+
+执行语义：
+
+传入 Lambda 中的代码块会在一个事务中执行：
+
+- 全部成功 → 提交事务
+- 任意异常 → 回滚事务
+
+即：Lambda 代码块中的数据库操作具备原子性。
+
+### 21.4 适用场景对比
+
+| 方式             | 适用场景                     |
+| ---------------- | ---------------------------- |
+| `@Transactional` | 固定事务流程、声明式编程     |
+| `tx(...)`        | 动态流程、条件判断、循环处理 |
+
+### 21.5 Lambda 变量捕获说明（Java 语言规则）
+
+在 Java Lambda 中，只能捕获 **final 或 effectively final** 的局部变量。
+
+例如：
+
+```java
+int sum = 0;
+
+tx(() -> {
+    sum = sum + 1;   // 编译错误
+    return 1;
+});
+```
+
+原因：
+
+- Lambda 不能修改外部局部变量的值
+- 这是 Java 语言规范，与 FastQuery 无关
+
+可修改对象内容。若外部变量是对象引用，则可修改对象内部状态：
+
+```java
+Map<String,Object> map = new HashMap<>();
+
+tx(() -> {
+    map.put("ok", true);   // 合法
+    return 1;
+});
+```
+
+原因：
+
+- 引用本身未变化
+- 修改的是对象内部数据
+
+### 21.6 如何从事务块中带出结果
+
+推荐通过返回值或外部对象承载结果。
+
+方式一：使用返回值（推荐）
+
+```java
+int total = tx(() -> {
+    return 5;
+});
+```
+
+方式二：使用对象承载
+
+```java
+AtomicInteger total = new AtomicInteger();
+
+tx(() -> {
+    total.set(5);
+    return 1;
+});
+```
+
+### 21.7 使用建议
+
+#### 推荐 `@Transactional`
+
+适用于：
+
+- 固定业务流程
+- 多条 SQL 原子提交
+- 方法级事务边界清晰
+
+#### 推荐 `tx(...)`
+
+适用于：
+
+- 循环插入
+- 条件分支事务
+- 运行期动态决定执行步骤
+
+### 21.8 注意事项
+
+- 事务主要用于改操作（增删改）
+- 查询通常不需要事务（除锁定读取等特殊场景）
+- 事务范围应尽量小，避免长事务占用连接资源
+- 不建议在事务中执行耗时 IO（网络请求、文件操作等）
+
+### 21.9 一句话总结
+
+FastQuery 同时提供声明式事务与函数式事务，既适合固定业务流程，也适合复杂动态事务场景。
+
+## 22. 类型映射
+
+FastQuery 的类型映射采用 **宽兼容策略（compatible mapping）**，并非严格的一一强类型绑定。
+
+其核心原则是：**只要目标 Java 类型能够安全容纳 SQL 字段值，即可完成映射。**
+
+换句话说：
+
+- Java 类型“装得下” SQL 值 → 可以映射
+- Java 类型“装不下” SQL 值 → 不建议映射，可能产生溢出、截断或转换异常
+
+这意味着 FastQuery 更关注：
+
+- 数据是否可承载
+- 转换是否合理
+- 使用是否便利
+
+而不是机械地要求 JDBC 类型完全对应。
+
+### 22.1 常见映射关系
+
+| Java 类型   | 常见 SQL 类型                     |
+| ----------- | --------------------------------- |
+| `Boolean`   | `BIT(1)`、`TINYINT(1)`、`CHAR(1)` |
+| `Byte`      | `TINYINT`                         |
+| `Short`     | `SMALLINT`                        |
+| `Integer`   | `INT`                             |
+| `Long`      | `BIGINT`                          |
+| `Float`     | `FLOAT`                           |
+| `Double`    | `DOUBLE`                          |
+| `Character` | `CHAR(1)`                         |
+| `Enum`      | `ENUM`                            |
+| `EnumSet`   | `SET`                             |
+| `String`    | 几乎所有常见类型（按字符串读取）  |
+
+### 22.2 设计特点
+
+#### 宽类型可接收窄类型
+
+例如：
+
+```text
+SMALLINT → Integer
+INT      → Long
+FLOAT    → Double
+```
+
+通常是可行的，因为目标类型容量更大。
+
+#### 窄类型接收宽类型需谨慎
+
+例如：
+
+```text
+BIGINT → Integer
+DOUBLE → Float
+```
+
+可能出现：
+
+- 数值溢出
+- 精度损失
+- 转换异常
+
+因此不推荐。
+
+### 22.3 `String` 的特殊性
+
+`String` 具备较强兼容性，可用于读取多种 SQL 类型，例如：
+
+- 数值型
+- 字符型
+- 枚举型
+- 日期型（按字符串形式）
+
+例如：
+
+```sql
+INT        → "100"
+DOUBLE     → "3.14"
+DATETIME   → "2015-06-20 10:30:00"
+```
+
+因此：`String` 常作为通用接收类型使用，但会失去原始类型语义。
+
+### 22.4 布尔值映射说明
+
+以下字段常被映射为 `Boolean`：
+
+| SQL 值类型   | 常见解释                          |
+| ------------ | --------------------------------- |
+| `BIT(1)`     | `0 / 1`                           |
+| `TINYINT(1)` | `0 / 1`                           |
+| `CHAR(1)`    | `Y/N`、`T/F`、`0/1`（视规则而定） |
+
+### 22.5 枚举映射
+
+`Enum`，适用于数据库 `ENUM` 字段：
+
+```java
+enum Status {
+    ENABLED, DISABLED
+}
+```
+
+`EnumSet`，适用于数据库 `SET` 字段（如 MySQL）。
+
+例如：
+
+```sql
+SET('READ','WRITE','EXECUTE')
+```
+
+映射为：
+
+```java
+EnumSet<Permission>
+```
+
+### 22.6 使用建议
+
+#### 推荐使用语义明确的类型
+
+```java
+Integer age
+Long id
+Boolean enabled
+```
+
+优于：
+
+```java
+String age
+String enabled
+```
+
+#### 数值字段优先使用包装类型
+
+```java
+Integer ✔
+Long ✔
+int ✘（查询字段可能为 null）
+```
+
+原因：
+
+- SQL 字段允许 `NULL`
+- 包装类型可表示 `null`
+
+#### 超大数值谨慎选择类型
+
+若数据库字段可能超出 `Integer` 范围，建议直接使用：`Long`
+
+### 22.7 一句话总结
+
+FastQuery 的类型映射采用“能安全承载即可映射”的宽兼容策略，强调实用性与开发效率，而非僵硬的一一强绑定。
+
+## 23. 动态适配数据源
+
+在运行时动态切换数据源，使同一 `Repository` 接口可连接不同数据库实例。
+
+适用于：
+
+- 多租户系统（tenant isolation）
+- 读写分离
+- 分库分表后的库级路由
+- 多环境数据库切换
+- 同构数据库集群访问
+
+### 23.1 使用 `@Source` 指定数据源
+
+通过 `@Source` 可动态指定当前方法执行时所使用的数据源。
+
+```java
+@Query("select id,name,age from userinfo u where u.age > ?1")
+Map<String,Object> findOne(Integer age, @Source String dataSourceName);
+```
+
+调用示例：
+
+```java
+findOne(18, "tenant_a");
+findOne(18, "tenant_b");
+```
+
+表示同一查询逻辑，分别连接不同数据源执行。
+
+### 23.2 典型应用场景：多租户系统
+
+若系统采用：
+
+- 每个租户独立数据库
+- 表结构一致
+- 业务逻辑一致
+
+则可通过 `@Source` 动态切换租户数据库，而无需复制 DAO 接口。
+
+例如：
+
+```text
+tenant_a → db_a
+tenant_b → db_b
+tenant_c → db_c
+```
+
+这种模式在 SaaS 系统中非常实用。
+
+### 23.3 使用规则
+
+参数类型限制
+
+当 `@Source` 标注在方法参数上时，该参数类型必须为：`String`，用于表示数据源名称。
+
+例如：
+
+```java
+@Source String dataSourceName
+```
+
+### 23.4 数据源优先级
+
+若同时存在以下两种配置：
+
+#### 1）`fastquery.json` 中已配置默认数据源作用域
+
+```json
+{
+  "scope": [...]
+}
+```
+
+#### 2）方法参数使用 `@Source`
+
+则优先级为：
+
+```text
+@Source 指定的数据源
+    >
+fastquery.json 默认作用域数据源
+```
+
+即：显式指定优先于配置默认值。
+
+### 23.5 使用建议
+
+推荐用于“同结构多库”场景，例如：
+
+- 多租户独立库
+- 按地区拆库
+- 灰度数据库切换
+
+不建议用于频繁随机切换，若每次请求都随机切库，需注意：
+
+- 连接池数量
+- 连接复用率
+- 初始化成本
+- 运维复杂度
+
+### 23.6 一句话总结
+
+`@Source` 提供运行时数据源路由能力，使同一 Repository 可服务多个数据库实例，非常适合多租户与多库场景。
+
+## 24. 扩展支持连接池
+
+FastQuery 已内置支持常见连接池，例如：
+
+- HikariCP
+- Druid
+- c3p0
+
+同时支持扩展自定义连接池。
+
+### 24.1 扩展步骤总览
+
+实现流程：
+
+1. 实现 `ConnectionPoolProvider`
+2. 在 `pool-extend.xml` 注册
+3. 在 `fastquery.json` 中使用
+
+### 24.2 第一步：实现连接池提供者
+
+实现接口：
+
+```text
+org.fastquery.core.ConnectionPoolProvider
+```
+
+示例：
+
+```java
+public class MyPoolProvider implements ConnectionPoolProvider {
+
+    @Override
+    public DataSource getDataSource(
+            Resource resource,
+            String dataSourceName) {
+
+        // 读取配置文件
+        InputStream in =
+            resource.getResourceAsStream(...);
+
+        Properties props = new Properties();
+
+        // 初始化配置
+        props.setProperty(...);
+
+        // 创建并返回数据源
+        return new MyDataSource(props);
+    }
+}
+```
+
+说明：
+
+该接口职责是：根据配置创建并返回 `DataSource` 实例。
+
+### 24.3 第二步：注册连接池
+
+创建配置文件：
+
+```text
+pool-extend.xml
+```
+
+内容：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<pools name="providers">
+    <pool name="mypool" class="org.fastquery.xxx.MyPoolProvider" />
+</pools>
+```
+
+说明：
+
+- `name`：连接池名称
+- `class`：实现类全限定名
+
+### 24.4 第三步：在 `fastquery.json` 中使用
+
+```json
+{
+  "scope": [
+    {
+      "config": "mypool",
+      "dataSourceName": "hiworld",
+      "basePackages": [
+        "your.domain.XxxDBService"
+      ]
+    }
+  ]
+}
+```
+
+说明：
+
+```text
+config = mypool
+```
+
+即引用你注册的连接池实现。
+
+### 24.5 设计价值
+
+该扩展机制使 FastQuery 不依赖固定连接池生态，能够接入：
+
+- 企业内部自研连接池
+- 云厂商专用数据源
+- 特殊代理连接池
+- 新兴 JDBC Pool 方案
+
+具备较好的开放性。
+
+## 25. 内置 CRUD、统计查询与批量更新
+
+如果你的 Repository 接口继承的是 `QueryRepository`，FastQuery 提供了一组内置数据访问能力。
+对于许多常见场景（保存、更新、统计、存在性判断、分页等），可以**无需手写 SQL**，直接调用接口方法完成。
+
+### 25.1 为什么有这一章
+
+并不是所有操作都值得写：
+
+```java
+@Query("insert ...")
+@Query("update ...")
+@Query("select count(*) ...")
+```
+
+对于大量重复、固定模式的数据库操作，框架直接内置实现更高效。
+
+因此 FastQuery 提供：
+
+- 保存实体
+- 更新实体
+- 保存或更新
+- 按主键查询
+- 按主键删除
+- 条件统计
+- 是否存在
+- 条件查询单条记录
+- 批量更新
+- 条件分页查询
+- 函数式事务
+
+### 25.2 保存数据（Insert）
+
+#### 保存并返回实体
+
+```java
+UserInfo saved = userInfoDBService.save(entity);
+```
+
+行为：
+
+1. 执行插入
+2. 获取主键
+3. 回查数据库
+4. 返回完整实体对象
+
+适用于：
+
+- 自增主键场景
+- 插入后希望立即获得数据库最终值
+
+#### 仅返回主键
+
+```java
+BigInteger id = userInfoDBService.saveToId(entity);
+```
+
+适用于：
+
+- 只关心主键值
+- 高性能插入场景
+
+#### 批量保存
+
+```java
+int effect = userInfoDBService.save(false, list);
+```
+
+参数说明：
+
+```java
+save(ignoreRepeat, entities)
+```
+
+- `ignoreRepeat=true`：忽略唯一键冲突记录
+- `ignoreRepeat=false`：按正常规则执行
+
+### 25.3 更新数据（Update）
+
+#### 按主键更新实体
+
+```java
+UserInfo updated = userInfoDBService.update(entity);
+```
+
+行为：
+
+1. 根据实体主键执行更新
+2. 更新成功后回查
+3. 返回最新实体
+
+说明：
+
+- 默认 `null` 字段通常不参与更新（动态更新风格）
+- 若影响行数不是 1，可能抛异常
+
+#### 仅执行更新并返回影响行数
+
+```java
+int effect = userInfoDBService.executeUpdate(entity);
+```
+
+适用于：
+
+- 不需要回查实体
+- 更关注执行效率
+
+#### 保存或更新（UPSERT 风格）
+
+```java
+UserInfo result = userInfoDBService.saveOrUpdate(entity);
+```
+
+逻辑：
+
+- 存在主键记录 → 更新
+- 不存在 → 插入
+
+前提：
+
+- 实体包含主键字段
+
+### 25.4 查询数据（Find）
+
+#### 按主键查询
+
+```java
+UserInfo user = userInfoDBService.find(UserInfo.class, 1001);
+```
+
+#### 指定包含字段 / 排除字段
+
+```java
+UserInfo user = userInfoDBService.find(UserInfo.class, 1001, true, "name", "age");
+```
+
+参数：
+
+```text
+contain = true   → 仅查询这些字段
+contain = false  → 排除这些字段
+```
+
+适用于大字段裁剪场景。
+
+### 25.5 删除数据（Delete）
+
+#### 按主键删除
+
+```java
+int effect = userInfoDBService.delete("userinfo", "id", 1001);
+```
+
+参数：
+
+- 表名
+- 主键字段名
+- 主键值
+
+### 25.6 count 与 exists
+
+FastQuery 对这类高频需求做了直接支持。
+
+#### count
+
 ```java
 @Query("select count(no) from student")
 long count();
 ```
 
-## exists
+也支持按实体条件统计：
 
-判断是否存在
 ```java
-@Query("select no from student s where s.no=?1")
+long total = userInfoDBService.count(entity);
+```
+
+规则：
+
+- 实体中 `null` 字段不参与条件
+- 非 null 字段默认按 `=` + `and` 参与查询
+
+#### exists
+
+```java
+@Query("select no from student where no=?1")
 boolean exists(String no);
 ```
 
-## 改操作
-```java
-// 返回修改之后所影响的行数
-@Query("update student s set s.age=?3,s.name=?2 where  s.no=?1")
-@Modifying
-int update(String no,String name,int age); 
-
-// 改成功了返回true,反之,false
-@Modifying
-@Query("delete from `userinfo` where id=?1")
-boolean deleteUserinfoById(int id);
-
-// 以实体bean格式,返回当前保存的数据
-@Query("insert into student (no, name, sex, age, dept) values (?1, ?2, ?3, ?4, ?5)")
-@Modifying(table="student",id="no")
-// 注意: // 注意: student的主键是字符串,因此不会自增长,在此处需要用@Id标识哪个就是主键字段
-Student addStudent(@Id String no,String name,String sex,int age,String dept);
-
-// 以JSON格式,返回当前保存的数据
-@Modifying(id="id",table="userinfo")
-@Query("insert into #{#table} (name,age) values (?1, ?2)")
-JSONObject saveUserInfo2(String name,Integer age);
-
-// 返回当前保存的数据的主键信息
-@Modifying(id="id",table="userinfo")
-@Query("insert into #{#table} (name,age) values (?1, ?2)")
-Primarykey saveUserInfo(String name,Integer age);
-```
-
-新增一条记录,返回实体,可以通过`@Modifying`中的`selectFields`配置项明确指定待查询的字段. 如:
+也支持实体条件：
 
 ```java
-// 以Map格式,返回当前保存的数据
-@Modifying(id="id",table="userinfo",selectFields="name,age")
-@Query("insert into #{#table} (name,age) values (?1, ?2)")
-Map<String, Object> addUserInfo(String name,Integer age);
+boolean yes = userInfoDBService.exists(entity);
 ```
 
-其中,`selectFields` 默认是 **<code>\*</code>**,字段与字段之间请用英文逗号隔开.  
+#### existsEachOn
 
-**注意**:
-- 改操作返回int类型:表示影响的行数,没有找到可以修改的,那么影响行数为0,并不能视为改失败了
-- 改操作返回boolean类型:表示是否改正确,依据是,影响行数若大于或等于0都会返回true,反之,返回false
-
-## Annotation
-针对FastQuery中的所有注解,做个说明:
-
-| Annotation | 作用 |
-|:---|:---|
-|`@Id`|用来标识表主键|
-|`@Table`|用来指定表名称|
-|`@Modifying`|标识改操作|
-|`@Param`|标识参数名称,便于运行期获取|
-|`@Query`|标识查询语句|
-|`@QueryByNamed`|标识根据命名式查询(语句放在配置文件中)|
-|`@Source`|标识用来适配数据源的参数|
-|`@Transactional`|事务|
-|`@Transient`|标识实体中的属性是临时的(例如:save对象时,该属性不存储到数据库里)|
-|`@NotCount`|标识分页中不统计总行数|
-|`@PageIndex`|标识页索引|
-|`@PageSize`|标识页行数|
-|`@Condition`|标识条件单元|
-|`@Set`|标识设置字段单元|
-
-## QueryRepository的内置方法
-凡是继承`QueryRepository`的接口,都可以使用它的方法,并且不用写实现类. 部分内置方法如下:
-
-| 方法 | 描述 |
-|:---|:---|
-| `<E> E find(Class<E> entityClass,long id)` | 根据主键查询实体 |
-| `<E> int insert(E entity)` | 插入一个实体(主键字段的值若为null,那么该字段将不参与运算),返回影响行数 |
-| `<B> int save(boolean ignoreRepeat,Collection<B> entities)` | 保存一个集合实体,是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录 |
-| `int saveArray(boolean ignoreRepeat,Object...entities)` | 保存一个可变数组实体,是否忽略已经存在的唯一key(有可能是多个字段构成的唯一key)记录 |
-| `BigInteger saveToId(Object entity)` | 保存实体后,返回主键值.**注意**:主键类型必须为数字且自增长,不支持联合主键 |
-| `<E> E save(E entity)` | 保存实体后,返回实体 |
-| `<E> int executeUpdate(E entity)` | 更新一个实体,返回影响行数.**注意**:实体的成员属性如果是null,那么该属性将不会参与改运算 |
-| `<E> E update(E entity)` | 更新一个实体,返回被更新的实体 |
-| `<E> int executeSaveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含主键字段,主键值若是null,直接存),返回影响行数 |
-| `<E> E saveOrUpdate(E entity)` | 不存在就保存,反之更新(前提条件:这个实体必须包含主键字段,主键值若是null,直接存),返回被更新的实体或返回已存储的实体 |
-| `int update(Object entity,String where)` | 更新实体时,自定义条件(有时候不一定是根据主键来修改),若给where传递null或"",默认按照主键修改,返回影响行数 |
-| `<E> int update(Collection<E> entities)` | 更新集合实体,成员属性如果是null,那么该属性将不会参与改运算,每个实体必须包含主键 |
-| `int delete(String tableName,String primaryKeyName,long id)` | 根据主键删除实体,返回影响行数 |
-| `int tx(Supplier<Integer> fun)` | 事务函数. |
-| `<E> long count(E entity)` | 根据指定的条件统计总记录数，实体属性若为 null 值，则，该属性不参与运算，反之，参与 and 运算 |
-
-举例说明:  
-先准备一个实体  
+逐字段检测是否存在，命中即返回字段名：
 
 ```java
-public class UserInfo {
-	@Id
-	private Integer id;
-	private String name;
-	private Integer age;
-	// getter /setter 省略...	
-}
+String field = userInfoDBService.existsEachOn(entity);
 ```
 
-使用QueryRepository的内置函数,必须要继承它:
+适用于：
+
+- 唯一字段冲突提示
+- 用户名 / 手机号 / 邮箱重复检查
+
+### 25.7 条件查询一条记录
 
 ```java
-public interface StudentDBService extends QueryRepository {
-   ... ...
-}
+UserInfo one = userInfoDBService.findOne(entity, false);
 ```
 
-**提醒**: 继承`Repository`适合应用于不使用内置函数的场景,显然更加轻量级.   
+规则：
 
-保存实体,更新实体,保存或更新实体示例如下:
+- 实体中非 null 字段作为查询条件
+- 条件关系默认 `and`
 
-``` java
-UserInfo u1 = new UserInfo(36,"Dick", 23);
-
-// 保存实体
-studentDBService.save(u1)
-
-Integer id = 36;
-String name = "Dick";
-Integer age = null;
-UserInfo u2 = new UserInfo(id,name,age);
-// age是null值, age就不会参与修改运算了.
-studentDBService.update(u2); // 更新语句为: update UserInfo set name = ? where id = ?
-
-// 保存或更新实体
-studentDBService.saveOrUpdate(u1);
-```
-
-使用update时,同时自定义条件的例子:
+例如：
 
 ```java
-Integer id = 1;
-String name = "可馨";
-Integer age = 3;
-UserInfo entity = new UserInfo(id,name,age);
-// 会解析成:update `UserInfo` set `id`=?, `age`=? where name = ?
-int effect = studentDBService.update(entity,"name = :name");
-// 断言: 影响的行数大于0行
-assertThat(effect, greaterThan(0));
-
-// 不想让id字段参与改运算,那么就把它的值设置为null
-entity.setId(null);
-// 会解析成:update `UserInfo` set `age`=? where name = ?
-effect = studentDBService.update(entity,"name = :name");
-assertThat(effect, greaterThan(0));
+UserInfo q = new UserInfo();
+q.setName("Tom");
+q.setAge(18);
 ```
 
-批量更新(update),如果是把多条记录更新成相同的内容,没有什么好说的.在此主要解决:批量更新不同字段,不同内容.  
-举例:  
-假设需求是:
+等价逻辑：
 
-- 把id=77的用户的姓名修改成"茝若",年龄修改成18
-- 把id=88的用户的姓名修改成"芸兮",注意:不修改年龄
-- 把id=99的用户的年龄修改成16
+```sql
+where name = 'Tom' and age = 18
+```
 
-实现代码:
+### 25.8 批量更新（高亮能力）
+
+这是 FastQuery 很有价值的一项能力。你可以提交多条不同内容的数据，框架自动生成：
+
+```sql
+case when
+```
+
+批量更新 SQL。
+
+示例：
 
 ```java
-// 步骤1: 准备要修改的实体
-List<UserInfo> userInfos = new ArrayList<>();
-userInfos.add(new UserInfo(77,"茝若", 18));
-userInfos.add(new UserInfo(88,"芸兮", null));
-userInfos.add(new UserInfo(99,null, 16));
+List<UserInfo> list = new ArrayList<>();
 
-// 步骤2: 批量更新
-int effect = userInfoDBService.update(userInfos);
-assertThat(effect, is(3));
+list.add(new UserInfo(77,"Alice",18));
+list.add(new UserInfo(88,"Bob",null));
+list.add(new UserInfo(99,null,16));
+
+int effect = userInfoDBService.update(list);
 ```
 
-最终会解释成一条SQL语句:
+可能生成：
 
 ```sql
 update UserInfo set
-  name = case id
-  when 77 then '茝若'
-  when 88 then '芸兮'
-  else name end 
-  ,
-  age = case id
-  when 77 then '18'
-  when 99 then '16'
+name = case id
+  when 77 then 'Alice'
+  when 88 then 'Bob'
+  else name end,
+
+age = case id
+  when 77 then 18
+  when 99 then 16
   else age end
-where id in (77, 88, 99)
+
+where id in (77,88,99)
 ```
 
-## @Set 实现动态修改不同字段
+价值：相比逐条 update：N 次 SQL 往返，该方案可优化为：1 次批量 SQL。
 
-往往只需要修改表的中的个别字段: A处需要修改table.x字段,B处要修改table.y字段,C处同时改x,y字段,. 设计`@Set`就是为了满足诸如此类的需求. 根据传递参数的不同动态地增减需要set的字段,让一条SQL尽可能地满足多个要求.
+适用于：
+
+- 批量改状态
+- 导入修复数据
+- 多行不同值更新
+
+### 25.9 条件分页查询（零 SQL）
+
+```java
+Page<UserInfo> page =
+    userInfoDBService.findPageByPredicate(entity, false, 1, 20, false);
+```
+
+说明：
+
+- 实体非 null 字段作为条件
+- 自动分页
+- 自动统计（可关闭）
+- 返回 `Page<T>`
+
+适用于后台快速查询页。
+
+### 25.10 内置事务函数
+
+```java
+long effect = userInfoDBService.tx(() -> {
+    // 多个写操作
+    return 3L;
+});
+```
+
+说明：
+
+- Lambda 内操作处于同一事务
+- 成功提交
+- 异常回滚
+
+## 26. 注解总览
+
+FastQuery 采用 **注解驱动（Annotation-Driven）** 的设计方式。开发者通过在接口、方法、参数或实体类上标注注解，即可完成查询、更新、分页、事务、动态 SQL、实体映射等功能。
+
+本章用于快速总览 FastQuery 的全部核心注解，帮助建立整体认知。
+
+### 26.1 按功能分类
+
+| 分类     | 注解             | 说明                     |
+| -------- | ---------------- | ------------------------ |
+| 查询     | `@Query`         | 在注解中直接编写 SQL     |
+| 查询     | `@QueryByNamed`  | 引用外部模板文件中的 SQL |
+| 写操作   | `@Modifying`     | 标识插入、更新、删除操作 |
+| 参数绑定 | `@Param`         | 指定命名参数             |
+| 动态 SQL | `@Condition`     | 动态构建 `WHERE` 条件    |
+| 动态 SQL | `@Set`           | 动态构建 `SET` 子句      |
+| 实体映射 | `@Table`         | 指定实体对应表名         |
+| 实体映射 | `@Id`            | 标识主键字段或主键参数   |
+| 实体映射 | `@Transient`     | 标识非持久化字段         |
+| 多数据源 | `@Source`        | 动态切换数据源           |
+| 分页     | `@NotCount`      | 分页时不统计总记录数     |
+| 分页     | `@PageIndex`     | 指定页码参数             |
+| 分页     | `@PageSize`      | 指定每页条数参数         |
+| 事务     | `@Transactional` | 声明式事务控制           |
+
+### 26.2 查询类注解
+
+#### `@Query`
+
+用于在方法上直接声明 SQL。
+
+```java
+@Query("select * from userinfo where id = ?1")
+UserInfo findById(Integer id);
+```
+
+适合：
+
+- SQL 简短明确
+- 常规 CRUD
+- 固定查询逻辑
+
+#### `@QueryByNamed`
+
+引用 XML 模板文件中的 SQL。
+
+```java
+@QueryByNamed("findUserById")
+UserInfo findById(Integer id);
+```
+
+适合：
+
+- SQL 很长
+- 多条件动态查询
+- 模板复用
+- 复杂业务逻辑
+
+### 26.3 写操作类注解
+
+#### `@Modifying`
+
+标识当前方法执行的是：
+
+- `INSERT`
+- `UPDATE`
+- `DELETE`
 
 ```java
 @Modifying
-@Query("update `Course` #{#sets} where no = ?5")
-@Set("`name` = ?1") // ?1 若是 null 或是 "" , 则, 该行set移除
-@Set("`credit` = ?2")
-@Set("`semester` = ?3")
-@Set("`period` = ?4")
-int updateCourse(String name,Integer credit, Integer semester, Integer period, String no);
+@Query("delete from userinfo where id=?1")
+int deleteById(Integer id);
 ```
 
-`#{#sets}` 用于引用设置选项. `@Set(value="name = ?1" , ignoreNull=true , ignoreEmpty=true)` 中的可选配置项,顾名思义.    
+### 26.4 参数绑定类注解
 
-方法上的所有`@Set`有可能全部被移除,那么就会得到一个错误的SQL`update Course set where no = ?5`,避免此错误有两个方法: 1). 加一条不含有SQL参数的`@set`,如: `@set("name = name")`,它永远不会被删除,并且不会对原有数据造成任何影响; 2).调用方法前对参数做校验,以排除因为参数导致全部`@set`被丢弃的可能.  
+#### `@Param`
 
-单个`@Set`针对出现多个`SQL`参数的情形,如 `@Set("name = ?1","credit = ?2")` 或 `@Set("name = :name","credit = :credit")` 参数 `?1`、`?2`、`:name`、 `:credit`中的任意一个为`null`都会导致该行设置项被移除.  
-
-### 通过JAVA脚本控制设置项增减
-`@Set`中的`ignoreScript`属性可以绑定一个JAVA脚本(非JS),根据脚本运行后的布尔结果,来决定是否保留设置项.脚本运行后的结果如果是`true`,那么就删除该设置项,反之,保留设置项,默认脚本是`false`,表示保留该设置项. 注意: 脚本执行后得到的结果必须是布尔类型,否则,项目都启动不起来.  
-举例:
+为参数命名，供 `:name` 使用。
 
 ```java
-@Modifying
-@Query("update `Course` #{#sets} where no = ?3")
-@Set(value="`name` = :name",
-     ignoreScript=":name!=null && :name.startsWith(\"计算\") && :credit!=null && :credit.intValue() > 2")
-@Set("`credit` = :credit")
-int updateCourse(@Param("name") String name,@Param("credit") Integer credit,String no);
+@Query("select * from userinfo where name=:name")
+UserInfo find(@Param("name") String name);
 ```
-其中, `:credit`引用的是`@Param("credit") Integer credit`的实参值.`:name`是`@Param("name")String name`的实参值.这个脚本要表达的意思不言而喻. 不过脚本的解析能力还不能自动**拆箱**(unboxing),需要调用拆箱方法,请留意住`:credit.intValue() > 2`. 若写成`:credit > 2`是编译不了的. 其他包装类型`Short`, `Long`, `Byte`, `Boolean`, `Character`, `Float`, `Double` 以此类推.  
-脚本的编译工作在项目初始化阶段完成,因此不存在性能问题.建议不要把脚本写得太长,那样会破坏可读性.
 
-### @Set 中的 if...else
-这个`SQL`设置项是否保留,可以通过`if`...`else`...来确定.`if`的表达式用`=`号与之绑定.`if`成立,则,保留当前设置项,反之,就取`else`所指定的值.当然,`else`在语法上不是必须的,若不写`else`,`if`条件不成立,则,直接删除当前`@Set`.  
-举例:
+### 26.5 动态 SQL 类注解
+
+#### `@Condition`
+
+动态拼接 `WHERE` 条件。
 
 ```java
-@Modifying
-@Query("update `User` #{#sets} where id = ?3")
-@Set(value="`name` = :name",if$="!:name.contains(\"root\")",else$="`name` = name")
-int updateUser(@Param("name") String name,int id);
+@Condition("and age > ?1")
 ```
-其中,如果`name`的值不包含"root",就保留`"name = :name"`这个设置选项,否则,设置选项为`name = name`(表示`name`的值保持原样).
 
-### 自定义类控制设置项增减
-决定一个Set项是否参与运算,可以根据多个参数进行某种计算来决定,`@Set`允许关联一个自定义的`Judge`类,作为这种计算的载体.  
-举例: 若: name值的前缀是"*计算*" 并且 credit的值大于2, 则,删除`name = :name`这条设置项.  
-NameJudge 类:
+适合搜索页、多条件筛选。
+
+#### `@Set`
+
+动态拼接 `UPDATE ... SET ...`
 
 ```java
-public class NameJudge extends Judge {
-	@Override
-	public boolean ignore() {
-		// 获取方法中名称为"name"的参数值
-		String name = this.getParameter("name", String.class);
-		// 获取方法中名称为"credit"的参数值
-		Integer credit = this.getParameter("credit", Integer.class);
-		return name.startsWith("计算") && credit!=null && credit > 2;
-	}
+@Set("name = ?1")
+```
+
+适合部分字段更新。
+
+### 26.6 实体映射类注解
+
+#### `@Table`
+
+指定实体映射的表名。
+
+```java
+@Table("userinfo")
+public class UserInfo {
 }
 ```
-设置项绑定 NameJudge: 
+
+#### `@Id`
+
+标识主键。
+
+可用于：实体字段
 
 ```java
-@Modifying
-@Query("update `Course` #{#sets} where no = ?3")
-@Set(value="`name` = :name",ignore=NameJudge.class)
-@Set("`credit` = :credit")
-int updateCourse(@Param("name") String name,@Param("credit") Integer credit,String no);
+@Id
+private Integer id;
 ```
-关于修改`name`的那个设置项, 有三种可能使它作废: ① name的值是null; ② name的值是""; ③ NameJudge类的ignore方法返回了`true`.
 
-根据参数动态增减set不同字段,除了用`@Set`实现之外,别忘了还有其他几种解决办法: a.调用内置方法`int executeUpdate(E entity)`,实体的字段若是`null`值,那么,该字段将不会参与set运算; b.使用SQL模版,在里头做逻辑判断; c.采用`$表达式`. 开发者将会发现很难不能选择出适合的解决方式.
-
-## 事务
-
-### 用`@Transactional`实现简单事务
+方法参数（插入回查）
 
 ```java
-// 将三条改操作纳入到一个事务中.
+save(@Id String no, String name);
+```
+
+#### `@Transient`
+
+标识该字段不参与数据库映射。
+
+```java
+@Transient
+private String tempValue;
+```
+
+适合：
+
+- 临时字段
+- 计算字段
+- 页面展示字段
+
+### 26.7 多数据源类注解
+
+#### `@Source`
+
+动态指定当前方法使用的数据源。
+
+```java
+findById(1001, @Source String dsName);
+```
+
+适合：
+
+- 多租户系统
+- 主从切换
+- 分库分表
+
+### 26.8 分页类注解
+
+#### `@NotCount`
+
+分页时跳过 `count(*)`
+
+```java
+@NotCount
+Page<UserInfo> findAll(Pageable pageable);
+```
+
+适合：
+
+- 大表分页
+- 无限滚动
+- 性能优先场景
+
+#### `@PageIndex`
+
+指定页码参数（从 1 开始）
+
+```java
+@PageIndex int page
+```
+
+#### `@PageSize`
+
+指定每页条数参数
+
+```java
+@PageSize int size
+```
+
+⚠️ 建议优先使用 `Pageable`
+
+### 26.9 事务类注解
+
+#### `@Transactional`
+
+声明当前方法在事务中执行。
+
+```java
 @Transactional
 @Modifying
-@Query("update `userinfo` set `name`=?1 where id=?3")
-@Query("update `userinfo` set `age`=?2 where id=?3")
-// 把主键id修改为1,目前主键id=1是存在的.这行会报错.那么前两行所做的操作全部失效.
-@Query("update `userinfo` set `id`=1 where `id`=?3")
-int updateBatch(String name,Integer age,Integer id);
-// 注意: 
-// 1).返回值如果是int类型,表示这个事务成功提交后所有改操作所影响的行数总和.
-// 2).返回值如果是int[]类型,表示这个事务成功提交后,每个最小修改单元所影响行数的集合.
-//    举例说明: 若有个事务T,它里面有3条改操作,分别叫U1,U2,U3. T成功提交后,U1,U2,U3所影响的数据行数分别为N1,N2,N3.
-//    则: 返回值为: new int[]{N1,N2,N3}
+@Query(...)
+@Query(...)
+int updateBatch(...);
 ```
 
-### 事务函数式接口
-在`QueryRepository`中提供了一个内置事务函数`tx`.
+特性：
 
-```java
-int effect = userInfoDBService.tx(() -> {
-	// 把需要纳入到一个事务内的改操作放入到这里来
-	// update1
-	// to do...
-	// update2
-	// return 影响行数;
-});
-```
+- 全部成功提交
+- 任一失败回滚
 
-以上`Lambda`表达式,`()->{}`中的`{}`里的所有操作是原子性的,要么统统成功,要么全部失败回滚.`Lambda`表达式对**值**封闭,对**变量**开放(Lambda expressions close over values,not variables),正因为这个特性,不能在`{}`中修改外界的值,但是可以给外界的对象设置值. 
+## 27. 应用于 Spring 环境
 
-```java
-... ...
-Map<String, Object> map = new HashMap<>();
-int sum = 0;
-tx(() -> {
-     sum = sum + 1; // 编译报错,不能修改sum的值(Illegal, close over values)
-     map.put(K, V); // 这是允许的(Legal, open over variables)
-});
-```
-因此,要想把`{}`中处理的数据拿出来使用,将其设置给一个外界的对象就行了.
+FastQuery 可以与 Spring Framework / Spring Boot 无缝集成。
+只需将 Repository 接口所在包纳入 Spring 扫描范围，即可通过依赖注入直接使用 FastQuery 自动生成的实例对象。
 
-## @Param参数
+### 27.1 配置扫描范围
 
-**SQL中使用冒号表达式**
+确保 Spring 能扫描到 FastQuery 的 DB 接口或相关组件。
 
-```java
-@Query("select name,age from UserInfo u where u.name = :name or u.age = :age")
-UserInfo[] findUserInfoByNameOrAge(@Param("name") String name, @Param("age")Integer age);
-```
-
-其中`:name`对应`@Param("name")`所指定的方法变量值;`:age`对应`@Param("age")`所指定的方法变量值.当然SQL中的变量也可以用`?N`(N={正整数})的形式来表达,且不用标识`@Param`.  
-如:`select name,age from UserInfo u where u.name = :name or u.age = :age`以防SQL注入问题,在执行语句之前,最终会被编译成`select name,age from UserInfo u where u.name=? or u.age=?`
-
-> **注意**: 有时候在`@Query`中使用`:`不一定是表达式,而是字面字符.为了避开跟冒号表达式冲突,请额外加一个`:`以起到转义作用.
-
-**SQL中的变量采用${name}表达式**  
-实现原样替换,当然,也可以写成`$name`.不过请注意避免SQL注入问题.   
-
-```java
-@Query("select * from `userinfo` where ${one} ${orderby}")
-UserInfo findUserInfo(@Param("orderby") String orderby, @Param("one") int i);
-// String orderby 这个形参接受到的值会原样取代掉 "${orderby}", orderby 如果接受到的值为null,那么${orderby}默认为""
-// int i 接受到的值会取代掉 "${one}"
-
-// 假设: orderby的值为: "order by age desc", i的值为:1
-// 则: 最终的SQL为: "select * from `userinfo` where 1 order by age desc"
-```
-
-### 采用${name}时请注意: 
-- 传递null值,模板变量默认取""
-- 参数模板仅仅用来辅助开发者构建SQL语句
-- 请提防使用不当,引发SQL注入问题
-- 请避免模板参数的值完全来源于用户层的输入
-- 请确保参数值可控.  
-
-通过`defaultVal`属性指定:若参数接受到null值,应该采用的默认值(该属性不是必须的,默认为"").例如:
-
-```java
-@Query("select * from `userinfo` ${orderby}")
-// orderby 若为null, 那么 ${orderby}的值,就取defaultVal的值
-JSONArray findUserInfo(@Param(value="orderby",defaultVal="order by age desc") String orderby);
-```
-
-`$表达式` 的值如果不可避免需要从用户层录入，并且不可控，为了安全起见，防止 SQL 注入，请使用 `@Safe` 标识形参，如
-
-```java
-@Query("select * from `userinfo` ${orderby}")
-JSONArray findUserInfo(@Param(value="orderby") @Safe String orderby);
-```
-
-那么，框架会严格检测 `orderby`的实参是否有注入风险，一旦存在注入嫌疑，拒绝请求。
-
-##  SQL IN
-
-### 使用"?"索引方式
-```java
-@Query("select * from UserInfo where name in (?1)")
-List<UserInfo> findByNameIn(String...names);
-
-@Query("select * from UserInfo where name in (?1) and id > ?2")
-List<UserInfo> findByNameListIn(List<String> names,Integer id);
-```
-
-参数如果是一个空集合或空数组,那么`in`中的`?`所对应的值是`null`. `not in`结果集中若含有`null`,则,查询结果为`null`. `in` 结果集含有`null`不会影响正常查询.
-
-```sql
-id not in (1,2,null) -- 查不出
-id in (null)         -- 并不会把id为null的记录查出来,id是null与否,最终查不出.
-id in(1,2,null)      -- id为1或为2的结果会被查询出来
-```
-
-### 使用冒号表达式
-```java
-@Query("select * from student where sex = :sex and age > :age and name in(:names)")
-List<Student> findByIn(@Param("sex")String sex,@Param("age")Integer age,@Param("names")Set<String> names);
-```
-
-## @QueryByNamed命名式查询
-就是把`SQL`语句写在配置文件里(在配置文件中可以进行逻辑判断),然后用`@QueryByNamed`绑定配置文件中的id值,以便引用到解析后的`SQL`.       
-配置文件的命名格式: `类的长名称(包含包地址).queries.xml`,每个类文件对应一个配置文件,请放到`classpath`目录下.  
-配置文件里的SQL代码段,会被**Velocity**的模板引擎所渲染,因此,很方便写出复杂的动态SQL语句.    
-例如: `org.fastquery.dao.QueryByNamedDBExample.queries.xml`  
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<queries>
-	<query id="findUserInfoAll">
-		select id,name,age from UserInfo
-	</query>
-
-	<query id="findUserInfoOne">
-		<value>
-			## :id 最终会替换成 ?
-			## ${id} 不会替换还成"?",引用的是参数源值
-			select id,name,age from UserInfo where id = :id
-		</value>
-	</query>
-
-	<query id="findUserInfoByNameAndAge">
-		<value>
-			select id,name,age from UserInfo where 1 #{#condition}
-		</value>
-
-		<parts>
-			<part name="condition">
-			   <![CDATA[
-				#if(${name})
-				and name = :name
-				#end
-
-				#if(${age})
-				and age = :age
-				#end
-			    ]]>
-			</part>
-		</parts>
-	</query>
-</queries>
-```
-
-假如在 XML 文档中放置了类似 `<` 或 `&` 字符,那么这个文档会产生一个错误,这是因为 XML 解析器会把 `<` 解释为新元素的开始,为了避免此类错误,可以将模板代码片段定义为CDATA. XML 解析器会把CDATA所包含的内容当作字符串处理.CDATA 部分由`<![CDATA[` 开始,由 `]]>`结束.   
-若不用CDATA,那么有些字符必须采用**命名实体**的方式引入. 在 XML 中有 5 个预定义的实体引用:
-
-| 字符 | 命名实体 | 实体编码 | 说明 |
-|:-----:|:----:|:----:|:----:|
-|  &lt;   | &amp;lt;  | &amp;#60; | 小于号 |
-|  &gt;   | &amp;gt;  | &amp;#62; | 大于号 |
-|  &amp;  | &amp;amp; | &amp;#38; | 与符号 |
-|  &apos; | &amp;apos;| &amp;#39; | 单引号 |
-|  &quot; | &amp;quot;| &amp;#34; | 双引号 |
-
-如果想把一些公用的SQL代码片段提取出来,以便重用,通过定义`<parts>`元素(零件集)就可以做到. 在`<value>`,`<countQuery>`元素中,可以通过`#{#name}`表达式引用到名称相匹配的零件.如:`#{#condition}`表示引用name="condition"的零件.  
-若`<parts>`元素跟`<query>`保持并列关系,那么该零件集是全局的.当前文件里的`<query>`都能引用它.  
-一个非分页的函数,如果绑定的模板中包含`<countQuery>`,那么这个函数只会提取`<query>`语句,而不会提取计数语句.
-
-```java
-public interface QueryByNamedDBExample extends QueryRepository {
-
-	// 从该类的配置文件里寻找id="findUserInfoAll"节点,然后绑定其SQL代码段
-	@QueryByNamed("findUserInfoAll")
-	JSONArray findUserInfoAll();
-	
-	@QueryByNamed("findUserInfoOne")
-	UserInfo findUserInfoOne(@Param("id")Integer id);
-	
-	@QueryByNamed("findUserInfoByNameAndAge")
-	JSONArray findUserInfoByNameAndAge(@Param("name") String name, @Param("age")Integer age);
-}
-```
-
-当然,采用`@QueryByNamed`同样适应于改操作,例如:
-
-```java
-@Modifying
-@QueryByNamed("updateUserInfoById")
-int updateUserInfoById(@Param("id") int id,@Param("name") String name,@Param("age") int age);
-```
-
-对应的SQL模板配置
-
-```xml
-<query id="updateUserInfoById">
-      ## 在这里支持velocity语法
-      update UserInfo set name = :name,age = :age where id = :id
-</query>
-```
-
-`@QueryByNamed` 中的value值如果没有指定,默认是当前方法名.
-
-```java
-@QueryByNamed
-public List<Student> findSomeStudent();
-```
-
-等效于 `@QueryByNamed("findSomeStudent")`  
-
-`@QueryByNamed` 中的`render`属性,表示是否启用模板引擎对配置文件进行渲染,默认是`true`表示开启. 如果`<query>`节点中没有使用到任何模板语法,仅用于存储目的,那么建议设置为`false`.`:expression`,`?N`,`$expression`这些都不依赖模板引擎.  
-
-**注意**: `$name`和`:name`这两种表达式的主要区别是——`$name`表示引用的是参数源值,可用于在模板中做逻辑判断,而`:name`用于标记参数位,SQL解析器会将其翻译成`?`号.  
-
-在模板中`:expression`表达式或`?N`表达式可以作为`SQL`函数的逻辑判断表达式,如跟这些函数一起参与运算:`IF(expr1,expr2,expr3)`,`IFNULL(expr1,expr2)`,`NULLIF(expr1,expr2)`,`ISNULL(expr)`.  
-
-```sql
--- 方法的第1个参数的值可以影响where的条件
-select t.A from (select 11 as A,22 as B,33 as C) as T where if(?1 > 10,t.B>10,t.C>100)
--- 方法的第2个参数的值可以影响查询集
-select if(?2 > 10,'大于10','不大于10') as msg
--- 名称为"number"的参数,其值可以影响where条件
-select t.A from (select 11 as A,22 as B,33 as C) as T where if(:number > 10,t.B>10,t.C>100)
--- 名称为"number"的参数,其值可以影响查询集
-select if(:number > 10,'大于10','不大于10') as msg
-```
-
-允许多个方法绑定同一个模板id. 在模板中使用`${_method}`可以引用到当前方法的`org.fastquery.core.MethodInfo`对象,该对象是反射`java.lang.reflect.Method`的缓存.  
-例: 根据当前方法名称的不同取不同的`SQL`语句
-
-```java
-public interface QueryByNamedDBExtend extends QueryRepository {
-	@QueryByNamed(render = false)
-	JSONArray findUAll();
-	
-	// 两个方法指定同一个模板id值
-	@QueryByNamed("findSome")
-	JSONArray findLittle();
-	@QueryByNamed("findSome")
-	JSONArray findSome();
-}
-```
-
-org.fastquery.dao.QueryByNamedDBExtend.queries.xml 模板文件的内容: 
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE xml> 
-<queries>
-	<!-- 定义全局 parts -->
-	<parts>
-		<part name="feids">id,name,age</part>
-	</parts>
-	<query id="findUAll">
-		<value>select #{#feids} from UserInfo limit 3</value>
-	</query>
-
-	<query id="findSome">
-		<![CDATA[
-		## 如果当前方法的名称等于 "findLittle"
-		#if( ${_method.getName()} == "findLittle" )
-			## 查3条  
-			select #{#feids} from UserInfo limit 3
-		#else 
-		   select `no`, `name` from Student limit 5
-		#end  
-		]]>
-	</query>	
-</queries>
-```
-
-其中 `${_method.getName()}` 可简写成 `${_method.name}`. 在`Velocity`里调用对象或方法,不是本文的重点,点到为止.
-
-## 支持存储过程
-
-只支持in(输入)参数,不支持out(输出参数), 如果想输出存储过程的处理结果,在过程内部使用`select`查询输出.  
-举例:  
-插入一条学生,返回学生的总记录数和当前编码,存储过程语句:
-
-```sql
-delimiter $$
-drop procedure if exists `xk`.`addStudent` $$
-create procedure `xk`.`addStudent` (in no char(7), in name char(10), in sex char(2), in age tinyint(4), 
-  in dept char(20))
-begin
-
-   -- 定义变量
-   -- 总记录数
-  declare count_num int default 0;
-  -- 编码
-  declare pno varchar(7) default '';
-  
-  insert into `student` (`no`, `name`, `sex`, `age`, `dept`) values(no, name, sex, age, dept);
-  select count(`no`) into count_num from student;
-  select `no` from student where `no`=no limit 0,1 into pno;
-  -- 输出结果
-  select count_num, pno;  
-end $$
-delimiter ;
-```
-
-调用存储过程:
-
-```java
-@Query("call addStudent(?1,:name,?3,?4,:dept)")
-JSONObject callProcedure(String no,@Param("name")String name,String sex,int age,@Param("dept")String dept);
-```
-
-## 分页
-要处理查询语句的参数,只需定义方法参数,为了在运行时对参数名称可见就额外加上`@Param`,上面有很多示例.另外,方法的设计还能识别某些特殊的类型,如`Pageable`,以便核心能智能地将动态构建查询和分页应用于查询中.
-
-- 通过`@QueryByNamed`实现分页
-
-```java
-@QueryByNamed("findPage") // 引用id为"findPage"的分页模板
-Page<Student> findPage(Pageable pageable, @Param("name") String name,@Param("age") Integer age);
-```
-
-模板文件:
-
-```xml
-<query id="findPage">
-	<!-- 查询主体语句 -->
-	<value>
-		select no, name, sex from Student #{#condition} #{#order}
-	</value>
-
-	<!-- count语句 -->
-	<countQuery>
-		select count(no) from Student #{#condition}
-	</countQuery>
-
-	<!-- 定义零件集,他们可以被value,countQuery节点引用,以达到复用的效果 -->
-	<parts>
-		<part name="condition">
-	       <![CDATA[
-		    <where>
-			#if($no)
-			no like :no
-			#end
-
-			#if($name)
-			or name like :name
-			#end
-
-			#if($age)
-			or age > :age
-			#end
-	        </where>
-	        ]]>
-		</part>
-
-		<part name="order">
-			order by age desc
-		</part>
-	</parts>
-</query>
-```
-
-### 注意: 
-- `#{#limit}`是分页模板的内置零件,表示分页区间. `#{#limit}`默认是放在尾部,在符合`SQL`语法的前提下也可以把它放在`SQL`语句中的其他地方
-- 动态条件部分若用`<where>`元素进行包裹,会自动处理好条件连接符问题(避免出现where紧接`or`或`and`)
-- `<value>`和`<countQuery>`节点引用的零件若包含`<where>`元素,零件解析成字符串后会自动加上 *"where"* ,请不要在引入切口处重复追加 *"where"* 字符串
-
-- 通过@Query实现分页
-
-```java
-public interface UserInfoDBService extends QueryRepository {
-
-	// Pageable 用做描述当前页的索引和每页条数.
-    
-	// countField : 明确指定用来统计总行数的字段,count(countField)中的countField默认值是"id"
-	@Query(value="select id,name,age from `userinfo` where 1",countField="id")
-	Page<Map<String, Object>> findAll(Pageable pageable);
-	
-	// 如果没有指定count语句,那么由fastquery分析出最优的count语句
-	@Query("select id,name,age from `userinfo` #{#where}")
-	@Condition("age > ?1")     // 若age的值传递null,该条件将不参与运算
-	@Condition("and id < ?2")  // 若id的值传递null,该条件将不参与运算
-	Page<UserInfo> find(Integer age,Integer id,Pageable pageable);
-	
-	// countQuery : 指定自定义count语句
-	@Query(value = "select id,name,age from `userinfo` #{#where}", 
-	       countQuery = "select count(id) from `userinfo` #{#where}")
-	@Condition("age > ?1")        // 若age的值传递null,该条件将不参与运算
-	@Condition("and id < ?2")     // 若id的值传递null,该条件将不参与运算
-	Page<UserInfo> findSome(Integer age,Integer id,Pageable pageable);
-}
-```
-
-### @PageIndex和@PageSize
-`@PageIndex` 用来指定当前页索引,从1开始计数,如果传递的值小于1,依然视为1   
-`@PageSize`  用来指定当前页应该显示多少条数据,如果传递的值小于1,依然视为1   
-**注意**: 该注解组合不能和`Pageable`一起使用  
-例如:
-
-```java
-@NotCount // 分页不统计总行数
-@Query(value = "select id,name,age from `userinfo`")
-Page<Map<String,Object>> findSome(Integer age,Integer id,@PageIndex int pageIndex,@PageSize int pageSize);
-```
-
-
-### 使用分页     
-`Page`是分页的抽象,通过它可以获取分页中的各种属性,并且不用开发者去实现.
-
-```java
-int p = 1;    // 指定访问的是第几页(不是从0开始计数)
-int size = 3; // 设定每一页最多显示几条记录
-Integer age=10,id = 50;
-Pageable pageable = new PageableImpl(p, size);
-Page<UserInfo> page  = userInfoDBService.findSome(age, id,pageable);
-List<UserInfo> userInfos = page.getContent(); // 获取这页的数据
-Slice slice = page.getNextPageable();         // 下一页
-int number = page.getNumber();                // 当前页数(当前是第几页)
-// 更多 page.? 不妨亲自去试试看
-```
-
-`Page`转换成`JSON`后的结构如下:
-
-```js
-{
-    "content":[                 // 这页的数据
-		{
-			"name":"查尔斯·巴贝奇","id":2,"year":1792
-		},
-		{
-			"name":"约翰·冯·诺依曼","id":3,"year":1903
-		},
-		{                     
-			"name":"阿兰·麦席森·图灵","id":1,"year":1912
-		},
-		{
-			"name":"约翰·麦卡锡","id":4,"year":1927
-		},
-		{
-			"name":"丹尼斯·里奇","id":5,"year":1941
-		},
-		{
-			"name":"蒂姆·伯纳斯·李","id":6,"year":1955
-		}
-    ],
-    "first": true,           	// 是否是第一页
-    "hasContent": true,      	// 这页是否有数据
-    "hasNext": true,         	// 是否有下一页
-    "hasPrevious": false,    	// 是否有上一页
-    "last": false,           	// 是否是最后一页
-    "previousPageable": {    	// 上一页的基本属性
-        "number": 0,         	// 定位的页码
-        "size": 15           	// 期望每页多少条数据
-    },
-    "nextPageable": {        	// 下一页的基本属性
-        "number": 1,         	// 定位的页码
-        "size": 15           	// 期望每页多少条数据
-    },
-    "number": 1,             	// 当前页码,从1开始
-    "size": 15,              	// 期望每页行数(numberOfElements表示真正查出的条数)
-    "numberOfElements": 6,  	// 当前页的真实记录行数
-    "totalElements": 188,    	// 总行数
-    "totalPages": 13         	// 总页数
-}
-```
-
-### 注意:
-- 如果在分页函数上标识`@NotCount`,表示在分页中不统计总行数.那么分页对象中的`totalElements`的值为-1L,`totalPages`为-1.其他属性都有效并且真实.    
-- 如果明确指定不统计行数,那么设置`countField`和`countQuery`就会变得无意义.    
-- `#{#limit}`不仅能使用在 XML 文件里,也可以使用在`@Query`里,无特殊要求,建议不要指定`#{#limit}`.
-
-### 扩展分页实现
-目前该框架默认支持分页的数据库有`MySQL`,`Microsoft SQL Server`,`PostgreSQL`,因此,扩展的空间非常大,并且非常容易.实现`org.fastquery.page.PageDialect`类,有针对性地重写相关方法,解决`SQL`中的差异.欲了解更多细节请参考`org.fastquery.dialect.MySQLPageDialect`,`org.fastquery.dialect.PostgreSQLPageDialect`.
-
-## 动态适配数据源
-
-### 适配数据源
-使用`@Source`动态适配当前`Repository`的方法应该采用哪个数据源. 显然这个功能很有用.      
-在多租户系统中,数据库彼此隔离,表结构一样.那么使用这个特性是非常方便的.    
-**注意:** `@Source`如果标识在参数前面,那么该参数只能是字符串类型.
-
-```java
-@Query("select id,name,age from `userinfo` as u where u.age>?1")
-Map<String, Object> findOne(Integer age,@Source String dataSourceName);
-```
-
-### 适配数据源的优先级
-如果在fastquery.json文件里明确指定了数据源的作用域,同时接口函数也存在`@Source`,那么以`@Source`指定的数据源优先,其次是配置文件.
-
-## 扩展支持数据连接池
-默认已经支持的连接池有,`c3p0`,`druid`,`hikari`...当然,开发者很容易在此基础上进行扩展.  
-示例,让`FastQuery`支持自定义的连接池.实现过程如下:  
-步骤1: 自定义类实现`org.fastquery.core.ConnectionPoolProvider`接口
-
-```java
-public class MyPoolProvider implements ConnectionPoolProvider {
-
-	@Override
-	public DataSource getDataSource(Resource resource, String dataSourceName) {
-		// 读取配置文件
-		InputStream inputStream = resource.getResourceAsStream(name);
-		.... ...
-
-		Properties props = new Properties();
-		props.setProperty(k, v);
-		... ...
-		
-		// 创建数据源实例
-		return new MyDataSource(props);
-	}
-
-}
-```
-步骤2: 在`pool-extend.xml`里注册
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE xml>
-<pools name="providers">
-	<pool name="mypool" class="org.fastquery.<your.domain>.MyPoolProvider" />
-</pools>
-```
-
-步骤3: 使用自定义的连接池`mypool`  
-配置`fastquery.json`文件
-
-```js
-{
-    "scope": [
-        {
-            "config": "mypool", // 用这个池提供数据源 
-            "dataSourceName": "hiworld",
-            "basePackages": [
-                "<your.domain>.XxxDBService"
-            ]
-        }
-    ]
-}
-```
-
-## 应用在 Spring 环境
-
-配置扫描范围：
+XML 配置方式：
 
 ```xml
 <context:component-scan base-package="org.fastquery.service" />
 ```
 
-或者
+Java Config 方式：
 
 ```java
 @ComponentScan("org.fastquery.service")
 ```
 
-使用 db 接口处, 注入得到实例对象
+### 27.2 注入 Repository 实例
+
+在业务类中，可直接注入 FastQuery 生成的 Repository 实例。
+
+使用 `@Resource`
 
 ```java
 @javax.annotation.Resource
 private UserInfoDB userInfoDB;
 ```
 
-## 测试FastQuery
-FastQuery提供的测试方式能轻松解决如下问题.
-- 运行时获取SQL和它的参数值,以便开发者验证生成的SQL是否跟期望值一致.
-- 运行DB方法后自动回滚数据库事务.
-
-`FastQueryTestRule` 实现了Junit中的 `TestRule` 类,用来扩展测试用例.可以在测试方法中获取执行过的SQL语句及SQL所对应的参数值,以便做断言.加上`@Rollback`注解,可以用来控制测试方法执行完毕之后是否让数据事务回滚或提交.测试方法结束后默认自动回滚,既可以达到测试效果,又不影响数据库(可回滚到改之前状态). 如下是例子,请留意注释.
+使用 `@Autowired`
 
 ```java
-// junit fastquery的扩展
-@org.junit.Rule
-public FastQueryTestRule rule = new FastQueryTestRule();
+@Autowired
+private UserInfoDB userInfoDB;
+```
 
-// 获取DB接口
-private StudentDBService studentDBService = FQuery.getRepository(StudentDBService.class);
+### 27.3 使用示例
 
-@Rollback(true) // 当该方法执行完毕之后自动回滚事务
-@Test
-public void update() {
-	String no = "9512101";
-	String name = "清风习习";
-	int age = 17;
-	int effect = studentDBService.update(no, name, age);
-	// 断言: 影响的行数是1
-	assertThat(effect, is(1));
-	// 获取DB操作所绑定的SQL
-	List<SQLValue> sqlValues = rule.getListSQLValue();
-	// 断言: studentDBService.update 执行后产生的SQL为一条
-	assertThat(sqlValues.size(), is(1));
-	SQLValue sqlValue = sqlValues.get(0);
-	// 断言: 所产生的SQL等于"update student s set s.age=?,s.name=? where  s.no=?"
-	assertThat(sqlValue.getSql(), equalTo("update student s set s.age=?,s.name=? where  s.no=?"));
-	// 获取SQL参数列表
-	List<Object> values = sqlValue.getValues();
-	// 断言: 这条SQL语句中一共有3个参数
-	assertThat(values.size(), is(3));
-	// 断言: SQL的第一个参数是Integer类型,并且他的值等于age
-	assertThat(values.get(0).getClass() == Integer.class && values.get(0).equals(age), is(true));
-	// 断言: SQL的第二个参数是String类型,并且他的值等于name
-	assertThat(values.get(1).getClass() == String.class && values.get(1).equals(name), is(true));
-	// 断言: SQL的第三个参数是String类型,并且他的值等于no
-	assertThat(values.get(2).getClass() == String.class && values.get(2).equals(no), is(true));
+```java
+@Service
+public class UserService {
+
+    @Resource
+    private UserInfoDB userInfoDB;
+
+    public UserInfo findById(Integer id) {
+        return userInfoDB.findById(id);
+    }
 }
 ```
 
-并不是绑定了多少条`SQL`就一定执行多少条.就拿分页来说,并不是总会执行`count`,查不到数据时,就没有必要发出`count`语句.使用`rule.getExecutedSQLs()`可以取得已被执行过的`SQL`.每个`DB`方法执行之前都会清除历史记录从新统计.
+### 27.4 说明
 
-```java
-assertThat(db.findPageWithWhere(id, cityAbb, 6,pageSize).isHasContent(), is(true));
-//  获取上行执行后,所执行过的sql
-List<String> executedSQLs = rule.getExecutedSQLs();
-// 断言已经执行了2条sql语句
-assertThat(executedSQLs.size(), is(2));
-// 断言第二条sql是...
-assertThat(executedSQLs.get(1), equalTo("select count(id) from City where id > ? and cityAbb like ?"));
+Spring 注入的对象并不是你手写的实现类，而是 FastQuery 在初始化阶段自动生成并注册到容器中的代理实例。
 
-assertThat(db.findPageWithWhere(id, cityAbb, 7,pageSize).isHasContent(), is(false));
-// 获取上行执行后,所执行过的sql
-executedSQLs = rule.getExecutedSQLs();
-assertThat(executedSQLs.size(), is(1));
-assertThat(executedSQLs.get(0), not(containsString("count")));
+这意味着：
+
+- 无需手写 DAO 实现类
+- 可直接面向接口编程
+- 与 Spring IoC 生命周期统一管理
+- 易于测试与维护
+
+## 28. 测试 FastQuery
+
+FastQuery 提供专用测试支持，可帮助开发者高效验证 Repository 方法的执行结果与 SQL 生成行为。
+
+核心能力包括：
+
+- 在运行时获取最终执行的 SQL 与参数值
+- 验证动态 SQL 是否符合预期
+- 测试结束后自动回滚事务
+- 避免测试数据污染数据库
+- 对分页、条件拼接、批量更新等行为做精确断言
+
+### 28.1 为什么需要专用测试支持
+
+对于 SQL 驱动框架，仅验证返回结果通常不够。
+
+例如：
+
+```text
+查询结果正确，但 SQL 性能很差
+结果正常，但条件拼接错误
+分页可用，但 count SQL 多执行了一次
 ```
 
-`FastQuery`已经迭代了很久,每次发布新版本是如何保证之前的功能不受影响的呢?那是因为`FastQuery`的每个功能特性都有非常缜密的断言测试,发布时把能否通过所有断言做为先决条件,当然也得益于深思熟虑的设计.`Junit`是众多Java框架中,真正有用的为数不多的其中之一,`FastQuery`乐此不疲.
+因此，FastQuery 测试能力不仅测试“结果”，还测试：SQL 是否正确生成、是否正确执行、是否符合预期。
 
-## fastquery.json其他可选配置选项:
+### 28.2 `FastQueryTestRule`
 
-| 属性名 | 类型 | 默认值 | 作用 | 示例 |
-|:-----:|:-----:|:-----:|:-----|:-----|
-| basedir | string | 无 | 基准目录,注意: 后面记得加上 "/" <br> 该目录用来放SQL文件,需要执行SQL文件时,指定其名称就够了 | "/tmp/sql/" |
-| debug | boolean | false | 在调试模式下,可以动态装载xml里的SQL语句,且不用重启项目<br>默认是false,表示不开启调试模式.提醒:在生产阶段不要开启该模式 | false |
-| queries | array | [ ] | 指定*.queries.xml(SQL模板文件)可以放在classpath目录下的哪些文件夹里.<br>默认:允许放在classpath根目录下<br>注意:配置文件的位置不一定基于classpath目录,也可以通过`"fastquery.config.dir"`另行指定,上文已经提及到.每个目录前不用加"/",目录末尾需要加"/" | ["queries/","tpl/"] |
-| slowQueryTime | int | 0 | 设置慢查询的时间值(单位:毫秒; 默认:0,表示不开启慢查询功能), 如果 `QueryRepository` 中的方法执行超过这个时间,则会警告输出那些执行慢的方法,以便优化 | 50 |
+`FastQueryTestRule` 它基于 JUnit 的 `TestRule` 扩展机制，用于增强单元测试能力。
 
-## 源码
+作用：
 
-- https://gitee.com/fastquery2016/fastquery
-- https://github.com/xixifeng/fastquery
+- 捕获执行 SQL
+- 捕获绑定参数
+- 记录实际执行语句
+- 配合事务回滚测试
 
-## 反馈问题
-https://gitee.com/fastquery2016/fastquery/issues  
-FastQuery秉承自由、开放、分享的精神,本项目每次升级之后,代码和文档手册都会在第一时间完全开源,以供大家查阅、批评、指正.笔者技术水平有限,bug或不周之处在所难免,所以,遇到有问题或更好的建议时,还请大家通过[issue](https://gitee.com/fastquery2016/fastquery/issues)来向我们反馈.  
+### 28.3 基本使用方式
 
+```java
+@org.junit.Rule
+public FastQueryTestRule rule = new FastQueryTestRule();
+```
+
+Repository 获取方式：
+
+```java
+private StudentDBService studentDBService =
+        FQuery.getRepository(StudentDBService.class);
+```
+
+### 28.4 自动回滚测试事务
+
+默认：`@Rollback(true)` 可让测试方法执行完成后自动回滚事务。这样既能验证写操作，又不会污染数据库数据。
+
+### 28.5 完整示例
+
+```java
+@Rule
+public FastQueryTestRule rule = new FastQueryTestRule();
+
+private StudentDBService studentDBService =
+        FQuery.getRepository(StudentDBService.class);
+
+@Rollback(true)
+@Test
+public void update() {
+
+    String no = "9512101";
+    String name = "清风习习";
+    int age = 17;
+
+    int effect = studentDBService.update(no, name, age);
+
+    assertThat(effect, is(1));
+
+    List<SQLValue> sqlValues = rule.getListSQLValue();
+
+    assertThat(sqlValues.size(), is(1));
+
+    SQLValue sqlValue = sqlValues.get(0);
+
+assertThat(
+        sqlValue.getSql(),
+        equalTo(
+          "update student s set s.age=?,s.name=? where s.no=?"
+        ));
+}
+```
+
+### 28.6 获取生成 SQL 与参数
+
+获取 SQL 记录
+
+```java
+List<SQLValue> list = rule.getListSQLValue();
+```
+
+每个 `SQLValue` 包含：
+
+- SQL 文本
+- 参数列表
+
+获取参数值：`sqlValue.getValues();`
+
+适合断言：
+
+- 参数顺序是否正确
+- 参数类型是否正确
+- 参数值是否正确绑定
+
+### 28.7 获取实际执行 SQL
+
+需要区分两个概念：已绑定 SQL，表示框架生成的 SQL。已执行 SQL，表示真正发送到数据库执行的 SQL。
+
+获取方式：`rule.getExecutedSQLs();`
+
+### 28.8 分页优化测试案例
+
+分页查询并不一定总会执行 `count(*)`。
+
+例如：
+
+- 当前页已有数据 → 可能执行 count
+- 当前页无数据 → 可跳过 count
+- 当前页行数不足 →  是最后一页，没必要检查是否有一下页
+- 检查是否有下一页  →  只查一条数据就够了
+
+示例
+
+```java
+db.findPage(...);
+List<String> sqls = rule.getExecutedSQLs();
+```
+
+断言：
+
+```java
+assertThat(sqls.size(), is(3));
+```
+
+说明执行了：
+
+1. 查询当前页数据
+2. 查询总数
+3. 检测是否有下一页
+
+若当前页无数据：
+
+```java
+assertThat(sqls.size(), is(1));
+```
+
+说明框架自动跳过 count 查询。这类测试非常有价值，因为它验证的是：框架是否真正做了性能优化。
